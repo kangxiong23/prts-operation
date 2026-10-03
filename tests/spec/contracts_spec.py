@@ -301,6 +301,31 @@ def check_game_second_is_thirty_frames() -> str:
     return "1 游戏秒 = 30 逻辑帧"
 
 
+def check_time_state_is_three_valued() -> str:
+    """§3：**时间态**三值（常速 / 慢放 / 暂停）。它与 §2 的**视图**是两个类型：
+    视图两值（无暂停），时间态三值 —— **类型不该允许不存在的取值**。
+
+    **判据用 `.value`，不用 `str(member)`**（修正过一次）：早先那一版用 `str()` 判，
+    等于顺手要求了"打印出来就是那个词"，而规格没说过这条 ——
+    那是**用检查发明规范**，正是这套脚本自己的头号纪律要防的事。
+    """
+    state, view = _need("TimeState"), _need("View")
+    try:
+        members = list(state)
+    except TypeError:
+        raise AssertionError(f"{state.__name__} 不可枚举；期望三个取值") from None
+    assert len(members) == 3, f"时间态应当三个取值，实际 {len(members)}：{members}"
+    values = [m.value for m in members]
+    for want in ("常速", "慢放", "暂停"):
+        assert want in values, f"时间态缺「{want}」：{values}"
+    assert state is not view, "时间态与视图是同一个类型 —— 投影会因此允许「暂停」"
+    assert not issubclass(state, str), (
+        "时间态继承了 str：那会让 TimeState.NORMAL == '常速' 成立，"
+        "等于把「分得开」松掉一格 —— §3 整节防的就是这个"
+    )
+    return f"时间态三值：{values}；未继承 str"
+
+
 # ---------------------------------------------------------------------------
 # 「这一层唯一的验收判据」与它派生出的两条
 # ---------------------------------------------------------------------------
@@ -553,6 +578,20 @@ def check_action_is_frame_verb_args() -> str:
     return f"动作 {len(fields)} 栏：{sorted(fields)}"
 
 
+def check_snapshot_header_uses_time_state() -> str:
+    """§4 + §3：快照页眉的「当前时间态」必须是 `TimeState`，不是裸字符串 ——
+    裸字符串允许任何取值，那正是这一层要拦的东西。"""
+    header, state = _need("SnapshotHeader"), _need("TimeState")
+    fields = getattr(header, "__dataclass_fields__", None)
+    assert fields, f"{header.__name__} 不是 dataclass"
+    hit = [n for n, f in fields.items() if state.__name__ in str(f.type)]
+    assert hit, (
+        f"{header.__name__} 里没有一栏的类型是 {state.__name__}："
+        f"{ {n: str(f.type) for n, f in fields.items()} }"
+    )
+    return f"{header.__name__}.{hit[0]} 的类型是 {state.__name__}"
+
+
 def check_doubt_entry_has_four_fields() -> str:
     """§4：存疑清单条目 = 类别 + 涉及什么（字段 / 来源） + 严重度 + 涉及哪几帧。
 
@@ -578,6 +617,95 @@ def check_doubt_entry_has_four_fields() -> str:
     return f"四栏 {sorted(fields)}；这一层没有八成员枚举"
 
 
+# ---------------------------------------------------------------------------
+# 契约层 §5 端口与错误
+# ---------------------------------------------------------------------------
+
+
+def _public_names(obj: object) -> list[str]:
+    return sorted(n for n in dir(obj) if not n.startswith("_"))
+
+
+def check_four_ports_exist() -> str:
+    """§5：**端口有四个** —— 设备 · 时钟 · 样本 · 资产。"""
+    wanted = {"设备": "DevicePort", "时钟": "ClockPort", "样本": "SamplePort", "资产": "AssetPort"}
+    missing = []
+    for chinese, py in wanted.items():
+        try:
+            _need(py)
+        except AssertionError:
+            missing.append(f"{chinese}（建议名 {py}）")
+    assert not missing, "端口缺：" + "、".join(missing)
+    return f"{len(wanted)} 个端口都在公开面上"
+
+
+def check_device_port_methods() -> str:
+    """§5 + 设备层 §5：取一帧 / 注入手势 / 设备事实（分辨率 · 方向）。"""
+    port = _need("DevicePort")
+    names = _public_names(port)
+    for want in ("grab_frame", "inject_gesture", "device_facts"):
+        assert want in names, f"设备端口没有 {want}；它有 {names}"
+    assert len(names) == 3, f"设备端口应当三个方法，实际 {names}"
+    return f"三个方法：{names}"
+
+
+def check_gesture_takes_grid_not_pixel() -> str:
+    """§5 + 设备层 §1：手势原语的参数是**格坐标与朝向**，不是像素 ——
+    像素在这个入口内部由投影算出（慢放是另一套投影，让每个调用方自己换算，
+    等于把那条纪律复制到每个调用点）。"""
+    port = _need("DevicePort")
+    hint = str(getattr(port.inject_gesture, "__annotations__", {}))
+    assert "Pixel" not in hint, f"注入手势的签名里出现了像素：{hint}"
+    return f"注入手势的签名不提像素：{hint}"
+
+
+def check_clock_port_gives_wall_clock() -> str:
+    """§5 + §3：时钟端口只产出**墙钟毫秒**。**逻辑帧不在这个端口里** ——
+    它由费用推算，不是从时钟读来的。"""
+    port = _need("ClockPort")
+    names = _public_names(port)
+    assert len(names) == 1, f"时钟端口应当只有一个方法，实际 {names}"
+    lowered = names[0].lower()
+    assert "wall" in lowered or "ms" in lowered, f"时钟端口的方法名看不出是墙钟：{names}"
+    assert "frame" not in lowered, f"时钟端口里出现了逻辑帧：{names}"
+    return f"一个方法：{names[0]}"
+
+
+def check_sample_port_has_exactly_one_method() -> str:
+    """§5：样本端口**方法集 = 一个方法**（落一份样本）——
+    三层触发产出的是同一份东西，区别只在"谁触发 · 留几条 · 落在哪个池子里"，
+    那些是 `offline/hardcase/` 的策略，不是边界。"""
+    port = _need("SamplePort")
+    names = _public_names(port)
+    assert len(names) == 1, f"样本端口应当恰好一个方法，实际 {names}"
+    return f"一个方法：{names[0]}"
+
+
+def check_asset_port_has_no_methods() -> str:
+    """§5：资产端口**方法集留空** —— 每个方法由它的第一个用户层在用到时补，
+    补的时候只加方法、不改端口本身。所以它**会长期是空的**，这不是欠账。"""
+    port = _need("AssetPort")
+    names = _public_names(port)
+    assert not names, f"资产端口现在不该有方法，实际 {names}"
+    return "资产端口方法集为空（补法规则写在它的文档字符串里）"
+
+
+def check_error_model_is_three_without_partial() -> str:
+    """§5：错误模型三种（拒绝 / 降级 / 中止）。
+    **铁律：错误集里不许有"部分成功"这一支** —— 工具不报"我尽力了"，只报三态。"""
+    import ark.contracts as contracts
+
+    kinds = [_need("Refusal"), _need("Degradation"), _need("Abort")]
+    assert len(set(kinds)) == 3, "三种错误必须是三个类型，不许合成一个"
+    banned = [
+        n
+        for n in contracts.__all__
+        if any(w in n.lower() for w in ("partial", "success", "succeed"))
+    ]
+    assert not banned, f"公开面上出现了「部分成功」这类名字：{banned}"
+    return "拒绝 / 降级 / 中止 三个类型；公开面上没有「部分成功」"
+
+
 CHECKS: tuple[Check, ...] = (
     Check("S0.1", "契约层「这份文件负责什么」", "公开面是一份列得出来的名单", check_public_surface),
     Check("S1.1", "契约层 §1", "三态三支、载荷六支，两套词表不相交", check_two_vocabularies),
@@ -596,6 +724,7 @@ CHECKS: tuple[Check, ...] = (
     Check("S3.3", "契约层 §3", "跨刻度二元运算被拒", check_cross_scale_binary_ops_are_refused),
     Check("S3.4", "契约层 §3", "跨刻度不相等、大小比较抛错", check_cross_scale_equality_and_order),
     Check("S3.5", "契约层 §3 + 时间基 §2", "1 游戏秒 = 30 逻辑帧", check_game_second_is_thirty_frames),
+    Check("S3.6", "契约层 §3 + §2", "时间态三值，且与视图是两个类型", check_time_state_is_three_valued),
     Check("G1", "契约层 §2", "格坐标是连续的，小数位不丢", check_grid_coord_keeps_its_fraction),
     Check("G2", "契约层 §2", "像素与格坐标在类型上分得开", check_grid_and_pixel_cannot_impersonate_each_other),
     Check("G3", "契约层 §2 + §1", "区间 / 下界 / 上界 共用同一套操作", check_interval_operations_are_shared),
@@ -610,6 +739,14 @@ CHECKS: tuple[Check, ...] = (
     Check("C4", "契约层 §4 + 时序层 §1", "轴 ⊂ 记录，两者都带前提头", check_axis_is_a_subset_of_record),
     Check("C5", "契约层 §4", "动作 = 帧号 + 动词 + 参数", check_action_is_frame_verb_args),
     Check("C6", "契约层 §4", "存疑清单条目四栏，八类不在这层", check_doubt_entry_has_four_fields),
+    Check("C7", "契约层 §4 + §3", "快照页眉的时间态是 TimeState，不是裸字符串", check_snapshot_header_uses_time_state),
+    Check("P1", "契约层 §5", "四个端口都在公开面上", check_four_ports_exist),
+    Check("P2", "契约层 §5 + 设备层 §5", "设备端口三个方法", check_device_port_methods),
+    Check("P3", "契约层 §5 + 设备层 §1", "注入手势收格坐标，不收像素", check_gesture_takes_grid_not_pixel),
+    Check("P4", "契约层 §5 + §3", "时钟端口只给墙钟毫秒", check_clock_port_gives_wall_clock),
+    Check("P5", "契约层 §5", "样本端口恰好一个方法", check_sample_port_has_exactly_one_method),
+    Check("P6", "契约层 §5", "资产端口方法集留空", check_asset_port_has_no_methods),
+    Check("P7", "契约层 §5", "错误三种，没有「部分成功」", check_error_model_is_three_without_partial),
     Check("J1", "契约层「这一层唯一的验收判据」", "哪几个数是猜的，必须能从类型里看出来", check_the_one_acceptance_criterion),
     Check("J2", "契约层 §1", "未命中升格成「空」要有分数落点", check_promotion_needs_a_score),
 )
