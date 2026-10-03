@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import dataclasses
 import sys
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -498,6 +498,127 @@ def check_projection_carries_its_view() -> str:
     return f"{projection.__name__}.{hit[0]} 的类型是 {view.__name__}"
 
 
+def check_projection_require_refuses_the_wrong_view() -> str:
+    """§2「投影」：投影自带视图标识，而它的**落点是调用点的一次断言**（`require(view)`）。
+
+    两套混用是**静默且系统性**的错：拿常速那套去算慢放下的部署点击或识别 ROI，
+    错得看不出来。所以"要哪一套"必须在运行期被拒一次 —— 带标识却不拒，标识就是装饰。
+    """
+    projection, view = _need("Projection"), _need("View")
+    members = list(view)
+    assert len(members) == 2, f"视图应当两个取值：{members}"
+    good, bad = members[0], members[1]
+    made = projection(good, lambda point: point, lambda point: point)
+    assert made.require(good) is made, "require() 没把这一套投影还回来"
+    try:
+        made.require(bad)
+    except (TypeError, AssertionError, ValueError) as caught:
+        return (
+            f"require({good.value}) 放行；"
+            f"require({bad.value}) 被拒（{type(caught).__name__}）"
+        )
+    raise AssertionError(
+        f"要「{bad.value}」那一套，手里是「{good.value}」那一套，require() 却放行了 —— "
+        "两套混用会静默出错"
+    )
+
+
+def check_canvas_is_the_capture_resolution() -> str:
+    """§2「归一化画布」：那块画布的尺寸 = **捕获分辨率本身**（用户裁定）—— 不取一个
+    固定尺寸、**不做缩放**。
+
+    缩放会引入插值误差（这条链的判据是颜色与统计量、置信度要报出去），还会让
+    "不吻合即拒绝"变成"先缩放再拒绝，等于已经适配过了"。
+    """
+    canvas = _need("Canvas")
+    assert dataclasses.is_dataclass(canvas), f"{canvas.__name__} 不是 dataclass"
+    made = canvas(1920, 864)
+    flat = tuple(v for v in dataclasses.astuple(made) if isinstance(v, (int, float)))
+    assert 1920 in flat and 864 in flat, f"画布没有原样保留捕获分辨率：{flat}"
+    assert canvas(1920, 864) != canvas(1280, 720), "两种分辨率被当成了同一块画布"
+    return f"画布原样保留 {flat}；没有缩放成某个固定尺寸"
+
+
+def check_interval_meets_a_threshold_in_three_ways() -> str:
+    """§2「区间进入条件判定 → 结果是三值」：位置是区间时，「敌人到第 3 格」的答案
+    **不是真假二值**，而是**一定真 / 一定假 / 判不了**。
+
+    技术上是区间与阈值求交的三种结果：包含 → 一定真；不相交 → 一定假；相交但不包含
+    → 判不了。**这一层定"结果是三值"**；"判不了怎么办"归[控制层/暂停条件](../控制层/暂停条件.md) §4。
+    """
+    _needs_method(LowerBound(3), "contains")
+    _needs_method(LowerBound(3), "intersects")
+    threshold = LowerBound(3)
+    sure_yes = threshold.contains(Interval(3.2, 4.0))
+    sure_no = not threshold.intersects(Interval(1.0, 2.5))
+    unsure = threshold.intersects(Interval(2.5, 3.5)) and not threshold.contains(
+        Interval(2.5, 3.5)
+    )
+    assert sure_yes, "整段都在阈值之上，却没判成「一定真」"
+    assert sure_no, "整段都在阈值之下，却没判成「一定假」"
+    assert unsure, "跨在阈值两侧，却没判成「判不了」—— 它被压成了二值"
+    return "一定真 / 一定假 / 判不了 三种结果都能区分出来，没有被压成二值"
+
+
+def check_pixel_rect_is_corner_plus_size() -> str:
+    """§2「像素矩形」：四个数是 **角 + 宽高**，不是 left/top/right/bottom —— 后者把
+    四个数里塞进两个冗余约束，更容易写出自相矛盾的矩形。**宽高必须为正**。"""
+    rect = _need("PixelRect")
+    made = rect(1770, 600, 110, 60)
+    assert (made.x, made.y, made.width, made.height) == (1770, 600, 110, 60), (
+        f"四个数不是「角 + 宽高」：{dataclasses.astuple(made)}"
+    )
+    _refuses(ValueError, rect, 1770, 600, 0, 60)
+    _refuses(ValueError, rect, 1770, 600, 110, -1)
+    _refuses(TypeError, rect, 1770, 600, 110, "60")
+    return "角 + 宽高；宽或高不为正、或不是数，都拒绝"
+
+
+# ---------------------------------------------------------------------------
+# 契约层 §2 UI 布局常量：设备层与视觉层共用的那张表
+# ---------------------------------------------------------------------------
+
+
+def check_ui_layout_is_a_table_of_named_rects() -> str:
+    """§2「UI 布局常量」+ §5：设备层与视觉层都要读界面上那些固定矩形，而两者互不
+    import —— 所以常量**住这一层**，类型与值都在这里。形状是「名字 → 像素矩形」的表。"""
+    layout, rect = _need("UiLayout"), _need("PixelRect")
+    sample = rect(1770, 600, 110, 60)
+    made = layout({"费用读数": sample})
+    table = made.rects
+    assert isinstance(table, Mapping), f"UI 常量不是映射：{type(table).__name__}"
+    assert table["费用读数"] == sample, "取出来的矩形不是放进去那个"
+    _refuses(TypeError, layout, {"费用读数": (1770, 600, 110, 60)})
+    _refuses(TypeError, layout, {1: sample})
+    _refuses(TypeError, layout, {"": sample})
+    return "一张「名字 → 像素矩形」的表；裸元组 / 非字符串键 / 空名字都进不来"
+
+
+def check_ui_layout_is_read_only() -> str:
+    """§2「UI 布局常量」：**交出去之后谁也不能改一个格子** —— 它是常量，不是一张谁都
+    能写的草稿。常量能被就地改写，"常量"这两个字就不成立了。"""
+    layout, rect = _need("UiLayout"), _need("PixelRect")
+    made = layout({"费用读数": rect(1770, 600, 110, 60)})
+    frozen = _refuses(dataclasses.FrozenInstanceError, setattr, made, "rects", {})
+    try:
+        made.rects["备战席"] = rect(0, 0, 1, 1)
+    except TypeError as caught:
+        return f"整张表是冻结的（{frozen}）；往表里加一条也被拒（{type(caught).__name__}）"
+    raise AssertionError("UI 常量的表可以被改写 —— 那它就不是常量了")
+
+
+def check_ui_layout_values_are_absolute_pixels() -> str:
+    """§2「UI 布局常量」：坐标是**绝对像素**，与画布同一条纪律 —— 不缩放、不归一化。
+    所以它跟画布一起定死在这台设备的分辨率上。"""
+    layout, rect = _need("UiLayout"), _need("PixelRect")
+    made = layout({"费用读数": rect(1770, 600, 110, 60)})
+    (kept,) = made.rects.values()
+    flat = tuple(v for v in dataclasses.astuple(kept) if isinstance(v, (int, float)))
+    assert 1770 in flat and 110 in flat, f"像素矩形的值没原样保留：{flat}"
+    assert all(v > 1 for v in flat), f"像素矩形的值像是归一化过的：{flat}"
+    return f"矩形原样保留 {flat} —— 1920×864 下的绝对像素，不是 0–1"
+
+
 # ---------------------------------------------------------------------------
 # 契约层 §4 容器
 # ---------------------------------------------------------------------------
@@ -733,6 +854,13 @@ CHECKS: tuple[Check, ...] = (
     Check("G6", "契约层 §2 + 视觉层/原语 §1", "二维区域是第六种载荷", check_region_is_the_sixth_payload),
     Check("G7", "契约层 §2 + 采集与验收/难例采集 §1", "视图两值，且不含暂停", check_view_is_two_valued_and_excludes_pause),
     Check("G8", "契约层 §2", "投影类型自带视图标识", check_projection_carries_its_view),
+    Check("G9", "契约层 §2", "require() 拒绝对不上的视图", check_projection_require_refuses_the_wrong_view),
+    Check("G10", "契约层 §2", "画布就是捕获分辨率本身，不缩放", check_canvas_is_the_capture_resolution),
+    Check("G11", "契约层 §2", "区间对阈值是三种结果，不是二值", check_interval_meets_a_threshold_in_three_ways),
+    Check("G12", "契约层 §2", "像素矩形是「角 + 宽高」，宽高为正", check_pixel_rect_is_corner_plus_size),
+    Check("U1", "契约层 §2 + §5", "UI 布局常量是「名字 → 像素矩形」的表", check_ui_layout_is_a_table_of_named_rects),
+    Check("U2", "契约层 §2", "UI 布局常量交出去之后改不了", check_ui_layout_is_read_only),
+    Check("U3", "契约层 §2", "UI 常量的值是绝对像素，不是归一化", check_ui_layout_values_are_absolute_pixels),
     Check("C1", "契约层 §4", "九样容器都在公开面上", check_container_inventory),
     Check("C2", "契约层 §4 + 时序层 §5", "观测迹条目是三元组，槽不许拆开", check_trace_entry_holds_a_whole_slot),
     Check("C3", "契约层 §4 + 状态层/快照 ⓪", "快照带页眉", check_snapshot_has_a_header),
