@@ -11,6 +11,7 @@ build/
 venv/
 .pytest_cache/
 .ruff_cache/
+pytest-cache-files-*/
 
 # 运行时数据与派生资产：各自的目录里还有更细的 .gitignore
 data/
