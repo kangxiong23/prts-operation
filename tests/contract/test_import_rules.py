@@ -27,6 +27,6 @@ def test_import_direction(path, module) -> None:
     allowed = rule_for(module)
     if allowed is None:
         return
-    for imported in sorted(ark_imports(path)):
+    for imported in sorted(ark_imports(path, module)):
         ok = any(imported == a or imported.startswith(a + ".") for a in allowed)
         assert ok, f"{module} 不许 import {imported}（允许：{sorted(allowed)}）"

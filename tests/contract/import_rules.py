@@ -1,4 +1,4 @@
-﻿"""边界契约的检查逻辑。
+"""边界契约的检查逻辑。
 
 只使用标准库，所以**不装 pytest 也能跑**：
 
@@ -57,12 +57,16 @@ def modules() -> list[tuple[Path, str]]:
     return found
 
 
-def ark_imports(path: Path) -> set[str]:
-    """这个模块 import 了哪些 ark.* 名字。相对 import 不算。
+def ark_imports(path: Path, module: str) -> set[str]:
+    """这个模块 import 了哪些 ark.* 名字。
 
     对 `from X import a` 记的是 **`X.a` 而不是 `X`**。只记 `X` 的话，
     `from ark import contracts` 会被误报成「不许 import ark」，
     把一种完全正常的写法全杀掉。
+
+    **相对 import 要折算成绝对名再判。** 曾经把它整个跳过（"相对 import 不算"），
+    那是个洞：`ark/contracts/__init__.py` 里写 `from ..engine import x` 是**逃出这一层**，
+    而跳过等于放行。折算靠 `module`（文件自己的点分名）与 `path`（是不是 `__init__`）。
 
     用 utf-8-sig 读：Windows 上的编辑器与 PowerShell 常给文件加 BOM，
     而带 BOM 的文本交给 ast.parse 会抛 SyntaxError。
@@ -76,12 +80,32 @@ def ark_imports(path: Path) -> set[str]:
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             names.update(alias.name for alias in node.names)
-        elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+        elif isinstance(node, ast.ImportFrom):
+            base = _absolute_base(module, path, node)
+            if base is None:
+                continue
             for alias in node.names:
                 if alias.name == "*":
                     continue
-                names.add(f"{node.module}.{alias.name}")
+                names.add(f"{base}.{alias.name}")
     return {n for n in names if n == "ark" or n.startswith("ark.")}
+
+
+def _absolute_base(module: str, path: Path, node: ast.ImportFrom) -> str | None:
+    """把一条 `from ... import` 的模块部分折算成绝对名。
+
+    `level == 0` 本来就是绝对名。相对的那几种：`level=1` 是本包，每多一级上跳一层。
+    上跳越过 `ark` 就返回 None（那不是本项目的事）。
+    """
+    if node.level == 0:
+        return node.module
+    package = module if path.name == "__init__.py" else module.rpartition(".")[0]
+    parts = package.split(".") if package else []
+    keep = len(parts) - (node.level - 1)
+    if keep <= 0:
+        return None
+    base = ".".join(parts[:keep])
+    return f"{base}.{node.module}" if node.module else base
 
 
 def rule_for(module: str) -> frozenset[str] | None:
@@ -108,7 +132,7 @@ def violations() -> list[str]:
         if allowed is None:
             continue
         try:
-            imported_names = sorted(ark_imports(path))
+            imported_names = sorted(ark_imports(path, module))
         except SyntaxError as exc:
             # 解析不了就报出来，不要崩。崩了会让人以为检查通过。
             problems.append(f"{module} 无法解析，导入规则未能检查：{exc}")
