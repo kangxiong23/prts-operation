@@ -32,6 +32,7 @@ from ark.contracts import (
     Snapshot,
     SnapshotHeader,
     SourceRef,
+    TimeState,
     TraceEntry,
     Unknown,
     Unsampled,
@@ -147,7 +148,7 @@ def test_frames_are_logical_frames_only() -> None:
     with pytest.raises(TypeError):
         SnapshotHeader(
             frame=30,  # type: ignore[arg-type]
-            time_state="常速",
+            time_state=TimeState.NORMAL,
             sampled_fields=(),
             end_reason="一段跑完",
             doubts=(),
@@ -231,20 +232,29 @@ def test_snapshot_header_has_the_six_items() -> None:
     ]
     header = SnapshotHeader(
         frame=LogicalFrame(30),
-        time_state="慢放",
+        time_state=TimeState.SLOW,
         sampled_fields=(FieldRef("费用"),),
         end_reason="一段跑完",
         doubts=(DoubtEntry("账不平", SourceRef("识别"), "低", ()),),
         compositions={FieldRef("费用"): Composition((Contribution(SourceRef("识别"), 1.0),), None)},
     )
-    assert header.time_state == "慢放"
+    assert header.time_state is TimeState.SLOW
     assert list(header.compositions) == [FieldRef("费用")]
     with pytest.raises(TypeError):
         header.compositions[FieldRef("费用")] = Composition((), None)  # 页眉交出去就不能改
 
 
+def test_the_header_time_state_is_a_time_state_not_a_bare_string() -> None:
+    """§4 + §3：裸字符串允许任何取值，那正是这一层要拦的东西。"""
+    with pytest.raises(TypeError) as excinfo:
+        SnapshotHeader(LogicalFrame(30), "常速", (), "一段跑完", (), {})  # type: ignore[arg-type]
+    assert "TimeState" in str(excinfo.value)
+    with pytest.raises(TypeError):
+        SnapshotHeader(LogicalFrame(30), "暂停中", (), "一段跑完", (), {})  # type: ignore[arg-type]
+
+
 def test_snapshot_is_header_plus_blocks_plus_a_precondition_pointer() -> None:
-    header = SnapshotHeader(LogicalFrame(30), "常速", (), "一段跑完", (), {})
+    header = SnapshotHeader(LogicalFrame(30), TimeState.NORMAL, (), "一段跑完", (), {})
     precondition = _header()
     blocks = (
         SlotSet(block="HUD", slots=(NamedSlot(FieldRef("费用"), _slot()),)),

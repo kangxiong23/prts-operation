@@ -12,7 +12,8 @@
 - slot.py        §1 槽：三态 × 载荷 × 置信度。三态是三支不同的类型，
                  载荷的六种形态是六个类型；区间 / 下界 / 上界 共用同一套操作
                  （包含 / 相交）也在这里 —— §2 的标量区间不是第四个类型；
-- scale.py       §3 刻度：逻辑帧与墙钟毫秒。跨刻度的构造 / 运算 / 比较一律拒绝；
+- scale.py       §3 刻度与时间态：逻辑帧与墙钟毫秒（跨刻度的构造 / 运算 /
+                 比较一律拒绝）、时间态（三值，与 §2 的视图是两个类型）；
 - geometry.py    §2 几何：格坐标 / 像素 / 画布 / 像素矩形 / 二维区域（Region，
                  它是第六种载荷）/ 视图与投影 / UI 布局常量；
 - containers.py  §4 容器：槽集合 / 前提头（Premise）/ 动作 / 轴 / 记录 /
@@ -52,7 +53,7 @@ from .geometry import (
     UiLayout,
     View,
 )
-from .scale import LOGICAL_FRAMES_PER_GAME_SECOND, LogicalFrame, WallClockMs
+from .scale import LOGICAL_FRAMES_PER_GAME_SECOND, LogicalFrame, TimeState, WallClockMs
 from .slot import (
     PAYLOAD_TYPES,
     SLOT_STATES,
@@ -111,4 +112,7 @@ __all__ = [
     "DoubtEntry",
     "SnapshotHeader",
     "Snapshot",
+    # §3 时间态（T1.2b 补：它属于 §3，但排在名单末尾 —— 前面那 15 项是
+    # T1.1 定下的前缀，一字不许动，其余按节往上加）
+    "TimeState",
 ]

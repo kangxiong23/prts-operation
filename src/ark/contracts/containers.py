@@ -24,7 +24,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TypeAlias, final
 
-from ark.contracts.scale import LogicalFrame
+from ark.contracts.scale import LogicalFrame, TimeState
 from ark.contracts.slot import SLOT_STATES, SlotValue
 
 __all__ = [
@@ -336,10 +336,12 @@ class SnapshotHeader:
     """快照页眉：**六项，一项不少**（状态层/快照 ⓪）。
 
     1. frame            逻辑帧戳
-    2. time_state       当前时间态（常速 / 慢放 / 暂停）——**取值归控制层**，
-                        这一层只收一个字符串，不在这里发明它的枚举
+    2. time_state       当前时间态（**TimeState，三值**：常速 / 慢放 / 暂停）——
+                        类型在这一层，行为在控制层；裸字符串收不了，那会允许
+                        任何取值，正是这一层要拦的东西
     3. sampled_fields   本片实际取了哪些字段
-    4. end_reason       本段结束原因（取值归控制层 / 时序层）
+    4. end_reason       本段结束原因（**字符串**：它的几值是接口层的策略枚举，
+                        不是跨层的物理事实，所以它没有类型）
     5. doubts           存疑清单（条目形状见 DoubtEntry）
     6. compositions     多来源字段的成分（字段 → 成分表）
 
@@ -347,7 +349,7 @@ class SnapshotHeader:
     """
 
     frame: LogicalFrame
-    time_state: str
+    time_state: TimeState
     sampled_fields: tuple[FieldRef, ...]
     end_reason: str
     doubts: tuple[DoubtEntry, ...]
@@ -359,7 +361,11 @@ class SnapshotHeader:
     def __post_init__(self) -> None:
         if not isinstance(self.frame, LogicalFrame):
             raise TypeError(f"页眉的逻辑帧戳只许是逻辑帧，收到 {type(self.frame).__name__}")
-        _check_text(self.time_state, "页眉的当前时间态")
+        if not isinstance(self.time_state, TimeState):
+            raise TypeError(
+                f"页眉的当前时间态要是 TimeState（三值），收到 "
+                f"{type(self.time_state).__name__}：裸字符串允许任何取值"
+            )
         _check_tuple_of(self.sampled_fields, FieldRef, "页眉的取样字段")
         _check_text(self.end_reason, "页眉的结束原因")
         _check_tuple_of(self.doubts, DoubtEntry, "页眉的存疑清单")

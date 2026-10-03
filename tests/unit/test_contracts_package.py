@@ -66,6 +66,9 @@ CONTAINER_NAMES = [
     "Snapshot",
 ]
 
+# §3 后补的一支（T1.2b）：它排在名单末尾，不在上面两组的顺序里。
+SCALE_EXTRA_NAMES = ["TimeState"]
+
 LEAVES = (slot, scale, geometry, containers)
 
 
@@ -88,7 +91,9 @@ def test_the_t11_surface_is_still_the_prefix() -> None:
 
 
 def test_new_names_are_appended_after_the_old_ones() -> None:
-    assert contracts.__all__[len(EXPECTED_ALL) :] == GEOMETRY_NAMES + CONTAINER_NAMES
+    assert contracts.__all__[len(EXPECTED_ALL) :] == (
+        GEOMETRY_NAMES + CONTAINER_NAMES + SCALE_EXTRA_NAMES
+    )
 
 
 def test_every_public_name_is_importable_from_the_package() -> None:
@@ -101,7 +106,7 @@ def test_each_leaf_is_the_home_of_its_own_names() -> None:
         assert _home(name) is geometry
     for name in CONTAINER_NAMES:
         assert _home(name) is containers
-    for name in ("LOGICAL_FRAMES_PER_GAME_SECOND", "LogicalFrame", "WallClockMs"):
+    for name in ("LOGICAL_FRAMES_PER_GAME_SECOND", "LogicalFrame", "WallClockMs", "TimeState"):
         assert _home(name) is scale
     for name in ("Exact", "Payload", "Unsampled", "SlotValue", "SLOT_STATES"):
         assert _home(name) is slot
@@ -110,12 +115,13 @@ def test_each_leaf_is_the_home_of_its_own_names() -> None:
 def test_every_leaf_is_importable_by_name() -> None:
     from ark.contracts.containers import Snapshot
     from ark.contracts.geometry import GridCoord
-    from ark.contracts.scale import LogicalFrame
+    from ark.contracts.scale import LogicalFrame, TimeState as LeafTimeState
     from ark.contracts.slot import Valued
 
     assert contracts.Snapshot is Snapshot
     assert contracts.GridCoord is GridCoord
     assert contracts.LogicalFrame is LogicalFrame
+    assert contracts.TimeState is LeafTimeState
     assert contracts.Valued is Valued
 
 
@@ -131,7 +137,9 @@ def test_the_four_leaves_exist_and_nothing_else() -> None:
 
 def test_all_has_no_duplicates() -> None:
     assert len(contracts.__all__) == len(set(contracts.__all__))
-    assert len(contracts.__all__) == len(EXPECTED_ALL) + len(GEOMETRY_NAMES) + len(CONTAINER_NAMES)
+    assert len(contracts.__all__) == (
+        len(EXPECTED_ALL) + len(GEOMETRY_NAMES) + len(CONTAINER_NAMES) + len(SCALE_EXTRA_NAMES)
+    )
 
 
 def test_re_export_does_not_pull_in_other_layers() -> None:

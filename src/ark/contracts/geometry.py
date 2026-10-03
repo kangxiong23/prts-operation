@@ -211,6 +211,10 @@ class View(Enum):
     NORMAL = "常速"
     SLOW = "慢放"
 
+    def __str__(self) -> str:
+        """打印出来就是它自己那个词（常速 / 慢放）—— 与 TimeState 同一套写法。"""
+        return self.value
+
 
 @final
 @dataclass(frozen=True)

@@ -13,6 +13,8 @@ import pytest
 from ark.contracts import (
     LOGICAL_FRAMES_PER_GAME_SECOND,
     LogicalFrame,
+    TimeState,
+    View,
     WallClockMs,
 )
 
@@ -150,6 +152,33 @@ def test_non_additive_arithmetic_within_a_scale_defers_to_int() -> None:
     assert LogicalFrame(6) * 2 == 12
     assert WallClockMs(200) // 3 == 66
     assert WallClockMs(200) / 2 == 100.0
+
+
+def test_time_state_is_three_valued() -> None:
+    """§3：时间态三值 —— 常速 / 慢放 / 暂停。它是跨层的物理事实，所以有类型。"""
+    members = list(TimeState)
+    assert len(members) == 3
+    assert [member.value for member in members] == ["常速", "慢放", "暂停"]
+    assert TimeState.NORMAL.value == "常速"
+    assert TimeState.SLOW.value == "慢放"
+    assert TimeState.PAUSED.value == "暂停"
+
+
+def test_time_state_and_view_are_two_types() -> None:
+    """视图 = 时间态去掉「暂停」：两个类型都留着，**类型不该允许不存在的取值**。
+
+    拿三值的时间态去标投影，等于允许"暂停投影"这种东西存在。
+    """
+    assert TimeState is not View
+    assert {view.value for view in View} == {"常速", "慢放"}
+    assert "暂停" not in {view.value for view in View}
+    assert {view.value for view in View} < {state.value for state in TimeState}
+    # 两个类型之间没有构造路径：谁也不是谁的子类，也不能互相构造
+    assert not issubclass(TimeState, View) and not issubclass(View, TimeState)
+    with pytest.raises(ValueError):
+        View(TimeState.PAUSED)  # 枚举里没有这一支：构造不出来，也就没有"暂停投影"
+    with pytest.raises(ValueError):
+        TimeState("快进")  # 不存在的取值同样构造不出来
 
 
 def test_the_game_second_constant_is_thirty_frames() -> None:
