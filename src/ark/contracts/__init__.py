@@ -17,10 +17,14 @@
 - geometry.py    §2 几何：格坐标 / 像素 / 画布 / 像素矩形 / 二维区域（Region，
                  它是第六种载荷）/ 视图与投影 / UI 布局常量；
 - containers.py  §4 容器：槽集合 / 前提头（Premise）/ 动作 / 轴 / 记录 /
-                 观测迹条目 / 成分表 / 存疑清单条目 / 快照。
+                 观测迹条目 / 成分表 / 存疑清单条目 / 快照；
+- ports.py       §5 端口与错误：设备 / 时钟 / 样本 / 资产 四个端口（Protocol），
+                 与拒绝 / 降级 / 中止三种错误。
 
 方向是 slot → geometry：二维区域的**形状**在 §2，词表在 §1 的 PAYLOAD_TYPES。
-端口与错误（§5）那一节随自己落地时再建文件，**不预建**。
+ports 是**汇点**：它 import geometry / scale / containers（格坐标与画布、墙钟与
+逻辑帧、中止与降级要用的容器），别人不 import 它 —— 端口的实现（适配器）住
+engine 与 offline，由 runtime/wiring.py 接上。
 
 这个 __init__ 只做再导出：T1.1 定下的那 15 个名字原样排在 __all__ 最前面，
 后面按节往上加 —— 名单只增不减，接口才稳。
@@ -52,6 +56,16 @@ from .geometry import (
     Region,
     UiLayout,
     View,
+)
+from .ports import (
+    Abort,
+    AssetPort,
+    ClockPort,
+    Degradation,
+    DeviceFacts,
+    DevicePort,
+    Refusal,
+    SamplePort,
 )
 from .scale import LOGICAL_FRAMES_PER_GAME_SECOND, LogicalFrame, TimeState, WallClockMs
 from .slot import (
@@ -115,4 +129,14 @@ __all__ = [
     # §3 时间态（T1.2b 补：它属于 §3，但排在名单末尾 —— 前面那 15 项是
     # T1.1 定下的前缀，一字不许动，其余按节往上加）
     "TimeState",
+    # §5 端口与错误（DeviceFacts 是设备事实那条的返回形状，不是规格点名的
+    # 那七个名字之一 —— 它比 tuple[Canvas, str] 好：契约层不给无名字的元组）
+    "DevicePort",
+    "ClockPort",
+    "SamplePort",
+    "AssetPort",
+    "DeviceFacts",
+    "Refusal",
+    "Degradation",
+    "Abort",
 ]

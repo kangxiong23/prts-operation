@@ -1,8 +1,8 @@
 """拆叶子之后的公开面：from ark.contracts import X 逐项对得上。
 
 叶子切法见 docs/10-规格/代码结构.md 的目录树：contracts/ 按《契约层》的节开叶子
-—— slot.py（§1）· scale.py（§3）· geometry.py（§2）· containers.py（§4）；
-端口与错误（§5）那一节随自己落地时再建，**不预建空文件**。
+—— slot.py（§1）· geometry.py（§2）· scale.py（§3）· containers.py（§4）·
+ports.py（§5 端口与错误）。五个节各一个叶子，再没有别的。
 
 EXPECTED_ALL 是**拆分叶子之前（T1.1）那 15 项**，逐项抄下来的，顺序也是原样：
 它必须仍然是 __all__ 的前缀 —— 新名字一律往后面加。
@@ -16,6 +16,7 @@ import types
 import ark.contracts as contracts
 import ark.contracts.containers as containers
 import ark.contracts.geometry as geometry
+import ark.contracts.ports as ports
 import ark.contracts.scale as scale
 import ark.contracts.slot as slot
 
@@ -69,7 +70,20 @@ CONTAINER_NAMES = [
 # §3 后补的一支（T1.2b）：它排在名单末尾，不在上面两组的顺序里。
 SCALE_EXTRA_NAMES = ["TimeState"]
 
-LEAVES = (slot, scale, geometry, containers)
+# §5 端口与错误：四个端口 + 三种错误（DeviceFacts 是设备事实那条的返回形状，
+# 它不在规格点名的那七个名字里 —— 见叶子的文档字符串）。
+PORTS_NAMES = [
+    "DevicePort",
+    "ClockPort",
+    "SamplePort",
+    "AssetPort",
+    "DeviceFacts",
+    "Refusal",
+    "Degradation",
+    "Abort",
+]
+
+LEAVES = (slot, scale, geometry, containers, ports)
 
 
 def _home(name: str):
@@ -92,7 +106,7 @@ def test_the_t11_surface_is_still_the_prefix() -> None:
 
 def test_new_names_are_appended_after_the_old_ones() -> None:
     assert contracts.__all__[len(EXPECTED_ALL) :] == (
-        GEOMETRY_NAMES + CONTAINER_NAMES + SCALE_EXTRA_NAMES
+        GEOMETRY_NAMES + CONTAINER_NAMES + SCALE_EXTRA_NAMES + PORTS_NAMES
     )
 
 
@@ -110,11 +124,14 @@ def test_each_leaf_is_the_home_of_its_own_names() -> None:
         assert _home(name) is scale
     for name in ("Exact", "Payload", "Unsampled", "SlotValue", "SLOT_STATES"):
         assert _home(name) is slot
+    for name in PORTS_NAMES:
+        assert _home(name) is ports
 
 
 def test_every_leaf_is_importable_by_name() -> None:
     from ark.contracts.containers import Snapshot
     from ark.contracts.geometry import GridCoord
+    from ark.contracts.ports import DevicePort, Refusal
     from ark.contracts.scale import LogicalFrame, TimeState as LeafTimeState
     from ark.contracts.slot import Valued
 
@@ -123,22 +140,28 @@ def test_every_leaf_is_importable_by_name() -> None:
     assert contracts.LogicalFrame is LogicalFrame
     assert contracts.TimeState is LeafTimeState
     assert contracts.Valued is Valued
+    assert contracts.DevicePort is DevicePort
+    assert contracts.Refusal is Refusal
 
 
-def test_the_four_leaves_exist_and_nothing_else() -> None:
-    """按节开出的四个叶子；端口（§5）那一节还没到，不许预建。"""
+def test_the_five_leaves_exist_and_nothing_else() -> None:
+    """按节开出的五个叶子（§1 §2 §3 §4 §5）—— 多一个都是没跟着节走。"""
     leaves = sorted(
         path.stem
         for path in pathlib.Path(contracts.__file__).parent.glob("*.py")
         if path.stem != "__init__"
     )
-    assert leaves == ["containers", "geometry", "scale", "slot"]
+    assert leaves == ["containers", "geometry", "ports", "scale", "slot"]
 
 
 def test_all_has_no_duplicates() -> None:
     assert len(contracts.__all__) == len(set(contracts.__all__))
     assert len(contracts.__all__) == (
-        len(EXPECTED_ALL) + len(GEOMETRY_NAMES) + len(CONTAINER_NAMES) + len(SCALE_EXTRA_NAMES)
+        len(EXPECTED_ALL)
+        + len(GEOMETRY_NAMES)
+        + len(CONTAINER_NAMES)
+        + len(SCALE_EXTRA_NAMES)
+        + len(PORTS_NAMES)
     )
 
 
@@ -152,6 +175,7 @@ def test_re_export_does_not_pull_in_other_layers() -> None:
     assert sorted(module.__name__ for module in modules) == [
         "ark.contracts.containers",
         "ark.contracts.geometry",
+        "ark.contracts.ports",
         "ark.contracts.scale",
         "ark.contracts.slot",
     ]
