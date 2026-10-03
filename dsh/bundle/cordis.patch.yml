@@ -1,0 +1,52 @@
+# 纯配置 bundle：零代码、零依赖。
+# 装法（本地开发）：dsh plugin --profile web add <本目录的绝对路径>
+# 装法（发布后）：  dsh plugin --profile web add <npm 包名>
+#
+# 零依赖不是省事，是有意的：没有依赖就不会卡在 pnpm 的构建脚本审批上，
+# 没有 DSH peer 依赖就不会卡在版本兼容检查上。
+#
+# TODO 接通前不要装：
+#   1. 引擎还不存在，url 是占位地址
+#   2. 接通后把 failOnStartupError 改成 true
+#   3. customSkillDirs 里是硬编码的绝对路径，分发前必须想办法变成可移植的
+- insert:
+    - id: preset-ark-ai-op
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: ark-ai-op
+        name: 明日方舟排轴
+        description: 通过 ADB 操作明日方舟并辅助排轴
+        order: 20
+        plugins:
+          - id: persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: 你在协助用户探索明日方舟的作战轴。需要看清战场时调用工具，不要凭记忆推断。
+              includeRuntimeContext: false
+
+          # 工具面只对选中本预设的会话可见，不进别的会话。
+          - id: mcp-ark
+            name: '@deepseek-ai/dsh-mcp-client'
+            config:
+              serverName: ark
+              transport: streamable-http
+              url: http://127.0.0.1:8765/mcp
+              failOnStartupError: false
+              # wait_until 天生是长调用，默认的 60 秒不够。
+              toolCallTimeoutMs: 600000
+
+          - id: mcp-resources
+            name: '@deepseek-ai/dsh-mcp-resources'
+
+          # includeDefaultRoots 保持 true，在默认技能之外加上本项目的。
+          # 已验证：默认根是否无法屏蔽尚未确认，所以不冒险关掉。
+          - id: skill-filesystem
+            name: '@deepseek-ai/dsh-skill-filesystem'
+            config:
+              includeDefaultRoots: true
+              customSkillDirs:
+                - 'D:\Android\ark-ai-op\dsh\skills'
+
+          # 工具包（@deepseek-ai/dsh-tool-*）先一个都不挂。
+          # 理由见 D-全局-08：现在方案还没构思完，先注册工具等于用工具清单
+          # 倒过来约束方案。挂什么应该由"方案需要 AI 做什么"推出来。

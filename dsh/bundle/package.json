@@ -1,0 +1,7 @@
+{
+  "name": "@local/dsh-ark-ai-op",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
+}

@@ -1,0 +1,18 @@
+﻿# ark-ai-op 运行时依赖
+#
+# 对应 pyproject.toml 的 [project.dependencies] 与 [project.optional-dependencies].vision
+# 版本由 uv 解析钉死，来源：pyproject.toml 的宽松约束（未指定下限）
+# 重新生成：uv pip compile requirements.in -o requirements.txt
+#
+# Python: 3.12（见 requires-python = ">=3.12"）
+# 安装：uv pip install -r requirements.txt
+
+# --- 必需：颜色与统计量、格网与采样 ---
+numpy==2.5.3
+
+# --- vision 额外项：模板匹配与图像解码 ---
+# 用 headless 版本：项目不弹 GUI 窗口，首轮探索的 OpenCV 窗口是本地开发行为
+opencv-python-headless==5.0.0.93
+
+# --- offline 额外项：资产生成器的图像读写 ---
+pillow==12.3.0

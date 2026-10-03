@@ -1,0 +1,12 @@
+﻿# ark-ai-op 桥接层依赖（engine/mcp/）
+#
+# 对应 pyproject.toml 的 [project.optional-dependencies].mcp
+# 引擎本体不依赖它 —— 见 docs/10-规格/代码结构.md 规则三：
+# engine/ 里除 mcp/ 之外不许出现 MCP 字样，换桥接不用动引擎。
+#
+# 所以这份要单独装，不要并进 requirements.txt：
+# 核心闭环跑通前装了也没用（MCP 服务端还没起来，见 D-全局-07）
+#
+# 安装：uv pip install -r requirements-mcp.txt
+
+mcp==2.3.0

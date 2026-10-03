@@ -1,0 +1,12 @@
+﻿# ark-ai-op 开发依赖
+#
+# 不属于发行包，不进 pyproject 的 dependencies
+# 安装：uv pip install -r requirements-dev.txt
+
+# 契约层与单元测试。注意 tests/contract/import_rules.py 只用标准库，
+# 没装 pytest 也能跑：python tests/contract/import_rules.py
+pytest==9.1.1
+
+# Lint。pyproject 未声明，但 .gitignore 已预留 .ruff_cache/，
+# 说明本来就要用；先钉在这里，正式启用时补进 pyproject
+ruff==0.16.10

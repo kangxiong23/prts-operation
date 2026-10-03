@@ -1,0 +1,20 @@
+# 第三方参考检出：只是本地的只读参考，AGPL，不参与本项目的代码
+MaaAssistantArknights-dev-v2/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# 运行时数据与派生资产：各自的目录里还有更细的 .gitignore
+data/
+assets/gamedata/
+
+# 引擎运行时的落盘输出
+*.log

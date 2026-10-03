@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ark-ai-op"
+version = "0.0.0"
+description = "明日方舟排轴辅助工具：在线引擎与离线工具"
+requires-python = ">=3.12"
+dependencies = [
+  "numpy",
+]
+
+[project.optional-dependencies]
+# 模板匹配与图像解码。目前只需要 numpy 就能跑颜色与统计量。
+vision = ["opencv-python-headless"]
+# 桥接层。引擎本体不依赖它 —— 见 docs/10-规格/代码结构.md 规则三。
+mcp = ["mcp"]
+# 资产生成器的额外依赖。
+offline = ["pillow"]
+
+# 入口点。叶子模块还没建，所以先注释掉，装上去不会指向不存在的模块。
+# 建好之后解开，并把三个入口指向 runtime 的分发逻辑。
+#
+# [project.scripts]
+# ark = "ark.runtime.cli:main"
+# ark-assets = "ark.runtime.cli:assets"
+# ark-lab = "ark.runtime.cli:lab"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ark"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
