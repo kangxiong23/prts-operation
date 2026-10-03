@@ -33,11 +33,14 @@ pytest 外壳是 `test_cost_spec.py`，它只是把下面那张表逐条变成�
 
 from __future__ import annotations
 
+import contextlib
 import importlib
+import itertools
 import json
+import os
+import shutil
 import struct
 import sys
-import tempfile
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -81,7 +84,7 @@ DIGIT_UNION_X = (2676, 2766)
 
 # 文档《视觉层/顶部HUD与数字》§区域与常量 里那张表，逐字抄下来（含两端）
 DOC_RECTS: Mapping[str, tuple[int, int, int, int]] = {
-    "cost_panel": (2585, 845, 2800, 972),
+    "cost_panel": (2585, 845, 2799, 972),
     "cost_icon": (2595, 873, 2658, 936),
     "cost_digits": (2666, 868, 2776, 936),
     "cost_bar": (2589, 945, 2741, 954),
@@ -118,6 +121,28 @@ def _mod(name: str):
                 f"`{name}` 还不存在：{type(exc).__name__}: {exc}"
             ) from None
     return _LOADED[name]
+
+
+_TMP_SEQ = itertools.count()
+
+
+@contextlib.contextmanager
+def _writable_tmp():
+    """建一个**能进得去**的临时目录。
+
+    本机沙箱下 `tempfile.mkdtemp()` 建出来的目录**连建它的进程自己都进不去**：
+    它用 `os.mkdir(path, 0o700)`，而受限令牌下那份 DACL 不继承父目录。
+    这是**本机环境的事，不是被测实现的事** —— 所以在这里绕开，而不是让实现去迁就。
+    实测：默认权限的 mkdir 能进，`0o700` 的进不去。
+    """
+    base = REPO / "data" / "_spec_tmp"
+    base.mkdir(parents=True, exist_ok=True)
+    dest = base / f"run{os.getpid()}_{next(_TMP_SEQ)}"
+    dest.mkdir()
+    try:
+        yield dest
+    finally:
+        shutil.rmtree(dest, ignore_errors=True)
 
 
 def _index() -> dict:
@@ -274,6 +299,24 @@ def check_bar_constant_is_the_track_itself() -> str:
     return f"cost_bar x [{r.x},{right}] 就是轨道本体，宽 {r.width} px"
 
 
+def check_windows_stay_inside_the_canvas() -> str:
+    """窗口是**含两端**的绝对像素，所以右缘最大只能是画布最后一列（2799）、
+    下缘最大只能是最后一行（1259）。写 2800 就是"含了一个不存在的像素"——
+    夹具的 `index.json` 与 `cost_panel` 都踩过这个（规划者自己写错）。"""
+    ui = _ui()
+    bad = []
+    for name, r in sorted(ui.rects.items()):
+        right, bottom = r.x + r.width - 1, r.y + r.height - 1
+        if r.x < 0 or r.y < 0:
+            bad.append(f"{name} 左上角越出画布：({r.x},{r.y})")
+        if right > CANVAS_W - 1:
+            bad.append(f"{name} 右缘 {right} 越出画布最后一列 {CANVAS_W - 1}")
+        if bottom > CANVAS_H - 1:
+            bad.append(f"{name} 下缘 {bottom} 越出画布最后一行 {CANVAS_H - 1}")
+    assert not bad, "；".join(bad)
+    return f"{len(ui.rects)} 个窗口都落在 {CANVAS_W}×{CANVAS_H} 画布内（含两端口径）"
+
+
 def check_digit_window_holds_one_and_two_digit_unions() -> str:
     r = _ui().rects["cost_digits"]
     right = r.x + r.width - 1
@@ -347,8 +390,8 @@ def check_roi_is_taken_from_the_layout_table() -> str:
 def check_glyph_table_builds_from_the_harvest() -> str:
     gen = _mod("ark.offline.assets_gen.glyphs")
     ui = _ui()
-    with tempfile.TemporaryDirectory() as td:
-        dest = Path(td) / "glyphs"
+    with _writable_tmp() as td:
+        dest = td / "glyphs"
         gen.build_digit_glyphs(
             _harvest(), dest, crops_dir=FIXTURES, rect=ui.rects["cost_digits"]
         )
@@ -364,8 +407,8 @@ def check_shipped_glyph_table_reproduces_from_the_harvest() -> str:
     ui = _ui()
     assert GLYPH_DIR.is_dir(), f"出厂字形表不在 {GLYPH_DIR}"
     shipped = glyphs.GlyphTable.load(GLYPH_DIR)
-    with tempfile.TemporaryDirectory() as td:
-        dest = Path(td) / "glyphs"
+    with _writable_tmp() as td:
+        dest = td / "glyphs"
         gen.build_digit_glyphs(
             _harvest(), dest, crops_dir=FIXTURES, rect=ui.rects["cost_digits"]
         )
@@ -380,6 +423,32 @@ def check_shipped_glyph_table_reproduces_from_the_harvest() -> str:
             "——出厂表必须能从取材帧重现，否则它就不是取材帧产出的"
         )
     return f"{len(shipped.digits)} 个字形都能从取材帧逐像素重现"
+
+
+def check_glyph_templates_are_actually_glyph_images() -> str:
+    """A2 只比「重建 == 出厂」，**两边都错也一致** —— 所以另立这条。
+
+    真出过一次：归一化给了 0..1 浮点，量化时忘了乘 255，模板被压成 0/1 两档；
+    比对靠相关系数（尺度无关），D1 与 A2 照样全绿，**存进版本库的却不是字形图**。
+    所以这里直接查模板长什么样：笔画得是亮的、灰度得是连续的。
+    """
+    table = _glyphs()
+    bad = []
+    for d in sorted(table.digits):
+        t = np.asarray(table.templates[d])
+        bright = int((t >= 200).sum())
+        uniq = len(np.unique(t))
+        if bright < 200:
+            bad.append(f"字形 {d} 只有 {bright} 个像素 ≥200（该是笔画）")
+        if uniq < 16:
+            bad.append(f"字形 {d} 只有 {uniq} 个不同灰度（被压成几档了）")
+    assert not bad, "；".join(bad)
+    return (
+        f"{len(table.digits)} 个模板都是连续灰度的字形图"
+        f"（笔画像素 {min(int((np.asarray(table.templates[d]) >= 200).sum()) for d in table.digits)}"
+        f"–{max(int((np.asarray(table.templates[d]) >= 200).sum()) for d in table.digits)}，"
+        f"灰度档数 ≥16）"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -429,27 +498,87 @@ def check_digits_are_read_not_remembered() -> str:
     return f"shot01 的数字贴到 shot26 的面板上，读到 {slot.payload.value}"
 
 
-def check_one_bad_digit_becomes_an_interval() -> str:
-    """识别方法 §一条待查的线索：逐位歧义能传播，`1?` → [10,19]，比整字段报未知诚实。"""
+def _last_glyph_cut(shot: int) -> tuple[int, int]:
+    """末位字形在 ROI 里的相对起止列：返回 (间隙起点, 末位中点)。"""
+    r = _ui().rects["cost_digits"]
+    ox, oy = _entry(shot)["origin"]
+    block = _crop(shot)[r.y - oy : r.y - oy + r.height, r.x - ox : r.x - ox + r.width]
+    cols = (block.min(axis=2) > 190).any(axis=0)
+    runs, start = [], None
+    for i, on in enumerate(cols):
+        if not on and start is None:
+            start = i
+        elif on and start is not None:
+            runs.append((start, i - 1))
+            start = None
+    inner = [g for g in runs if g[0] > 0 and g[1] < len(cols) - 1]
+    assert inner, f"shot{shot} 该是两位数字，中间该有一个列间隙"
+    last_on = int(np.nonzero(cols)[0].max())
+    gap = inner[-1][0]
+    return gap, (gap + last_on) // 2
+
+
+def check_missing_last_digit_is_not_a_shorter_number() -> str:
+    """**整块**拿掉末位字形 —— 不许报成一个更短的确切数。
+
+    这是这条链最危险的一种假事实：位数是"数有几个字形"数出来的，所以**缺一位的
+    两位数会长得像一个一位数**。实测：真的一位数字形中心在 **2720–2722**，
+    而缺了末位的 `1` 中心在 **2690**（偏左 31 px）—— 所以"居中于 x≈2721"
+    这条事实**不只是描述，是判据**：偏了就是缺位。
+    """
     cost = _mod("ark.engine.vision.cost")
-    from ark.contracts import Interval, Valued
+    from ark.contracts import Exact, Interval, Unknown, Unsampled, Valued
 
     ui = _ui()
     r = ui.rects["cost_digits"]
     ox, oy = _entry(16)["origin"]
     block = _crop(16)[r.y - oy : r.y - oy + r.height, r.x - ox : r.x - ox + r.width].copy()
-    # 涂黑右半：第二位字形整块没了，第一位 `1` 还在
-    block[:, r.width // 2 :] = 0
-    frame = _frame(16, patch=((r.x, r.y, r.width, r.height), block))
-    slot = cost.read_cost_digits(frame, _glyphs(), ui=ui)
-    assert isinstance(slot, Valued), f"第一位还在，不该整个字段报 {type(slot).__name__}"
-    p = slot.payload
-    assert isinstance(p, Interval), (
-        f"一位对不上该降成区间，收到 {type(p).__name__}"
-        "——猜一个整数就是假事实"
+    gap, _ = _last_glyph_cut(16)
+    block[:, gap:] = 0  # shot16 的真值是 10；末位整块没了
+    slot = cost.read_cost_digits(
+        _frame(16, patch=((r.x, r.y, r.width, r.height), block)), _glyphs(), ui=ui
     )
-    assert 10 <= p.lo and p.hi <= 19, f"`1?` 该落在 [10,19] 里，收到 [{p.lo},{p.hi}]"
-    return f"`1?` 读成区间 [{p.lo},{p.hi}]"
+    if isinstance(slot, Valued) and isinstance(slot.payload, Exact):
+        raise AssertionError(
+            f"末位整块没了，却报成一个更短的确切数 Exact({slot.payload.value})"
+            "——真值是 10，这就是假事实"
+        )
+    if isinstance(slot, Valued) and isinstance(slot.payload, Interval):
+        p = slot.payload
+        assert 10 <= p.lo and p.hi <= 19, f"`1?` 该落在 [10,19] 里，收到 [{p.lo},{p.hi}]"
+        return f"末位整块没了 → 区间 [{p.lo},{p.hi}]"
+    assert isinstance(slot, (Unsampled,)) or (
+        isinstance(slot, Valued) and isinstance(slot.payload, Unknown)
+    ), f"该报区间或未知，收到 {type(slot).__name__}"
+    return f"末位整块没了 → {type(slot).__name__}，没有给出更短的确切数"
+
+
+def check_partly_occluded_last_digit_is_an_interval() -> str:
+    """末位**被遮掉一半**（还剩一点笔画）→ 该是区间，不许猜整数。"""
+    cost = _mod("ark.engine.vision.cost")
+    from ark.contracts import Exact, Interval, Unknown, Unsampled, Valued
+
+    ui = _ui()
+    r = ui.rects["cost_digits"]
+    ox, oy = _entry(16)["origin"]
+    block = _crop(16)[r.y - oy : r.y - oy + r.height, r.x - ox : r.x - ox + r.width].copy()
+    _, mid = _last_glyph_cut(16)
+    block[:, mid:] = 0
+    slot = cost.read_cost_digits(
+        _frame(16, patch=((r.x, r.y, r.width, r.height), block)), _glyphs(), ui=ui
+    )
+    if isinstance(slot, Valued) and isinstance(slot.payload, Exact):
+        raise AssertionError(
+            f"末位只剩一半，却报成确切数 Exact({slot.payload.value})——真值是 10"
+        )
+    if isinstance(slot, Valued) and isinstance(slot.payload, Interval):
+        p = slot.payload
+        assert 10 <= p.lo and p.hi <= 19, f"`1?` 该落在 [10,19] 里，收到 [{p.lo},{p.hi}]"
+        return f"末位被遮一半 → 区间 [{p.lo},{p.hi}]"
+    assert isinstance(slot, (Unsampled,)) or (
+        isinstance(slot, Valued) and isinstance(slot.payload, Unknown)
+    ), f"该报区间或未知，收到 {type(slot).__name__}"
+    return f"末位被遮一半 → {type(slot).__name__}"
 
 
 def check_occluded_digits_are_not_a_number() -> str:
@@ -570,6 +699,9 @@ CHECKS: tuple[Check, ...] = (
     Check("L4", "视觉层/顶部HUD与数字 §每个区域必须知道的事实",
           "cost_digits 窗口装得下 1 位与 2 位数字的并集",
           check_digit_window_holds_one_and_two_digit_unions),
+    Check("L5", "契约层 §2（含两端）+ 设备层 §4（画布 2800×1260）",
+          "每个窗口都落在画布内，右缘不超过 2799",
+          check_windows_stay_inside_the_canvas),
     Check("F1", "设备层 §4 + 契约层 §2",
           "原始帧解出捕获分辨率的画布，不缩放",
           check_raw_frame_decodes_to_the_capture_canvas),
@@ -586,13 +718,20 @@ CHECKS: tuple[Check, ...] = (
     Check("A2", "资产生成器/特征库 + 视觉层/识别方法 §已定",
           "出厂字形表能从取材帧逐像素重现",
           check_shipped_glyph_table_reproduces_from_the_harvest),
+    Check("A3", "视觉层/识别方法 §已定：数字一律走固定字形模板",
+          "字形模板真的是字形图，不是被压成几档的数",
+          check_glyph_templates_are_actually_glyph_images),
     Check("D1", "状态层/全局与HUD §当前费用",
           "31 帧的费用整数全部读对",
           check_cost_digits_read_correctly_on_every_sample),
     Check("D2", "契约层「这一层唯一的验收判据」",
           "数字是读出来的，不是按帧号记的", check_digits_are_read_not_remembered),
-    Check("D3", "视觉层/识别方法 §一条待查的线索",
-          "逐位歧义降成区间，不猜整数", check_one_bad_digit_becomes_an_interval),
+    Check("D3", "视觉层/顶部HUD与数字 §每个区域必须知道的事实（数字居中于 x≈2721）",
+          "末位整块缺失时，不许报成一个更短的确切数",
+          check_missing_last_digit_is_not_a_shorter_number),
+    Check("D5", "视觉层/识别方法 §已查：逐位歧义降成区间",
+          "末位被遮一半时降成区间，不猜整数",
+          check_partly_occluded_last_digit_is_an_interval),
     Check("D4", "契约层 §1 + 状态层 README「这一层的验收标准」",
           "数字被遮挡时不给出数字", check_occluded_digits_are_not_a_number),
     Check("B1", "视觉层/顶部HUD与数字 §每个区域必须知道的事实",
