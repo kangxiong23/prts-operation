@@ -71,8 +71,14 @@ AMBIGUITY_MARGIN: Final[float] = 0.03
 实测正确那一位与最像的错字差 0.167 以上，所以 0.03 只会抓住真正并排的两个。
 """
 
-BAR_DARK_MAX: Final[int] = 67
-"""「整条暗」的上界（文档：空态每列最亮 ≤67）。"""
+BAR_DARK_MAX: Final[int] = 70
+"""「整条暗」的上界（文档：空态每列最亮 ≤70）。
+
+**从 67 放宽到 70 是量出来的，不是拍的**：暗簇上界在原始帧上确实是 67，
+但**录像通道把它抬穿一格** —— `probe_m15c` 的 1436 帧里，47 帧空条有
+43 帧因此读成未知（暗簇上界到 68–69，其中 1 帧的第 0 列到 71–73）。
+70 覆盖 68–69，离 `BAR_FULL_MIN = 117` 还有 47。
+"""
 
 BAR_FULL_MIN: Final[int] = 117
 """「整条中间灰 + 白 MAX」的下界（文档：满态每列最亮 ≥117）。"""
@@ -237,6 +243,40 @@ def _column_peaks(roi: np.ndarray) -> np.ndarray:
     return roi[:, :, :3].min(axis=2).max(axis=0)
 
 
+def _full_strength(peaks: np.ndarray) -> np.ndarray:
+    """把「逐列峰值」换成**全强度列**的逐列峰值 —— 第 0 列由第 1 列代表。
+
+    `cost_bar` 窗口的第 0 列（x = 2589）落在条左沿那条 4 px 渐变沿上，**不是
+    全强度列**：同一个轨道状态，它读 **199 / 118 / 88**，而右边第一条全强度列
+    （x = 2590）读 **255 / 146 / 146** —— 低 20% 以上，而且压低的比例还随状态
+    变（填充 0.78、满态 0.81、0.5× 0.60）。**所以它的观测值不是「轨道有多亮」
+    的另一个测量，而是同一条轨道被渐变压暗之后的样子**：它不携带全强度列没有
+    的信息，却单独贡献了三个症状 ——
+
+    | 通道 / 档 | 第 0 列读到 | 后果 |
+    | --- | --- | --- |
+    | 录像 `probe_m15b`（填充态） | **188–189** | 填充整段看不见（48 帧） |
+    | 录像 `probe_m15c`（空条） | **71–73** | 空条读不出来（3 帧） |
+    | 0.7× / 0.5×（满态灰轨） | **104 / 88** | 满态那一侧只剩 1 个灰阶 |
+
+    这里把第 0 列的**判据值换成第 1 列的值**。计数仍锚在窗口左端，所以 `n`
+    的口径一个字不变（窗口第 0 列本来就是填充的一部分：填充时它必然被覆盖，
+    实测 10/10 读 197–199）。取「**换**」而不是「**取大**」：渐变只会把这一列
+    **压低**，而录像通道的污染方向恰好相反（把它**抬高**到 68–73）—— 取大会把
+    污染原样留下，换才把它从判据里拿掉。
+
+    > 换掉之后 `n` 依赖第 1 列这一列。实测三条录像通道 3354 帧里，
+    > **「第 0 列 ≥190 而第 1 列 <190」的帧数是 0**，所以换不会改变任何一帧
+    > 的填充判定；填充数为 1（只覆盖渐变列、第 1 列还是暗的）那种样子没有
+    > 出现过，也不可能出现（填充从轨道左沿 x = 2590 起算）。
+    """
+    if peaks.size <= 1:
+        return peaks
+    judged = peaks.copy()
+    judged[0] = peaks[1]
+    return judged
+
+
 def _fill_confidence(peaks: np.ndarray, filled: int) -> float:
     """这条相位读数有多稳：**定下这次读数的那个判据两侧，隔了多远**（归一到 0..1）。
 
@@ -267,11 +307,17 @@ def read_cost_bar(frame: Frame, *, ui: UiLayout = UI) -> SlotValue:
 
     - 自左端起有亮白填充 → `Valued(Exact(n), 置信度)`，`0 < n ≤ 153`；
       **整条填满也是这一支**（n = 153），不是「满态」；
-    - 没有亮白填充、且整条暗（每列最亮 ≤`BAR_DARK_MAX`）→ `Valued(Exact(0), 置信度)`；
-    - 没有亮白填充、且整条中间灰 + 白 MAX（每列最亮 ≥`BAR_FULL_MIN`）
+    - 没有亮白填充、且整条暗（全强度列最亮 ≤`BAR_DARK_MAX`）→
+      `Valued(Exact(0), 置信度)`；
+    - 没有亮白填充、且整条中间灰 + 白 MAX（全强度列最亮 ≥`BAR_FULL_MIN`）
       → `Valued(Unknown(), None)` —— **不许报成 0**，那是假事实；
     - 其余（没有亮白填充，又既不全暗也不全灰）→ 未知：那是**没见过**的样子，
       报 0 等于说「我看清了它是空的」，而我们没有。
+
+    **三个判据一律建立在全强度列上**（`_full_strength`）：窗口的第 0 列落在条
+    左沿的渐变沿上，它的观测值**只会把「有填充 / 有灰度」这两件事往下压**，
+    而录像通道还会把它往上抬 —— 它在这两个方向上都会单独说谎，所以不进判据。
+    计数仍从窗口第 0 列起算（`n` 的口径不变）。
     """
     if not isinstance(frame, Frame):
         raise TypeError(f"要读的是一帧，收到 {type(frame).__name__}")
@@ -279,15 +325,16 @@ def read_cost_bar(frame: Frame, *, ui: UiLayout = UI) -> SlotValue:
     peaks = _column_peaks(frame.crop(rect))
     if peaks.size == 0:
         return Unsampled()
+    judged = _full_strength(peaks)
     # 先数填充，再分「暗 / 灰」—— 顺序不能反。反了的话，**整条填满**那种样子
     # （每列最亮 197–255，全都 ≥117）会先落进「满态」，于是全长 153 永远读不出来。
     filled = 0
-    while filled < peaks.size and int(peaks[filled]) >= BAR_BRIGHT_MIN:
+    while filled < judged.size and int(judged[filled]) >= BAR_BRIGHT_MIN:
         filled += 1
     if filled > 0:
-        return Valued(Exact(filled), _fill_confidence(peaks, filled))
-    if int(peaks.max()) <= BAR_DARK_MAX:
-        return Valued(Exact(0), _fill_confidence(peaks, 0))
-    if int(peaks.min()) >= BAR_FULL_MIN:
+        return Valued(Exact(filled), _fill_confidence(judged, filled))
+    if int(judged.max()) <= BAR_DARK_MAX:
+        return Valued(Exact(0), _fill_confidence(judged, 0))
+    if int(judged.min()) >= BAR_FULL_MIN:
         return Valued(Unknown(), None)
     return Valued(Unknown(), None)
