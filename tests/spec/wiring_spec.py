@@ -16,7 +16,7 @@
 
 ## 这批检查现在是红的
 
-T4 还没做。**红的这些就是 T4 的活清单**——不是"实现有问题"，是"规格要求的东西
+T5 还没做。**红的这些就是 T5 的活清单**——不是"实现有问题"，是"规格要求的东西
 还不存在"。
 
 ## 跑法（不需要 pytest）
@@ -226,17 +226,69 @@ def check_sample_port_empty_impl_does_nothing() -> str:
     return "submit 收下一份不透明的样本，什么都不做"
 
 
-def check_asset_port_method_set_is_empty() -> str:
-    """资产端口的方法集是空的 —— 那是设计，不是欠账。"""
+def check_asset_port_empty_impl_does_not_invent_a_projection() -> str:
+    """资产端口的空实现**不许编出一个投影**（端口与错误 §5 的补法规则 + 零假事实）。
+
+    端口现在有第一个方法 `projection`（补法规则：每个方法由它的第一个用户层补），
+    而这一轮**没有真的投影值** —— 标定是首轮探索编辑器的第一块。空实现只有两条
+    诚实出路：**没有这个方法**（那就登记进 `PORT_GAPS`）、或者**调用就报错**。
+
+    **返回一个编出来的 `Projection` 是最坏的一条**：设备层会照着它算像素、
+    把手指放到一个没人验过的地方 —— 那是假事实，比"没接"坏得多。
+    """
     port_module = _module("ark.offline.assets_gen.port")
-    public = sorted(
-        name for name in vars(port_module.EmptyAssetPort) if not name.startswith("_")
+    impl = port_module.EmptyAssetPort()
+    method = getattr(impl, "projection", None)
+    if method is None:
+        return "空实现没有 projection：这一轮投影还没有来源，欠账要登记进 PORT_GAPS"
+    from ark.contracts import View
+
+    try:
+        got = method(View.NORMAL)
+    except BaseException as bad:  # noqa: BLE001 —— 报错就是那条诚实出路
+        return f"空实现的 projection 调用就报错（{type(bad).__name__}）—— 没编出投影"
+    raise AssertionError(
+        f"空实现的 projection 返回了 {got!r}：这一轮没有真的投影值，"
+        "返回一个编出来的投影会让设备层照着它去点，那是假事实"
     )
-    assert public == [], (
-        f"资产端口的方法集按设计是空的，现在有 {public} —— "
-        "加方法要走补法规则：先改契约层 §5，只加方法、不改端口本身"
-    )
-    return "方法集为空（每个方法由它的第一个用户层在用到时补）"
+
+
+def check_missing_projection_never_becomes_a_click() -> str:
+    """拿不到投影时，四个动词**一条命令都不许发**（设备层 §1 + 零假事实）。
+
+    设备层 §1：像素在这个入口**内部**由投影算出。投影拿不到，就等于"不知道该把
+    手指放到哪" —— 这时候**发一条 `input` 就是猜**。所以判据不是"报不报错"，
+    而是"**有没有往设备上发东西**"：报错的方式可以变，手指不许乱动。
+    """
+    from ark.contracts import GridCoord
+
+    wiring = _wiring()
+    adb = _adb()
+    seen: list[tuple[str, ...]] = []
+    with _writable_tmp() as scratch:
+        device = wiring.build_wiring(
+            _fake_transport(adb, _synthetic_raw(8, 4), seen=seen, scratch=scratch)
+        ).device
+        for what, call in (
+            ("deploy", lambda: device.deploy(0, GridCoord(1, 1), "右")),
+            ("retreat", lambda: device.retreat(GridCoord(1, 1))),
+            ("skill_on", lambda: device.skill_on(GridCoord(1, 1))),
+            ("skill_off", lambda: device.skill_off(GridCoord(1, 1))),
+        ):
+            assert callable(getattr(device, what, None)), (
+                f"{what} 还不存在 —— 方法没有的时候这条检查不算过（那是 W2 的事）"
+            )
+            before = len(seen)
+            try:
+                call()
+            except BaseException:  # noqa: BLE001 —— 报错是允许的出路
+                pass
+            sent = seen[before:]
+            assert not sent, (
+                f"{what} 在拿不到投影时往设备上发了 {[' '.join(a) for a in sent]}："
+                "不知道该点哪就不许点，猜出来的坐标是假事实"
+            )
+    return "四个动词在缺投影时一条命令都没发"
 
 
 _ABSOLUTE_PATH = re.compile(r"[A-Za-z]:[\\/]")
@@ -373,9 +425,9 @@ CHECKS: tuple[Check, ...] = (
           "时钟只给墙钟毫秒，且不倒退", check_clock_is_wall_clock_and_monotonic),
     Check("W4", "端口与错误 §5 + 采集与验收/README §1",
           "样本端口的空实现什么都不做", check_sample_port_empty_impl_does_nothing),
-    Check("W5", "端口与错误 §5（资产：方法集留空）",
-          "资产端口的方法集为空，是设计不是欠账",
-          check_asset_port_method_set_is_empty),
+    Check("W5", "端口与错误 §5（资产：补法规则）+ 零假事实",
+          "资产端口的空实现不许编出一个投影",
+          check_asset_port_empty_impl_does_not_invent_a_projection),
     Check("W6", "设备层 §6（前置）+ 代码结构 规则一",
           "引擎里不许出现本机的绝对路径与设备序列号",
           check_no_local_paths_or_serials_in_sources),
@@ -393,6 +445,9 @@ CHECKS: tuple[Check, ...] = (
     Check("W11", "代码结构 §尚未落地（端口完备性测试）",
           "端口完备性测试在 tests/contract/，四个端口都查",
           check_port_completeness_test_exists_and_covers_four),
+    Check("W12", "设备层 §1（像素在入口内部由投影算出）+ 零假事实",
+          "拿不到投影时，四个动词一条命令都不许发",
+          check_missing_projection_never_becomes_a_click),
 )
 
 
