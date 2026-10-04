@@ -768,6 +768,127 @@ def check_bar_reports_the_track_length() -> str:
     return f"shot03 填充 {got} px；轨道全长 {TRACK_PX} px，不是搜索窗口的宽度"
 
 
+# ---------------------------------------------------------------------------
+# 判据的形状：不许是"单列"，也不许是"整条极值"
+#
+# 这一组不查"阈值对不对"，查的是**判据建立在什么量上**。做法是把夹具的
+# `cost_bar` 里**一列**涂成另一个值，看状态会不会被这一列翻掉。
+# ---------------------------------------------------------------------------
+
+GATE_COLS: tuple[int, ...] = (0, 1, 2, 3)
+"""第一级判据所在的那一段：窗口最左 4 列。扰动只打在这里。"""
+
+FAR_COLS: tuple[int, ...] = (76, 116)
+"""条中段的两列（x = 2665 / 2705），用来验「空」那一级的形状。"""
+
+EMPTY_SHOTS: tuple[int, ...] = (18, 32)
+"""整条暗的夹具（`FILLS` 是 0）。"""
+
+BENEATH_BRIGHT = 189
+"""刚好在「亮白」线（190）下面一格 —— 实测录像通道上第 0 列掉到 188–189。"""
+
+ABOVE_DARK = 71
+"""刚好在「空」的线（70）上面一格 —— 实测 `m15b` 的空条到 71。"""
+
+
+def _column_patch(col: int, value: int) -> tuple[tuple[int, int, int, int], np.ndarray]:
+    """把 `cost_bar` 的第 `col` 列整列涂成一个常量 —— 扰动用的贴片。"""
+    r = _ui().rects["cost_bar"]
+    return ((r.x + col, r.y, 1, r.height), np.full((r.height, 1, 3), value, np.uint8))
+
+
+def check_one_bright_column_cannot_invent_a_fill() -> str:
+    """「有没有开始填」不许挂在一列上 —— 涂亮一列不许**伪造**出填充。
+
+    填充是**自左端起**的，所以"第 1 列亮、第 0 列暗"根本不是填充。空条里
+    **非最左**的任意一列被涂成亮白，都不许报出一个 > 0 的 `Exact` —— 那是假事实
+    （契约层「让不知道在类型上没法被伪装成知道」）。
+    """
+    cost = _mod("ark.engine.vision.cost")
+    from ark.contracts import Exact, Valued
+
+    ui = _ui()
+    bad = []
+    for shot in EMPTY_SHOTS:
+        for col in GATE_COLS[1:]:
+            slot = cost.read_cost_bar(_frame(shot, patch=_column_patch(col, 255)), ui=ui)
+            if (
+                isinstance(slot, Valued)
+                and isinstance(slot.payload, Exact)
+                and slot.payload.value > 0
+            ):
+                bad.append(f"shot{shot:02d} 第 {col} 列涂亮 → 报出填充 {slot.payload.value} px")
+    assert not bad, (
+        "空条只有非最左的一列被涂亮，就报出了一个并不存在的填充数"
+        "（填充自左端起，第 1 列亮而第 0 列暗不是填充）：" + "；".join(bad)
+    )
+    return f"空条第 {list(GATE_COLS[1:])} 列各自涂亮，都没有伪造出填充"
+
+
+def check_one_dark_column_cannot_erase_a_fill() -> str:
+    """涂暗一列不许**抹掉**填充。
+
+    填充态最左 4 列里任意一列被压到 **189**（刚好在「亮白」线下面），条体那
+    九十多列还是亮的 —— 不许因此变成 `Unknown()` 或 `Exact(0)`。
+    """
+    cost = _mod("ark.engine.vision.cost")
+    from ark.contracts import Exact, Valued
+
+    ui = _ui()
+    bad = []
+    for shot in (3, 6):
+        want = FILLS[shot]
+        for col in GATE_COLS:
+            slot = cost.read_cost_bar(_frame(shot, patch=_column_patch(col, BENEATH_BRIGHT)), ui=ui)
+            ok = (
+                isinstance(slot, Valued)
+                and isinstance(slot.payload, Exact)
+                and slot.payload.value > 0
+            )
+            if not ok:
+                got = (
+                    type(slot.payload).__name__
+                    if isinstance(slot, Valued)
+                    else type(slot).__name__
+                )
+                bad.append(f"shot{shot:02d}（真值 {want} px）第 {col} 列压到 {BENEATH_BRIGHT} → 报成 {got}")
+    assert not bad, "填充态只有一列被压暗，整个填充就丢了：" + "；".join(bad)
+    return f"填充态最左 {len(GATE_COLS)} 列各自压到 {BENEATH_BRIGHT}，填充都还在"
+
+
+def check_empty_is_not_decided_by_the_brightest_column() -> str:
+    """「空」不许看整条**最亮**的那一列。
+
+    空条**中段**任意一列被抬到 **71**（实测录像通道上"空"的上界），必须仍报
+    `Exact(0)` —— 一列异常不该把状态翻成"读不出"。
+    """
+    cost = _mod("ark.engine.vision.cost")
+    from ark.contracts import Exact, Valued
+
+    ui = _ui()
+    bad = []
+    for shot in EMPTY_SHOTS:
+        for col in FAR_COLS:
+            slot = cost.read_cost_bar(_frame(shot, patch=_column_patch(col, ABOVE_DARK)), ui=ui)
+            ok = (
+                isinstance(slot, Valued)
+                and isinstance(slot.payload, Exact)
+                and slot.payload.value == 0
+            )
+            if not ok:
+                got = (
+                    type(slot.payload).__name__
+                    if isinstance(slot, Valued)
+                    else type(slot).__name__
+                )
+                bad.append(f"shot{shot:02d} 第 {col} 列抬到 {ABOVE_DARK} → 报成 {got}")
+    assert not bad, (
+        "一列异常就把空条翻掉了（拿整条最亮的那一列当判据，天生没有余量）："
+        + "；".join(bad)
+    )
+    return f"空条第 {list(FAR_COLS)} 列各自抬到 {ABOVE_DARK}，都还报 Exact(0)"
+
+
 CHECKS: tuple[Check, ...] = (
     Check("S0", "本文件的真值表（自检，不查 T3）",
           "31 帧的真值能从夹具像素重算出来",
@@ -831,6 +952,15 @@ CHECKS: tuple[Check, ...] = (
     Check("B3", "视觉层/顶部HUD与数字 §每个区域必须知道的事实",
           "轨道全长是实测的 153 px，不是搜索窗口的宽度",
           check_bar_reports_the_track_length),
+    Check("B4", "视觉层/顶部HUD与数字 §每个区域必须知道的事实（判据的形状）",
+          "空条非最左的任意一列涂亮，不许伪造出填充",
+          check_one_bright_column_cannot_invent_a_fill),
+    Check("B5", "视觉层/顶部HUD与数字 §每个区域必须知道的事实（判据的形状）",
+          "填充态最左 4 列里任意一列压到 189，不许丢掉填充",
+          check_one_dark_column_cannot_erase_a_fill),
+    Check("B6", "视觉层/顶部HUD与数字 §每个区域必须知道的事实（判据的形状）",
+          "空条中段任意一列抬到 71，必须仍报 Exact(0)",
+          check_empty_is_not_decided_by_the_brightest_column),
 )
 
 
