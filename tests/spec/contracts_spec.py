@@ -761,23 +761,37 @@ def check_four_ports_exist() -> str:
 
 
 def check_device_port_methods() -> str:
-    """§5 + 设备层 §5：取一帧 / 注入手势 / 设备事实（分辨率 · 方向）。"""
+    """§5 + 设备层 §1：**方法集就是轴上的动词表** —— 取一帧 · 四个动词 · 设备事实。"""
     port = _need("DevicePort")
     names = _public_names(port)
-    for want in ("grab_frame", "inject_gesture", "device_facts"):
+    wanted = (
+        "grab_frame",
+        "deploy",
+        "retreat",
+        "skill_on",
+        "skill_off",
+        "device_facts",
+    )
+    for want in wanted:
         assert want in names, f"设备端口没有 {want}；它有 {names}"
-    assert len(names) == 3, f"设备端口应当三个方法，实际 {names}"
-    return f"三个方法：{names}"
+    assert len(names) == len(wanted), (
+        f"设备端口应当是这 {len(wanted)} 个方法，实际 {names}"
+    )
+    return f"{len(wanted)} 个方法：{names}"
 
 
-def check_gesture_takes_grid_not_pixel() -> str:
-    """§5 + 设备层 §1：手势原语的参数是**格坐标与朝向**，不是像素 ——
+def check_device_verbs_take_grid_not_pixel() -> str:
+    """§5 + 设备层 §1：动作方法的参数是**格坐标与朝向**，不是像素 ——
     像素在这个入口内部由投影算出（慢放是另一套投影，让每个调用方自己换算，
     等于把那条纪律复制到每个调用点）。"""
     port = _need("DevicePort")
-    hint = str(getattr(port.inject_gesture, "__annotations__", {}))
-    assert "Pixel" not in hint, f"注入手势的签名里出现了像素：{hint}"
-    return f"注入手势的签名不提像素：{hint}"
+    hints = {
+        name: str(getattr(getattr(port, name), "__annotations__", {}))
+        for name in ("deploy", "retreat", "skill_on", "skill_off")
+    }
+    bad = [name for name, hint in hints.items() if "Pixel" in hint]
+    assert not bad, f"这些动作方法的签名里出现了像素：{bad} —— {hints}"
+    return f"四个动词的签名都不提像素：{sorted(hints)}"
 
 
 def check_clock_port_gives_wall_clock() -> str:
@@ -802,13 +816,17 @@ def check_sample_port_has_exactly_one_method() -> str:
     return f"一个方法：{names[0]}"
 
 
-def check_asset_port_has_no_methods() -> str:
-    """§5：资产端口**方法集留空** —— 每个方法由它的第一个用户层在用到时补，
-    补的时候只加方法、不改端口本身。所以它**会长期是空的**，这不是欠账。"""
+def check_asset_port_has_only_the_projection_method() -> str:
+    """§5：资产端口的**方法集由第一个用户层补**（补法规则：只加方法、不改端口
+    本身）。现在有第一个：`projection` —— 它的用户层是设备层（§1 说像素在那个
+    入口内部由投影算出），而投影值住在 `offline/`，`engine` 永远不 import 它。"""
     port = _need("AssetPort")
     names = _public_names(port)
-    assert not names, f"资产端口现在不该有方法，实际 {names}"
-    return "资产端口方法集为空（补法规则写在它的文档字符串里）"
+    assert names == ["projection"], (
+        f"资产端口现在应当只有 projection 这一个方法，实际 {names} —— "
+        "再加方法要走补法规则"
+    )
+    return "一个方法：projection（补法规则的第一个）"
 
 
 def check_error_model_is_three_without_partial() -> str:
@@ -869,11 +887,11 @@ CHECKS: tuple[Check, ...] = (
     Check("C6", "契约层 §4", "存疑清单条目四栏，八类不在这层", check_doubt_entry_has_four_fields),
     Check("C7", "契约层 §4 + §3", "快照页眉的时间态是 TimeState，不是裸字符串", check_snapshot_header_uses_time_state),
     Check("P1", "契约层 §5", "四个端口都在公开面上", check_four_ports_exist),
-    Check("P2", "契约层 §5 + 设备层 §5", "设备端口三个方法", check_device_port_methods),
-    Check("P3", "契约层 §5 + 设备层 §1", "注入手势收格坐标，不收像素", check_gesture_takes_grid_not_pixel),
+    Check("P2", "契约层 §5 + 设备层 §1", "设备端口六个方法（取帧 · 四个动词 · 设备事实）", check_device_port_methods),
+    Check("P3", "契约层 §5 + 设备层 §1", "四个动词收格坐标，不收像素", check_device_verbs_take_grid_not_pixel),
     Check("P4", "契约层 §5 + §3", "时钟端口只给墙钟毫秒", check_clock_port_gives_wall_clock),
     Check("P5", "契约层 §5", "样本端口恰好一个方法", check_sample_port_has_exactly_one_method),
-    Check("P6", "契约层 §5", "资产端口方法集留空", check_asset_port_has_no_methods),
+    Check("P6", "契约层 §5（补法规则）", "资产端口只有 projection 这一个方法", check_asset_port_has_only_the_projection_method),
     Check("P7", "契约层 §5", "错误三种，没有「部分成功」", check_error_model_is_three_without_partial),
     Check("J1", "契约层「这一层唯一的验收判据」", "哪几个数是猜的，必须能从类型里看出来", check_the_one_acceptance_criterion),
     Check("J2", "契约层 §1", "未命中升格成「空」要有分数落点", check_promotion_needs_a_score),

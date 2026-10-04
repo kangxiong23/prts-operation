@@ -171,29 +171,34 @@ def check_wiring_supplies_all_four_ports() -> str:
     return "四个端口都接上了：device / clock / samples / assets"
 
 
-def check_device_write_side_is_left_open_and_registered() -> str:
-    """端口签名不够的写侧，这一轮不许自己补一个出来——它必须留空并登记。"""
+def check_device_port_is_fully_wired() -> str:
+    """设备端口的方法集齐了：取帧 · 设备事实 · 轴上的四个动词。"""
     wiring = _wiring()
     adb = _adb()
     with _writable_tmp() as scratch:
         device = wiring.build_wiring(
             _fake_transport(adb, _synthetic_raw(8, 4), scratch=scratch)
         ).device
-    assert callable(getattr(device, "grab_frame", None)), "取帧没接上"
-    for name in ("inject_gesture", "device_facts"):
-        assert not hasattr(device, name), (
-            f"{name} 这一轮不该有：注入手势的端口签名不够（起点是备战席那张卡、"
-            "朝向对撤退一类又不适用），设备事实缺「方向从哪来」的来源 —— "
-            "自己补一个签名出来就是发明规格"
-        )
+    wanted = (
+        "grab_frame",
+        "device_facts",
+        "deploy",
+        "retreat",
+        "skill_on",
+        "skill_off",
+    )
+    missing = [name for name in wanted if not callable(getattr(device, name, None))]
+    assert not missing, (
+        f"设备端口还缺 {missing}：轴上有几个动词，端口上就该有几个入口"
+        "（设备层 §1）—— 缺的那些要么接上，要么写进 PORT_GAPS"
+    )
     gaps = wiring.PORT_GAPS
     assert isinstance(gaps, tuple), f"PORT_GAPS 要是元组，收到 {type(gaps).__name__}"
-    assert gaps, "PORT_GAPS 是空的：留空必须写下来，不许是「忘了接」"
-    for name in ("inject_gesture", "device_facts"):
-        assert any(name in gap for gap in gaps), (
-            f"{name} 的欠账没写进 PORT_GAPS：{gaps}"
-        )
-    return f"取帧已接；inject_gesture / device_facts 留空并登记（{len(gaps)} 条欠账）"
+    leftover = [gap for gap in gaps if "DevicePort" in gap]
+    assert not leftover, (
+        f"设备端口已经接齐了，PORT_GAPS 里不该还有它的欠账：{leftover}"
+    )
+    return f"六个方法都在；PORT_GAPS 共 {len(gaps)} 条（设备端口 0 条）"
 
 
 def check_clock_is_wall_clock_and_monotonic() -> str:
@@ -361,9 +366,9 @@ CHECKS: tuple[Check, ...] = (
     Check("W1", "代码结构 §尚未落地（端口完备性测试）",
           "四个端口在装配那一刻各有一个实现者，一个不缺",
           check_wiring_supplies_all_four_ports),
-    Check("W2", "代码结构 §尚未落地 + 设备层 §5",
-          "端口签名不够的写侧留空，且留空必须写进 PORT_GAPS",
-          check_device_write_side_is_left_open_and_registered),
+    Check("W2", "设备层 §1（对外面就是轴的动词表）+ 代码结构 §尚未落地",
+          "设备端口的方法集齐了：取帧 · 设备事实 · 轴上的四个动词",
+          check_device_port_is_fully_wired),
     Check("W3", "契约层 §3 + 端口与错误 §5",
           "时钟只给墙钟毫秒，且不倒退", check_clock_is_wall_clock_and_monotonic),
     Check("W4", "端口与错误 §5 + 采集与验收/README §1",
