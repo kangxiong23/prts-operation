@@ -315,7 +315,7 @@ def check_spec_thresholds_are_pinned_to_the_code() -> str:
         "CENTER_TOLERANCE": 8,      # 顶部HUD与数字 §每个区域必须知道的事实：±8
         "BAR_BRIGHT_MIN": 190,      # 同上：「亮白」阈值
         "BAR_FULL_MIN": 117,        # 同上：满态轨道最暗列下界
-        "BAR_DARK_MAX": 67,         # 同上：空态轨道最亮列上界
+        "BAR_DARK_MAX": 70,         # 同上：空态轨道最亮列上界（录像是 68–69，67 覆盖不住）
         "MAX_DIGITS": 2,            # 同上：位数范围 1–2 位
     }
     bad = []
