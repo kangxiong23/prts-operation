@@ -1,12 +1,12 @@
 """从取材帧造**出厂字形表**。
 
-取材只许来自 `tests/帧样本/费用/取材.json» 里那 11 帧 —— 那是训练集。
+取材只许来自 `tests/帧样本/费用/取材.json` 里那 11 帧 —— 那是训练集。
 剩下的 20 帧是验收用的测试集，**不许拿它们取材**（不然「自己写自己测」就没有
 独立性了，见夹具 README）。
 
 **为什么这一步在离线侧**：它读夹具、写资产，是**生成物**；读数链只读表
-（`ark.engine.vision.glyphs.GlyphTable.load»），不重建。所以这里能 import 线上
-那套切字 / 归一 / 比对的代码（`ark.engine.vision.glyphs»）—— 建表与读表**共用
+（`ark.engine.vision.glyphs.GlyphTable.load`），不重建。所以这里能 import 线上
+那套切字 / 归一 / 比对的代码（`ark.engine.vision.glyphs`）—— 建表与读表**共用
 同一个 INK_THRESHOLD、同一套归一**，两边不一致是这一层最隐蔽的坏法。
 
 **产物必须可重建**：同一批取材帧，跑两次逐像素一致。所以这里没有随机、
@@ -43,7 +43,7 @@ def _canvas_of(
 ) -> np.ndarray:
     """把一张裁剪**贴回**捕获分辨率那张画布上。
 
-    夹具 README 说得明白：裁剪是原生像素，`index.json» 记了 origin，所以贴回去
+    夹具 README 说得明白：裁剪是原生像素，`index.json` 记了 origin，所以贴回去
     之后 **ROI 的取法仍然是真的在被测** —— 而不是把 ROI 预先替它做好。
     """
     patch = np.asarray(Image.open(shot_path).convert("RGB"))
@@ -79,11 +79,11 @@ def build_digit_glyphs(
     crops_dir: Path,
     rect: PixelRect,
 ) -> Path:
-    """从取材帧造字形表，写到 `dest»，返回落盘的文件路径。
+    """从取材帧造字形表，写到 `dest`，返回落盘的文件路径。
 
-    - `harvest»：`{源帧号: 该帧的费用整数}»（值由规划者目视确认）；
-    - `crops_dir»：装着 `index.json»（每张裁剪的 origin）与 `shotNN.png»；
-    - `rect»：费用数字那个矩形（`UI.rects["cost_digits"]»）。
+    - `harvest`：`{源帧号: 该帧的费用整数}`（值由规划者目视确认）；
+    - `crops_dir`：装着 `index.json`（每张裁剪的 origin）与 `shotNN.png`；
+    - `rect`：费用数字那个矩形（`UI.rects["cost_digits"]`）。
 
     **切出来的块数必须等于位数**：不等就报错，不猜。切错了还硬造一张表，
     等于把一次错误固化进资产，而且从此看不出来。
@@ -141,7 +141,7 @@ def build_digit_glyphs(
 
 
 def harvest_from_file(path: Path) -> dict[int, int]:
-    """读 `取材.json»。放在这里是为了让「谁取材了」只有一个入口。"""
+    """读 `取材.json`。放在这里是为了让「谁取材了」只有一个入口。"""
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
     return {int(item["shot"]): int(item["cost"]) for item in payload["harvest"]}
 
@@ -151,7 +151,7 @@ def main(argv: list[str] | None = None) -> int:
 
         .venv\Scripts\python.exe -m ark.offline.assets_gen.glyphs
 
-    默认取材 `tests/帧样本/费用/取材.json»、落到 `assets/features/glyphs/»。
+    默认取材 `tests/帧样本/费用/取材.json`、落到 `assets/features/glyphs/`。
     **这条路只写资产，不读验收套件** —— 取材帧与验收帧是分开的两批。
     """
     import argparse

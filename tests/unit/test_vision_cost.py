@@ -5,7 +5,7 @@
 对不对、字形表的往返、以及三种降级各自落在哪一支上。
 
 用到夹具的地方只有一处（出厂字形表能不能从取材帧重建），用的是
-`tests/帧样本/费用/» 这份数据夹具，不是验收套件。
+`tests/帧样本/费用/` 这份数据夹具，不是验收套件。
 """
 
 from __future__ import annotations
@@ -273,7 +273,7 @@ def test_read_cost_digits_that_match_nothing_widens_to_the_whole_range() -> None
 def test_read_cost_digits_lone_glyph_off_center_is_a_missing_digit_not_a_shorter_number() -> None:
     """缺了一位的两位数，长得就像一个更短的一位数 —— 这是最危险的那种假事实。"""
     table = GlyphTable.load(DEFAULT_GLYPHS_PATH)
-    # `10» 的末位被整块涂掉之后，剩下的那个 `1» 偏在窗口中心**左边** 31 px。
+    # `10` 的末位被整块涂掉之后，剩下的那个 `1` 偏在窗口中心**左边** 31 px。
     frame, ui = _digits_frame([(47, 8, table.templates[1])])
     got = cost_mod.read_cost_digits(frame, table, ui=ui)
     assert isinstance(got, Valued) and isinstance(got.payload, Interval)

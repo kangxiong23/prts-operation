@@ -5,15 +5,15 @@
 
 这一层只做三件事，都不含语义：
 
-1. **切**：ROI 里哪几列有笔画（`glyph_boxes»）—— 数字是横向排的，笔画之间必然
+1. **切**：ROI 里哪几列有笔画（`glyph_boxes`）—— 数字是横向排的，笔画之间必然
    有空白列，所以按「有笔画的列连成一段」切就够了；
-2. **整**：把每块切成固定尺寸（`normalize»）—— **按高度归一，宽度按比例**：
-   高度是字号（固定），宽度随字形变（`1» 只有 `0» 的一半），所以宽度里带着
+2. **整**：把每块切成固定尺寸（`normalize`）—— **按高度归一，宽度按比例**：
+   高度是字号（固定），宽度随字形变（`1` 只有 `0` 的一半），所以宽度里带着
    「这是哪个字形」的信息，不能一起拉齐；
-3. **比**：`similarity» —— 零均值归一化相关（Pearson），配一个 ±2 px 的
+3. **比**：`similarity` —— 零均值归一化相关（Pearson），配一个 ±2 px 的
    水平平移搜索，吃掉两次读数之间 1 px 的定位抖动。
 
-**这一层不判断「够不够像」**：阈值是读数链（`cost.py»）的事 —— 同一次匹配，
+**这一层不判断「够不够像」**：阈值是读数链（`cost.py`）的事 —— 同一次匹配，
 「整块没笔画」和「有一位对不上」要落成不同的槽，那是字段级的降级策略
 （契约层 §1「三态是字段级的」）。
 """
@@ -49,7 +49,7 @@ TEMPLATE_WIDTH: Final[int] = 64
 """模板尺寸。笔画高 57–59 px（文档），归一到 64 —— 略微放大，不丢笔画。"""
 
 INK_THRESHOLD: Final[int] = 128
-"""「这一列有笔画」的判据：`min(R,G,B)» 到这个值。
+"""「这一列有笔画」的判据：`min(R,G,B)` 到这个值。
 
 面板底色是 47–67 的渐变（文档：暗态每列最亮 ≤67），笔画是 255，
 所以 128 稳稳落在两者之间 —— 取 67 与 255 的中点（161）也一样，中间没有东西。
@@ -75,10 +75,10 @@ DEFAULT_GLYPHS_PATH: Final[Path] = (
 
 
 def ink_of(rgb: np.ndarray) -> np.ndarray:
-    """墨迹：`min(R,G,B)»，逐像素。
+    """墨迹：`min(R,G,B)`，逐像素。
 
     白字的三通道都亮，所以取**最小值**就是「有多白」；取最大值或均值会让
-    带色偏的像素（例如半透明的粉）显得比实际亮。返回 `(高, 宽)» 的 uint8。
+    带色偏的像素（例如半透明的粉）显得比实际亮。返回 `(高, 宽)` 的 uint8。
     """
     if not isinstance(rgb, np.ndarray) or rgb.ndim != 3 or rgb.shape[2] < 3:
         raise TypeError(
@@ -88,11 +88,11 @@ def ink_of(rgb: np.ndarray) -> np.ndarray:
 
 
 def glyph_boxes(rgb: np.ndarray) -> list[tuple[int, int, int, int]]:
-    """把 ROI 的笔画切成一块一块，返回 `(x0, y0, x1, y1)»，**右/下开**。
+    """把 ROI 的笔画切成一块一块，返回 `(x0, y0, x1, y1)`，**右/下开**。
 
     判据是「这一列有没有笔画」：有笔画的列连成一段就是一块。数字是横向排的，
     块与块之间必然有空白列（实测 9–12 px），所以不需要更聪明的分割 ——
-    而「按连通域分割」会把 `4» 的横竖、`7» 的撇捺这类**一个字形内部的断开**
+    而「按连通域分割」会把 `4` 的横竖、`7` 的撇捺这类**一个字形内部的断开**
     切成好几块，反而更糟。
 
     返回的框是**紧外框**（那一块里笔画真正占到的行与列），不是整块 ROI。
@@ -125,7 +125,7 @@ def _resize_bilinear(image: np.ndarray, out_height: int, out_width: int) -> np.n
     """双线性缩放（自己写，免得视觉层为了一个缩放去依赖图像库）。
 
     像素中心对齐：输出第 k 个像素对应输入的
-    `(k + 0.5) × 输入尺寸 / 输出尺寸 - 0.5»。越界的取样点夹到边缘。
+    `(k + 0.5) × 输入尺寸 / 输出尺寸 - 0.5`。越界的取样点夹到边缘。
     **确定性**：同样的输入永远给同样的输出。
     """
     src_h, src_w = image.shape
@@ -143,10 +143,10 @@ def _resize_bilinear(image: np.ndarray, out_height: int, out_width: int) -> np.n
 
 
 def normalize(ink: np.ndarray) -> np.ndarray:
-    """把一块墨迹整成 `TEMPLATE_HEIGHT × TEMPLATE_WIDTH» 的浮点图（0..1）。
+    """把一块墨迹整成 `TEMPLATE_HEIGHT × TEMPLATE_WIDTH` 的浮点图（0..1）。
 
     **按高度归一，宽度按比例，再水平居中。** 高度是字号、是固定的；宽度是
-    字形自己的属性（`1» 窄、`0» 宽），把它也拉齐等于把一条判据扔掉。
+    字形自己的属性（`1` 窄、`0` 宽），把它也拉齐等于把一条判据扔掉。
 
     宽度超过模板宽度时**只缩到模板宽**（不再按高度算），宁可压扁也不裁掉笔画 ——
     裁掉是丢证据，压扁只是变形，而变形对模板匹配是一致的（建表时也这么压）。
@@ -196,7 +196,7 @@ def _shift_columns(image: np.ndarray, dx: int) -> np.ndarray:
 
 
 def similarity(query: np.ndarray, template: np.ndarray) -> float:
-    """两块归一化墨迹有多像：`[-1, 1]» 的相关系数，取 ±SHIFT_SEARCH 里最好的那个。
+    """两块归一化墨迹有多像：`[-1, 1]` 的相关系数，取 ±SHIFT_SEARCH 里最好的那个。
 
     上界 1.0 = 逐像素一致。**不是概率**，也别当概率用 —— 契约层只说置信度是
     「无量纲的连续量」，没给它一个 [0,1] 的语义。
@@ -217,10 +217,10 @@ def similarity(query: np.ndarray, template: np.ndarray) -> float:
 
 
 def _resolve_table_path(path: Path, *, for_write: bool) -> Path:
-    """`load» / `save» 收的既可以是那个文件，也可以是它所在的目录。
+    """`load` / `save` 收的既可以是那个文件，也可以是它所在的目录。
 
-    **判据是后缀**：写盘时给一个没有后缀的路径（`assets/features/glyphs»）就是
-    「写到这个目录里去」，给一个带后缀的路径（`…/digits.npz»）就是那个文件本身。
+    **判据是后缀**：写盘时给一个没有后缀的路径（`assets/features/glyphs`）就是
+    「写到这个目录里去」，给一个带后缀的路径（`…/digits.npz`）就是那个文件本身。
     读盘时目录必须已经存在。
     """
     path = Path(path)
@@ -242,11 +242,11 @@ def _resolve_table_path(path: Path, *, for_write: bool) -> Path:
 
 @dataclass(frozen=True)
 class GlyphTable:
-    """字形表：`digits» 是表里有哪些数字，`templates» 是每个数字那一张图。
+    """字形表：`digits` 是表里有哪些数字，`templates` 是每个数字那一张图。
 
-    - `digits» 与 `templates» 的键必须**一模一样**：少一个键就是一张读不出
+    - `digits` 与 `templates` 的键必须**一模一样**：少一个键就是一张读不出
       那个数字的表，而它看起来仍然「有表」，那是最坏的一种不知道；
-    - 模板是 `(TEMPLATE_HEIGHT, TEMPLATE_WIDTH)» 的 uint8：**存 uint8 不存浮点**，
+    - 模板是 `(TEMPLATE_HEIGHT, TEMPLATE_WIDTH)` 的 uint8：**存 uint8 不存浮点**，
       体积小一个数量级，而「出厂表能不能从取材帧重现」要的是**完全相等**，
       不是「近似相等」；
     - 表是只读的（交出去之后谁也不能改一张模板）。
