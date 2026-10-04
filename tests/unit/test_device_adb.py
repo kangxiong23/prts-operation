@@ -13,15 +13,22 @@ from pathlib import Path
 
 import pytest
 
-from ark.contracts import Canvas
+from ark.contracts import Canvas, GridCoord, Pixel, Projection, View
 from ark.engine.device.adb import (
     DEFAULT_TIMEOUT_MS,
     DEVICE_TMP_DIR,
+    FACING_VECTORS,
     FRAME_FILE_NAME,
+    PANEL_RETREAT_AT,
+    PANEL_SKILL_AT,
+    PANEL_WAIT_MS,
+    R_GRID,
+    SWIPE_DURATION_MS,
     AdbDevice,
     AdbTimeout,
     AdbTransport,
     WmSize,
+    parse_dumpsys_input,
     parse_wm_size,
 )
 
@@ -61,10 +68,12 @@ class Recorder:
         *,
         delay_ms: int = 0,
         write_local: bool = False,
+        stdout: bytes = b"",
     ) -> None:
         self.frame = frame
         self.delay_ms = delay_ms
         self.write_local = write_local
+        self.stdout = stdout
         self.calls: list[tuple[list[str], int]] = []
 
     def __call__(self, argv, timeout_ms):
@@ -75,7 +84,7 @@ class Recorder:
             if self.write_local:
                 Path(argv[-1]).write_bytes(self.frame)
             return self.frame
-        return b""
+        return self.stdout
 
     @property
     def flat(self) -> list[str]:
@@ -302,8 +311,285 @@ def test_grab_frame_reports_timeout_instead_of_waiting_forever(work_dir):
         AdbDevice(transport).grab_frame()
 
 
-def test_device_adapter_has_no_invented_methods():
+def test_device_adapter_has_exactly_the_six_methods():
     device = AdbDevice(AdbTransport(run=Recorder()))
-    assert callable(device.grab_frame)
+    for name in ("grab_frame", "device_facts", "deploy", "retreat", "skill_on", "skill_off"):
+        assert callable(getattr(device, name, None)), name
     assert not hasattr(device, "inject_gesture")
-    assert not hasattr(device, "device_facts")
+
+
+# ---------------------------------------------------------------------------
+# 设备事实：一条 dumpsys input，画布取 logicalFrame、方向取那个整数
+# ---------------------------------------------------------------------------
+
+VIEWPORT_TEXT = (
+    "some header\n"
+    "  Viewport INTERNAL: displayId=0, uniqueId=local:463, port=131, "
+    "orientation=1, logicalFrame=[0, 0, 2800, 1260], "
+    "physicalFrame=[0, 0, 2800, 1260], deviceSize=[2800, 1260], isActive=[1]\n"
+    "tail\n"
+)
+
+
+def test_parse_dumpsys_input_reads_the_viewport_line():
+    """T5 裁定一与二：方向是**设备自己报的那个整数**，画布取 @@logicalFrame@@。"""
+    facts = parse_dumpsys_input(VIEWPORT_TEXT)
+    assert facts.resolution == Canvas(width=2800, height=1260)
+    assert facts.orientation == "1"
+    assert isinstance(facts.orientation, str)
+
+
+def test_parse_dumpsys_input_keeps_the_orientation_literal():
+    for raw, want in (("0", "0"), ("1", "1"), ("2", "2"), ("3", "3")):
+        text = f"Viewport INTERNAL: orientation={raw}, logicalFrame=[0, 0, 100, 50]\n"
+        assert parse_dumpsys_input(text).orientation == want
+
+
+def test_parse_dumpsys_input_takes_the_canvas_from_the_frame_not_from_wm_size():
+    """两个口径不许混：@@wm size@@ 报 1260x2800，画布是 2800x1260（T5 裁定二）。"""
+    facts = parse_dumpsys_input(VIEWPORT_TEXT)
+    assert facts.resolution == Canvas(width=2800, height=1260)
+    assert parse_wm_size("Physical size: 1260x2800\n").physical == Canvas(1260, 2800)
+
+
+def test_parse_dumpsys_input_skips_lines_missing_a_field():
+    text = (
+        "Viewport INTERNAL: displayId=0, orientation=1\n"
+        "Viewport EXTERNAL: logicalFrame=[0, 0, 800, 600]\n"
+        "Viewport MAIN: orientation=0, logicalFrame=[0, 0, 640, 480]\n"
+    )
+    facts = parse_dumpsys_input(text)
+    assert facts.resolution == Canvas(width=640, height=480)
+    assert facts.orientation == "0"
+
+
+def test_parse_dumpsys_input_refuses_when_there_is_no_viewport():
+    with pytest.raises(ValueError):
+        parse_dumpsys_input("error: device offline\n")
+    with pytest.raises(ValueError):
+        parse_dumpsys_input("Viewport INTERNAL: orientation=1\n")
+
+
+def test_parse_dumpsys_input_refuses_a_non_string():
+    with pytest.raises(TypeError):
+        parse_dumpsys_input(b"Viewport INTERNAL: orientation=1")  # type: ignore[arg-type]
+
+
+def test_device_facts_goes_through_one_dumpsys_and_needs_no_projection():
+    """设备事实**不发手势**：所以没有投影也照样能查（T5 裁定五只约束四个动词）。"""
+    recorder = Recorder(stdout=VIEWPORT_TEXT.encode())
+    device = AdbDevice(AdbTransport(run=recorder))
+    facts = device.device_facts()
+    assert facts.resolution == Canvas(width=2800, height=1260)
+    assert facts.orientation == "1"
+    assert [argv for argv, _ in recorder.calls] == [["shell", "dumpsys", "input"]]
+
+# ---------------------------------------------------------------------------
+# 四个动词：像素一律经投影，手势原语沉在这条类里面
+# ---------------------------------------------------------------------------
+
+
+class FakeAssets:
+    """假的资产端口：给一套**线性**投影（格 → 像素 = 原点 + 格 × 100）。
+
+    `refuses` 那支模拟真正的空实现（`EmptyAssetPort` 调用就报错）。
+    """
+
+    ORIGIN = (1000.0, 500.0)
+    SCALE = 100.0
+
+    def __init__(self, *, refuses: bool = False) -> None:
+        self.refuses = refuses
+        self.asked: list[View] = []
+
+    def projection(self, view: View) -> Projection:
+        self.asked.append(view)
+        if self.refuses:
+            raise RuntimeError("投影值还没有来源：标定是首轮探索编辑器的第一块")
+        ox, oy = self.ORIGIN
+        s = self.SCALE
+        return Projection(
+            view=view,
+            grid_to_pixel=lambda gp: Pixel(ox + gp.x * s, oy + gp.y * s),
+            pixel_to_grid=lambda px: GridCoord((px.x - ox) / s, (px.y - oy) / s),
+        )
+
+
+def _device(recorder: Recorder, assets: object | None = None, view: View = View.NORMAL):
+    transport = AdbTransport(run=recorder)
+    if assets is None:
+        return AdbDevice(transport)
+    return AdbDevice(transport, assets, view)  # type: ignore[arg-type]
+
+
+def _commands(recorder: Recorder) -> list[list[str]]:
+    return [argv for argv, _ in recorder.calls]
+
+
+def test_deploy_is_one_swipe_from_the_card_to_grid_plus_r():
+    """设备层 §2：**一次直线 swipe** —— 起点是第 `card` 张卡，终点是 `格心 + r·û`。"""
+    recorder = Recorder()
+    device = _device(recorder, FakeAssets())
+    device.deploy(0, GridCoord(3, 4), "右")
+
+    # 卡 0（最左那张）的中心：UiLayout 那张表给 1762 + 207.5/2、1045 + 214/2。
+    start = (round(1762 + 207.5 / 2), 1045 + 214 // 2)
+    # 终点 = 格心 + 0.3 格向右 → 格 (3.3, 4) → 像素 (1330, 900)
+    end = (round(1000 + 3.3 * 100), 500 + 4 * 100)
+    assert _commands(recorder) == [
+        ["shell", "input", "swipe", str(start[0]), str(start[1]),
+         str(end[0]), str(end[1]), str(SWIPE_DURATION_MS)]
+    ]
+    assert R_GRID == 0.3
+
+
+def test_deploy_endpoint_encodes_the_facing():
+    """同一个终点**同时编码了格与朝向**：四个朝向各落一个方向。"""
+    want = {
+        "上": (1300, 870),
+        "下": (1300, 930),
+        "左": (1270, 900),
+        "右": (1330, 900),
+    }
+    assert set(want) == set(FACING_VECTORS)
+    for facing, end in want.items():
+        recorder = Recorder()
+        _device(recorder, FakeAssets()).deploy(0, GridCoord(3, 4), facing)
+        argv = _commands(recorder)[0]
+        assert (int(argv[-3]), int(argv[-2])) == end, facing
+
+
+def test_deploy_refuses_an_unknown_facing_without_touching_the_device():
+    recorder = Recorder()
+    device = _device(recorder, FakeAssets())
+    for bad in ("斜", "up", "", None):
+        with pytest.raises((ValueError, TypeError)):
+            device.deploy(0, GridCoord(3, 4), bad)  # type: ignore[arg-type]
+    assert recorder.calls == []
+
+
+def test_deploy_refuses_a_card_the_table_does_not_have():
+    recorder = Recorder()
+    device = _device(recorder, FakeAssets())
+    with pytest.raises(IndexError):
+        device.deploy(9, GridCoord(3, 4), "右")
+    assert recorder.calls == []
+
+
+def test_deploy_refuses_a_pixel_where_a_grid_belongs():
+    recorder = Recorder()
+    device = _device(recorder, FakeAssets())
+    with pytest.raises(TypeError):
+        device.deploy(0, Pixel(3, 4), "右")  # type: ignore[arg-type]
+    assert recorder.calls == []
+
+
+def test_retreat_is_two_taps_with_a_wait_between_them():
+    """设备层 §2：**两次点 + 一次等面板** —— 第二下落在干员旁边那个键上。"""
+    recorder = Recorder()
+    device = _device(recorder, FakeAssets())
+    device.retreat(GridCoord(3, 4))
+    assert _commands(recorder) == [
+        ["shell", "input", "tap", "1300", "900"],
+        [
+            "shell",
+            "input",
+            "tap",
+            str(round(1000 + (3 + PANEL_RETREAT_AT.x) * 100)),
+            str(round(500 + (4 + PANEL_RETREAT_AT.y) * 100)),
+        ],
+    ]
+    assert PANEL_WAIT_MS > 0
+
+
+def test_skill_on_and_off_tap_the_skill_key():
+    for verb in ("skill_on", "skill_off"):
+        recorder = Recorder()
+        device = _device(recorder, FakeAssets())
+        getattr(device, verb)(GridCoord(3, 4))
+        assert _commands(recorder)[1] == [
+            "shell",
+            "input",
+            "tap",
+            str(round(1000 + (3 + PANEL_SKILL_AT.x) * 100)),
+            str(round(500 + (4 + PANEL_SKILL_AT.y) * 100)),
+        ]
+
+
+def test_the_four_verbs_ask_for_the_view_they_were_built_with():
+    assets = FakeAssets()
+    recorder = Recorder()
+    device = _device(recorder, assets, View.SLOW)
+    device.retreat(GridCoord(3, 4))
+    assert assets.asked == [View.SLOW]
+
+
+def test_the_four_verbs_send_nothing_when_the_projection_refuses():
+    """T5 裁定五：拿不到投影时**一条命令都不许发**。"""
+    recorder = Recorder()
+    device = _device(recorder, FakeAssets(refuses=True))
+    for label, call in (
+        ("deploy", lambda: device.deploy(0, GridCoord(1, 1), "右")),
+        ("retreat", lambda: device.retreat(GridCoord(1, 1))),
+        ("skill_on", lambda: device.skill_on(GridCoord(1, 1))),
+        ("skill_off", lambda: device.skill_off(GridCoord(1, 1))),
+    ):
+        with pytest.raises(RuntimeError):
+            call()
+        assert recorder.calls == [], label
+
+
+class AssetsWithoutProjection:
+    """假的资产端口：**根本没有 projection 这个方法**（`EmptyAssetPort` 就是这一支）。
+
+    「留空 = 方法不存在」（代码结构 §尚未落地），所以四个动词撞上的是
+    `AttributeError` —— 那**不许**直接漏出去（读起来像 bug），要转成一句带话的报错。
+    """
+
+
+def test_the_four_verbs_send_nothing_when_the_method_does_not_exist():
+    recorder = Recorder()
+    device = _device(recorder, AssetsWithoutProjection())
+    for label, call in (
+        ("deploy", lambda: device.deploy(0, GridCoord(1, 1), "右")),
+        ("retreat", lambda: device.retreat(GridCoord(1, 1))),
+        ("skill_on", lambda: device.skill_on(GridCoord(1, 1))),
+        ("skill_off", lambda: device.skill_off(GridCoord(1, 1))),
+    ):
+        with pytest.raises(RuntimeError) as bad:
+            call()
+        assert "投影还没有来源" in str(bad.value), label
+        assert recorder.calls == [], label
+
+
+def test_the_four_verbs_send_nothing_when_there_is_no_asset_port():
+    recorder = Recorder()
+    device = _device(recorder)
+    for call in (
+        lambda: device.deploy(0, GridCoord(1, 1), "右"),
+        lambda: device.retreat(GridCoord(1, 1)),
+        lambda: device.skill_on(GridCoord(1, 1)),
+        lambda: device.skill_off(GridCoord(1, 1)),
+    ):
+        with pytest.raises(RuntimeError):
+            call()
+    assert recorder.calls == []
+
+
+def test_the_adapter_refuses_a_view_that_is_not_a_view():
+    with pytest.raises(TypeError):
+        AdbDevice(AdbTransport(run=Recorder()), FakeAssets(), "常速")  # type: ignore[arg-type]
+
+
+def test_the_verbs_do_not_go_through_exec_out_or_a_second_adb():
+    """手势原语沉在这条类里：发出去的只有 `shell input` 那一种形状。"""
+    recorder = Recorder()
+    device = _device(recorder, FakeAssets())
+    device.deploy(0, GridCoord(3, 4), "右")
+    device.retreat(GridCoord(3, 4))
+    for argv in _commands(recorder):
+        assert argv[:3] == ["shell", "input", "swipe"] or argv[:3] == [
+            "shell",
+            "input",
+            "tap",
+        ]

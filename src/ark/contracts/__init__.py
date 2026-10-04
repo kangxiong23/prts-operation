@@ -48,6 +48,7 @@ from .containers import (
     TraceEntry,
 )
 from .geometry import (
+    UI_LAYOUT,
     Canvas,
     GridCoord,
     Pixel,
@@ -110,6 +111,7 @@ __all__ = [
     "View",
     "Projection",
     "UiLayout",
+    "UI_LAYOUT",
     # §4 容器
     "FieldRef",
     "SourceRef",

@@ -66,9 +66,25 @@ def test_the_four_ports_are_protocols() -> None:
         assert getattr(port, "_is_protocol", False), f"{port.__name__} 应当是 Protocol"
 
 
-def test_device_port_has_exactly_three_methods() -> None:
-    """设备层 §5：取一帧 · 注入手势 · 设备事实（分辨率 / 方向）。"""
-    assert _public_names(DevicePort) == ["device_facts", "grab_frame", "inject_gesture"]
+def test_device_port_has_exactly_six_methods() -> None:
+    """设备层 §1 + §5：**对外面就是轴的动词表** —— 取一帧 · 设备事实 · 四个动词。"""
+    assert _public_names(DevicePort) == [
+        "deploy",
+        "device_facts",
+        "grab_frame",
+        "retreat",
+        "skill_off",
+        "skill_on",
+    ]
+
+
+def test_the_gesture_signature_is_gone() -> None:
+    """设备层 §5：**曾经写作 `inject_gesture(at, facing)`，已改**。
+
+    那个签名是**手势那一层**的，而且它表达不了部署（起点是备战席那张卡，
+    "哪张卡"不在签名里），`facing` 又对撤退一类不适用。
+    """
+    assert not hasattr(DevicePort, "inject_gesture")
 
 
 def test_clock_port_has_one_method_and_it_is_wall_clock() -> None:
@@ -86,15 +102,15 @@ def test_sample_port_has_exactly_one_method() -> None:
     assert _public_names(SamplePort) == ["submit"]
 
 
-def test_asset_port_has_no_methods_and_carries_the_rule() -> None:
-    """§5：资产端口**方法集留空**，而且**长期是空的，不是欠账**。
+def test_asset_port_has_one_method_and_carries_the_rule() -> None:
+    """§5：资产端口**方法集由第一个用户层补**，现在有第一个：`projection`。
 
     补法规则必须写在它的文档字符串里，否则下一个人会在这一层替别的层发明类型。
     """
-    assert _public_names(AssetPort) == []
+    assert _public_names(AssetPort) == ["projection"]
     # 文档字符串会按行折行，所以把空白全抹掉再对句子 —— 折行不该让一条规则"查不到"
     doc = "".join((AssetPort.__doc__ or "").split())
-    for phrase in ("第一个用户层", "只加方法", "不改端口本身", "不是欠账"):
+    for phrase in ("第一个用户层", "只加方法", "不改端口本身"):
         assert phrase in doc, f"资产端口的文档字符串缺了补法规则的这句：{phrase}"
 
 
@@ -103,21 +119,31 @@ def test_asset_port_has_no_methods_and_carries_the_rule() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_inject_gesture_takes_grid_and_facing_not_pixel() -> None:
-    """设备层 §1：手势原语的参数是**格坐标与朝向**，不是像素。"""
-    signature = inspect.signature(DevicePort.inject_gesture)
-    assert list(signature.parameters) == ["self", "at", "facing"]
+def test_deploy_takes_card_grid_and_facing_not_pixel() -> None:
+    """设备层 §1 + §2：部署的参数是**第几张卡 · 格坐标 · 朝向**，不是像素。"""
+    signature = inspect.signature(DevicePort.deploy)
+    assert list(signature.parameters) == ["self", "card", "at", "facing"]
     assert signature.return_annotation == "None"
-    annotation = _annotations(DevicePort.inject_gesture)
+    annotation = _annotations(DevicePort.deploy)
     assert "GridCoord" in annotation
-    assert "Pixel" not in annotation, f"注入手势的签名里出现了像素：{annotation}"
+    assert "Pixel" not in annotation, f"部署的签名里出现了像素：{annotation}"
 
 
-def test_inject_gesture_facing_is_required() -> None:
-    """朝向**必填**（时序层 §4）：没有"只给格"的形态，所以朝向不许有默认值。"""
-    parameters = inspect.signature(DevicePort.inject_gesture).parameters
-    assert parameters["facing"].default is inspect.Parameter.empty
-    assert parameters["at"].default is inspect.Parameter.empty
+def test_deploy_parameters_are_all_required() -> None:
+    """朝向**必填**（时序层 §4）：不选朝向 = 一次未完成的放置，所以没有默认值。
+
+    卡下标与格坐标同理 —— 它们都是"这次动作到底做什么"，缺一个就不是同一个动作。
+    """
+    parameters = inspect.signature(DevicePort.deploy).parameters
+    for name in ("card", "at", "facing"):
+        assert parameters[name].default is inspect.Parameter.empty, name
+
+
+def test_only_deploy_has_a_facing() -> None:
+    """设备层 §5：**只有这一个方法有朝向** —— 撤退 / 开技能 / 关技能没有这回事。"""
+    for name in ("retreat", "skill_on", "skill_off"):
+        parameters = inspect.signature(getattr(DevicePort, name)).parameters
+        assert list(parameters) == ["self", "at"], name
 
 
 def test_grab_frame_returns_raw_frame() -> None:
@@ -263,8 +289,8 @@ def test_no_partial_success_anywhere_on_the_surface() -> None:
 
 
 def test_grid_coord_is_not_a_pixel_in_the_device_port() -> None:
-    """顺手确认真设备的入口只认格：拿像素喂注入手势，类型上就过不去。"""
-    annotation = _annotations(DevicePort.inject_gesture)
+    """顺手确认真设备的入口只认格：拿像素喂部署，类型上就过不去。"""
+    annotation = _annotations(DevicePort.deploy)
     assert "GridCoord" in annotation
     assert "Pixel" not in annotation
     assert not isinstance(GridCoord(5, 4), contracts.Pixel)

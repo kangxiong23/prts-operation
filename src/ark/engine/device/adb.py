@@ -1,20 +1,20 @@
-"""设备层的真机适配器：取像走 **设备端写文件 + `pull`**（设备层 §4 · D-全局-19）。
+"""设备层的真机适配器：取一帧 + 轴上的四个动词 + 设备事实。
 
-这个模块只做一件事：**把「取一帧」变成两条命令**。它不认识画面、也不认识画布 ——
-那是视觉层的入口（`engine/vision/frame.py`）；它更不知道动作有没有生效，那是接口层
-的事。设备层 §1 那条边界不能糊。
+这个模块做三件事，**都在设备层 §1 那条边界之内**：
 
-三样东西：
+- **取一帧**：设备端写文件 + `pull`（§4 · D-全局-19）。它不认识画面、也不认识
+  画布 —— 那是视觉层的入口（`engine/vision/frame.py`）；
+- **轴上的四个动词**（部署 / 撤退 / 开技能 / 关技能）：**手势原语（按 / 拖 / 抬 /
+  点 / 键）沉在这条类里面，端口上看不见**（时序层 §4）。参数是**格坐标与朝向**，
+  像素在这里由投影算出 —— 所以这条类构造时要拿到「资产端口」与「此刻的视图」
+  （T5 裁定）。**切视图 = 重新装配**，不是给端口加一个开关（代码结构 规则二）：
+  慢放是另一套投影，而让每个调用方自己换算等于把那条纪律复制到每个调用点（§1）；
+- **设备事实**（分辨率 / 方向）：查真机（§5）。两个值都从 `dumpsys input` 里
+  那条 `Viewport ...` 行取 —— 它的 `orientation=` 就是方向，它的
+  `logicalFrame=` 直接就是**画布口径**（T5 裁定：一个转置都不做）。
 
-- `parse_wm_size`：**纯函数**，把 `wm size` 的两行按**它自己的口径**解出来。
-  设备层 §4 说得很死：`wm size` 与画布差 90°，**两个口径不许混** —— 所以这里
-  **不转置**，`Physical size: 1260x2800` 就解成 `Canvas(1260, 2800)`；
-- `AdbTransport`：跑一条命令，拿回它的 stdout 字节。**墙钟超时属于这一层**
-  （设备层 §5）；
-- `AdbDevice`：设备端口的真机适配器。**这一轮只接 `grab_frame`** ——
-  `inject_gesture` 与 `device_facts` 留空，理由与去向登记在 `runtime/wiring.py`
-  的 `PORT_GAPS` 里（一个是签名不够，一个是「方向从哪来」没有来源，两条都还没
-  裁定；自己补一个出来就是**发明规格**）。
+**它不知道动作有没有生效** —— 那是接口层的事（接口层/执行与失败 §3）。这条边界
+不能糊。
 
 ## 那个 `run` 的缝
 
@@ -33,6 +33,12 @@
 
 **要 `perf_counter` 那一类、不要 `monotonic`** —— 规定与实测数在「契约层/刻度 §3」
 （T4 定）。这里**只引用，不重述**：同一条规定出现两次，改的时候就会漏掉一处。
+
+## 拿不到投影就一条命令都不发
+
+四个动词要像素，而像素只能由投影算（§1：像素在这个入口**内部**由投影算出）。
+投影拿不到就等于「不知道该把手指放到哪」 —— 这时候发一条 `input` 就是**猜**。
+所以四个动词**先要投影、再发命令**，要不到就直接抛出去（T5 裁定）。
 """
 
 from __future__ import annotations
@@ -41,30 +47,47 @@ import re
 import subprocess
 import tempfile
 import time
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from types import MappingProxyType
 from typing import Final, final
 
-from ark.contracts import Canvas
+from ark.contracts import (
+    AssetPort,
+    Canvas,
+    DeviceFacts,
+    GridCoord,
+    Pixel,
+    Projection,
+    UI_LAYOUT,
+    View,
+)
 
 __all__ = [
     "AdbTimeout",
     "WmSize",
     "parse_wm_size",
+    "parse_dumpsys_input",
     "AdbTransport",
     "AdbDevice",
     "DEFAULT_TIMEOUT_MS",
     "DEVICE_TMP_DIR",
     "FRAME_FILE_NAME",
+    "R_GRID",
+    "FACING_VECTORS",
+    "SWIPE_DURATION_MS",
+    "PANEL_WAIT_MS",
+    "PANEL_RETREAT_AT",
+    "PANEL_SKILL_AT",
 ]
 
 
 DEFAULT_TIMEOUT_MS: Final[int] = 30_000
 """一条命令的默认墙钟上限（ms）。
 
-实测一条命令的地板约 200 ms、取像往返中位 1.02–1.07 s（设备层 §3），所以 30 s
-是「明显坏了」那条线，不是「慢」那条线。它的用处是**不许无限等**，不是掐着实测值卡。
+实测一条命令的地板约 200 ms、取像往返中位约 1.0 s（设备层 §3），所以 30 s 是
+「明显坏了」那条线，不是「慢」那条线。它的用处是**不许无限等**，不是掐着实测值卡。
 """
 
 DEVICE_TMP_DIR: Final[str] = "/data/local/tmp"
@@ -74,12 +97,61 @@ DEVICE_TMP_DIR: Final[str] = "/data/local/tmp"
 东西会被媒体扫描器看见）。
 
 **它是一个固定槽位，不每帧删**（设备层 §4 · T4 定）：同名写入直接覆盖、不累积，
-而删它要多跑一条命令、约 200 ms（§3 的地板），占往返的两成。**本地那一份才每帧删**
-（本机文件，不花命令）。
+而删它要多跑一条命令、约 200 ms（§3 的地板）。**本地那一份才每帧删**（本机文件，
+不花命令）。
 """
 
 FRAME_FILE_NAME: Final[str] = "ark_frame.raw"
 """设备端与本地两侧共用的文件名。原始帧定长 14,112,016 字节，`.raw` 是它自己。"""
+
+R_GRID: Final[float] = 0.3
+"""部署终点相对格心的偏移 `r`（单位：格）。**估 0.3 格，真机待测。**
+
+设备层 §2：终点是 `格心 + r·û`，同一个终点**同时编码了格与朝向**。`r` 被两边
+夹住（上界：终点要落在可部署区域内；下界：四个朝向要分得开），而 §6 把「`r` 的
+取值」列成待实测项 —— 这一轮**不测它**，只把它钉成一个**显式常量**。
+"""
+
+FACING_VECTORS: Final[Mapping[str, tuple[float, float]]] = MappingProxyType(
+    {
+        "上": (0.0, -1.0),
+        "下": (0.0, 1.0),
+        "左": (-1.0, 0.0),
+        "右": (1.0, 0.0),
+    }
+)
+"""朝向 → **格空间**里的单位向量 `û`。**四个，不含斜向**（时序层 §4）。
+
+格空间的 y 向**下**为正（与屏幕一致），所以「上」是 `(0, -1)`。四个字面值是
+设备层 §5 钉的，词表在时序层 §4。
+"""
+
+SWIPE_DURATION_MS: Final[int] = 400
+"""部署那一次 `input swipe` 的 `duration` 参数（ms）。**真机待测**（设备层 §6）。
+
+它是「手势耗时」那一栏的输入（§3）：`swipe` 的 `duration` 参数 vs 实际墙钟。
+"""
+
+PANEL_WAIT_MS: Final[int] = 400
+"""点开干员之后**等面板滑出来**多久（ms）。**真机待测**（设备层 §6）。
+
+设备层 §5：这个等待**不是判断**（等的是一件确定会发生的事），但它**也不能盲等**
+—— 所以它是一个**显式常量**，不是一个循环。「面板出现要等多久」是 §6 的待实测项。
+"""
+
+PANEL_RETREAT_AT: Final[GridCoord] = GridCoord(0.0, 1.2)
+"""面板上那个**撤退键**相对干员所在格的偏移（格）。**占位值，真机待测。**
+
+视觉层/技能详情通道 §1：点开干员之后，「在干员**旁**显示技能按钮」—— 所以按钮的
+位置是**格空间里的一个偏移**，像素经投影算，视图一换它跟着换。
+
+**这个数是我挑的占位**：这一轮**没有面板打开的那一帧**，所以它没有实测来源
+（§6 那张表里也没有这一项）。它不影响任何离线检查 —— 拿不到投影时这条命令根本
+发不出去（T5 裁定五）。
+"""
+
+PANEL_SKILL_AT: Final[GridCoord] = GridCoord(0.0, 2.0)
+"""面板上那个**技能键**相对干员所在格的偏移（格）。**占位值，真机待测**（同上）。"""
 
 
 class AdbTimeout(Exception):
@@ -107,8 +179,9 @@ class WmSize:
     校验要读 `Override size`** —— 有它的时候 `Physical size` 是物理屏、不是当前
     画布，读错了会在降档之后仍以为画布是 2800×1260）。
 
-    **两个字段都不转置。** 这台机器报 `1260x2800`（竖屏自然朝向），画布是
-    `2800x1260`；转置要方向，而方向从哪来还没定（设备层「尚未定」）。
+    **两个字段都不转置**（设备层 §4）：这台机器报 `1260x2800`（竖屏自然朝向），
+    画布是 `2800x1260`。**画布口径不靠这里转** —— 设备事实取自 `dumpsys input`
+    那条 `Viewport` 行的 `logicalFrame`（T5 定），所以这条解析器不必知道方向。
     """
 
     physical: Canvas
@@ -137,8 +210,9 @@ def parse_wm_size(text: str) -> WmSize:
         Physical size: 1260x2800   → Canvas(1260, 2800)
         Override size: 882x1960    → Canvas(882, 1960)
 
-    **不转置**（设备层 §4）：想要 2800×1260 就自己去写 `1260x2800` —— 转置要方向，
-    而方向来源还没定。两行都在时 `override` 非空。
+    **不转置**（设备层 §4）：想要 2800×1260 就自己去写 `1260x2800` —— 这台设备的
+    `wm size` 与画布差 90°，而**画布口径从 `dumpsys input` 那条 `Viewport` 行来**
+    （T5 定），不必在这里转。两行都在时 `override` 非空。
 
     **没有 `Physical size` 这一行就报错**：它是基础那一行，缺了它说明这份输出
     根本不是 `wm size` 的输出（多半是别的命令的错误信息），按 RGBA 那样猜着解
@@ -159,6 +233,55 @@ def parse_wm_size(text: str) -> WmSize:
             f"wm size 的输出里没有 `Physical size: 宽x高` 那一行，收到 {text!r}"
         )
     return WmSize(physical=physical, override=override)
+
+
+_VIEWPORT_LINE: Final[re.Pattern[str]] = re.compile(
+    r"Viewport\s+\S+\s*:(?P<body>.*)$", re.MULTILINE
+)
+"""`dumpsys input` 里那条 `Viewport <名字>: ...` 行。名字（`INTERNAL` 之类）不认，
+它随安卓版本变。"""
+
+_ORIENTATION: Final[re.Pattern[str]] = re.compile(r"\borientation=(-?\d+)")
+"""方向。**词表就是设备自己报的那个整数**：字面值 `"0"` `"1"` `"2"` `"3"`
+（T5 裁定一）。"""
+
+_LOGICAL_FRAME: Final[re.Pattern[str]] = re.compile(
+    r"\blogicalFrame=\[\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)\s*\]"
+)
+"""`[左, 上, 右, 下]`。**它直接就是画布口径**（T5 裁定二）。"""
+
+
+def parse_dumpsys_input(text: str) -> DeviceFacts:
+    """把 `dumpsys input` 的输出解成设备事实。**纯函数，不碰设备。**
+
+    取的是 `Viewport <名字>: ...` 那一行里的两个字段（T4.1 试出来、T5 裁定的那一对）：
+
+        orientation=1                     → 方向就是**设备自己报的那个整数**
+        logicalFrame=[0, 0, 2800, 1260]   → 画布口径**直接**就是它（宽 2800、高 1260）
+
+    **一个转置都不做**（T5 裁定二）：`wm size` 报 `1260x2800`（竖屏自然朝向），
+    而画布是 2800×1260 —— 差的那 90° 不必自己转，这条 `Viewport` 行已经把画布
+    口径给出来了。两个口径不许混（设备层 §4）。
+
+    **找不到就报错**：拿不到这两个字段说明这份输出不是那个形状，猜着解就是假事实。
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"dumpsys input 的输出要是字符串，收到 {type(text).__name__}")
+    for match in _VIEWPORT_LINE.finditer(text):
+        body = match.group("body")
+        orientation = _ORIENTATION.search(body)
+        frame = _LOGICAL_FRAME.search(body)
+        if orientation is None or frame is None:
+            continue
+        left, top, right, bottom = (int(value) for value in frame.groups())
+        return DeviceFacts(
+            resolution=Canvas(right - left, bottom - top),
+            orientation=orientation.group(1),
+        )
+    raise ValueError(
+        "dumpsys input 的输出里没有一条同时带 orientation= 与 logicalFrame=[...] 的 "
+        f"`Viewport` 行（设备事实就住那一行）：{text[:400]!r}"
+    )
 
 
 class AdbTransport:
@@ -260,19 +383,42 @@ class AdbTransport:
         return max(1, (time.perf_counter_ns() - started_ns) // 1_000_000)
 
 
+def _digits(point: Pixel) -> list[str]:
+    """像素 → 两个整数字符串。`input` 只认整数，四舍五入到最近的那一个。"""
+    return [str(int(round(point.x))), str(int(round(point.y)))]
+
+
 class AdbDevice:
-    """设备端口的真机适配器：**这一轮只有取像那一条**。
+    """设备端口的真机适配器：**取一帧 + 轴上的四个动词 + 设备事实**（设备层 §5）。
 
     `grab_frame` 的形状是「一条 `shell` 写设备端文件 + 一条 `pull` 取回」，
     **不走 `exec-out` 直出**（设备层 §4 · D-全局-19）：原始帧 14 MB 走流式通道比
     取文件慢，而且 PowerShell 的 `>` 会毁掉二进制。
 
-    `inject_gesture` 与 `device_facts` **不在这里**：它们的形状还没裁定，自己补
-    一个出来就是发明规格。欠账登记在 `runtime/wiring.py` 的 `PORT_GAPS`。
+    `assets` 与 `view` 都是**构造时收进来的**（T5 裁定三）：四个动词要像素时向
+    `assets.projection(view)` 要。**端口一个字不改** —— 切视图 = 重新装配
+    （代码结构 规则二那句「换一套参数 = 换一个适配器」）。
+
+    两个都**可以省略**（默认没有资产端口 + 常速视图）：取帧与设备事实**不需要投影**，
+    所以 `AdbDevice(transport)` 对那两条成立；而四个动词在拿不到投影时**一条命令
+    都不发**（T5 裁定五）—— 省略它们就是「没有投影」的一种。
+
+    **replay 适配器对四个动作方法都只记一笔、不点**（契约层 §5）。
     """
 
-    def __init__(self, transport: AdbTransport) -> None:
+    def __init__(
+        self,
+        transport: AdbTransport,
+        assets: AssetPort | None = None,
+        view: View = View.NORMAL,
+    ) -> None:
+        if not isinstance(view, View):
+            raise TypeError(f"此刻的视图要是 View，收到 {type(view).__name__}")
         self._transport = transport
+        self._assets = assets
+        self._view = view
+
+    # -- 设备管理 -----------------------------------------------------------
 
     def grab_frame(self) -> bytes:
         """取一帧，返回**原始帧**（不是归一化帧，设备层 §4）。
@@ -284,7 +430,7 @@ class AdbDevice:
         2. 一条 `pull`：把那一份取回本地。
 
         设备端那个文件是**固定槽位**：同名写入直接覆盖、不累积，所以**它不每帧删**
-        —— 删它要多跑一条命令、约 200 ms（§3 的地板），占往返的两成。
+        —— 删它要多跑一条命令、约 200 ms（§3 的地板）。
         **本地那一份才每帧删**（本机文件，不花命令）。
 
         **本地那份读不出来就是取帧坏了**：不许退回 `pull` 的 stdout —— 真 `adb pull`
@@ -310,6 +456,142 @@ class AdbDevice:
         finally:
             self._drop_local(local)
         return raw
+
+    def device_facts(self) -> DeviceFacts:
+        """设备事实：分辨率 · 方向（设备层 §5）。**查真机，不发手势。**
+
+        一条 `dumpsys input`，取那条 `Viewport ...` 行（解析在 `parse_dumpsys_input`）：
+        `orientation=` 就是方向（词表就是那个整数），`logicalFrame=` 直接就是画布。
+
+        **它不需要投影** —— 它不发手势，所以拿不到投影也照样能查（T5 裁定五只约束
+        四个动词）。
+        """
+        raw = self._transport.run_command(["shell", "dumpsys", "input"])
+        return parse_dumpsys_input(raw.decode("utf-8", "replace"))
+
+    # -- 轴上的四个动词 -----------------------------------------------------
+
+    def deploy(self, card: int, at: GridCoord, facing: str) -> None:
+        """部署：**一次直线 swipe**（设备层 §2）。
+
+        起点 = 备战席第 `card` 张卡的中心（UiLayout 的卡框），终点 = `格心 + r·û`
+        —— 同一个终点**同时编码了格与朝向**，所以四个朝向塌成一次直线拖动。
+
+        `card` 是**此刻读到的那一张**，这条类**不许缓存它**（契约层 §5）。下标
+        **0 = 最左那张卡**（与 UiLayout 那张表同一条口径）。
+        """
+        if not isinstance(facing, str) or facing not in FACING_VECTORS:
+            raise ValueError(
+                "朝向只有 " + "、".join(FACING_VECTORS) + f" 四个（不含斜向），收到 {facing!r}"
+            )
+        at = self._as_grid(at)
+        projection = self._projection()
+        start = self._card_center(card)
+        ux, uy = FACING_VECTORS[facing]
+        end = projection.to_pixels(
+            GridCoord(at.x + R_GRID * ux, at.y + R_GRID * uy)
+        )
+        self._swipe(start, end, SWIPE_DURATION_MS)
+
+    def retreat(self, at: GridCoord) -> None:
+        """撤退：点那个格上的干员 → 等面板 → 点面板上的撤退（设备层 §2）。"""
+        self._two_taps(at, PANEL_RETREAT_AT)
+
+    def skill_on(self, at: GridCoord) -> None:
+        """开技能：同撤退那个形状，点面板上的技能键。**仅对手动触发的技能成立**。"""
+        self._two_taps(at, PANEL_SKILL_AT)
+
+    def skill_off(self, at: GridCoord) -> None:
+        """关技能：同上。**仅对可关的技能成立**（时序层 §4）。"""
+        self._two_taps(at, PANEL_SKILL_AT)
+
+    # -- 内部：像素与手势原语 -----------------------------------------------
+
+    def _projection(self) -> Projection:
+        """此刻这一套投影。**拿不到就抛** —— 调用方一条命令都别发（T5 裁定五）。
+
+        三条"拿不到"，**报出来的是同一件事**：投影还没标定，所以像素算不出来。
+
+        ① **没接资产端口**（`assets` 是空的 —— 取帧与设备事实不需要它，所以那两条
+        命令允许单参数构造）；② 接了，但**那个实现上根本没有这个方法**（`EmptyAssetPort`
+        就是这一支：T5 裁定四说「留空 = 方法不存在」）；③ 方法在、调用时抛。
+
+        **② 不许落成一句光秃秃的 `AttributeError`** —— 那读起来像 bug，而它其实是
+        「投影还没标定」。所以在这里转成一句带话的报错。
+        """
+        if self._assets is None:
+            raise RuntimeError(
+                "投影还没有来源：这条设备适配器没有接资产端口（取帧与设备事实不需要它，"
+                "所以允许单参数构造）。像素算不出来，**一条命令都不发**"
+            )
+        make = getattr(self._assets, "projection", None)
+        if not callable(make):
+            raise RuntimeError(
+                "投影还没有来源：资产端口上没有 projection 这个方法（留空 = 方法不存在，"
+                "代码结构 §尚未落地），欠账登记在 runtime/wiring.py 的 PORT_GAPS 里 —— "
+                "标定是首轮探索编辑器的第一块。像素算不出来，**一条命令都不发**"
+            )
+        return make(self._view)
+
+    @staticmethod
+    def _as_grid(at: GridCoord) -> GridCoord:
+        """格坐标入口**只收格坐标**：喂像素进来就抛（契约层 §5）。"""
+        if not isinstance(at, GridCoord):
+            raise TypeError(
+                f"这个入口收的是格坐标，收到 {type(at).__name__}："
+                "像素在这一层内部由投影算出（设备层 §1）"
+            )
+        return at
+
+    @staticmethod
+    def _card_center(card: int) -> Pixel:
+        """备战席第 `card` 张卡的**中心**（UiLayout 的卡框）。
+
+        表里没有那一张就**报错，不猜**：那张表是就着 T5 段 0 那一帧（5 张卡）量的，
+        而**卡距随卡数变**（见设备层 §6 与 T5 报告的规格洞）。
+        """
+        if isinstance(card, bool) or not isinstance(card, int):
+            raise TypeError(f"卡下标是整数，收到 {type(card).__name__}")
+        rect = UI_LAYOUT.rects.get(f"squad_card_{card}")
+        if rect is None:
+            raise IndexError(
+                f"备战席卡框表里没有第 {card} 张卡：那张表是就着 T5 段 0 那一帧"
+                "（5 张卡）量的，只有 0..4；别的卡数下卡距不一样"
+            )
+        return Pixel(rect.x + rect.width / 2, rect.y + rect.height / 2)
+
+    def _two_taps(self, at: GridCoord, button_at: GridCoord) -> None:
+        """撤退 / 开技能 / 关技能共用的形状：**两次点 + 一次等面板**（设备层 §2）。"""
+        at = self._as_grid(at)
+        projection = self._projection()
+        self._tap(projection.to_pixels(at))
+        time.sleep(PANEL_WAIT_MS / 1000.0)
+        self._tap(
+            projection.to_pixels(
+                GridCoord(at.x + button_at.x, at.y + button_at.y)
+            )
+        )
+
+    def _tap(self, point: Pixel) -> None:
+        """手势原语「点」。**端口上看不见它**（时序层 §4）。"""
+        self._transport.run_command(["shell", "input", "tap", *_digits(point)])
+
+    def _swipe(self, start: Pixel, end: Pixel, duration_ms: int) -> None:
+        """手势原语「拖」：按下与抬起是它的两端（设备层 §2）。
+
+        `input swipe` 是**原子的** —— 手指无法跨越两条 adb 命令保持按下，所以
+        部署必须是一次性手势，不能「先拖到格、停一下看清预览、再选方向」。
+        """
+        self._transport.run_command(
+            [
+                "shell",
+                "input",
+                "swipe",
+                *_digits(start),
+                *_digits(end),
+                str(int(duration_ms)),
+            ]
+        )
 
     def _remote_path(self) -> str:
         """设备端那个槽位的路径。固定名字：只有「取一帧」，没有取像流。"""

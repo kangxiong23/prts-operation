@@ -26,7 +26,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from enum import Enum
 from types import MappingProxyType
-from typing import TypeAlias, final
+from typing import Final, TypeAlias, final
 
 __all__ = [
     "GridCoord",
@@ -37,6 +37,7 @@ __all__ = [
     "View",
     "Projection",
     "UiLayout",
+    "UI_LAYOUT",
 ]
 
 
@@ -304,3 +305,46 @@ class UiLayout:
             if not isinstance(rect, PixelRect):
                 raise TypeError(f"UI 常量 {name!r} 的值要是像素矩形，收到 {type(rect).__name__}")
         object.__setattr__(self, "rects", MappingProxyType(dict(self.rects)))
+
+
+# ---------------------------------------------------------------------------
+# UI 布局常量的值：类型与值都在这一层（契约层 §2 · 用户裁定）
+# ---------------------------------------------------------------------------
+
+UI_LAYOUT: Final[UiLayout] = UiLayout(
+    {
+        # 备战席卡行。**整排一个矩形表达不了它**：它是右对齐的，右缘固定、左缘随
+        # 卡数变（视觉层/顶部HUD与数字）。这一段是 T5 段 0 那一帧量出来的 ——
+        # 原生 2800×1260、**5 张卡**：卡行上缘 **1045** · 下缘 **1259** ·
+        # 卡距 **207.5** · 最左那张卡的左缘 **1762**（抽验：五张卡上那个固定
+        # 特征点在 1884 / 2091 / 2299 / 2506 / 2714，间距 207–208）。
+        #
+        # **下标 0 = 最左那张卡**，向右递增 —— 与特征库 §1 读卡的方向一致
+        # （那里说"四张卡从左到右是 7 / 10 / 10 / 14"，还说"下了第 2、3 张"）。
+        #
+        # **这张表只在 5 张卡那一档成立**：卡距随卡数变，规格里记的 189 是
+        # 12 张卡那一档（视觉层/顶部HUD与数字），两档对不上，见 T5 报告的规格洞。
+        "squad_card_0": PixelRect(1762, 1045, 207.5, 214),
+        "squad_card_1": PixelRect(1969.5, 1045, 207.5, 214),
+        "squad_card_2": PixelRect(2177, 1045, 207.5, 214),
+        "squad_card_3": PixelRect(2384.5, 1045, 207.5, 214),
+        "squad_card_4": PixelRect(2592, 1045, 207.5, 214),
+        # 卡面上的**身份识别区**（卡面与指纹 §0）：整张卡去掉顶上那一条 ——
+        # 职业图标与部署费用都长在那一条里，而两样都**不进身份区**（前者不唯一、
+        # 后者会随死亡 / 撤退次数变）。顶上那一条量到 y 1045..1092。
+        "squad_card_face_0": PixelRect(1762, 1092, 207.5, 167),
+        "squad_card_face_1": PixelRect(1969.5, 1092, 207.5, 167),
+        "squad_card_face_2": PixelRect(2177, 1092, 207.5, 167),
+        "squad_card_face_3": PixelRect(2384.5, 1092, 207.5, 167),
+        "squad_card_face_4": PixelRect(2592, 1092, 207.5, 167),
+    }
+)
+"""这一台设备上的 UI 布局常量（**值**在这里，类型在上面）。
+
+**坐标是绝对像素**，与投影同一条纪律：不缩放、不归一化，所以它跟画布一起定死
+在这台设备的分辨率上（契约层 §2）。**名字**由用它的那一层起：备战席这一组是
+视觉层/顶部HUD与数字与设备层共用的那一段。
+
+**这张表不是"资产"**（用户裁定）：它不是生成物、不进资产库，所以它不走资产端口
+——它住契约层，设备层与视觉层各自 import 它，不必互相 import。
+"""

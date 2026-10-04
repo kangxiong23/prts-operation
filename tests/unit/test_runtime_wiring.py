@@ -46,26 +46,34 @@ def test_build_wiring_sends_no_command_by_itself():
     assert recorder.calls == []
 
 
-def test_port_gaps_is_a_tuple_of_sentences_naming_a_round():
+def test_port_gaps_is_a_tuple_of_sentences():
+    """登记的形状不变：一个元组，每条一句话 —— 每条点名一个端口方法。"""
     assert isinstance(PORT_GAPS, tuple)
-    assert PORT_GAPS
     for entry in PORT_GAPS:
         assert isinstance(entry, str) and entry.strip()
-        assert "T4.1" in entry
-        assert "DevicePort" in entry
+        assert "DevicePort" in entry or "AssetPort" in entry
 
 
-def test_port_gaps_names_the_two_methods_left_open():
-    text = "\n".join(PORT_GAPS)
-    assert "inject_gesture" in text
-    assert "device_facts" in text
+def test_port_gaps_names_no_device_method_any_more():
+    """T5 裁定六：这一轮做完，`PORT_GAPS` 里**不该再有任何 DevicePort 条目**。"""
+    assert [entry for entry in PORT_GAPS if "DevicePort" in entry] == []
 
 
-def test_device_adapter_does_not_invent_the_unsettled_methods():
+def test_device_adapter_has_exactly_the_ports_methods():
+    """设备端口的六个方法一个不缺，也**一个不多**（多了要先改契约层）。"""
     device = build_wiring(AdbTransport(run=Silent())).device
-    assert callable(getattr(device, "grab_frame", None))
-    assert not callable(getattr(device, "inject_gesture", None))
-    assert not callable(getattr(device, "device_facts", None))
+    for name in ("grab_frame", "device_facts", "deploy", "retreat", "skill_on", "skill_off"):
+        assert callable(getattr(device, name, None)), name
+    assert not hasattr(device, "inject_gesture")
+
+
+def test_build_wiring_hands_the_view_to_the_device_adapter():
+    """T5 裁定三：`build_wiring(transport, view=...)` 把视图交给设备层。"""
+    from ark.contracts import View
+
+    wiring = build_wiring(AdbTransport(run=Silent()), view=View.SLOW)
+    assert wiring.device._view is View.SLOW  # noqa: SLF001
+    assert build_wiring(AdbTransport(run=Silent())).device._view is View.NORMAL  # noqa: SLF001
 
 
 def test_empty_sample_port_does_nothing():
@@ -74,8 +82,16 @@ def test_empty_sample_port_does_nothing():
     assert vars(port) == {}
 
 
-def test_empty_asset_port_has_no_public_method():
+def test_empty_asset_port_has_no_projection_and_the_gap_is_registered():
+    """T5 裁定四（新口径）：**留空 = 方法不存在** —— 空实现一个公开方法都没有。
+
+    欠账必须**写下来**（`PORT_GAPS`），不许摆一个「在但一调就炸」的方法：那会让
+    「接上了」这个判断变成**假的**（`port_completeness` 的判据是方法级的）。
+    """
     assert [name for name in dir(EmptyAssetPort) if not name.startswith("_")] == []
+    assert any(
+        "AssetPort" in entry and "projection" in entry for entry in PORT_GAPS
+    ), "资产端口那条欠账没有登记进 PORT_GAPS"
 
 
 def test_port_completeness_check_passes():

@@ -47,6 +47,7 @@ GEOMETRY_NAMES = [
     "View",
     "Projection",
     "UiLayout",
+    "UI_LAYOUT",
 ]
 
 CONTAINER_NAMES = [
