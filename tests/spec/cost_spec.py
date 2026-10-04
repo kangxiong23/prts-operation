@@ -299,6 +299,36 @@ def check_bar_constant_is_the_track_itself() -> str:
     return f"cost_bar x [{r.x},{right}] 就是轨道本体，宽 {r.width} px"
 
 
+def check_spec_thresholds_are_pinned_to_the_code() -> str:
+    """规格写死的判据阈值，代码里的常量必须相等。
+
+    **为什么单立一条**：这几个数是这条链**全部的决策面**，而它们原本住在两个家里
+    （文档写一遍、代码写一遍），**改一处忘一处就是静默漂移**，且没有任何守卫抓得到
+    —— `check_docs.py` 只看状态行 / 链接 / 废词，不比对数值。
+    所以规格这边把值钉住，代码跟着比。
+
+    **只钉规格说过的数**：`SOLID_MATCH_SCORE` / `AMBIGUITY_MARGIN` 是实现的自由
+    （规格没给刻度），**不进这条** —— 钉了就等于我替实现定分。
+    """
+    cost = _mod("ark.engine.vision.cost")
+    pinned = {
+        "CENTER_TOLERANCE": 8,      # 顶部HUD与数字 §每个区域必须知道的事实：±8
+        "BAR_BRIGHT_MIN": 190,      # 同上：「亮白」阈值
+        "BAR_FULL_MIN": 117,        # 同上：满态轨道最暗列下界
+        "BAR_DARK_MAX": 67,         # 同上：空态轨道最亮列上界
+        "MAX_DIGITS": 2,            # 同上：位数范围 1–2 位
+    }
+    bad = []
+    for name, want in pinned.items():
+        got = getattr(cost, name, None)
+        if got is None:
+            bad.append(f"{name} 不在 cost.py 的公开面上")
+        elif got != want:
+            bad.append(f"{name} 是 {got!r}，规格钉的是 {want!r}")
+    assert not bad, "；".join(bad)
+    return "规格钉住的 5 个数与代码一致：" + " · ".join(f"{k}={v}" for k, v in pinned.items())
+
+
 def check_windows_stay_inside_the_canvas() -> str:
     """窗口是**含两端**的绝对像素，所以右缘最大只能是画布最后一列（2799）、
     下缘最大只能是最后一行（1259）。写 2800 就是"含了一个不存在的像素"——
@@ -756,6 +786,9 @@ CHECKS: tuple[Check, ...] = (
     Check("L5", "契约层 §2（含两端）+ 设备层 §4（画布 2800×1260）",
           "每个窗口都落在画布内，右缘不超过 2799",
           check_windows_stay_inside_the_canvas),
+    Check("L6", "视觉层/顶部HUD与数字 §每个区域必须知道的事实",
+          "规格写死的判据阈值，代码里的常量必须相等",
+          check_spec_thresholds_are_pinned_to_the_code),
     Check("F1", "设备层 §4 + 契约层 §2",
           "原始帧解出捕获分辨率的画布，不缩放",
           check_raw_frame_decodes_to_the_capture_canvas),
