@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import contextlib
 import importlib
+import inspect
 import itertools
 import os
 import re
@@ -337,13 +338,20 @@ def check_wm_size_is_read_in_its_own_units() -> str:
 
 
 def check_frame_is_taken_by_screencap_plus_pull() -> str:
-    """取一帧走 `screencap`（不带 `-p`）+ `pull`，不走 `exec-out` 直出。"""
+    """取一帧走 `screencap`（不带 `-p`）+ `pull`，不走 `exec-out` 直出。
+
+    **走装配点拿设备**（T5 修）：原来这里直接 `AdbDevice(transport)` 单参数构造，
+    而设备层 §5 已经定了适配器要收三样（传输 · 资产端口 · 此刻的视图）—— 验收里
+    那条单参数写法**逼着实现给后两样留默认值**，于是"没接资产端口的适配器"在类型上
+    说得通了。规格检查不许反过来削规格（同一条教训：W8 曾经逼出一个 stdout 回退）。
+    """
+    wiring = _wiring()
     adb = _adb()
     raw = _synthetic_raw(8, 4)
     seen: list[tuple[str, ...]] = []
     with _writable_tmp() as scratch:
         transport = _fake_transport(adb, raw, seen=seen, scratch=scratch)
-        got = adb.AdbDevice(transport).grab_frame()
+        got = wiring.build_wiring(transport).device.grab_frame()
     flat = [" ".join(argv) for argv in seen]
     assert any("screencap" in line for line in flat), f"没跑 screencap：{flat}"
     assert any("pull" in line for line in flat), f"没走 pull：{flat}"
@@ -359,6 +367,7 @@ def check_frame_is_taken_by_screencap_plus_pull() -> str:
 
 def check_timeout_is_reported_not_waited() -> str:
     """命令没返回要报超时，不是无限等。"""
+    wiring = _wiring()
     adb = _adb()
 
     def slow(argv: Sequence[str], timeout_ms: int) -> bytes:
@@ -368,7 +377,7 @@ def check_timeout_is_reported_not_waited() -> str:
     with _writable_tmp() as scratch:
         transport = adb.AdbTransport(run=slow, timeout_ms=50, work_dir=scratch)
         try:
-            adb.AdbDevice(transport).grab_frame()
+            wiring.build_wiring(transport).device.grab_frame()
         except adb.AdbTimeout as caught:
             elapsed = getattr(caught, "elapsed_ms", None)
             assert isinstance(elapsed, int) and elapsed > 0, (
@@ -385,6 +394,37 @@ def check_timeout_is_reported_not_waited() -> str:
 # ---------------------------------------------------------------------------
 # W 族：端到端与端口完备性
 # ---------------------------------------------------------------------------
+
+
+def check_device_adapter_requires_its_three_parts() -> str:
+    """设备适配器构造时三样都要给全：传输 · 资产端口 · 此刻的视图（设备层 §5）。
+
+    **不许给后两样留默认值**：一个"没接资产端口"的适配器在类型上说得通，但它其实
+    **只能取帧与查设备事实** —— 那种对象会让"设备端口接上了"变成一句半真话（与
+    [代码结构] §尚未落地 那条"留空 = 方法不存在"同一个道理）。缺投影时四个动词
+    本来就不许发命令（W12），所以它没有存在的理由。
+
+    **这条是 T5 补的**：原来 W8 / W9 直接 `AdbDevice(transport)` 单参数构造，
+    逼着实现给后两样留默认值 —— 规格检查反过来削规格，同一个坑踩过两次
+    （上一次是 `grab_frame` 的 stdout 回退）。
+    """
+    adb = _adb()
+    params = inspect.signature(adb.AdbDevice.__init__).parameters
+    for name in ("transport", "assets", "view"):
+        assert name in params, (
+            f"设备适配器的构造参数里没有 {name}：它要收三样（设备层 §5），"
+            f"现在只有 {sorted(params)}"
+        )
+    optional = [
+        name
+        for name in ("assets", "view")
+        if params[name].default is not inspect.Parameter.empty
+    ]
+    assert not optional, (
+        f"{optional} 有默认值：一个没接资产端口的适配器只能取帧与查设备事实，"
+        "而它会让「设备端口接上了」变成一句半真话 —— 缺投影时四个动词本来就不许发命令"
+    )
+    return f"三样都必填：{sorted(params)}"
 
 
 def check_e2e_script_goes_through_the_ports() -> str:
@@ -448,6 +488,9 @@ CHECKS: tuple[Check, ...] = (
     Check("W12", "设备层 §1（像素在入口内部由投影算出）+ 零假事实",
           "拿不到投影时，四个动词一条命令都不许发",
           check_missing_projection_never_becomes_a_click),
+    Check("W13", "设备层 §5（适配器收三样）",
+          "设备适配器构造时传输 · 资产端口 · 此刻的视图都要给全",
+          check_device_adapter_requires_its_three_parts),
 )
 
 
