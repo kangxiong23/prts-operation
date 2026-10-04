@@ -4,17 +4,10 @@
 混起来会产生一个**静默的错** —— 同一次 200 ms 的 ADB 延迟，常速下是 6 个游戏帧、
 慢放下只有 0.6 帧 —— 所以这里返回的是 `WallClockMs`，不是裸数。
 
-## 用哪个时钟
+## 墙钟读哪把时钟
 
-本机实测（CPython 3.12 / Windows）：`time.monotonic_ns()` 的粒度是 **15,625,000 ns**
-（背后是 `GetTickCount64()`，分辨率 0.015625 s），而 `time.perf_counter_ns()` 是
-**100 ns**（`QueryPerformanceCounter()`）。设备层 §3 要用这个量算「取像往返」
-（中位 1.02–1.07 s、极差 170–210 ms），16 ms 的台阶会把极差量成一堆 0 ——
-所以这里取 `perf_counter`。
-
-两者都是 `monotonic=True`、`adjustable=False`：**单调不减是平台的保证**，
-不是这里补的一层保护。用挂钟时间（`time.time()`）就不行 —— 系统校时可以把
-「两次取帧隔了多久」往回拨，而那是测量，不是日历。
+**要 `perf_counter` 那一类、不要 `monotonic`** —— 规定与实测数在「契约层/刻度 §3」
+（T4 定）。这里**只引用，不重述**：同一条规定出现两次，改的时候就会漏掉一处。
 """
 
 from __future__ import annotations

@@ -209,27 +209,36 @@ def test_default_work_dir_is_the_platform_temp_dir_not_a_fresh_one():
 # ---------------------------------------------------------------------------
 
 
-def test_grab_frame_goes_through_the_device_file_and_the_local_copy(work_dir):
+def test_grab_frame_goes_through_one_shell_and_one_pull(work_dir):
     frame = bytes(range(64))
     recorder = Recorder(frame=frame, write_local=True)
     transport = AdbTransport(run=recorder, serial="SERIAL-X", work_dir=work_dir)
     raw = AdbDevice(transport).grab_frame()
     assert raw == frame
+    remote = f"{DEVICE_TMP_DIR}/{FRAME_FILE_NAME}"
     commands = [argv for argv, _ in recorder.calls]
+    # **两条命令，不许有第三条**（T4 定）：删旧文件与写新文件并进同一次 shell 调用。
+    assert len(commands) == 2
     assert commands[0] == [
         "-s",
         "SERIAL-X",
         "shell",
+        "rm",
+        "-f",
+        remote,
+        "&&",
         "screencap",
-        f"{DEVICE_TMP_DIR}/{FRAME_FILE_NAME}",
+        remote,
     ]
     assert commands[1] == [
         "-s",
         "SERIAL-X",
         "pull",
-        f"{DEVICE_TMP_DIR}/{FRAME_FILE_NAME}",
+        remote,
         str(work_dir / FRAME_FILE_NAME),
     ]
+    # 顺序是**先删再写**：写之前那个槽位必须是空的。
+    assert commands[0].index("rm") < commands[0].index("screencap")
     flat = recorder.flat
     assert "screencap" in flat
     assert "pull" in flat
@@ -237,29 +246,52 @@ def test_grab_frame_goes_through_the_device_file_and_the_local_copy(work_dir):
     assert "exec-out" not in flat
 
 
-def test_grab_frame_returns_the_pulled_bytes_when_nothing_landed(work_dir):
-    frame = bytes(range(32))
-    recorder = Recorder(frame=frame, write_local=False)
+def test_grab_frame_never_issues_a_standalone_delete(work_dir):
+    """取帧的参数表里**不许再出现单独的删除命令**（那是 ~200 ms 的两成）。"""
+    recorder = Recorder(frame=b"x", write_local=True)
+    AdbDevice(AdbTransport(run=recorder, work_dir=work_dir)).grab_frame()
+    for argv, _ in recorder.calls:
+        standalone = argv[0] == "shell" and argv[1] == "rm" and "screencap" not in argv
+        assert not standalone
+
+
+def test_grab_frame_refuses_to_hand_back_the_pull_stdout(work_dir):
+    """取回之后本地没有那一份帧 → 报错。**不许退回 stdout**（T4.1 裁定二）。
+
+    真取回命令的 stdout 是**进度文本**（下面这条假的就是照着它编的），把它当帧
+    返回就是假事实的入口。这一条专门钉那个分支。
+    """
+    recorder = Recorder(frame=b"1 file pulled. 0 files skipped.", write_local=False)
     transport = AdbTransport(run=recorder, work_dir=work_dir)
-    assert AdbDevice(transport).grab_frame() == frame
+    with pytest.raises(RuntimeError) as caught:
+        AdbDevice(transport).grab_frame()
+    assert "stdout" in str(caught.value)
+    assert not (work_dir / FRAME_FILE_NAME).exists()
 
 
-def test_grab_frame_leaves_neither_side_behind(work_dir):
+def test_grab_frame_leaves_no_local_file_behind(work_dir):
     recorder = Recorder(frame=b"x" * 8, write_local=True)
     transport = AdbTransport(run=recorder, work_dir=work_dir)
     AdbDevice(transport).grab_frame()
     assert not (work_dir / FRAME_FILE_NAME).exists()
-    assert "rm" in recorder.flat
-    assert recorder.flat.count(f"{DEVICE_TMP_DIR}/{FRAME_FILE_NAME}") == 3
+    # 设备端那一份**不删**：它是固定槽位，靠同名覆盖（T4 定）—— 所以只有两条命令。
+    assert len(recorder.calls) == 2
 
 
-def test_grab_frame_does_not_read_a_stale_local_frame(work_dir):
+def test_grab_frame_clears_the_local_slot_before_taking_the_frame(work_dir):
+    """本地那份**在发命令之前**就被清掉：陈帧会被当成这一帧读出来。"""
     stale = work_dir / FRAME_FILE_NAME
     stale.write_bytes(b"\xff" * 16)
-    recorder = Recorder(frame=b"fresh", write_local=False)
-    transport = AdbTransport(run=recorder, work_dir=work_dir)
-    assert AdbDevice(transport).grab_frame() == b"fresh"
-    assert not stale.exists()
+    seen: list[bool] = []
+
+    def spy(argv, timeout_ms):
+        if "screencap" in argv:
+            seen.append(stale.is_file())
+        return b""
+
+    with pytest.raises(RuntimeError):
+        AdbDevice(AdbTransport(run=spy, work_dir=work_dir)).grab_frame()
+    assert seen == [False]
 
 
 def test_grab_frame_reports_timeout_instead_of_waiting_forever(work_dir):

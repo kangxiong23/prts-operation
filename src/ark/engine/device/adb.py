@@ -29,14 +29,10 @@
 不给它时**真跑**（走 `adb` 那个名字，不写绝对路径：换台机器就得改引擎的东西
 不许出现在这里）。
 
-## 为什么量墙钟用的是 `perf_counter` 而不是 `monotonic`
+## 墙钟读哪把时钟
 
-本机实测（CPython 3.12 / Windows）：`time.monotonic_ns()` 的粒度是
-**15,625,000 ns**（背后是 `GetTickCount64()`，分辨率 0.015625 s），而
-`time.perf_counter_ns()` 是 **100 ns**（`QueryPerformanceCounter()`）。设备层 §3
-要的是「取像往返」这种几百毫秒量级的测量，16 ms 的台阶会把 107.8 ms 的极差量成
-一堆 0 —— 所以这一层用 `perf_counter`。两者都 `monotonic=True`、
-`adjustable=False`，「不倒退」是平台的保证，不是这里补的一层保护。
+**要 `perf_counter` 那一类、不要 `monotonic`** —— 规定与实测数在「契约层/刻度 §3」
+（T4 定）。这里**只引用，不重述**：同一条规定出现两次，改的时候就会漏掉一处。
 """
 
 from __future__ import annotations
@@ -72,11 +68,14 @@ DEFAULT_TIMEOUT_MS: Final[int] = 30_000
 """
 
 DEVICE_TMP_DIR: Final[str] = "/data/local/tmp"
-"""设备端临时文件的落点。
+"""设备端那个文件的落点。
 
 `shell` 用户在这里有写权限、不需要 root，而且它**不是媒体库**（`/sdcard` 上的
-东西会被媒体扫描器看见）。取完就删（见 `AdbDevice.grab_frame`）。
-**它在真机上到底可不可写，归 T4.1** —— 这一轮只写通道形状。
+东西会被媒体扫描器看见）。
+
+**它是一个固定槽位，不每帧删**（设备层 §4 · T4 定）：同名写入直接覆盖、不累积，
+而删它要多跑一条命令、约 200 ms（§3 的地板），占往返的两成。**本地那一份才每帧删**
+（本机文件，不花命令）。
 """
 
 FRAME_FILE_NAME: Final[str] = "ark_frame.raw"
@@ -171,7 +170,7 @@ class AdbTransport:
     - `work_dir` 是**本地临时文件的落点**。默认用**平台临时目录本身**，不用
       `tempfile.mkdtemp()`：本机沙箱下 `mkdtemp()` 建出来的目录连建它的进程
       自己都进不去（它用 `os.mkdir(path, 0o700)`，受限令牌下那份 DACL 不继承父
-      目录）。临时文件取完就删（见 `AdbDevice.grab_frame`）。
+      目录）。**本地那份取完就删**（见 `AdbDevice.grab_frame`）。
 
     **它不知道自己在跟什么说话**：这条类里没有「现在真的是游戏在跑」这类信息
     （契约层 §5），所以换一个 `run` 就是换一条通道。
@@ -264,9 +263,9 @@ class AdbTransport:
 class AdbDevice:
     """设备端口的真机适配器：**这一轮只有取像那一条**。
 
-    `grab_frame` 的形状是「设备端写文件 + 取回」，**不走 `exec-out` 直出**
-    （设备层 §4 · D-全局-19）：原始帧 14 MB 走流式通道比取文件慢，而且 PowerShell
-    的 `>` 会毁掉二进制。
+    `grab_frame` 的形状是「一条 `shell` 写设备端文件 + 一条 `pull` 取回」，
+    **不走 `exec-out` 直出**（设备层 §4 · D-全局-19）：原始帧 14 MB 走流式通道比
+    取文件慢，而且 PowerShell 的 `>` 会毁掉二进制。
 
     `inject_gesture` 与 `device_facts` **不在这里**：它们的形状还没裁定，自己补
     一个出来就是发明规格。欠账登记在 `runtime/wiring.py` 的 `PORT_GAPS`。
@@ -278,12 +277,18 @@ class AdbDevice:
     def grab_frame(self) -> bytes:
         """取一帧，返回**原始帧**（不是归一化帧，设备层 §4）。
 
-        三步：**设备端写文件**（原始 RGBA，**不带 `-p`**）→ 取回 → **两侧都删掉**
-        （取完就删，不许在手机上留垃圾）。
+        **两条命令，不许有第三条**（设备层 §4 · T4 定）：
 
-        返回的字节：本地那份读得出来就用它（真的落盘了），读不出来就用取回那条命令
-        的 stdout —— 那正是**离线用假 transport 验通道**时能拿到的东西（假的 `run`
-        不落盘）。两条路都**一个字节都不改**。
+        1. 一条 `shell`：**先删旧文件、再 `screencap` 写新的**（原始 RGBA，
+           **不带 `-p`**）—— 两步并进同一次调用；
+        2. 一条 `pull`：把那一份取回本地。
+
+        设备端那个文件是**固定槽位**：同名写入直接覆盖、不累积，所以**它不每帧删**
+        —— 删它要多跑一条命令、约 200 ms（§3 的地板），占往返的两成。
+        **本地那一份才每帧删**（本机文件，不花命令）。
+
+        **本地那份读不出来就是取帧坏了**：不许退回 `pull` 的 stdout —— 真 `adb pull`
+        的 stdout 是**进度文本**，把它当帧返回就是**假事实的入口**。
         """
         transport = self._transport
         remote = self._remote_path()
@@ -291,19 +296,23 @@ class AdbDevice:
         parent = local.parent
         if not parent.is_dir():
             parent.mkdir(parents=True, exist_ok=True)
-        # 先清掉上一次留下的：陈帧会被当成这一帧读出来（取回失败时尤其危险）。
+        # 先清掉上一次留下的**本地**那份：陈帧会被当成这一帧读出来。
         self._drop_local(local)
-        transport.run_command(["shell", "screencap", remote])
+        transport.run_command(["shell", "rm", "-f", remote, "&&", "screencap", remote])
         try:
-            pulled = transport.run_command(["pull", remote, str(local)])
-            raw = local.read_bytes() if local.is_file() else pulled
+            transport.run_command(["pull", remote, str(local)])
+            if not local.is_file():
+                raise RuntimeError(
+                    f"取回之后本地没有那一份帧（{local}）：取帧坏了。"
+                    "不许把取回命令的 stdout 当帧 —— 那是进度文本，不是画面"
+                )
+            raw = local.read_bytes()
         finally:
             self._drop_local(local)
-            self._drop_remote(remote)
         return raw
 
     def _remote_path(self) -> str:
-        """设备端那一份的路径。固定名字：只有「取一帧」，没有取像流。"""
+        """设备端那个槽位的路径。固定名字：只有「取一帧」，没有取像流。"""
         return f"{DEVICE_TMP_DIR}/{FRAME_FILE_NAME}"
 
     def _local_path(self) -> Path:
@@ -315,11 +324,4 @@ class AdbDevice:
         try:
             Path(local).unlink(missing_ok=True)
         except OSError:
-            pass
-
-    def _drop_remote(self, remote: str) -> None:
-        """删设备端那份。同上：清理失败只说明手机上多了一个文件，不是取帧坏了。"""
-        try:
-            self._transport.run_command(["shell", "rm", "-f", remote])
-        except Exception:  # noqa: BLE001 —— 清理是尽力而为，不许盖掉取帧本身的错
             pass
