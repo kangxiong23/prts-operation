@@ -316,6 +316,7 @@ def check_spec_thresholds_are_pinned_to_the_code() -> str:
         "BAR_BRIGHT_MIN": 190,      # 同上：「亮白」阈值
         "BAR_FULL_MIN": 117,        # 同上：满态轨道最暗列下界
         "BAR_DARK_MAX": 94,         # 同上：空态轨道上界 —— 取空档 72–116 的中点
+        "FILL_START_MIN": 160,      # 同上：最左那一列「基本亮」—— 取空档 132–187 的中点
         "MAX_DIGITS": 2,            # 同上：位数范围 1–2 位
     }
     bad = []
@@ -889,6 +890,56 @@ def check_empty_is_not_decided_by_the_brightest_column() -> str:
     return f"空条第 {list(FAR_COLS)} 列各自抬到 {ABOVE_DARK}，都还报 Exact(0)"
 
 
+def _frame_with_columns(shot: int, cols: Mapping[int, int]):
+    """把 `cost_bar` 的**若干列**各涂成一个常量，再编成原始帧。
+
+    `_raw` 只收一个贴片，而这一组检查要同时涂**两列** —— 所以这里自己拼画布，
+    路径与 `_raw` 完全一致（夹具裁剪贴回黑底），只是多涂几列。
+    """
+    e = _entry(shot)
+    x, y = e["origin"]
+    w, h = e["size"]
+    canvas = np.zeros((CANVAS_H, CANVAS_W, 3), np.uint8)
+    canvas[y : y + h, x : x + w] = _crop(shot)
+    r = _ui().rects["cost_bar"]
+    for col, value in cols.items():
+        canvas[r.y : r.y + r.height, r.x + col : r.x + col + 1] = value
+    rgba = np.dstack([canvas, np.full((CANVAS_H, CANVAS_W), 255, np.uint8)])
+    raw = struct.pack("<4I", CANVAS_W, CANVAS_H, 1, 1) + rgba.tobytes()
+    return _mod("ark.engine.vision.frame").frame_from_raw(raw)
+
+
+def check_two_bright_columns_cannot_invent_a_fill() -> str:
+    """**两列**一起涂亮，同样不许伪造出填充。
+
+    B4 只涂**一列**，所以放过了一种更宽的伪造：把第 1、2 列**同时**涂亮，
+    「最左 3 列里亮的有 2 列」就成立 —— 而第 0 列是暗的。填充自左端起，
+    **最左列暗就不是填充**，多列投票不许把这条事实绕过去。
+    """
+    cost = _mod("ark.engine.vision.cost")
+    from ark.contracts import Exact, Valued
+
+    ui = _ui()
+    bad = []
+    for shot in EMPTY_SHOTS:
+        for first, second in ((1, 2), (1, 3), (2, 3)):
+            frame = _frame_with_columns(shot, {first: 255, second: 255})
+            slot = cost.read_cost_bar(frame, ui=ui)
+            if (
+                isinstance(slot, Valued)
+                and isinstance(slot.payload, Exact)
+                and slot.payload.value > 0
+            ):
+                bad.append(
+                    f"shot{shot:02d} 第 {first}+{second} 列涂亮 → 报出填充 {slot.payload.value} px"
+                )
+    assert not bad, (
+        "空条上把两列一起涂亮，就报出了一个并不存在的填充数 —— 填充自左端起，"
+        "最左列暗就不是填充：" + "；".join(bad)
+    )
+    return "空条上任意两列一起涂亮，都没有伪造出填充"
+
+
 CHECKS: tuple[Check, ...] = (
     Check("S0", "本文件的真值表（自检，不查 T3）",
           "31 帧的真值能从夹具像素重算出来",
@@ -961,6 +1012,9 @@ CHECKS: tuple[Check, ...] = (
     Check("B6", "视觉层/顶部HUD与数字 §每个区域必须知道的事实（判据的形状）",
           "空条中段任意一列抬到 71，必须仍报 Exact(0)",
           check_empty_is_not_decided_by_the_brightest_column),
+    Check("B7", "视觉层/顶部HUD与数字 §每个区域必须知道的事实（判据的形状）",
+          "空条上任意两列一起涂亮，也不许伪造出填充",
+          check_two_bright_columns_cannot_invent_a_fill),
 )
 
 
