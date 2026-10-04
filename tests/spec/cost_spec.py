@@ -581,6 +581,60 @@ def check_partly_occluded_last_digit_is_an_interval() -> str:
     return f"末位被遮一半 → {type(slot).__name__}"
 
 
+def check_missing_first_digit_is_not_a_shorter_number() -> str:
+    """**首位**整块缺失 —— 同样不许报成一个更短的确切数。
+
+    这一路的余量比末位缺失**小得多**：末位缺失时剩下的字形偏左 16 px 开外，
+    而首位缺失时剩下的字形只偏 **15.0 px**（31 帧里最小的三帧是 shot05/19/23，
+    都是 `11`——两个 `1` 都窄，去掉一个剩下的那个离中心最近）。
+    所以文档把判据收到 **±8 px**：真读数全在 ±1.5 以内，两边各留 6.5 px。
+    """
+    cost = _mod("ark.engine.vision.cost")
+    from ark.contracts import Exact, Interval, Unknown, Unsampled, Valued
+
+    ui = _ui()
+    r = ui.rects["cost_digits"]
+    bad, checked = [], 0
+    for shot in sorted(DIGITS):
+        if DIGITS[shot] < 10:
+            continue
+        ox, oy = _entry(shot)["origin"]
+        block = _crop(shot)[r.y - oy : r.y - oy + r.height, r.x - ox : r.x - ox + r.width].copy()
+        cols = (block.min(axis=2) > 190).any(axis=0)
+        runs, start = [], None
+        for i, on in enumerate(cols):
+            if on and start is None:
+                start = i
+            elif not on and start is not None:
+                runs.append((start, i - 1))
+                start = None
+        if start is not None:
+            runs.append((start, len(cols) - 1))
+        if len(runs) != 2:
+            continue
+        block[:, : runs[0][1] + 1] = 0  # 首位整块拿掉
+        checked += 1
+        want = DIGITS[shot]
+        slot = cost.read_cost_digits(
+            _frame(shot, patch=((r.x, r.y, r.width, r.height), block)), _glyphs(), ui=ui
+        )
+        if isinstance(slot, Valued) and isinstance(slot.payload, Exact):
+            bad.append(f"shot{shot:02d}: 首位没了却报 Exact({slot.payload.value})，真值 {want}")
+            continue
+        if isinstance(slot, Valued) and isinstance(slot.payload, Interval):
+            p = slot.payload
+            if not (p.lo <= want <= p.hi):
+                bad.append(f"shot{shot:02d}: 区间 [{p.lo},{p.hi}] 不含真值 {want}")
+            continue
+        if isinstance(slot, (Unsampled,)) or (
+            isinstance(slot, Valued) and isinstance(slot.payload, Unknown)
+        ):
+            continue
+        bad.append(f"shot{shot:02d}: 收到 {type(slot).__name__}")
+    assert not bad, "；".join(bad[:6])
+    return f"{checked} 帧涂掉首位，都报区间且都含真值，没有一帧塌成更短的确切数"
+
+
 def check_occluded_digits_are_not_a_number() -> str:
     cost = _mod("ark.engine.vision.cost")
     from ark.contracts import Exact, Interval, Unknown, Unsampled, Valued
@@ -732,6 +786,9 @@ CHECKS: tuple[Check, ...] = (
     Check("D5", "视觉层/识别方法 §已查：逐位歧义降成区间",
           "末位被遮一半时降成区间，不猜整数",
           check_partly_occluded_last_digit_is_an_interval),
+    Check("D6", "视觉层/顶部HUD与数字 §每个区域必须知道的事实（数字居中于 x≈2721）",
+          "首位整块缺失时，也不许报成一个更短的确切数",
+          check_missing_first_digit_is_not_a_shorter_number),
     Check("D4", "契约层 §1 + 状态层 README「这一层的验收标准」",
           "数字被遮挡时不给出数字", check_occluded_digits_are_not_a_number),
     Check("B1", "视觉层/顶部HUD与数字 §每个区域必须知道的事实",

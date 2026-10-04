@@ -27,12 +27,27 @@ from typing import Final
 
 import numpy as np
 
-from ark.contracts import Exact, Interval, SlotValue, UiLayout, Unknown, Unsampled, Valued
+from ark.contracts import (
+    Exact,
+    Interval,
+    PixelRect,
+    SlotValue,
+    UiLayout,
+    Unknown,
+    Unsampled,
+    Valued,
+)
 from ark.engine.vision.frame import Frame
 from ark.engine.vision.glyphs import GlyphTable, glyph_boxes, ink_of, normalize
 from ark.engine.vision.layout import UI
 
-__all__ = ["read_cost_digits", "read_cost_bar", "SOLID_MATCH_SCORE", "AMBIGUITY_MARGIN"]
+__all__ = [
+    "read_cost_digits",
+    "read_cost_bar",
+    "SOLID_MATCH_SCORE",
+    "AMBIGUITY_MARGIN",
+    "CENTER_TOLERANCE",
+]
 
 
 SOLID_MATCH_SCORE: Final[float] = 0.90
@@ -82,6 +97,25 @@ BAR_BRIGHT_MIN: Final[int] = 190
 MAX_DIGITS: Final[int] = 2
 """费用是 1–2 位（文档：位数范围 1–2 位，触顶时是 `99»）。"""
 
+CENTER_TOLERANCE: Final[int] = 15
+"""「这一位落没落在中心附近」的判据（±px）。
+
+**位数是「数有几个字形」数出来的**，所以**缺了一位的两位数长得就像一个更短的
+一位数** —— 把 `10» 读成 `1»。费用是所有部署的闸门，这是这条链最危险的一种
+假事实，而且它比「认不出」更糟：认不出会报未知，这个会报一个**确切但更短的数**。
+
+文档（《顶部HUD与数字》§每个区域必须知道的事实）给了判据：**读到 1 位时，回头
+验那一个字形落没落在中心附近**。数字水平居中于窗口中心，实测：
+
+| | 中心 | 偏移 |
+| --- | --- | --- |
+| 31 帧**真**的读数（不管 1 位还是 2 位） | 2720.5–2723.0 | **−1.0 … +1.5** |
+| `10» 的末位整块被涂掉，只剩那个 `1» | 2691.0 | **−30.5** |
+| 反过来，首位被涂掉、只剩那个 `0» | 2738.5 | **+17.0** |
+
+真读数挤在 ±1.5 里，缺位那两种在 17 开外 —— ±15 落在中间那条空档里。
+"""
+
 
 def _rect(ui: UiLayout, name: str):
     """从 UI 常量里取一个矩形。**ROI 一律从表里取**，不许在代码里另抄一份坐标。"""
@@ -95,15 +129,28 @@ def _rect(ui: UiLayout, name: str):
         ) from None
 
 
+def _number_center(rect: PixelRect, boxes: list[tuple[int, int, int, int]]) -> float:
+    """这些字形在**画布**上的水平中心：取所有紧外框并集的中心。
+
+    框是 ROI 坐标（右/下开），所以中心 = `rect.x + (最左 + 最右) / 2»。
+    """
+    left = min(box[0] for box in boxes)
+    right = max(box[2] for box in boxes)
+    return rect.x + (left + right) / 2.0
+
+
 def read_cost_digits(frame: Frame, glyphs: GlyphTable, *, ui: UiLayout = UI) -> SlotValue:
     """读费用整数。
 
-    - 逐位都读出来 → `Valued(Exact(n), 置信度)»；
+    - 逐位都读出来、而且**位数没缺** → `Valued(Exact(n), 置信度)»；
     - 有一位分不开（并排两个候选，或整个对不上任何字形）→
       `Valued(Interval(lo, hi), 置信度)» —— **逐位歧义传播**：每一位各自留一组
       候选，最小值是「每位取最小」拼起来、最大值是「每位取最大」拼起来
       （十进制是逐位单调的，所以这样就够了）。对不上的那一位，候选是**全部
       十个数字**：`1?» → `[10, 19]»；
+    - **只读到 1 位、而它不在中心附近**（`CENTER_TOLERANCE»）→ 那就是**缺了一位**：
+      偏左说明缺的在它右边（`1» 缺末位 = `1?» → `[10, 19]»），偏右说明缺的在它
+      左边（`?1»）。**不许把它报成一个更短的确切数**；
     - 整块没笔画 → `Unsampled()»（「那里没有东西」与「我们没能看到」在这一层
       信息上等价，契约层 §1 把这两件事合成同一支）；
     - 切出的块数超过 2（费用只有 1–2 位）→ `Valued(Unknown(), None)»：
@@ -142,6 +189,19 @@ def read_cost_digits(frame: Frame, glyphs: GlyphTable, *, ui: UiLayout = UI) -> 
             # 而变宽是**安全的**（区间越宽越不像假事实）。不许在这里挑一个最像的。
             plausible = tuple(sorted(scores))
         positions.append((plausible, best_score))
+
+    if len(boxes) == 1:
+        offset = _number_center(rect, boxes) - (rect.x + rect.width / 2.0)
+        if abs(offset) > CENTER_TOLERANCE:
+            # 只读到一位、而它不在中心附近 —— 位数是「数有几个字形」数出来的，
+            # 所以**缺了一位的两位数长得就像一个更短的一位数**。缺的那一位在
+            # 哪边，由偏移的**符号**给出：偏左 → 缺的在右边；偏右 → 缺的在左边。
+            every = tuple(range(10))
+            weakest = min(score for _, score in positions)
+            if offset < 0:
+                positions.append((every, weakest))
+            else:
+                positions.insert(0, (every, weakest))
 
     lowest = int("".join(str(candidates[0]) for candidates, _ in positions))
     highest = int("".join(str(candidates[-1]) for candidates, _ in positions))

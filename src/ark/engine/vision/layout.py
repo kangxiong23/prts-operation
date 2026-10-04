@@ -27,7 +27,7 @@ __all__ = ["UI", "DOCUMENTED_WINDOWS", "RECT_NAMES"]
 
 # 名字 → 文档原样的 (x0, y0, x1, y1)，**含两端**，原生 2800×1260。
 DOCUMENTED_WINDOWS: dict[str, tuple[int, int, int, int]] = {
-    "cost_panel": (2585, 845, 2800, 972),
+    "cost_panel": (2585, 845, 2799, 972),
     "cost_icon": (2595, 873, 2658, 936),
     "cost_digits": (2666, 868, 2776, 936),
     "cost_bar": (2589, 945, 2741, 954),

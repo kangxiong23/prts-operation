@@ -262,10 +262,35 @@ def test_read_cost_digits_that_match_nothing_widens_to_the_whole_range() -> None
     table = GlyphTable.load(DEFAULT_GLYPHS_PATH)
     rng = np.random.default_rng(20240617)
     noise = rng.integers(0, 256, size=(64, 40), dtype=np.uint8)
-    frame, ui = _digits_frame([(5, 8, noise)])
+    # **必须摆在中间**：真读数的数字水平居中于窗口中心，摆在边上会被
+    # 「缺位判据」当成缺了一位的两位数（见下一条）。
+    frame, ui = _digits_frame([(90, 8, noise)])
     got = cost_mod.read_cost_digits(frame, table, ui=ui)
     assert isinstance(got, Valued) and isinstance(got.payload, Interval)
     assert (got.payload.lo, got.payload.hi) == (0, 9)  # 一位：全部十个数字
+
+
+def test_read_cost_digits_lone_glyph_off_center_is_a_missing_digit_not_a_shorter_number() -> None:
+    """缺了一位的两位数，长得就像一个更短的一位数 —— 这是最危险的那种假事实。"""
+    table = GlyphTable.load(DEFAULT_GLYPHS_PATH)
+    # `10» 的末位被整块涂掉之后，剩下的那个 `1» 偏在窗口中心**左边** 31 px。
+    frame, ui = _digits_frame([(47, 8, table.templates[1])])
+    got = cost_mod.read_cost_digits(frame, table, ui=ui)
+    assert isinstance(got, Valued) and isinstance(got.payload, Interval)
+    assert (got.payload.lo, got.payload.hi) == (10, 19)
+    # 反过来：偏在右边 → 缺的那一位在它**前**面
+    frame, ui = _digits_frame([(109, 8, table.templates[0])])
+    got = cost_mod.read_cost_digits(frame, table, ui=ui)
+    assert isinstance(got, Valued) and isinstance(got.payload, Interval)
+    assert got.payload.lo == 0 and got.payload.hi == 90
+
+
+def test_read_cost_digits_lone_glyph_at_the_center_is_still_an_exact_integer() -> None:
+    table = GlyphTable.load(DEFAULT_GLYPHS_PATH)
+    frame, ui = _digits_frame([(78, 8, table.templates[7])])
+    got = cost_mod.read_cost_digits(frame, table, ui=ui)
+    assert isinstance(got, Valued) and isinstance(got.payload, Exact)
+    assert got.payload.value == 7
 
 
 def test_read_cost_digits_more_than_two_blocks_is_unknown() -> None:
