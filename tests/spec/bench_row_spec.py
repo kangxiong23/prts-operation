@@ -527,6 +527,51 @@ def check_a_real_ring_never_lands_in_the_undecided_band() -> str:
     return f"真环 {total} 张，一张都没落进判不了"
 
 
+def check_a_countdown_is_read_not_just_not_guessed() -> str:
+    """真值里写了秒数的那些卡，秒数必须**读出来**，不许停在「未知」。
+
+    出处是[状态层/我方干员] 那一行的三档（精确 / 未知 / 未采样）与[视觉层/备战席] §尚未定
+    （"欠的是资产，不是链"）。
+
+    **它和 R6 是两条不同的要求，不合并**：
+
+    - **R6 管零假事实** —— "读到了什么就必须是什么"，落未知是**允许**的；
+    - **这一条管能力** —— "该读出来的地方读出来了没有"，落未知在这里是**欠账**。
+
+    所以"R6 绿、这一条红"是一个有意义的组合：链**没有说谎**，只是**还没学会**。
+
+    **这一条现在是红的，而且红得对**：那套粗体字形资产还没建
+    （`1` 带底衬线、最像的字形反而是 `2`）。资产落地那一天它绿。
+    它盖到的 5 帧里，`shot26` 是**另一局、另一段取像**（那 40 帧扫描里的），
+    而 `cd20` 是**留出来没给执行者值**的那一帧。
+    """
+    from ark.contracts import Unknown, Unsampled, Valued
+
+    unread: list[str] = []
+    values: list[str] = []
+    total = 0
+    for name, row in TRUTH.items():
+        cards = _read(name)
+        for index, want in sorted(row["redeploy"].items()):
+            total += 1
+            slot = cards[index].seconds
+            if isinstance(slot, Unsampled):
+                unread.append(f"{name}#{index}=未采样")
+                continue
+            assert isinstance(slot, Valued), f"{name}#{index}：秒数落成了 {slot!r}"
+            if isinstance(slot.payload, Unknown):
+                unread.append(f"{name}#{index}=未知")
+                continue
+            # 值对不对归 R6 管，这一条只问"读出来了没有" —— 两条的红要能分开看。
+            values.append(f"{name}#{index}={slot.payload.value}(真值 {want})")
+    assert not unread, (
+        f"{len(unread)}/{total} 个倒计时的秒数没读出来 —— 这是**欠账，不是假事实**："
+        + "、".join(unread)
+        + " ｜ 出处是那套粗体字形资产还没建（[视觉层/备战席] §尚未定）"
+    )
+    return f"{total} 个倒计时全部读出 ｜ " + " ".join(values)
+
+
 CHECKS: tuple[Check, ...] = (
     Check("R1", "采集与验收/基准集 §2（字段表）",
           "清单里的必填字段一样不少地读出来，没记的前提头不许补",
@@ -555,6 +600,9 @@ CHECKS: tuple[Check, ...] = (
     Check("R9", "视觉层/备战席 §判死与再部署 + 状态层/我方干员（三档）",
           "环与数字都在的那些卡，不许落「判不了」",
           check_a_real_ring_never_lands_in_the_undecided_band),
+    Check("R10", "状态层/我方干员（精确 / 未知 / 未采样）+ 视觉层/备战席 §尚未定",
+          "真值里写了秒数的那些卡，秒数必须读出来，不许停在未知（与 R6 分工：R6 管不许猜，这条管读没读出来）",
+          check_a_countdown_is_read_not_just_not_guessed),
 )
 
 
