@@ -51,6 +51,14 @@
 真值却反着**。所以这一层量的是**环带减环外**（`_ring_gain`），两条线见
 `RING_GAIN_PRESENT_MIN`。
 
+**倒计时那串数字用另一套字形表**（《视觉层/识别方法》§已定）：卡片正中那个秒数的笔画比
+费用那套**更粗**、`1` 带底衬线 —— 拿出厂表去比，`1` 最像的字形反而是 `2`。所以这一层
+读秒数时用的是**另一张表**（`assets/features/glyphs_countdown/`），由调用方经
+`countdown_path` 传进来、**默认就是 `COUNTDOWN_GLYPHS_PATH`**。
+
+**「表没建好」≠「这张卡没有倒计时」**：前者是**能力缺失**，`load_countdown_glyphs` 会抛错，
+不静默降级成一个「没有」—— 静默吐出来的**假缺席**与假事实一样坏。
+
 **红罩不单独当判据**：实测它分不开 —— `shot26` 下标 1 那张**普通卡**的卡面红度
 （`R − max(G,B)` 的均值 **+64.8**）比再部署那张（**+48.5**）还高，普通卡里整片红的
 角色有的是。红罩是**外观**的一部分，不是这一层能用的信号；而且"暗"本身要一条**绝对线**
@@ -60,6 +68,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Final
 
 import numpy as np
@@ -76,16 +85,20 @@ from ark.contracts import (
 )
 from ark.engine.vision.frame import Frame
 from ark.engine.vision.glyphs import (
+    COUNTDOWN_GLYPHS_PATH,
     INK_MIN,
     GlyphTable,
     glyph_boxes,
     ink_of,
+    load_countdown_glyphs,
     normalize,
 )
 
 __all__ = [
     "read_squad_row",
     "SquadCard",
+    "squad_card_centres",
+    "countdown_boxes",
     "JUMP_LIGHT_MIN",
     "JUMP_DARK_MAX",
     "CENTER_MATCH_TOL",
@@ -109,6 +122,8 @@ __all__ = [
     "RING_GAIN_PRESENT_MIN",
     "RING_GAIN_ABSENT_MAX",
     "COUNTDOWN_INK_THRESHOLD",
+    "COUNTDOWN_SOLID_MATCH_SCORE",
+    "COUNTDOWN_AMBIGUITY_MARGIN",
     "COUNTDOWN_MIN_DIGIT_WIDTH",
     "COUNTDOWN_MIN_DIGIT_HEIGHT",
     "COUNTDOWN_DOT_MIN_WIDTH",
@@ -301,14 +316,45 @@ COUNTDOWN_MASK_RADIUS: Final[int] = 45
 COUNTDOWN_INK_THRESHOLD: Final[int] = 200
 """中央秒数的墨线。实测 `shot26` 那张：数字是**纯白 255**，环也是 250–255，
 所以这一条线分不开数字与环 —— **分开它们的是形状（把环挖掉），不是线**。
+
+**它在 17 个取材样本 49 位上同样是 200**：数字笔画一律纯白（`min(R,G,B) = 255`），
+环带里其余地方 ≤ 40 —— 中间没有东西。
+"""
+
+COUNTDOWN_SOLID_MATCH_SCORE: Final[float] = 0.90
+"""这一位至少要像到什么程度，才配被认出来（**倒计时那套表自己的线**，D-全局-24）。
+
+实测 **17 个取材样本 49 位**（用同一批取材建出来的粗体表打分）：
+
+| | 分数 |
+| --- | --- |
+| **正确那一位** | **0.9797 … 1.0000** |
+| **次像的** | **0.4374 … 0.8177** |
+
+空档 **0.8177 … 0.9797**（宽 **0.1621**），中点是 **0.8987** —— 取 0.90，两侧各留
+**0.082 / 0.080**。
+
+**它与 `cost.py` 那条链的 `SOLID_MATCH_SCORE` 同值，但两条线是各自量出来的**：那一条
+的空档是 0.774…0.938，这一条是 0.8177…0.9797 —— **碰巧同值，不是抄的**。它比这一层
+费用那一格的 `COST_SOLID_MATCH_SCORE = 0.86` 高，因为那一格笔画核心只有 128、卡面半透明，
+同一套模板打出来的分整体低一档；倒计时这串是**纯白 255**。
+"""
+
+COUNTDOWN_AMBIGUITY_MARGIN: Final[float] = 0.03
+"""次像的离最像的有多近才算「分不开」（照 `_one_digit` 的口径）。
+
+实测那 49 位上**最紧的一位**是正确与次像差 **0.176**（`cd01` 下标 0 的 `3`：0.9937 对
+0.8177），所以 0.03 只有它的六分之一 —— 这一版在取材帧上**一次都没触发**（纸上的防线）。
 """
 
 COUNTDOWN_MIN_DIGIT_WIDTH: Final[int] = 8
-"""中央秒数里**一位数字**至少多宽（px）。实测 `shot26` 那张的 `1` 是 16、`2` 是 19、
-`9` 是 18，而碎块 1–4。"""
+"""中央秒数里**一位数字**至少多宽（px）。
+
+实测 **17 个取材样本 49 位**：真数字 **16–20 px**（最窄的是 `1`），而小数点只有 **6**。
+空档 6…16，取 8，两侧各留 2 / 8。"""
 
 COUNTDOWN_MIN_DIGIT_HEIGHT: Final[int] = 20
-"""中央秒数里**一位数字**至少多高（px）。实测 29；小数点只有 5。"""
+"""中央秒数里**一位数字**至少多高（px）。实测 49 位是 **28–29**；小数点只有 **5**。"""
 
 COUNTDOWN_DOT_MIN_WIDTH: Final[int] = 2
 COUNTDOWN_DOT_MAX_WIDTH: Final[int] = 12
@@ -352,16 +398,21 @@ class SquadCard:
     ring_fraction: float | None
 
 
-def _guard(frame: object, glyphs: object, pitch: object) -> None:
-    """入口的类型闸门（照 `cost.py` / `topbar.py` 的样子）。"""
+def _guard_row(frame: object, pitch: object) -> None:
+    """**卡行**入口的类型闸门（`read_squad_row` 与 `squad_card_centres` 共用）。"""
     if not isinstance(frame, Frame):
         raise TypeError(f"要读的是一帧，收到 {type(frame).__name__}")
-    if not isinstance(glyphs, GlyphTable):
-        raise TypeError(f"要一张字形表，收到 {type(glyphs).__name__}")
     if isinstance(pitch, bool) or not isinstance(pitch, (int, float)):
         raise TypeError(f"卡距要是数，收到 {type(pitch).__name__}")
     if pitch <= 0:
         raise ValueError(f"卡距必须为正，收到 {pitch}")
+
+
+def _guard(frame: object, glyphs: object, pitch: object) -> None:
+    """入口的类型闸门（照 `cost.py` / `topbar.py` 的样子）。"""
+    _guard_row(frame, pitch)
+    if not isinstance(glyphs, GlyphTable):
+        raise TypeError(f"要一张字形表，收到 {type(glyphs).__name__}")
 
 
 def _anchors() -> tuple[PixelRect, PixelRect]:
@@ -410,6 +461,49 @@ def _jump_columns(frame: Frame, strip: PixelRect) -> list[int]:
         for x in range(column.size - 1)
         if column[x] >= JUMP_LIGHT_MIN and column[x + 1] <= JUMP_DARK_MAX
     ]
+
+
+def squad_card_centres(frame: Frame, *, pitch: float) -> tuple[tuple[float, bool], ...]:
+    """这一帧上每张卡的**水平中心** —— `((中心, 是不是像素读出来的), ...)`，下标 0 = 最右那张。
+
+    `read_squad_row` 数卡与定中心走的就是它。**建表也要用同一份中心**
+    （`offline/assets_gen/countdown.py`）：不然资产是按一个地方切、读表是按另一个地方切
+    —— 两处差 2 px 就足以让模板整体偏掉一条边。
+
+    **卡数是数出来的**：从最右那张起，一格一格往左问「这一格有没有跳变证据」，
+    问到没有为止。右对齐 + 只有还没上场的才显示 ⇒ 有卡的那些格**一定是连着的一片**
+    （中间缺一格说明那一格的跳变没读出来，那时**那一格还在**、中心落回网格，
+    第二个分量 `False` 说的就是这个）。
+    """
+    _guard_row(frame, pitch)
+    anchor, _ = _anchors()
+    strip = _row_strip(frame)
+    jumps = _jump_columns(frame, strip)
+    anchor_centre = float(squad_card_rect(0, pitch).x) + float(anchor.width) / 2.0
+
+    # 一格一格问过去：这一格的网格中心附近有没有跳变证据。
+    found: dict[int, int] = {}
+    index = 0
+    while True:
+        card = squad_card_rect(index, pitch)
+        if float(card.x) + float(card.width) <= 0.0:
+            break
+        expected = anchor_centre - index * pitch
+        near = [x for x in jumps if abs((x + 1) - expected) <= CENTER_MATCH_TOL]
+        if near:
+            found[index] = min(near, key=lambda x: abs((x + 1) - expected))
+        index += 1
+    if not found:
+        return ()
+    # 右对齐 + 只有还没上场的才显示 ⇒ 有卡的那些格是**连着的一片**：
+    # 最远那一格有卡，它右边每一格就都有卡。中间缺一格只说明那一格的跳变没读出来。
+    centres: list[tuple[float, bool]] = []
+    for index in range(max(found) + 1):
+        if index in found:
+            centres.append((float(found[index]) + 1.0, True))
+        else:
+            centres.append((anchor_centre - index * pitch, False))
+    return tuple(centres)
 
 
 def _one_digit(
@@ -508,15 +602,19 @@ def _ring_profile(frame: Frame, centre_x: float, card_top: float) -> np.ndarray:
         centre_x - radius, centre_y - radius, radius * 2, radius * 2
     )
     roi = frame.crop(rect)
-    profile = np.zeros((360, RING_OUTSIDE_OUTER - RING_INNER + 1), dtype=int)
-    for degree in range(360):
-        theta = np.radians(90.0 - degree)
-        cos, sin = float(np.cos(theta)), float(np.sin(theta))
-        for step, r in enumerate(range(RING_INNER, RING_OUTSIDE_OUTER + 1)):
-            x = int(round(radius + r * cos))
-            y = int(round(radius - r * sin))
-            if 0 <= y < roi.shape[0] and 0 <= x < roi.shape[1]:
-                profile[degree, step] = int(roi[y, x].min())
+    ink = roi.min(axis=2)
+    # **整圈一次算完**。原来是 360 × 21 的双层 Python 循环（占读一帧的六成）：
+    # 每一度的两个三角函数、每一次乘加、以及取整都照原来那个顺序算 ——
+    # `np.rint` 与 Python 的 `round` 都是「四舍六入五成双」，逐格一样
+    # （10 帧 96 张卡逐格比过，见报告）。
+    degrees = np.arange(360, dtype=np.float64)
+    theta = np.radians(90.0 - degrees)
+    radii = np.arange(RING_INNER, RING_OUTSIDE_OUTER + 1, dtype=np.float64)
+    xs = np.rint(radius + radii[None, :] * np.cos(theta)[:, None]).astype(np.int64)
+    ys = np.rint(radius - radii[None, :] * np.sin(theta)[:, None]).astype(np.int64)
+    profile = np.zeros((360, radii.size), dtype=int)
+    inside = (ys >= 0) & (ys < ink.shape[0]) & (xs >= 0) & (xs < ink.shape[1])
+    profile[inside] = ink[ys[inside], xs[inside]]
     return profile
 
 
@@ -558,23 +656,26 @@ def _ring_gain(profile: np.ndarray) -> int:
     return int(np.percentile(inside - outside, RING_GAIN_PERCENTILE))
 
 
-def _read_countdown(
-    frame: Frame, glyphs: GlyphTable, centre_x: float, card_top: float
-) -> SlotValue:
-    """圆环中央那个秒数（一位小数）→ 一个槽值。
+def countdown_boxes(
+    frame: Frame, centre_x: float, card_top: float
+) -> tuple[
+    np.ndarray,
+    list[tuple[int, int, int, int]],
+    list[tuple[int, int, int, int]],
+    list[tuple[int, int, int, int]],
+]:
+    """环心那一片切出来的块 —— `(墨迹, 全部块, 数字块, 小数点块)`，都按 x 排序、右/下开。
 
-    环**先挖掉**（半径 `RING_INNER` 以内才算数），否则 `glyph_boxes` 会把整圈
-    白环和数字按列并成一块。然后：
+    **先把环挖掉**（半径 `COUNTDOWN_MASK_RADIUS` 以内才算数），否则 `glyph_boxes`
+    会把整圈白环和数字**按列并成一块**（实测并出一块 116×116）。
 
-    - **一块墨迹都没有** → `Unsampled()`；
-    - **认不出小数点**（不是恰好一块贴着基线的点状块）→ `Valued(Unknown(), None)`：
-      秒数**必须**有小数位（实测 `12.9` / `68.6`），认不出它就没法把整数位与
-      小数位分开，报一个整数就是假事实；
-    - **某一位认不出 / 整数位超过 3 位** → `Valued(Unknown(), None)`；
-    - 否则 → `Valued(Exact(秒), 置信度)`。
+    - **数字块**：宽 ≥ `COUNTDOWN_MIN_DIGIT_WIDTH` 且高 ≥ `COUNTDOWN_MIN_DIGIT_HEIGHT`；
+    - **小数点块**：尺寸落在那一组范围里、而且**贴着数字的基线**（下缘离数字块下缘
+      ≤ `COUNTDOWN_DOT_BASELINE_TOL`）—— 它按**形状**认，不按模板比（字形表里没有小数点）。
 
-    **小数点按形状认，不按模板比**：字形表里只有 0-9（《识别方法》§已定 说这个游戏的
-    数字「只有 0-9 与小数点」），所以它靠尺寸与基线定位。
+    `read_squad_row` 读秒数走的就是它。**建表也必须走它**
+    （`offline/assets_gen/countdown.py`）：切法只有一份，不然资产是按一个地方切、
+    读表是按另一个地方切。
     """
     radius = RING_OUTER
     centre_y = card_top + RING_CENTER_DY
@@ -599,7 +700,7 @@ def _read_countdown(
         and box[3] - box[1] >= COUNTDOWN_MIN_DIGIT_HEIGHT
     ]
     if not digits:
-        return Unsampled() if not boxes else Valued(Unknown(), None)
+        return ink, boxes, digits, []
     baseline = max(box[3] for box in digits)
     dots = [
         box
@@ -608,6 +709,29 @@ def _read_countdown(
         and COUNTDOWN_DOT_MIN_HEIGHT <= box[3] - box[1] <= COUNTDOWN_DOT_MAX_HEIGHT
         and abs(box[3] - baseline) <= COUNTDOWN_DOT_BASELINE_TOL
     ]
+    return ink, boxes, digits, dots
+
+
+def _read_countdown(
+    frame: Frame, countdown: GlyphTable, centre_x: float, card_top: float
+) -> SlotValue:
+    """圆环中央那个秒数（一位小数）→ 一个槽值。`countdown` 是**粗体那套字形表**。
+
+    切法住 `countdown_boxes`（环先挖掉）。落法：
+
+    - **一块墨迹都没有** → `Unsampled()`；
+    - **认不出小数点**（不是恰好一块贴着基线的点状块）→ `Valued(Unknown(), None)`：
+      秒数**必须**有小数位（实测 `12.9` / `68.6`），认不出它就没法把整数位与
+      小数位分开，报一个整数就是假事实；
+    - **某一位认不出 / 整数位超过 3 位** → `Valued(Unknown(), None)`；
+    - 否则 → `Valued(Exact(秒), 置信度)`。
+
+    **小数点按形状认，不按模板比**：字形表里只有 0-9（《识别方法》§已定 说这个游戏的
+    数字「只有 0-9 与小数点」），所以它靠尺寸与基线定位。
+    """
+    ink, boxes, digits, dots = countdown_boxes(frame, centre_x, card_top)
+    if not digits:
+        return Unsampled() if not boxes else Valued(Unknown(), None)
     if len(dots) != 1:
         return Valued(Unknown(), None)
     dot = dots[0]
@@ -619,11 +743,11 @@ def _read_countdown(
         return Valued(Unknown(), None)
     read = [
         _one_digit(
-            glyphs,
+            countdown,
             ink,
             box,
-            solid=COST_SOLID_MATCH_SCORE,
-            margin=COST_AMBIGUITY_MARGIN,
+            solid=COUNTDOWN_SOLID_MATCH_SCORE,
+            margin=COUNTDOWN_AMBIGUITY_MARGIN,
         )
         for box in whole + fraction
     ]
@@ -638,6 +762,7 @@ def read_squad_row(
     glyphs: GlyphTable,
     *,
     pitch: float,
+    countdown_path: Path = COUNTDOWN_GLYPHS_PATH,
 ) -> tuple[SquadCard, ...]:
     """读备战席那一栏：**一帧 → 每张卡一条读数**（下标 0 = 最右那张）。
 
@@ -645,14 +770,20 @@ def read_squad_row(
     视觉层 import 设备层，所以**由调用方传进来** —— 契约层 `squad_card_rect` 的
     docstring 写的就是这个口径。
 
+    `countdown_path` 是**倒计时那套粗体字形表**的落点，**默认就是
+    `COUNTDOWN_GLYPHS_PATH`** —— 所以「默认就能拿到它、不额外传参」成立；调用方要拿
+    另一张表去读（换一版资产、或拿一条坏路径试它响不响）就传这个关键字。
+
+    **表没建好 ≠ 这张卡没有倒计时**：路径指到不存在的地方时 `load_countdown_glyphs`
+    **抛错**，不静默返回一行「未采样」的读数 —— 静默吐出来的**假缺席**与假事实一样坏。
+
     **不收 `ui` 参数**：卡框那两个键只有一份表（契约层 `UI_LAYOUT`），而
     `squad_card_rect` 也写死读它 —— 传一张别的表进来只能换掉锚点、换不掉位移，
     **一个只能换一半的参数比没有参数更危险**（调用方会以为换了表）。要换表就换契约层
     那一份，这里不开口子。
 
-    **卡数是数出来的**：从最右那张起，一格一格往左问「这一格有没有跳变证据」，
-    问到没有为止。右对齐 + 只有还没上场的才显示 ⇒ 有卡的那些格**一定是连着的一片**
-    （中间缺一格说明那一格的跳变没读出来，那时**停在缺口处**、报出已经读到的那些）。
+    **卡数与中心走 `squad_card_centres`**（那里有完整口径）：有卡的那些格**一定是连着
+    的一片**，中间缺一格说明那一格的跳变没读出来、中心落回网格。
 
     **再部署中的判据是环比它周围亮多少**（`_ring_gain`），不是白弧多长、也不是环带
     自己够不够亮 —— 白弧量的是**已过比例**（刚撤退的卡接近 0°），而环带自己的亮度会被
@@ -664,39 +795,14 @@ def read_squad_row(
     是**肯定证据**，读到了就是读到了；读不到就按秒数自己的三档落。
     """
     _guard(frame, glyphs, pitch)
-    anchor, _ = _anchors()
-    strip = _row_strip(frame)
-    jumps = _jump_columns(frame, strip)
-    top = float(anchor.y)
-    anchor_centre = float(squad_card_rect(0, pitch).x) + float(anchor.width) / 2.0
-
-    # 一格一格问过去：这一格的网格中心附近有没有跳变证据。
-    found: dict[int, int] = {}
-    index = 0
-    while True:
-        card = squad_card_rect(index, pitch)
-        if float(card.x) + float(card.width) <= 0.0:
-            break
-        expected = anchor_centre - index * pitch
-        near = [x for x in jumps if abs((x + 1) - expected) <= CENTER_MATCH_TOL]
-        if near:
-            found[index] = min(near, key=lambda x: abs((x + 1) - expected))
-        index += 1
-    if not found:
+    countdown = load_countdown_glyphs(countdown_path)
+    top = float(_anchors()[0].y)
+    centres = squad_card_centres(frame, pitch=pitch)
+    if not centres:
         return ()
-    # 右对齐 + 只有还没上场的才显示 ⇒ 有卡的那些格是**连着的一片**：
-    # 最远那一格有卡，它右边每一格就都有卡。中间缺一格只说明那一格的跳变没读出来。
-    count = max(found) + 1
 
     cards: list[SquadCard] = []
-    for index in range(count):
-        expected = anchor_centre - index * pitch
-        if index in found:
-            centre = float(found[index]) + 1.0
-            from_jump = True
-        else:
-            centre = expected  # 备选：锚点 + 卡距（这一格的跳变没读出来）
-            from_jump = False
+    for index, (centre, from_jump) in enumerate(centres):
         cost = _read_cost(
             frame,
             glyphs,
@@ -720,7 +826,7 @@ def read_squad_row(
             seconds: SlotValue = Unsampled()
             ring_fraction = None
         else:
-            seconds = _read_countdown(frame, glyphs, centre, top)
+            seconds = _read_countdown(frame, countdown, centre, top)
         cards.append(
             SquadCard(
                 index=index,

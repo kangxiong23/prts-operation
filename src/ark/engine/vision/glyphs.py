@@ -44,6 +44,8 @@ __all__ = [
     "GLYPH_TABLE_FORMAT",
     "TABLE_FILENAME",
     "DEFAULT_GLYPHS_PATH",
+    "COUNTDOWN_GLYPHS_PATH",
+    "load_countdown_glyphs",
 ]
 
 
@@ -88,10 +90,34 @@ GLYPH_TABLE_FORMAT: Final[str] = "ark.glyph_table/1"
 TABLE_FILENAME: Final[str] = "digits.npz"
 """字形表的文件名。格式是这一层自己定的（T3 任务：文件格式你定）。"""
 
-DEFAULT_GLYPHS_PATH: Final[Path] = (
-    Path(__file__).resolve().parents[4] / "assets" / "features" / "glyphs" / TABLE_FILENAME
-)
+def _assets_path(feature: str) -> Path:
+    """一个特征资产的默认落点：`assets/features/<feature>/<表文件名>`。
+
+    `src/ark/engine/vision/` 往上四级就是仓库根（`glyphs.py` → `vision` →
+    `engine` → `ark` → `src`）—— 与 `offline/assets_gen/` 那边算的是同一个根。
+    """
+    return (
+        Path(__file__).resolve().parents[4]
+        / "assets"
+        / "features"
+        / feature
+        / TABLE_FILENAME
+    )
+
+
+DEFAULT_GLYPHS_PATH: Final[Path] = _assets_path("glyphs")
 """出厂字形表（进版本库，clone 下来即用）。**读数链默认读它，不现场重建。**"""
+
+COUNTDOWN_GLYPHS_PATH: Final[Path] = _assets_path("glyphs_countdown")
+"""**倒计时那套粗体字形表**的默认落点 —— 与出厂那套**并列**，同一个表文件名。
+
+《视觉层/识别方法》§已定：备战席卡片正中那个秒数用的**不是**出厂那套字形（`1` 带底
+衬线、笔画更粗，最像的字形反而是 `2`），所以它是**另一套表**、另一份资产，住
+`assets/features/glyphs_countdown/`。
+
+`read_squad_row` 的 `countdown_path` 默认就是这个常量 —— 调用方**不额外传参**也拿得到
+它，与费用那套走 `DEFAULT_GLYPHS_PATH` 是同一个口径。
+"""
 
 
 # ---------------------------------------------------------------------------
@@ -398,3 +424,29 @@ class GlyphTable:
             digit: similarity(query, template)
             for digit, template in self.templates.items()
         }
+
+
+def _missing_countdown_table(path: Path) -> str:
+    """「表没建好」那句话 —— 它必须与「这张卡没有倒计时」**读起来不一样**。"""
+    return (
+        f"{path} 不在：倒计时那套粗体字形资产还没建。这不是「这张卡没有倒计时」——"
+        "是这条链现在**一个倒计时都读不出来**（能力缺失）。"
+        "建表：.venv/Scripts/python.exe scripts/build_countdown_glyphs.py。"
+    )
+
+
+def load_countdown_glyphs(path: Path = COUNTDOWN_GLYPHS_PATH) -> GlyphTable:
+    """读倒计时那套粗体字形表。**读不出来就抛错** —— 不返回空表、不返回 `None`。
+
+    《视觉层/识别方法》§已定：「**表没建好**」与「**这张卡没有倒计时**」不许看起来一样。
+    静默降级成一个「没有」吐出来的是**假缺席** —— 与假事实一样坏。所以这里不吞异常：
+    表不在、路径不是表、格式版本对不上，一律原样抛出去。
+    """
+    target = Path(path)
+    try:
+        resolved = _resolve_table_path(target, for_write=False)
+    except FileNotFoundError as missing:
+        raise FileNotFoundError(_missing_countdown_table(target)) from missing
+    if not resolved.is_file():
+        raise FileNotFoundError(_missing_countdown_table(resolved))
+    return GlyphTable.load(resolved)

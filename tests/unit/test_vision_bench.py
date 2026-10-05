@@ -19,13 +19,22 @@
 **降级用例是在真帧上涂改出来的**，不是自己画的图：涂黑、涂成实心块、把白弧压短、
 把环带调暗、往环带里刷一圈亮。
 
-**有一条路真帧上测不出来**：圆环中央那个秒数的**字体与出厂字形表不是同一套**
-（实测：那个 `1` 带底衬线、笔画整体更粗，最像的字形只有 0.44–0.84）——
-所以「读得出秒数」那一路只能用**字形表自己的字形合成一帧**来测，真帧上它落在未知。
+**圆环中央那个秒数用的是另一套字形**（那个 `1` 带底衬线、笔画整体更粗）：出厂那套表
+读它，`1` 最像的字形反而是 `2`（0.4448）。这一单把**粗体那套资产**补上了
+（`assets/features/glyphs_countdown/`），所以真帧上那 14 个秒数**逐位读出** ——
+那是这一节的主判据。**「表没建好」与「这张卡没有倒计时」是两支**：前者抛错，后者
+`Unsampled()`，下面两条各测一头。
+
+合成帧那一路仍然留着（换一个数照样读得出 —— 读的不是"这一帧记得的那个值"），
+但它现在用的是**粗体那套表**。
 """
 
 from __future__ import annotations
 
+import shutil
+import tempfile
+import uuid
+from collections.abc import Iterator
 from pathlib import Path
 
 import numpy as np
@@ -45,6 +54,7 @@ from ark.engine.vision.bench import (
     COST_DIGITS_HEIGHT,
     COST_DIGITS_TOP,
     COST_SOLID_MATCH_SCORE,
+    COUNTDOWN_SOLID_MATCH_SCORE,
     RING_BRIGHT_MIN,
     RING_CENTER_DY,
     RING_GAIN_ABSENT_MAX,
@@ -55,10 +65,17 @@ from ark.engine.vision.bench import (
     SquadCard,
     _ring_gain,
     _ring_profile,
+    countdown_boxes,
     read_squad_row,
 )
 from ark.engine.vision.frame import Frame, frame_from_raw
-from ark.engine.vision.glyphs import DEFAULT_GLYPHS_PATH, GlyphTable
+from ark.engine.vision.glyphs import (
+    COUNTDOWN_GLYPHS_PATH,
+    DEFAULT_GLYPHS_PATH,
+    GlyphTable,
+    load_countdown_glyphs,
+    normalize,
+)
 from ark.offline.bench.batch import BenchBatch, load_batch
 
 REPO = Path(__file__).resolve().parents[2]
@@ -113,6 +130,38 @@ RINGS: dict[str, tuple[int, ...]] = {
 （亮卡面顶穿了绝对亮度线）。"""
 
 
+SECONDS: dict[str, dict[int, float]] = {
+    "shot26": {0: 12.9},
+    "cd01": {0: 32.2, 1: 39.5, 2: 54.7, 5: 36.0, 7: 64.2, 8: 16.0},
+    "cd08": {0: 12.6, 1: 19.9, 2: 35.0, 3: 69.4, 4: 57.2, 5: 16.3, 7: 44.6},
+    "cd60": {},
+}
+"""这 6 帧上**每张卡的秒数真值**（取材.json）—— 一共 **14 个数**，正好对上 14 张真环。
+
+`cd60` 是空的：那一帧一张都不在再部署中，所以它那一栏**一张倒计时都没有** ——
+这与「读不出来」是两支（见 `test_the_harvest_frames_countdowns_read_exactly`）。
+"""
+
+
+@pytest.fixture
+def scratch() -> Iterator[Path]:
+    """一个**自己能进去**的临时目录（照 `test_vision_cost.py` 那份）。
+
+    **不用 pytest 的 `tmp_path`**：它建目录时用 0o700，而 0o700 的 DACL 不继承
+    父目录 —— 在受限令牌下（本机 DSH 沙箱就是这样），那个目录连创建它的进程
+    自己都进不去。这里用**默认权限**建，父目录的 ACL 会继承下来，所以在沙箱里
+    与不在沙箱里都能跑。
+    """
+    root = Path(tempfile.gettempdir()) / "ark-vision-bench-tests"
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / uuid.uuid4().hex[:12]
+    path.mkdir()
+    try:
+        yield path
+    finally:
+        shutil.rmtree(path, ignore_errors=True)
+
+
 @pytest.fixture(scope="module")
 def batch() -> BenchBatch:
     return load_batch(FIXTURES)
@@ -120,7 +169,14 @@ def batch() -> BenchBatch:
 
 @pytest.fixture(scope="module")
 def table() -> GlyphTable:
+    """**费用**那套出厂字形表（卡上那个暗盒里的数字）。"""
     return GlyphTable.load(DEFAULT_GLYPHS_PATH)
+
+
+@pytest.fixture(scope="module")
+def countdown() -> GlyphTable:
+    """**倒计时**那套粗体字形表（环心那个秒数）—— 与费用那套并列的另一份资产。"""
+    return load_countdown_glyphs()
 
 
 def _frame(batch: BenchBatch, name: str) -> Frame:
@@ -588,7 +644,8 @@ def test_a_pressed_arc_still_counts_as_redeploying(batch, table) -> None:
     row = read_squad_row(frame, table, pitch=PITCH)
     assert row[0].redeploying is True
     assert row[0].cost.payload.value == 18
-    assert isinstance(row[0].seconds.payload, Unknown)
+    assert isinstance(row[0].seconds.payload, Exact)
+    assert row[0].seconds.payload.value == 12.9
     assert row[0].ring_fraction is not None and row[0].ring_fraction < 0.25
     assert all(card.redeploying is False for card in row[1:])
 
@@ -633,31 +690,70 @@ def test_the_redeploying_gate_keeps_seconds_unsampled(batch, table) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_the_real_countdown_digits_cannot_be_matched(batch, table) -> None:
-    """真帧上那个秒数**落在未知** —— 它的字体与出厂字形表不是同一套。
+def test_the_harvest_frames_countdowns_read_exactly(batch, table) -> None:
+    """**这一列的主判据**：取材帧上那 **14 个秒数逐位读出、精确等于真值**。
 
-    实测 `shot26` 那张 `12.9`：`1` 最像的字形只有 0.4448（而且最像的是 `2`）、
-    `2` 0.8375、`9` 0.6909，全都低于 `COST_SOLID_MATCH_SCORE`。
-    这一条**不是"链坏了"**：它如实说出"那里有一位数字，我认不出它是几"。
+    落的是 `Exact(12.9)` 这种载荷 —— **不是"读得出大概"**，小数位也在里面。
+    不在再部署中的那些卡一律 `Unsampled()`（那里没有倒计时可读），`cd60` 整帧如此 ——
+    **「没有」与「读不出来」是两支**，那 14 个数一个都不许落进后者。
     """
-    card = _row(batch, table, "shot26")[0]
-    assert isinstance(card.seconds, Valued)
-    assert isinstance(card.seconds.payload, Unknown)
-    assert card.seconds.confidence is None
+    read = 0
+    for name in HARVEST:
+        for card in _row(batch, table, name):
+            want = SECONDS.get(name, {}).get(card.index)
+            if want is None:
+                assert card.seconds == Unsampled(), (name, card.index)
+                continue
+            assert isinstance(card.seconds, Valued), (name, card.index)
+            assert isinstance(card.seconds.payload, Exact), (name, card.index)
+            assert card.seconds.payload.value == want, (name, card.index)
+            read += 1
+    assert read == 14
 
 
-def test_a_countdown_written_in_the_table_font_is_read(batch, table) -> None:
-    """用**字形表自己的字形**合成的 `12.9` ⇒ 读得出 12.9（合成帧，见模块文档）。"""
-    frame = _draw_countdown(_blank_ring(_frame(batch, "shot26"), 0), table, "12.9", 0)
+def test_the_cost_table_cannot_read_the_bold_digits(batch, table, countdown) -> None:
+    """**为什么要有第二张表**：出厂那套字形读不出这串粗体数字 —— 同一块墨迹，两张表反着答。
+
+    实测 `shot26` 那张 `12.9` 的 `1`：出厂表最像的**反而是 `2`**（0.4448，低于它
+    自己的 0.86 线），粗体表最像的正是 `1`（0.9964，过它自己的 0.90 线）。所以这不是
+    "链坏了"，是**欠了一套资产** —— 这一单把它补上了。
+    """
+    frame = _frame(batch, "shot26")
+    card = read_squad_row(frame, table, pitch=PITCH)[0]
+    ink, _, digits, dots = countdown_boxes(frame, card.center_x, _card_top())
+    whole = [box for box in digits if box[2] <= dots[0][0]]
+    x0, y0, x1, y1 = whole[0]
+    block = normalize(ink[y0:y1, x0:x1])
+
+    cost_scores = table.scores(block)
+    bold_scores = countdown.scores(block)
+    assert max(cost_scores.values()) == pytest.approx(0.4448, abs=0.0002)
+    assert max(cost_scores, key=lambda digit: cost_scores[digit]) == 2
+    assert max(cost_scores.values()) < COST_SOLID_MATCH_SCORE
+    assert bold_scores[1] == pytest.approx(0.9964, abs=0.0002)
+    assert max(bold_scores, key=lambda digit: bold_scores[digit]) == 1
+    assert bold_scores[1] >= COUNTDOWN_SOLID_MATCH_SCORE
+
+
+def test_a_countdown_drawn_with_the_bold_glyphs_is_read(batch, table, countdown) -> None:
+    """用**粗体那套表自己的字形**合成的 `12.9` ⇒ 读得出 12.9（合成帧，见模块文档）。"""
+    frame = _draw_countdown(
+        _blank_ring(_frame(batch, "shot26"), 0), countdown, "12.9", 0
+    )
     row = read_squad_row(frame, table, pitch=PITCH)
     assert row[0].redeploying is True
     assert isinstance(row[0].seconds.payload, Exact)
     assert row[0].seconds.payload.value == 12.9
 
 
-def test_a_two_digit_countdown_without_a_dot_is_unknown(batch, table) -> None:
-    """认不出小数点 ⇒ **未知**：秒数必须有小数位，报一个整数就是假事实。"""
-    frame = _draw_countdown(_blank_ring(_frame(batch, "shot26"), 0), table, "129", 0)
+def test_a_two_digit_countdown_without_a_dot_is_unknown(batch, table, countdown) -> None:
+    """认不出小数点 ⇒ **未知**：秒数必须有小数位，报一个整数就是假事实。
+
+    画的是**粗体那套表自己的字形**（所以字形认得出来），坏掉的只有小数点这一件事。
+    """
+    frame = _draw_countdown(
+        _blank_ring(_frame(batch, "shot26"), 0), countdown, "129", 0
+    )
     row = read_squad_row(frame, table, pitch=PITCH)
     assert isinstance(row[0].seconds.payload, Unknown)
 
@@ -670,19 +766,100 @@ def test_an_empty_ring_centre_is_unsampled(batch, table) -> None:
     assert row[0].seconds == Unsampled()
 
 
-def test_the_countdown_is_read_with_the_tables_own_glyphs(batch, table) -> None:
+def test_the_countdown_is_read_with_the_tables_own_glyphs(batch, table, countdown) -> None:
     """换一个数（`3.5`）照样读得出 —— 读的不是"这一帧记得的那个值"。"""
-    frame = _draw_countdown(_blank_ring(_frame(batch, "shot26"), 0), table, "3.5", 0)
+    frame = _draw_countdown(
+        _blank_ring(_frame(batch, "shot26"), 0), countdown, "3.5", 0
+    )
     row = read_squad_row(frame, table, pitch=PITCH)
     assert row[0].seconds.payload.value == 3.5
 
 
-def test_the_seconds_is_a_tenth_not_a_float_artefact(batch, table) -> None:
+def test_the_seconds_is_a_tenth_not_a_float_artefact(batch, table, countdown) -> None:
     """值是**十进制的十分位**：129 / 10 落成的那个双精度数就是 `12.9` 本身。"""
-    frame = _draw_countdown(_blank_ring(_frame(batch, "shot26"), 0), table, "12.9", 0)
+    frame = _draw_countdown(
+        _blank_ring(_frame(batch, "shot26"), 0), countdown, "12.9", 0
+    )
     row = read_squad_row(frame, table, pitch=PITCH)
     assert row[0].seconds.payload.value == 12 + 9 / 10.0
     assert repr(row[0].seconds.payload.value) == "12.9"
+
+
+# ---------------------------------------------------------------------------
+# 资产：粗体那套表
+# ---------------------------------------------------------------------------
+
+
+def test_the_shipped_countdown_table_covers_all_ten_digits() -> None:
+    """出厂那份粗体表**十个数字一个不缺**，落点与文件名照规格钉的来。
+
+    「表里少一个键，那个数字就永远读不出来，而表看起来仍然是好的」—— 所以这一条与
+    `build_countdown_glyphs` 里那句报错是一对。
+    """
+    table = load_countdown_glyphs()
+    assert table.digits == tuple(range(10))
+    assert COUNTDOWN_GLYPHS_PATH.name == "digits.npz"
+    assert COUNTDOWN_GLYPHS_PATH.parent.name == "glyphs_countdown"
+    assert COUNTDOWN_GLYPHS_PATH.parent.parent.name == "features"
+
+
+def test_the_countdown_table_is_reproducible_from_the_harvest(scratch: Path) -> None:
+    """同一批取材卡跑两遍，**逐字节一样**；而且出厂那份就是这条路造出来的。
+
+    字节比的是两次构建（与压缩实现无关）；与出厂那份比的是**模板逐像素**（不让
+    `savez_compressed` 换个实现就把这一条变成假的）。
+    """
+    from ark.offline.assets_gen.countdown import (
+        build_countdown_glyphs,
+        load_countdown_harvest,
+    )
+
+    harvest = load_countdown_harvest()
+    first = build_countdown_glyphs(harvest, scratch / "a")
+    second = build_countdown_glyphs(harvest, scratch / "b")
+    assert first.read_bytes() == second.read_bytes()
+
+    fresh = GlyphTable.load(first)
+    shipped = load_countdown_glyphs()
+    assert fresh.digits == shipped.digits
+    for digit in shipped.digits:
+        assert np.array_equal(fresh.templates[digit], shipped.templates[digit])
+
+
+def test_a_missing_countdown_table_is_not_a_missing_countdown(
+    batch, table, scratch: Path
+) -> None:
+    """**能力缺失 ≠ 这张卡没有倒计时**：路径指到不存在的地方 ⇒ **抛错**。
+
+    静默返回一行「未采样」的读数，吐出来的是**假缺席** —— 与假事实一样坏
+    （《识别方法》§已定）。报什么错不管，**报就行**。
+    """
+    with pytest.raises(FileNotFoundError) as bad:
+        read_squad_row(
+            _frame(batch, "shot26"),
+            table,
+            pitch=PITCH,
+            countdown_path=scratch / "还没有这张表",
+        )
+    assert "倒计时" in str(bad.value)
+
+
+def test_an_empty_countdown_directory_is_also_loud(batch, table, scratch: Path) -> None:
+    """目录在、表不在（空目录）⇒ 同样抛错 —— 那也是「表没建好」。"""
+    empty = scratch / "空的"
+    empty.mkdir()
+    with pytest.raises(FileNotFoundError):
+        read_squad_row(
+            _frame(batch, "shot26"), table, pitch=PITCH, countdown_path=empty
+        )
+
+
+def test_the_caller_may_point_at_the_shipped_table_explicitly(batch, table) -> None:
+    """`countdown_path` 默认就是出厂那份 —— 显式传同一个路径，读数**逐字段一样**。"""
+    frame = _frame(batch, "shot26")
+    assert read_squad_row(
+        frame, table, pitch=PITCH, countdown_path=COUNTDOWN_GLYPHS_PATH
+    ) == read_squad_row(frame, table, pitch=PITCH)
 
 
 # ---------------------------------------------------------------------------
