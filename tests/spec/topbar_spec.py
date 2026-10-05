@@ -1,30 +1,7 @@
 """顶部两个数（生命 · 敌数）读数链的规格符合性验收 —— **由规划者维护，不住在 tests/unit/**。
 
-与 `tests/unit/` 的分工：
-
-| 目录 | 谁写 | 验证什么 |
-| --- | --- | --- |
-| `tests/unit/` | 执行者 | "实现按我的设计工作" |
-| **本文件** | **规划者** | **"规格说的那些话成立"** |
-
-## 两条纪律
-
-1. **只用公开面。** 只 import 视觉层与离线层**对外承诺**的那些名字。碰 `_` 开头的
-   内部名，验收就绑死在实现上了。
-2. **每条检查都带规格出处。** 没有出处的检查是**发明规范**；出处对不上的检查是
-   **发现了规格洞**。两种都要能在报告里看出来。
-
-## 它是规划者的工具，不进任务消息
-
-D-全局-22：`tests/spec/` 那套检查**只归规划者用**。执行者该建什么，从**规格文档**
-里读；把它当"活清单"交出去，等于给它一道有答案的题——它会朝"让这些检查变绿"
-过拟合，而不是朝"把这件事做对"。
-
-## 跑法（不需要 pytest）
-
-    python tests/spec/topbar_spec.py
-
-pytest 外壳是 `test_topbar_spec.py`，它只是把下面那张表逐条变成用例。
+分工、纪律、跑法都在 [README](README.md) —— **不在这里重述**（同一条规定只写
+一次）。
 
 ## 真值从哪来
 
@@ -217,11 +194,16 @@ def _paste_glyph(ch: str, left: int, top: int) -> tuple:
     return _patch(px, py, px + block.shape[1] - 1, py + block.shape[0] - 1, block)
 
 
-def _raw(name: str, *patches: tuple) -> bytes:
+def _patched_canvas(name: str, *patches: tuple) -> np.ndarray:
+    """这一帧的裁剪贴回画布，再盖上若干贴片 —— 还没编成原始字节的画布。"""
     canvas = _canvas(name)
     for (x0, y0, x1, y1), block in patches:
         canvas[y0 : y1 + 1, x0 : x1 + 1] = block
-    return _raw_from_canvas(canvas)
+    return canvas
+
+
+def _raw(name: str, *patches: tuple) -> bytes:
+    return _raw_from_canvas(_patched_canvas(name, *patches))
 
 
 def _frame(raw: bytes):
@@ -637,6 +619,184 @@ def check_cost_chain_did_not_move() -> str:
     return "费用在 shot01/26/35 上仍是 2 / 65 / 99"
 
 
+# ---------------------------------------------------------------------------
+# 退化族：把「读不全」的每一条路排成一张表走一遍（T15 · T16）
+#
+# T6–T13 是**点**检查（一条盯一个坏法）；这一组是**族**检查 —— 走一遍整族，
+# 断言的是**形状**（载荷只可能是精确 / 未知），不是某一个值。
+#
+# 族里有两个面**原先没人守过**：敌数**某一侧整位缺失**。文档把"缺一位必须判出来"
+# 写成这条链最危险的假事实，而 T8 / X8 守的都是生命那一侧 —— 敌数那侧靠的是
+# 三处缝（内端 / 块间 / 复合体居中），一条检查都没有。
+# ---------------------------------------------------------------------------
+
+
+def _ink_columns(
+    canvas: np.ndarray, window: str, *, take: str = "min", threshold: int = 128
+) -> list[tuple[int, int]]:
+    """**画布**上某个窗口里按列分出来的墨块（绝对像素、含两端）。
+
+    这里只要"哪些列有墨"，扫一遍即可 —— 不涉及读数链怎么切块，所以不算绑在实现上。
+    **两处的口径要各给各的**（D-全局-24）：敌数是白的（`min ≥ 128` 就够），
+    生命是粉的 `(255,120,120)`（`min` 只有 120，**一块都切不出来**）—— 所以生命
+    那一侧要传 `take="max"`。这条口径差正是《顶部两个数》§每个区域必须知道的事实
+    写着的那件事，用错一个参数就会量到"没有墨"。
+
+    收**画布**而不是帧名：合成帧要量的是**改过之后**的那一张（量原帧会把
+    "我摆了三块"验成"原帧里有一块"）。
+    """
+    x0, y0, x1, y1 = _window(window)
+    band = canvas[y0 : y1 + 1, x0 : x1 + 1]
+    stat = band.max(axis=2) if take == "max" else band.min(axis=2)
+    cols = (stat >= threshold).any(axis=0)
+    runs: list[tuple[int, int]] = []
+    start = None
+    for index, on in enumerate(cols):
+        if on and start is None:
+            start = index
+        elif not on and start is not None:
+            runs.append((x0 + start, x0 + index - 1))
+            start = None
+    if start is not None:
+        runs.append((x0 + start, x0 + len(cols) - 1))
+    return runs
+
+
+def _blank_columns(name: str, window: str, x0: int, x1: int) -> tuple:
+    """把一个窗口里某几列**整窗高**涂黑 —— 用来"整块拿掉一位"。"""
+    _wx0, wy0, _wx1, wy1 = _window(window)
+    return _blank(x0, wy0, x1, wy1)
+
+
+def _degradations() -> list[tuple[str, list, str, bool]]:
+    """退化族：`(名字, 读数, 该落成什么, 那里有没有笔画)`。
+
+    每一路都从**真帧**出发（`shot26` 是 `14/22` 与生命 `1`），只改一处。真值：
+    甲 = 14 · 乙 = 22 · 生命 = 1。
+    """
+    ui = _ui()
+    topbar = _topbar()
+    table = _glyphs()
+    solid = np.full((LIFE_UNION[3] - LIFE_UNION[1] + 1, 19, 3), 255, np.uint8)
+    enemy_runs = _ink_columns(_canvas("shot26"), "enemy_count")
+    assert len(enemy_runs) == 5, (
+        f"`shot26` 的敌数窗口该切出 5 块（`1` `4` `/` `2` `2`），切出 {enemy_runs}"
+    )
+
+    def life(*patches) -> list:
+        return [topbar.read_life_digits(_patched("shot26", *patches), table, ui=ui)]
+
+    def enemy(*patches) -> list:
+        return list(topbar.read_enemy_count(_patched("shot26", *patches), table, ui=ui))
+
+    return [
+        ("生命·整窗涂黑", life(_blank(*_window("life_digits"))), "未采样", False),
+        ("生命·一块实心块（居中）",
+         life(_blank(*_window("life_digits")),
+              _patch(1599, LIFE_UNION[1], 1617, LIFE_UNION[3], solid)),
+         "未知", True),
+        ("生命·一块真字形 + 一块实心块",
+         life(_blank(*_window("life_digits")),
+              _paste_glyph("1", 1589, LIFE_UNION[1]),
+              _patch(1604, LIFE_UNION[1], 1622, LIFE_UNION[3], solid)),
+         "未知", True),
+        ("生命·一块真字形偏右（缺的在左边）",
+         life(_blank(*_window("life_digits")),
+              _paste_glyph("3", _window("life_digits")[2] - 19, LIFE_UNION[1])),
+         "未知", True),
+        ("敌数·整窗涂黑", enemy(_blank(*_window("enemy_count"))), "未采样 / 未采样", False),
+        ("敌数·分隔符被抹掉",
+         enemy(_blank(*SEP_SHOT01)), "未知 / 未知", True),
+        ("敌数·甲的首位整块拿掉（`4/22`）",
+         enemy(_blank_columns("shot26", "enemy_count", *enemy_runs[0])),
+         "未知 / 精确(22)", True),
+        ("敌数·乙的末位整块拿掉（`14/2`）",
+         enemy(_blank_columns("shot26", "enemy_count", *enemy_runs[-1])),
+         "精确(14) / 未知", True),
+        ("敌数·甲的一位换成实心块",
+         enemy(_patch(*DIGIT4_SHOT26, np.full(
+             (DIGIT4_SHOT26[3] - DIGIT4_SHOT26[1] + 1,
+              DIGIT4_SHOT26[2] - DIGIT4_SHOT26[0] + 1, 3), 255, np.uint8))),
+         "未知 / 精确(22)", True),
+    ]
+
+
+def check_no_degradation_produces_an_interval() -> str:
+    """**整族退化都不产区间**，也不产半开界 —— 载荷只可能是精确 / 未知。
+
+    出处：《视觉层/顶部两个数》§降级（"这一层只产出三种东西：精确 / 未知 / 未采样。
+    它不产区间"，T7 裁定）+ 《识别方法》§已定末尾那条限定。
+
+    T6–T13 是**点**检查：每条盯住一个坏法、断言它落成什么。这一条断言的是**形状**
+    —— 把整族走一遍，看有没有哪一路给出 `Interval` / `UpperBound` / `LowerBound` /
+    `Region`。**形状比值要紧**：值错了是这一路错了，形状错了是"字段的形态被读数链
+    改写了"，那会顺着快照传到 AI 手上，而 AI 是按形态决定怎么用这个数的。
+
+    **有笔画的那几路还不许落未采样**：那里有东西、只是读不出来，与"那里没有东西"
+    混掉就是假事实（[识别方法](识别方法.md) §已定末尾）。
+    """
+    contracts = _mod("ark.contracts")
+    wrong_form: list[str] = []
+    wrong_value: list[str] = []
+    leaked: list[str] = []
+    for label, values, want, has_ink in _degradations():
+        got = " / ".join(_slot_value(value) for value in values)
+        if got != want:
+            wrong_value.append(f"{label}：该是 {want}，读成 {got}")
+        for value in values:
+            if has_ink and isinstance(value, contracts.Unsampled):
+                leaked.append(f"{label} → 未采样")
+            payload = value.payload if isinstance(value, contracts.Valued) else None
+            if isinstance(
+                payload,
+                (contracts.Interval, contracts.UpperBound, contracts.LowerBound, contracts.Region),
+            ):
+                wrong_form.append(f"{label} → {type(payload).__name__}")
+    assert not wrong_form, (
+        "这三个字段的「允许的形态」里没有区间、也没有半开界，读数链却给出来了："
+        + "；".join(wrong_form)
+    )
+    assert not leaked, (
+        "有笔画的那几路落了未采样 —— 那里有东西、只是读不出来，与「那里没有东西」"
+        "混掉就是假事实：" + "；".join(leaked)
+    )
+    assert not wrong_value, "；".join(wrong_value)
+    family = _degradations()
+    return (
+        f"{len(family)} 路退化全部落成 精确 / 未知 / 未采样"
+        f"（其中 {sum(1 for _l, _v, _w, ink in family if ink)} 路有笔画，都落未知）"
+    )
+
+
+def check_too_many_blocks_is_not_an_exact_number() -> str:
+    """生命窗口里出现 **3 块** → **不许报确切数**（生命只有 1–2 位）。
+
+    出处：《视觉层/顶部两个数》§位数（"生命 **1–2 位**"）+ §降级那张表（"逐位都读出
+    确切值、**位数也对** → 精确"）。三块不满足"位数也对"，所以按规格它不该落精确。
+
+    三个 `1` 都是**真字形**（从真帧里整块搬过来），排得下、每一个都认得出来 ——
+    唯一的错处是**块数超过上限**。**不许截断成 `11`**：那是把"窗口里有三块"静默
+    改写成"这个数是 11"，与"缺一位塌成更短的确切数"是同一类假事实。
+
+    **这条比"必须落未知"更松**：规格还没写"超上限落成什么"（见 §尚未定），所以
+    未知与未采样都算过 —— 但不许给一个数。
+    """
+    contracts = _mod("ark.contracts")
+    patches = [_blank(*_window("life_digits"))]
+    patches += [_paste_glyph("1", left, LIFE_UNION[1]) for left in (1594, 1608, 1622)]
+    canvas = _patched_canvas("shot26", *patches)
+    runs = _ink_columns(canvas, "life_digits", take="max", threshold=PINNED["LIFE_INK_THRESHOLD"])
+    got = _topbar().read_life_digits(_frame(_raw_from_canvas(canvas)), _glyphs(), ui=_ui())
+    assert len(runs) == 3, f"这一帧该摆出 3 块，量到 {runs}"
+    assert not (
+        isinstance(got, contracts.Valued) and isinstance(got.payload, contracts.Exact)
+    ), (
+        f"窗口里有 3 块（生命只有 1–2 位），却报出了确切数 {_slot_value(got)}"
+        " —— 那是把「块数超上限」静默改写成「这个数就是它」"
+    )
+    return f"3 块 → {_slot_value(got)}（没有给出确切数）"
+
+
 CHECKS: list[Check] = [
     Check("T1", "《视觉层/顶部两个数》§两个窗口", "两个窗口与文档逐字一致", check_windows_are_the_documented_ones),
     Check("T2", "《视觉层/顶部两个数》§每个区域必须知道的事实", "窗口装得下字形，中心就是实测锚点", check_windows_hold_the_measured_glyphs_and_the_anchor),
@@ -652,6 +812,8 @@ CHECKS: list[Check] = [
     Check("T12", "《视觉层/顶部两个数》§每个区域必须知道的事实 · D-全局-24", "费用那条链没被挪走", check_cost_chain_did_not_move),
     Check("T13", "《视觉层/顶部两个数》§降级", "只有一块且认不出 → 未知", check_single_unreadable_block_is_unknown),
     Check("T14", "《视觉层/顶部两个数》§每个区域必须知道的事实", "钉住的三个数与文档相等", check_pinned_constants_match_the_doc),
+    Check("T15", "《视觉层/顶部两个数》§降级 · 《识别方法》§已定", "整族退化都不产区间 / 半开界，有笔画的不落未采样", check_no_degradation_produces_an_interval),
+    Check("T16", "《视觉层/顶部两个数》§位数 §降级", "块数超过位数上限时，不许报确切数", check_too_many_blocks_is_not_an_exact_number),
 ]
 
 

@@ -1,30 +1,7 @@
 """费用读数链的规格符合性验收 —— **由规划者维护，不住在 tests/unit/**。
 
-与 `tests/unit/` 的分工：
-
-| 目录 | 谁写 | 验证什么 |
-| --- | --- | --- |
-| `tests/unit/` | 执行者 | "实现按我的设计工作" |
-| **本文件** | **规划者** | **"规格说的那些话成立"** |
-
-## 两条纪律
-
-1. **只用公开面。** 只 import 视觉层与离线层**对外承诺**的那些名字。碰 `_` 开头的
-   内部名，验收就绑死在实现上了。
-2. **每条检查都带规格出处。** 没有出处的检查是**发明规范**；出处对不上的检查是
-   **发现了规格洞**。两种都要能在报告里看出来。
-
-## 它是规划者的工具，不进任务消息
-
-D-全局-22：`tests/spec/` 那套检查**只归规划者用**。执行者该建什么，从**规格文档**
-里读；把它当"活清单"交出去，等于给它一道有答案的题——它会朝"让这些检查变绿"
-过拟合，而不是朝"把这件事做对"。T3 已经做完了，这批现在全绿。
-
-## 跑法（不需要 pytest）
-
-    python tests/spec/cost_spec.py
-
-pytest 外壳是 `test_cost_spec.py`，它只是把下面那张表逐条变成用例。
+分工、纪律、跑法都在 [README](README.md) —— **不在这里重述**（同一条规定只写
+一次）。T3 已经做完了，这批现在全绿。
 
 ## 真值从哪来
 
@@ -281,7 +258,7 @@ def check_ui_layout_values_cover_the_documented_windows() -> str:
         if not (y0 - 12 <= r.y <= y0 and y1 <= bottom <= y1 + 12):
             bad.append(f"{name} y 是 [{r.y},{bottom}]，文档要覆盖 [{y0},{y1}]")
     assert not bad, "；".join(bad)
-    return "8 个矩形都覆盖文档窗口，外扩不超过 12 px"
+    return f"{len(DOC_RECTS)} 个矩形都覆盖文档窗口，外扩不超过 12 px"
 
 
 def check_bar_constant_is_the_track_itself() -> str:
@@ -330,7 +307,10 @@ def check_spec_thresholds_are_pinned_to_the_code() -> str:
         elif got != want:
             bad.append(f"{name} 是 {got!r}，规格钉的是 {want!r}")
     assert not bad, "；".join(bad)
-    return "规格钉住的 5 个数与代码一致：" + " · ".join(f"{k}={v}" for k, v in pinned.items())
+    return (
+        f"规格钉住的 {len(pinned)} 个数与代码一致："
+        + " · ".join(f"{k}={v}" for k, v in pinned.items())
+    )
 
 
 def check_windows_stay_inside_the_canvas() -> str:
@@ -505,7 +485,8 @@ def check_cost_digits_read_correctly_on_every_sample() -> str:
         if slot.payload.value != want:
             bad.append(f"shot{shot:02d}: 该读到 {want}，读到 {slot.payload.value}")
     assert not bad, "；".join(bad[:8]) + (f"（共 {len(bad)} 帧不对）" if len(bad) > 8 else "")
-    return f"{len(DIGITS)} 帧全部读对（1 位 8 帧、2 位 23 帧）"
+    one = sum(1 for v in DIGITS.values() if v < 10)
+    return f"{len(DIGITS)} 帧全部读对（1 位 {one} 帧、2 位 {len(DIGITS) - one} 帧）"
 
 
 def check_digits_are_read_not_remembered() -> str:
@@ -588,7 +569,14 @@ def check_missing_last_digit_is_not_a_shorter_number() -> str:
 
 
 def check_partly_occluded_last_digit_is_an_interval() -> str:
-    """末位**被遮掉一半**（还剩一点笔画）→ 该是区间，不许猜整数。"""
+    """末位**被遮掉一半**（还剩一点笔画）→ 该给区间，**做不到就给未知**，不许猜整数。
+
+    **这条的落法是"争取"、不是"必须"**：状态层写的是"逐位歧义 → **争取**降成区间，
+    做不到就是未知"（[状态层/全局与HUD] §当前费用 的降级触发）。所以断言只管住
+    下界——**不许给一个确切数**；给出来的区间必须含真值。**证据行会报出实际落了
+    哪一种**，因为"费用这条链还产不产区间"是这一批关心的另一件事（T7 裁定里
+    费用与顶部两个数的落法**不一样**）。
+    """
     cost = _mod("ark.engine.vision.cost")
     from ark.contracts import Exact, Interval, Unknown, Unsampled, Valued
 
@@ -628,7 +616,7 @@ def check_missing_first_digit_is_not_a_shorter_number() -> str:
 
     ui = _ui()
     r = ui.rects["cost_digits"]
-    bad, checked = [], 0
+    bad, checked, bounds, unknowns = [], 0, 0, 0
     for shot in sorted(DIGITS):
         if DIGITS[shot] < 10:
             continue
@@ -657,16 +645,21 @@ def check_missing_first_digit_is_not_a_shorter_number() -> str:
             continue
         if isinstance(slot, Valued) and isinstance(slot.payload, Interval):
             p = slot.payload
+            bounds += 1
             if not (p.lo <= want <= p.hi):
                 bad.append(f"shot{shot:02d}: 区间 [{p.lo},{p.hi}] 不含真值 {want}")
             continue
         if isinstance(slot, (Unsampled,)) or (
             isinstance(slot, Valued) and isinstance(slot.payload, Unknown)
         ):
+            unknowns += 1
             continue
         bad.append(f"shot{shot:02d}: 收到 {type(slot).__name__}")
     assert not bad, "；".join(bad[:6])
-    return f"{checked} 帧涂掉首位，都报区间且都含真值，没有一帧塌成更短的确切数"
+    return (
+        f"{checked} 帧涂掉首位，都报区间或未知，没有一帧塌成更短的确切数"
+        f"（区间 {bounds} 帧、未知 {unknowns} 帧；报区间的都含真值）"
+    )
 
 
 def check_occluded_digits_are_not_a_number() -> str:
@@ -991,8 +984,8 @@ CHECKS: tuple[Check, ...] = (
     Check("D3", "视觉层/顶部HUD与数字 §每个区域必须知道的事实（数字居中于 x≈2721）",
           "末位整块缺失时，不许报成一个更短的确切数",
           check_missing_last_digit_is_not_a_shorter_number),
-    Check("D5", "视觉层/识别方法 §已查：逐位歧义降成区间",
-          "末位被遮一半时降成区间，不猜整数",
+    Check("D5", "视觉层/识别方法 §已查（逐位歧义降成区间）+ 状态层/全局与HUD §当前费用（争取降成区间，做不到就是未知）",
+          "末位被遮一半时给区间或未知，不猜整数",
           check_partly_occluded_last_digit_is_an_interval),
     Check("D6", "视觉层/顶部HUD与数字 §每个区域必须知道的事实（数字居中于 x≈2721）",
           "首位整块缺失时，也不许报成一个更短的确切数",

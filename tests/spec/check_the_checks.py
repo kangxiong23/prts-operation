@@ -1,4 +1,4 @@
-"""验证 `contracts_spec.py` 里的检查**不是永远绿的** —— 规划者的自检。
+"""验证 `tests/spec/` 里的检查**不是永远绿的** —— 规划者的自检。
 
 规划者写的验收套件有一个特有的风险：它描述的往往是**已经写好的**代码，所以
 "绿"可能只说明检查太松，而不是代码太对。这个探针逐条制造反例（把公开面换成
@@ -7,6 +7,11 @@
 **它不属于 `pytest tests`**（文件名不匹配 `test_*.py`），跑法：
 
     python tests/spec/check_the_checks.py
+
+现在覆盖两批：`contracts_spec.py`（契约层）与 `topbar_spec.py`（顶部两个数）。
+**不是每条检查都有探针** —— 探针要有"把公开面换成坏的那一版"这个动作，有些检查
+（例如"35 帧都读对"）的反例要伪造一整批帧，代价大于收益。**这一批挑的是"断言的是
+形状、而不是某个值"的那些**：形状类断言最容易写成永远绿。
 
 注意一个坑：`contracts_spec` 在**模块加载时**就把 `Interval` / `LowerBound` 这类
 名字绑死了（`from ark.contracts import ...`）。所以打补丁要**同时**打到
@@ -27,7 +32,9 @@ sys.path.insert(0, str(_HERE.parents[1] / "src"))
 sys.path.insert(0, str(_HERE))
 
 import ark.contracts as contracts  # noqa: E402
+import ark.engine.vision.topbar as topbar_mod  # noqa: E402
 import contracts_spec as spec  # noqa: E402
+import topbar_spec  # noqa: E402
 
 _MODULES = (contracts, spec)
 
@@ -57,6 +64,43 @@ def _goes_red(name: str, check: Callable[[], str], patch: dict[str, object]) -> 
         return False
     finally:
         for module, key, value in saved:
+            setattr(module, key, value)
+
+
+def _goes_red_in(
+    module: object,
+    name: str,
+    check: Callable[[], str],
+    patch: Mapping[str, object],
+    *,
+    must_mention: str | None = None,
+) -> bool:
+    """把 `patch` 盖到**某一个模块**上，跑 check —— 期望它抛 AssertionError。
+
+    `must_mention` 用来钉住**是哪一条断言**炸的：一条检查里往往有几层断言，
+    只验"会红"分不清是哪一层在起作用（外层先炸，里层就永远没人试过）。
+    """
+    saved = [(key, getattr(module, key)) for key in patch if hasattr(module, key)]
+    for key, value in patch.items():
+        if hasattr(module, key):
+            setattr(module, key, value)
+    try:
+        check()
+    except AssertionError as bad:
+        text = str(bad)
+        if must_mention is not None and must_mention not in text:
+            print(f"  ‼ {name} 红了，但不是那一条：{text[:64]}")
+            return False
+        print(f"  ✓ {name} 会红：{text[:76]}")
+        return True
+    except BaseException as other:  # noqa: BLE001
+        print(f"  ‼ {name} 炸错了类型：{type(other).__name__}: {other}")
+        return False
+    else:
+        print(f"  ✗ {name} **永远绿** —— 换成坏实现它照样过")
+        return False
+    finally:
+        for key, value in saved:
             setattr(module, key, value)
 
 
@@ -164,9 +208,68 @@ CASES: tuple[tuple[str, Callable[[], str], dict[str, object]], ...] = (
 )
 
 
+# ---------------------------------------------------------------------------
+# 顶部两个数那批（T15 / T16）：把两个读数入口换成坏的那一版
+#
+# 这两个入口在检查里是**每次调用现取**（`_topbar().read_life_digits(...)`），
+# 所以盖在模块属性上就能生效，不用去改帧。
+# ---------------------------------------------------------------------------
+
+
+def _fake_interval_life(*_args: object, **_kwargs: object) -> object:
+    """生命读数：一律报区间 —— T7 裁定说这三个字段不许有这个形态。"""
+    return contracts.Valued(contracts.Interval(0, 9), 0.9)
+
+
+def _fake_interval_enemy(*_args: object, **_kwargs: object) -> tuple:
+    return contracts.Valued(contracts.Interval(0, 9), 0.9), contracts.Valued(
+        contracts.Interval(0, 9), 0.9
+    )
+
+
+def _fake_unsampled_life(*_args: object, **_kwargs: object) -> object:
+    """生命读数：一律报未采样 —— 有笔画的那几路不许落这个。"""
+    return contracts.Unsampled()
+
+
+def _fake_truncated_life(*_args: object, **_kwargs: object) -> object:
+    """生命读数：一律报 `11` —— 三块超上限时"截断成两位"就是这么来的。"""
+    return contracts.Valued(contracts.Exact(11), 0.9)
+
+
+TOP_CASES: tuple[tuple[str, Callable[[], str], dict[str, object], str | None], ...] = (
+    (
+        "T15 退化族里冒出区间",
+        topbar_spec.check_no_degradation_produces_an_interval,
+        {"read_life_digits": _fake_interval_life, "read_enemy_count": _fake_interval_enemy},
+        "没有区间",
+    ),
+    (
+        "T15 有笔画的那几路落了未采样",
+        topbar_spec.check_no_degradation_produces_an_interval,
+        # **只盖生命那一个入口**：敌数那个换成区间假货的话，先炸的是"不产区间"
+        # 那一条，这一层断言就永远没人试过（探针要一次只弄坏一处）。
+        {"read_life_digits": _fake_unsampled_life},
+        "混掉就是假事实",
+    ),
+    (
+        "T16 超上限被截成一个确切数",
+        topbar_spec.check_too_many_blocks_is_not_an_exact_number,
+        {"read_life_digits": _fake_truncated_life},
+        "静默改写成",
+    ),
+)
+
+
 def main() -> int:
     print("把公开面换成坏的那一版，检查是否变红：")
     results = [_goes_red(name, check, patch) for name, check, patch in CASES]
+    print()
+    print("顶部两个数那批（盖在读数入口上）：")
+    results += [
+        _goes_red_in(topbar_mod, name, check, patch, must_mention=mention)
+        for name, check, patch, mention in TOP_CASES
+    ]
     print()
     print(f"{sum(results)}/{len(results)} 条检查被证明会红")
     return 0 if all(results) else 1
