@@ -31,5 +31,12 @@ offline = ["pillow"]
 packages = ["src/ark"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# **默认只跑这两棵**：执行者自己的用例 + 机器强制的边界契约。
+# `tests/spec/`（规划者的规格符合性验收）**不在默认收集范围里** —— 它是规划者的
+# 工具，执行者不该照着它写实现（D-全局-22），而 `pytest` 默认全收等于把那份
+# 检查连同它的判据与失败证据一起端到执行者面前。规划者自己跑：
+#
+#     python tests/spec/<那份>.py          # 或
+#     pytest tests/spec -q
+testpaths = ["tests/unit", "tests/contract"]
 pythonpath = ["src"]

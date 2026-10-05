@@ -450,12 +450,13 @@ def check_blank_life_window_is_unsampled() -> str:
     return "生命窗口整块涂黑 → 未采样"
 
 
-def check_unreadable_digit_with_known_count_is_an_interval() -> str:
-    """**位数已经数对、只是某一位认不出** → 区间，不是未知、更不是挑一个。
+def check_unreadable_digit_with_known_count_is_unknown() -> str:
+    """**位数已经数对、只是某一位认不出** → **未知**（不是区间、也不是挑一个）。
 
-    出处：《识别方法》§已定（"对不上任何字形"要分两种情形）+《视觉层/顶部两个数》
-    §降级第二条。生命窗口里放**两块**：左边是真实的 `1`，右边是一块实心块（实测
-    对最像的数字只得 0.54）。位数是 2，所以那一位的候选是全部十个数字 → `[10,19]`。
+    出处：《识别方法》§已定 +《视觉层/顶部两个数》§降级（T7 裁定：这三个字段的
+    允许形态里**没有区间**，读数链不许替字段加一个）。生命窗口里放**两块**：左边
+    是真实的 `1`，右边是一块实心块（实测对最像的数字只得 0.54）。位数是 2，但那
+    一位认不出 —— 我们知道那里有一位数字，不知道它是几。
     """
     ui = _ui()
     solid = np.full((LIFE_UNION[3] - LIFE_UNION[1] + 1, 19, 3), 255, np.uint8)
@@ -468,25 +469,18 @@ def check_unreadable_digit_with_known_count_is_an_interval() -> str:
     got = _topbar().read_life_digits(frame, _glyphs(), ui=ui)
     contracts = _mod("ark.contracts")
     assert isinstance(got, contracts.Valued), f"该是有值，读成 {_slot_value(got)}"
-    assert isinstance(got.payload, contracts.Interval), (
-        f"位数已定、某一位认不出该落成区间，读成 {_slot_value(got)}"
+    assert isinstance(got.payload, contracts.Unknown), (
+        f"位数已定、某一位认不出该落未知，读成 {_slot_value(got)}"
     )
-    assert (got.payload.lo, got.payload.hi) == (10, 19), (
-        f"`1` 后面那一位候选全十个数字 → [10,19]，读成 {_slot_value(got)}"
-    )
-    return "两块、其中一块认不出 → 区间 [10,19]"
+    return "两块、其中一块认不出 → 未知"
 
 
-def check_single_unreadable_block_does_not_claim_a_digit_count() -> str:
-    """**只有一块、而这一块认不出** → 不许给出一个"位数确定"的区间。
+def check_single_unreadable_block_is_unknown() -> str:
+    """**只有一块、而这一块认不出** → **未知**。
 
-    出处：《视觉层/顶部两个数》§降级第四条（T7 补）。区间那条规则的前提是"位数
-    已经数对了"；只有一块且认不出时，**位数本身就没定下来**（可能是一位认不出的
-    数字，也可能是两位被桥接成一块）。用这个 HUD 上真实的那个分隔符当"认不出的
-    墨"（实测对最像的数字只得 0.63–0.78）。
-
-    落法可以是**未知**，也可以是一个**不排除任何合法位数**的区间 —— 判据是
-    "不许把一个位数确定的区间当成读数"。
+    出处：《视觉层/顶部两个数》§降级。只有一块且认不出时，**位数本身就没定下来**
+    （可能是一位认不出的数字，也可能是两位被桥接成一块）。用这个 HUD 上真实的
+    那个分隔符当"认不出的墨"（实测对最像的数字只得 0.63–0.78）。
     """
     ui = _ui()
     src = _canvas("shot01")
@@ -504,17 +498,10 @@ def check_single_unreadable_block_does_not_claim_a_digit_count() -> str:
     got = _topbar().read_life_digits(frame, _glyphs(), ui=ui)
     contracts = _mod("ark.contracts")
     assert isinstance(got, contracts.Valued), f"该是有值，读成 {_slot_value(got)}"
-    payload = got.payload
-    if isinstance(payload, contracts.Unknown):
-        return "只有一块且认不出 → 未知"
-    assert isinstance(payload, contracts.Interval), (
-        f"该落成未知或一个不排除任何位数的区间，读成 {_slot_value(got)}"
+    assert isinstance(got.payload, contracts.Unknown), (
+        f"只有一块且认不出该落未知（位数没定下来），读成 {_slot_value(got)}"
     )
-    assert payload.lo <= 0 and payload.hi >= 99, (
-        f"只有一块且认不出时，位数没定下来，区间不许窄到排除合法值（生命 1–2 位），"
-        f"读成 {_slot_value(got)}"
-    )
-    return f"只有一块且认不出 → {_slot_value(got)}"
+    return "只有一块且认不出 → 未知"
 
 
 def check_missing_life_digit_does_not_shrink_the_number() -> str:
@@ -535,13 +522,11 @@ def check_missing_life_digit_does_not_shrink_the_number() -> str:
     got = _topbar().read_life_digits(_frame(_raw_from_canvas(canvas)), _glyphs(), ui=ui)
     contracts = _mod("ark.contracts")
     assert isinstance(got, contracts.Valued), f"该是有值，读成 {_slot_value(got)}"
-    assert isinstance(got.payload, contracts.Interval), (
-        f"缺一位该落成区间，不许报成一个更短的确切数，读成 {_slot_value(got)}"
+    assert isinstance(got.payload, contracts.Unknown), (
+        f"缺一位该落未知（这三个字段不收区间），**但绝不许报成一个更短的确切数**，"
+        f"读成 {_slot_value(got)}"
     )
-    assert (got.payload.lo, got.payload.hi) == (10, 19), (
-        f"偏左 → 缺的在右边 → `1?` → [10,19]，读成 {_slot_value(got)}"
-    )
-    return "只剩一块且偏左 → 区间 [10,19]，没有塌成 `1`"
+    return "只剩一块且偏左 → 未知，没有塌成 `1`"
 
 
 def check_missing_separator_makes_both_numbers_unknown() -> str:
@@ -659,13 +644,13 @@ CHECKS: list[Check] = [
     Check("T4", "《视觉层/顶部两个数》§每个区域必须知道的事实", "35 帧生命全部读成精确值", check_life_reads_on_every_frame),
     Check("T5", "《视觉层/顶部两个数》§每个区域必须知道的事实", "35 帧敌数全部读成两个精确值", check_enemy_reads_on_every_frame),
     Check("T6", "《视觉层/顶部两个数》§降级", "生命整块涂黑 → 未采样", check_blank_life_window_is_unsampled),
-    Check("T7", "《识别方法》§已定", "位数已定、某一位认不出 → 区间", check_unreadable_digit_with_known_count_is_an_interval),
-    Check("T8", "《视觉层/顶部两个数》§降级", "只剩一块且偏左 → 区间 [10,19]", check_missing_life_digit_does_not_shrink_the_number),
+    Check("T7", "《识别方法》§已定 · 《顶部两个数》§降级", "位数已定、某一位认不出 → 未知", check_unreadable_digit_with_known_count_is_unknown),
+    Check("T8", "《视觉层/顶部两个数》§降级", "缺一位 → 未知，不塌成更短的确切数", check_missing_life_digit_does_not_shrink_the_number),
     Check("T9", "《视觉层/顶部两个数》§每个区域必须知道的事实", "分隔符认不出 → 两个数都未知", check_missing_separator_makes_both_numbers_unknown),
     Check("T10", "《视觉层/顶部两个数》§每个区域必须知道的事实", "挡住一位只让那一边降级", check_one_blocked_digit_only_degrades_its_own_side),
     Check("T11", "《视觉层/顶部两个数》§两个窗口", "两条读数各看各的窗口", check_the_two_readers_do_not_look_at_each_other),
     Check("T12", "《视觉层/顶部两个数》§每个区域必须知道的事实 · D-全局-24", "费用那条链没被挪走", check_cost_chain_did_not_move),
-    Check("T13", "《视觉层/顶部两个数》§降级", "只有一块且认不出 → 不许报出位数确定的区间", check_single_unreadable_block_does_not_claim_a_digit_count),
+    Check("T13", "《视觉层/顶部两个数》§降级", "只有一块且认不出 → 未知", check_single_unreadable_block_is_unknown),
     Check("T14", "《视觉层/顶部两个数》§每个区域必须知道的事实", "钉住的三个数与文档相等", check_pinned_constants_match_the_doc),
 ]
 

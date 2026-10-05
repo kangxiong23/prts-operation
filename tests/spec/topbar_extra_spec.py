@@ -261,12 +261,12 @@ def check_reads_are_pure_and_repeatable() -> str:
     return f"读两遍都是 {got[0]}，像素一个字节没动"
 
 
-def check_life_digit_off_centre_to_the_right_is_an_interval() -> str:
-    """生命字形偏**右** → 缺的在左边 → `?3` → 区间 `[3, 93]`。
+def check_life_digit_off_centre_to_the_right_is_unknown() -> str:
+    """生命字形偏**右**（缺的在左边）→ **未知**，不许塌成确切值。
 
-    出处：《视觉层/顶部两个数》§降级第三条（缺在哪边由偏移的符号给）。
-    `topbar_spec` 那条测的是偏左（`1?` → `[10,19]`）；这条测另一边，两条合起来
-    才说明那条判据是**两边都管**的，而不是"只要偏了就一律报 `[0,99]`"。
+    出处：《视觉层/顶部两个数》§降级（缺一位必须判出来 —— 不判就会报一个更短的
+    确切数）。`topbar_spec` 那条测的是偏左，这条测另一边：两条合起来说明那条判据
+    是**两边都管**的。落法是未知（这三个字段不收区间）。
     """
     _block, (ix0, _iy0, ix1, _iy1) = _glyph("3")
     right = base._window("life_digits")[2]
@@ -279,26 +279,23 @@ def check_life_digit_off_centre_to_the_right_is_an_interval() -> str:
     life, _ = _read_both(frame)
     contracts = base._mod("ark.contracts")
     assert isinstance(life, contracts.Valued), f"该是有值，读成 {base._slot_value(life)}"
-    assert isinstance(life.payload, contracts.Interval), (
-        f"偏右该落成区间，不许报成确切值 3，读成 {base._slot_value(life)}"
+    assert isinstance(life.payload, contracts.Unknown), (
+        f"字形偏右（缺的在左边）该落未知，**不许报成确切值 3**，"
+        f"读成 {base._slot_value(life)}"
     )
-    assert (life.payload.lo, life.payload.hi) == (3, 93), (
-        f"偏右 → 缺的在左边 → `?3` → [3,93]，读成 {base._slot_value(life)}"
-    )
-    return "字形偏右 → 区间 [3,93]，没有塌成确切值 3"
+    return "字形偏右 → 未知，没有塌成确切值 3"
 
 
-def check_merged_pair_does_not_become_a_false_interval() -> str:
-    """两位被桥接成一块 → 那一侧**不许报出一个排除真值的读数**。
+def check_merged_pair_does_not_become_a_false_reading() -> str:
+    """两位被桥接成一块 → 那一侧落**未知**，不许报出一个排除真值的读数。
 
-    出处：《视觉层/顶部两个数》§降级第四条。**这条不是纸上的顾虑**：数字与数字
-    之间那条缝只有 **1–5 px** 宽，缝里的 `min(R,G,B)` 峰值实测到 **127**，而敌数
-    的墨线是 **128** —— **差一格**。所以"两位粘成一块"随时会发生。
+    出处：《视觉层/顶部两个数》§降级。**这条不是纸上的顾虑**：数字与数字之间那条
+    缝只有 **1–5 px** 宽，缝里的 `min(R,G,B)` 峰值实测到 **127**，而敌数的墨线是
+    **128** —— **差一格**。所以"两位粘成一块"随时会发生。
 
     `shot26` 的甲是 `14`（两块，1242..1279）。把这两块涂成**一整块**（39 px 宽，
     比最宽的单个字形 26 px 还宽 13 px），于是甲只剩一块、而它认不出。真值是 14。
-    判据是"**不许报出一个排除 14 的读数**"：未知可以，一个把 14 包进去的区间也
-    可以，`[0,9]` 不行（它把真值排除在外了）。
+    落法必须是**未知** —— 报了 `[0,9]` 就是把真值排除在外（假事实）。
     """
     solid = np.full((base.LIFE_UNION[3] - base.LIFE_UNION[1] + 1, 39, 3), 255, np.uint8)
     frame = base._patched("shot26", base._patch(1242, base.LIFE_UNION[1], 1280, base.LIFE_UNION[3], solid))
@@ -309,18 +306,11 @@ def check_merged_pair_does_not_become_a_false_interval() -> str:
     )
     killed = pair[0]
     assert isinstance(killed, contracts.Valued), f"该是有值，读成 {base._slot_value(killed)}"
-    payload = killed.payload
-    if isinstance(payload, contracts.Unknown):
-        return f"两块粘成一块 → 甲 {base._slot_value(killed)}，乙 精确(22)"
-    if isinstance(payload, contracts.Interval):
-        assert payload.contains(14), (
-            f"甲粘成一块之后读成 {base._slot_value(killed)}，"
-            "而真值 14 不在里面 —— 这是一个不含真值的区间（假事实）"
-        )
-        return f"两块粘成一块 → 甲 {base._slot_value(killed)}（含真值 14），乙 精确(22)"
-    raise AssertionError(
-        f"甲只剩一块、而且认不出，不许报成 {base._slot_value(killed)} —— 位数没定下来"
+    assert isinstance(killed.payload, contracts.Unknown), (
+        f"甲只剩一块、而且认不出，该落未知（位数没定下来），"
+        f"读成 {base._slot_value(killed)} —— 报了确切值或区间就是把真值 14 排除在外"
     )
+    return f"两块粘成一块 → 甲 {base._slot_value(killed)}，乙 精确(22)"
 
 
 CHECKS: tuple[tuple[str, str, str, object], ...] = (
@@ -331,8 +321,8 @@ CHECKS: tuple[tuple[str, str, str, object], ...] = (
     ("X5", "《视觉层/顶部两个数》§两个窗口", "窗口外的亮东西不许读进来", check_bright_ink_outside_the_windows_is_ignored),
     ("X6", "《视觉层/顶部两个数》§降级", "敌数整块涂黑 → 两个都未采样", check_blank_enemy_window_is_unsampled),
     ("X7", "《视觉层/README》三条不能越的线", "读数不改帧、且可重复", check_reads_are_pure_and_repeatable),
-    ("X8", "《视觉层/顶部两个数》§降级", "字形偏右 → 区间 [3,93]", check_life_digit_off_centre_to_the_right_is_an_interval),
-    ("X9", "《视觉层/顶部两个数》§降级", "两位粘成一块 → 不许报出排除真值的读数", check_merged_pair_does_not_become_a_false_interval),
+    ("X8", "《视觉层/顶部两个数》§降级", "字形偏右 → 未知，不塌成确切值", check_life_digit_off_centre_to_the_right_is_unknown),
+    ("X9", "《视觉层/顶部两个数》§降级", "两位粘成一块 → 未知，不报出排除真值的读数", check_merged_pair_does_not_become_a_false_reading),
 )
 
 
