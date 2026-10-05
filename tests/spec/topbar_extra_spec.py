@@ -315,6 +315,62 @@ def check_merged_pair_does_not_become_a_false_reading() -> str:
     return f"两块粘成一块 → 甲 {base._slot_value(killed)}，乙 精确(22)"
 
 
+BLEND_SIZE = (20, 30)
+"""混合字形缩到多大再摆进生命窗口 —— 与真字形同量级（`3` 实测 20×30）。"""
+
+
+def check_ambiguous_candidates_do_not_pick_one() -> str:
+    """两个候选的分数**几乎一样**时 → **未知**，不许挑一个。
+
+    出处：《识别方法》§B 卷积分类那一行（"候选重叠（两个类型都中等分）→ 挑错一个
+    （**双边**）"）+《顶部两个数》§降级（有笔画但读不全 → 未知）。
+
+    **这条补的是一个零覆盖的分支**：真数字之间的分差实测 **≥ 0.083**，而这条防线的
+    门槛是 0.03 —— 所以那 35 帧上**一次都没触发过**（执行者在 T7 的报告里点出了
+    这件事，它也没造帧）。这里把两个字形模板按 **0.5** 混（`3` 与 `8`：最像 0.9609、
+    次像 0.9577、**差 0.0032**），缩到与真字形同量级再摆进生命窗口 —— 于是
+    "最像"与"次像"只差千分之三，**挑一个就是抛硬币**。
+
+    **这不是纸上的输入**：抗锯齿、运动模糊、半透明特效盖上来，都会把一个数字变成
+    "两个都像"。所以判据是"证据真的分不开时不许挑"，不是"这种形状不许出现"。
+    """
+    table = base._glyphs()
+    grey = (
+        0.5 * np.asarray(table.templates[3]).astype(np.float64)
+        + 0.5 * np.asarray(table.templates[8]).astype(np.float64)
+    ).astype(np.uint8)
+    top = sorted(table.scores(grey).values(), reverse=True)[:2]
+    assert top[0] >= 0.90, (
+        f"混出来的这个字形最像只有 {top[0]:.4f} —— 那它落的是「对不上任何字形」那一支，"
+        "不是「并排候选」，这条检查就测错了对象"
+    )
+    assert top[0] - top[1] < 0.03, (
+        f"混出来的这个字形两个候选差 {top[0] - top[1]:.4f}，不够并排"
+        "（真数字之间的差实测 ≥ 0.083）—— 换一对字形重挑"
+    )
+    small = np.asarray(Image.fromarray(grey).resize(BLEND_SIZE, Image.BILINEAR))
+    block = np.dstack([small, small, small])
+    ys, xs = np.nonzero(small >= 150)
+    left = int(round(base.LIFE_ANCHOR - (xs.max() - xs.min() + 1) / 2.0))
+    px, py = left - int(xs.min()), base.LIFE_UNION[1] - int(ys.min())
+    frame = base._patched(
+        "shot26",
+        base._blank(*base._window("life_digits")),
+        base._patch(px, py, px + block.shape[1] - 1, py + block.shape[0] - 1, block),
+    )
+    life, _ = _read_both(frame)
+    contracts = base._mod("ark.contracts")
+    assert isinstance(life, contracts.Valued), f"该是有值，读成 {base._slot_value(life)}"
+    assert isinstance(life.payload, contracts.Unknown), (
+        f"两个候选只差 {top[0] - top[1]:.4f}，却挑了一个：读成 {base._slot_value(life)}"
+        " —— 那正是「挑错一个」的双边假事实"
+    )
+    return (
+        f"最像 {top[0]:.4f} / 次像 {top[1]:.4f}（差 {top[0] - top[1]:.4f}）"
+        f"→ {base._slot_value(life)}，没有挑"
+    )
+
+
 CHECKS: tuple[tuple[str, str, str, object], ...] = (
     ("X1", "《视觉层/顶部两个数》§两个窗口", "读数按传进来的 `ui` 取 ROI", check_readers_go_through_the_layout_parameter),
     ("X2", "《视觉层/顶部两个数》§尚未定", "两位数的生命读成精确值", check_two_digit_life_is_read_as_two_digits),
@@ -325,6 +381,7 @@ CHECKS: tuple[tuple[str, str, str, object], ...] = (
     ("X7", "《视觉层/README》三条不能越的线", "读数不改帧、且可重复", check_reads_are_pure_and_repeatable),
     ("X8", "《视觉层/顶部两个数》§降级", "字形偏右 → 未知，不塌成确切值", check_life_digit_off_centre_to_the_right_is_unknown),
     ("X9", "《视觉层/顶部两个数》§降级", "两位粘成一块 → 未知，不报出排除真值的读数", check_merged_pair_does_not_become_a_false_reading),
+    ("X10", "《视觉层/识别方法》§B（候选重叠）+《顶部两个数》§降级", "两个候选几乎同分时不许挑一个", check_ambiguous_candidates_do_not_pick_one),
 )
 
 

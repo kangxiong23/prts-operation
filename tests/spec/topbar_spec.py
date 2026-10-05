@@ -13,6 +13,9 @@
 覆盖到的是：敌数一侧 1 位与 2 位、`1` 这个窄字形在首位与末位、生命 `1` 与 `3`。
 **没覆盖到**：两位数的生命、3 位数的敌数——那两条的窗口是按度量推的，见
 《视觉层/顶部两个数》§尚未定。
+
+**「并排候选」那条分支这 35 帧上一次都没触发过**（真数字之间的分差实测 ≥ 0.083，
+而门槛是 0.03）—— 它归第二张网 `topbar_extra_spec.py` 的 **X10**，用合成帧覆盖。
 """
 
 from __future__ import annotations
@@ -710,6 +713,10 @@ def _degradations() -> list[tuple[str, list, str, bool]]:
         ("敌数·甲的首位整块拿掉（`4/22`）",
          enemy(_blank_columns("shot26", "enemy_count", *enemy_runs[0])),
          "未知 / 精确(22)", True),
+        ("敌数·甲那一片整块涂黑（乙照读）",
+         enemy(_blank_columns("shot26", "enemy_count", *enemy_runs[0]),
+               _blank_columns("shot26", "enemy_count", *enemy_runs[1])),
+         "未采样 / 精确(22)", False),
         ("敌数·乙的末位整块拿掉（`14/2`）",
          enemy(_blank_columns("shot26", "enemy_count", *enemy_runs[-1])),
          "精确(14) / 未知", True),
