@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "box": [
+    300,
+    1040,
+    2799,
+    1259
+  ],
+  "crops": [
+    {
+      "file": "shot01.png",
+      "shot": 1,
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/live/shot01.png",
+      "source_sha256": "721f0ff195be5838848430b190ec794d3c113816499adb568bf52a1b3705fae8"
+    },
+    {
+      "file": "shot02.png",
+      "shot": 2,
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/live/shot02.png",
+      "source_sha256": "daba34d3d2c6a096b2fe29904d02c940b6695f14d66b4376b5a6d8f9e5c128c9"
+    },
+    {
+      "file": "shot05.png",
+      "shot": 5,
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/live/shot05.png",
+      "source_sha256": "b74c55fa0fb45d1ab61639b908f40c8f19be9c96aba97140381edd9b3bd3df87"
+    },
+    {
+      "file": "shot07.png",
+      "shot": 7,
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/live/shot07.png",
+      "source_sha256": "97bc714ff352d2882cd485a2a5f2fd88f4c04762b2d6cadab856409a3ba4e816"
+    },
+    {
+      "file": "shot21.png",
+      "shot": 21,
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/live/shot21.png",
+      "source_sha256": "2c57db16bd844fd5040326495a54f6af294323ead633ae69ed36155cb8370dd9"
+    },
+    {
+      "file": "shot26.png",
+      "shot": 26,
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/live/shot26.png",
+      "source_sha256": "e7ab528de460c011e37437c3ba96d901e4f4f8d5baed833248aea9578c08f43d"
+    }
+  ]
+}

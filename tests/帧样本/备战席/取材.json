@@ -1,0 +1,31 @@
+{
+  "note": "这几帧的真值只用于开发。同目录里另外三帧（shot02 / shot07 / shot21）的值不给 —— 那是验收用的。",
+  "harvest": [
+    {
+      "file": "shot01.png",
+      "cards": 12,
+      "cost_right_to_left": [25, 23, 23, 21, 18, 17, 14, 13, 13, 12, 12, 11],
+      "not_operator": [6],
+      "redeploying": []
+    },
+    {
+      "file": "shot05.png",
+      "cards": 9,
+      "cost_right_to_left": [18, 17, 14, 14, 13, 13, 12, 11, 10],
+      "not_operator": [2],
+      "redeploying": []
+    },
+    {
+      "file": "shot26.png",
+      "cards": 6,
+      "cost_right_to_left": [18, 12, 11, 6, 2, 1],
+      "not_operator": [],
+      "redeploying": [
+        {
+          "index": 0,
+          "seconds": 12.9
+        }
+      ]
+    }
+  ]
+}
