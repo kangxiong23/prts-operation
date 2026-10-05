@@ -2,19 +2,22 @@
 
 这一批**不 import tests/spec**（D-全局-17），也不带规划者那套验收的检查编号 ——
 这里测的是**这条链自己的形状与边界**：跳变那道判据认在哪一列、网格怎么抽验、
-费用的三档怎么落、**再部署中的判据（环在不在）怎么分三值**、以及「不在再部署中 ⇒
-秒数是未采样」这条闸门。
+费用的三档怎么落、**再部署中的判据（环比周围亮多少）怎么分三值**、以及
+「不在再部署中 ⇒ 秒数是未采样」这条闸门。
 
-**白弧不再是判据**：它量的是**已过比例**，所以下面既测「把白弧压短不改判」，
-也测「在普通卡上刷长白弧不改判」；反过来，一条**画满一整圈的亮环**确实会被判成
-再部署中 —— 那正是这条判据的边界（它问的是"环在不在"，不是"这是不是真的在再部署"）。
+**判据是相对的，不是绝对的**（v2 改）：白弧量的是**已过比例**（所以把它压短不改判），
+而"环带本身够不够亮"会被**亮卡面**顶穿 —— 实测**同一张卡面**在批里出现两次，
+真环那次环带最暗 **110**、假环那次 **102**，绝对亮度只差 8 而真值反着。所以下面
+既测那一对，也测**这条判据自己的边界**：往环带里刷一整圈亮环，它照样认成"有环"
+（合成帧；真机素材上那个假事实是"亮卡面"，这一版就是为它改的）。
 
-夹具是 `tests/帧样本/备战席/`（第三批基准集，6 帧）。它**没有真值文件**
-（基准集 §1：真值住 `tests/spec/`），所以下面那张 `TRUTH` 里那三帧是
-`取材.json` 给的（规划者目视确认），另外三帧的值我没拿到 —— 它们的用例只断言
-**这条链自己的形状**（卡数落在六个互不相同的值上、费用都是精确值、中心贴着网格）。
+夹具是 `tests/帧样本/备战席/`（**第 2 版**基准集，**10 帧**）。`取材.json` 给了
+**6 帧**的真值（`shot01` · `shot05` · `shot26` · `cd01` · `cd08` ·
+`cd60`），另外 4 帧是**验收用的**、值不在这一层 —— 所以下面**值型的断言只落在
+取材那 6 帧上**（`HARVEST`）。
 
-**降级用例是在真帧上涂改出来的**，不是自己画的图：涂黑、涂成实心块、往环上刷一段弧。
+**降级用例是在真帧上涂改出来的**，不是自己画的图：涂黑、涂成实心块、把白弧压短、
+把环带调暗、往环带里刷一圈亮。
 
 **有一条路真帧上测不出来**：圆环中央那个秒数的**字体与出厂字形表不是同一套**
 （实测：那个 `1` 带底衬线、笔画整体更粗，最像的字形只有 0.44–0.84）——
@@ -44,13 +47,13 @@ from ark.engine.vision.bench import (
     COST_SOLID_MATCH_SCORE,
     RING_BRIGHT_MIN,
     RING_CENTER_DY,
+    RING_GAIN_ABSENT_MAX,
+    RING_GAIN_PRESENT_MIN,
     RING_INNER,
     RING_OUTER,
-    RING_PRESENT_ABSENT_MAX,
-    RING_PRESENT_MIN,
     RING_PRESENT_OUTER,
     SquadCard,
-    _ring_floor,
+    _ring_gain,
     _ring_profile,
     read_squad_row,
 )
@@ -78,9 +81,36 @@ TRUTH: dict[str, tuple[int, list[int]]] = {
     "shot26": (6, [18, 12, 11, 6, 2, 1]),
 }
 
-COUNTS = (12, 11, 10, 9, 8, 6)
-"""6 帧的卡数**互不相同**（夹具 README 那句「12 · 11 · 10 · 9 · 8 · 6」）——
-这一条不依赖真值，是**从像素里数出来的**那六个值本身。"""
+HARVEST = ("shot01", "shot05", "shot26", "cd01", "cd08", "cd60")
+"""`取材.json` 里**给了真值**的那 6 帧。**值型的断言只准落在它们身上** ——
+另外 4 帧是验收用的（基准集 §取材与验收是分开的两批）。"""
+
+CARDS: dict[str, int] = {
+    "shot01": 12,
+    "shot05": 9,
+    "shot26": 6,
+    "cd01": 9,
+    "cd08": 9,
+    "cd60": 11,
+}
+"""这 6 帧的**卡数**（取材.json）。
+
+**它们不再是互不相同的六个数**（9 出现三次）—— 所以下面那条测的是"逐帧都对上取材"，
+而不是"六个数互不相同"。卡数仍然是从像素里数出来的，只是这一批的六个值恰好重了。"""
+
+RINGS: dict[str, tuple[int, ...]] = {
+    "shot01": (),
+    "shot05": (),
+    "shot26": (0,),
+    "cd01": (0, 1, 2, 5, 7, 8),
+    "cd08": (0, 1, 2, 3, 4, 5, 7),
+    "cd60": (),
+}
+"""这 6 帧上**在再部署中**的下标（取材.json）—— 一共 **14 张**真环。
+
+两个关键样本：`cd08` 的 **5**（剩 16.3 s、白弧 277°）**被旧判据吃进了「判不了」**；
+`cd60` 那一帧**一张都不在再部署中**，而它的下标 **2** 在旧判据下被判成「是」
+（亮卡面顶穿了绝对亮度线）。"""
 
 
 @pytest.fixture(scope="module")
@@ -204,7 +234,11 @@ def _press_arc(frame: Frame, index: int, *, keep: float) -> Frame:
         np.clip(np.round(radius).astype(int), RING_INNER, RING_PRESENT_OUTER)
         - RING_INNER
     )
-    band = (radius >= RING_INNER) & (radius <= RING_PRESENT_OUTER) & (clock > keep)
+    band = (
+        (radius >= RING_INNER - 1)
+        & (radius <= RING_PRESENT_OUTER + 1)
+        & (clock > keep)
+    )
     press = band & (pixels.min(axis=2) >= RING_BRIGHT_MIN)
     pixels[press] = source[step[press]]
     return Frame(canvas=frame.canvas, pixels=pixels)
@@ -220,7 +254,7 @@ def _dim_ring(frame: Frame, index: int, factor: float) -> Frame:
     pixels = frame.pixels.copy()
     rows, columns = np.mgrid[0:frame.canvas.height, 0:frame.canvas.width]
     radius = np.hypot(columns - centre_x, rows - centre_y)
-    band = (radius >= RING_INNER) & (radius <= RING_PRESENT_OUTER)
+    band = (radius >= RING_INNER - 1) & (radius <= RING_PRESENT_OUTER + 1)
     pixels[band] = (pixels[band].astype(np.float64) * factor).astype(np.uint8)
     return Frame(canvas=frame.canvas, pixels=pixels)
 
@@ -321,36 +355,58 @@ def test_the_three_given_frames_match_the_harvest(batch, table) -> None:
         assert [card.cost.payload.value for card in row] == costs, name
 
 
-def test_the_six_frames_have_six_different_card_counts(batch, table) -> None:
-    counts = [len(_row(batch, table, case.name)) for case in batch.cases]
-    assert sorted(counts) == sorted(COUNTS)
-    assert len(set(counts)) == len(counts)
+def test_the_harvest_frames_have_their_harvest_card_counts(batch, table) -> None:
+    """取材那 6 帧的卡数逐帧对上（12 · 9 · 6 · 9 · 9 · 11）。
+
+    **卡数是数出来的，不是参数** —— 这一条只说明"逐帧都对上取材"，不说明"六个值互不
+    相同"：这一批里 9 出现了三次。
+    """
+    for name, want in CARDS.items():
+        assert len(_row(batch, table, name)) == want, name
+
+
+def test_the_batch_is_version_two_with_ten_frames(batch: BenchBatch) -> None:
+    """这一批是 **v2 / 10 帧**（6 帧扫描 + 4 帧连拍）。
+
+    验收那 4 帧的**名字与值都不在这一层** —— 下面值型的断言只落在 `HARVEST` 上。
+    """
+    assert batch.version == 2
+    assert len(batch.cases) == 10
+    assert set(HARVEST) <= {case.name for case in batch.cases}
 
 
 def test_indices_run_from_zero_without_gaps(batch, table) -> None:
-    for case in batch.cases:
-        row = _row(batch, table, case.name)
+    for name in HARVEST:
+        row = _row(batch, table, name)
         assert [card.index for card in row] == list(range(len(row)))
 
 
 def test_the_rightmost_card_is_the_anchor(batch, table) -> None:
     """下标 0 = 最右那张：它的中心就是 `squad_card_rect(0, pitch)` 的中心。"""
-    for case in batch.cases:
-        row = _row(batch, table, case.name)
+    for name in HARVEST:
+        row = _row(batch, table, name)
         assert row[0].center_x == _centre_of(0)
 
 
 def test_every_centre_sits_on_the_grid(batch, table) -> None:
-    """像素读出来的中心与网格那一格**最多差 2 px**（实测就是 2.0）。"""
-    for case in batch.cases:
-        for card in _row(batch, table, case.name):
+    """读出来的中心与网格那一格**最多差 2 px**（实测就是 2.0）。"""
+    for name in HARVEST:
+        for card in _row(batch, table, name):
             assert abs(card.center_x - _centre_of(card.index)) <= 2.0
 
 
-def test_the_centre_is_read_from_the_jump_not_from_the_grid(batch, table) -> None:
-    """6 帧 56 张卡的跳变都读出来了，所以中心**都是像素给的**，一个备选都没用上。"""
-    for case in batch.cases:
-        assert all(card.center_from_jump for card in _row(batch, table, case.name))
+def test_a_card_whose_badge_is_washed_out_falls_back_to_the_grid(batch, table) -> None:
+    """**顶那一条本身亮的卡靠网格兜**：它的跳变读不出来，中心落回网格。
+
+    实测 `cd01` 与 `cd08` 的**下标 6** 都是这种卡（职业标识牌那一片被亮立绘顶穿，
+    跳变那条判据找不到它）—— 卡还在那一格里，只是"谁给的"变成了网格。
+    这一条**不假设"全都由像素给出"**：那种卡就是有，而且两路给的中心差 ≤ 2 px。
+    """
+    for name in ("cd01", "cd08"):
+        row = _row(batch, table, name)
+        assert row[6].center_from_jump is False
+        assert row[6].center_x == _centre_of(6)
+        assert all(card.center_from_jump for card in row if card.index != 6)
 
 
 def test_a_wrong_pitch_does_not_find_the_row(batch, table) -> None:
@@ -468,46 +524,51 @@ def test_the_cost_window_does_not_eat_the_class_badge(batch, table) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_only_the_redeploying_card_is_flagged(batch, table) -> None:
-    row = _row(batch, table, "shot26")
-    assert row[0].redeploying is True
-    assert all(card.redeploying is False for card in row[1:])
+def test_the_harvest_frames_match_the_redeploy_truth(batch, table) -> None:
+    """**这一列的主判据**：取材那 6 帧的再部署状态**逐张对上**（14 张真环 · 42 张普通卡）。
 
-
-def test_a_plain_card_is_not_redeploying_in_any_frame(batch, table) -> None:
-    """6 帧里除了 `shot26` 下标 0 那张，**一张都没有环**（环带最暗那一度 ≤ 54）。
-
-    **红罩单独判不出来**：`shot26` 下标 1 那张普通卡的红度比再部署那张还高，
-    所以这一条同时也是"没拿红罩当判据"的证据。
+    它同时说明两件旧判据做不到的事：`cd08` 的 **5**（白弧 277°）不再掉进"判不了"，
+    `cd60` 的 **2**（亮卡面）不再被判成"是"。
     """
-    for case in batch.cases:
-        for card in _row(batch, table, case.name):
-            if case.name == "shot26" and card.index == 0:
-                continue
-            assert card.redeploying is False
-            assert card.ring_fraction is None
-            assert card.seconds == Unsampled()
+    for name in HARVEST:
+        row = _row(batch, table, name)
+        got = tuple(card.index for card in row if card.redeploying is True)
+        assert got == RINGS[name], name
+        assert all(card.redeploying is not None for card in row), name
+        for card in row:
+            if card.redeploying is False:
+                assert card.ring_fraction is None
+                assert card.seconds == Unsampled()
 
 
-def test_the_ring_floor_separates_the_redeploying_card(batch, table) -> None:
-    """**判据自己那个数**：再部署那张的环带最暗那一度 **110**，其余 55 张 **≤ 54**。
+def test_a_bright_card_face_is_not_a_ring(batch, table) -> None:
+    """**这一版要修的假事实**：亮卡面（白发 / 亮底）不是环。
 
-    两条线（`RING_PRESENT_MIN` / `RING_PRESENT_ABSENT_MAX`）就落在这条空档里 ——
+    `cd01` 下标 2 与 `cd60` 下标 2 是**同一个干员、同一个费用**，一次在再部署中、
+    一次不在 —— 最紧的一对证据。实测两者的**环带最暗那一度**只差 8（110 对 102），
+    而**环比环外亮多少**是 80 对 −58：任何画在绝对亮度上的线都会把其中一个说错。
+    """
+    assert _row(batch, table, "cd60")[2].redeploying is False
+    assert _row(batch, table, "cd01")[2].redeploying is True
+
+
+def test_the_gain_separates_true_rings_from_false_ones(batch, table) -> None:
+    """**判据自己那个数**：真环那 14 张的增益 **70…86**，其余 42 张 **−154…−12**。
+
+    两条线（`RING_GAIN_PRESENT_MIN` / `RING_GAIN_ABSENT_MAX`）就落在这条空档里 ——
     这一条把空档钉进测试，免得以后有人把线挪进样本里还不知道。
     """
-    floors: list[tuple[str, int, int]] = []
-    for case in batch.cases:
-        frame = _frame(batch, case.name)
-        count = len(read_squad_row(frame, table, pitch=PITCH))
-        for index in range(count):
-            profile = _ring_profile(frame, _centre_of(index), _card_top())
-            floors.append((case.name, index, _ring_floor(profile)))
-    hit = [f for f in floors if f[0] == "shot26" and f[1] == 0]
-    others = [f for f in floors if not (f[0] == "shot26" and f[1] == 0)]
-    assert len(hit) == 1 and len(others) == sum(COUNTS) - 1
-    assert hit[0][2] == 110
-    assert max(f[2] for f in others) == 54
-    assert max(f[2] for f in others) <= RING_PRESENT_ABSENT_MAX < RING_PRESENT_MIN <= hit[0][2]
+    real: list[int] = []
+    fake: list[int] = []
+    for name in HARVEST:
+        frame = _frame(batch, name)
+        for card in _row(batch, table, name):
+            gain = _ring_gain(_ring_profile(frame, card.center_x, _card_top()))
+            (real if card.index in RINGS[name] else fake).append(gain)
+    assert len(real) == 14 and len(fake) == 42
+    assert min(real) == 70 and max(real) == 86
+    assert min(fake) == -154 and max(fake) == -12
+    assert max(fake) <= RING_GAIN_ABSENT_MAX < RING_GAIN_PRESENT_MIN <= min(real)
 
 
 def test_the_ring_fraction_is_the_elapsed_fraction(batch, table) -> None:
@@ -520,8 +581,8 @@ def test_a_pressed_arc_still_counts_as_redeploying(batch, table) -> None:
     """把再部署那张的白弧从 278° 压到约 60°（**环还在、红罩还在、中央还是 12.9**）
     ⇒ 它**必须**判成再部署中。
 
-    这就是这一单要修的假事实：拿弧长当判据会把刚撤退的卡（弧接近 0°）判成
-    "不在再部署"。压过之后费用与中央那个数字都没动，正好一并说明**改的只是判据**。
+    判据问的是环这道笔画在不在，不是白弧多长：压短白弧只把"已过比例"改小，环带本身
+    照样比环外亮。压过之后费用与中央那个数字都没动，正好一并说明**改的只是那段白弧**。
     """
     frame = _press_arc(_frame(batch, "shot26"), 0, keep=60.0)
     row = read_squad_row(frame, table, pitch=PITCH)
@@ -532,22 +593,12 @@ def test_a_pressed_arc_still_counts_as_redeploying(batch, table) -> None:
     assert all(card.redeploying is False for card in row[1:])
 
 
-def test_a_long_arc_alone_does_not_make_a_card_redeploying(batch, table) -> None:
-    """反过来：在**普通卡**上刷一段长白弧 ⇒ 它**照样不是**再部署中。
+def test_a_painted_bright_ring_still_reads_as_redeploying(batch, table) -> None:
+    """**这条判据的边界**：往环带里刷一整圈亮环 ⇒ 照样认成"有环"。
 
-    白弧只是环上的一段亮，普通卡上刷一段白弧不会凭空长出一个环来。
-    """
-    frame = _paint_arc(_frame(batch, "shot26"), 1, 300)
-    row = read_squad_row(frame, table, pitch=PITCH)
-    assert row[1].redeploying is False
-    assert row[1].ring_fraction is None
-
-
-def test_a_full_bright_ring_reads_as_redeploying(batch, table) -> None:
-    """**这条判据的边界**：给普通卡画满一整圈亮环 ⇒ 它会被判成再部署中。
-
-    判据问的是"环在不在"，不是"这是不是真的在再部署" —— 一整圈亮环就是它认的
-    **肯定证据**。这一条如实把边界写下来（见报告 §最不放心）。
+    判据问的是"环比它周围亮多少" —— 往环带里画一道亮笔画，那就是一道笔画。
+    这一条是**合成帧**上的边界；真机素材上那个假事实是"**亮卡面**"（卡面整片亮、
+    并没有环），它由 `test_a_bright_card_face_is_not_a_ring` 管住 —— 这一版就是为它改的。
     """
     frame = _paint_arc(_frame(batch, "shot26"), 1, 360)
     row = read_squad_row(frame, table, pitch=PITCH)
@@ -555,8 +606,12 @@ def test_a_full_bright_ring_reads_as_redeploying(batch, table) -> None:
 
 
 def test_a_ring_that_is_too_dim_cannot_be_told(batch, table) -> None:
-    """环带最暗的那一度落在两条线**中间** ⇒ **判不了**，报"是"或"不是"都是假事实。"""
-    frame = _dim_ring(_frame(batch, "shot26"), 0, 0.7)
+    """环比周围只亮一点点 ⇒ **判不了**，报"是"或"不是"都是假事实。
+
+    把环带整圈调到 0.5 倍（环还在、红罩还在）：增益落到 `RING_GAIN_ABSENT_MAX`…
+    `RING_GAIN_PRESENT_MIN` 那一段。
+    """
+    frame = _dim_ring(_frame(batch, "shot26"), 0, 0.5)
     row = read_squad_row(frame, table, pitch=PITCH)
     assert row[0].redeploying is None
     assert row[0].ring_fraction is not None

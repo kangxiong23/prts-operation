@@ -343,7 +343,7 @@ VIEWPORT_TEXT = (
 
 
 def test_parse_dumpsys_input_reads_the_viewport_line():
-    """T5 裁定一与二：方向是**设备自己报的那个整数**，画布取 @@logicalFrame@@。"""
+    """T5 裁定一与二：方向是**设备自己报的那个整数**，画布取 `logicalFrame`。"""
     facts = parse_dumpsys_input(VIEWPORT_TEXT)
     assert facts.resolution == Canvas(width=2800, height=1260)
     assert facts.orientation == "1"
@@ -357,7 +357,7 @@ def test_parse_dumpsys_input_keeps_the_orientation_literal():
 
 
 def test_parse_dumpsys_input_takes_the_canvas_from_the_frame_not_from_wm_size():
-    """两个口径不许混：@@wm size@@ 报 1260x2800，画布是 2800x1260（T5 裁定二）。"""
+    """两个口径不许混：`wm size` 报 1260x2800，画布是 2800x1260（T5 裁定二）。"""
     facts = parse_dumpsys_input(VIEWPORT_TEXT)
     assert facts.resolution == Canvas(width=2800, height=1260)
     assert parse_wm_size("Physical size: 1260x2800\n").physical == Canvas(1260, 2800)

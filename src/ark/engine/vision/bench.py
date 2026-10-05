@@ -7,7 +7,7 @@
 | --- | --- | --- |
 | 卡位 | 卡上「职业标识牌 → 费用暗盒」那道黑↔白跳变（= 卡的水平正中心） | 一个中心 x |
 | 每张卡的费用 | 卡中心右边那个暗盒里的数字（1–2 位） | 精确 / 未知 / 未采样 |
-| 是否再部署中 | 卡片正中**那一圈环在不在**（环带最暗的那一度还是亮的） | 是 / 否 / 判不了 |
+| 是否再部署中 | 卡片正中**那一圈环在不在**（环比**环外**那一圈亮多少） | 是 / 否 / 判不了 |
 | 再部署剩余秒数 | 圆环中央那个数字（一位小数） | 精确 / 未知 / 未采样 |
 | 环形进度 | 同一圈上白色弧占整圈的比例 = **已过比例** | 0…1，或判不了 |
 
@@ -42,12 +42,19 @@
 **再部署中的判据是「环在不在」，不是「白弧多长」**（《备战席》§判死与再部署）：那道白弧
 量的是**已过比例**（从 12 点起顺时针长的角度 ÷ 360）—— 剩 12.9 s 的那张白弧 278°，
 而剩 68.6 s 的那张只有约 20°。**刚撤退的卡白弧接近 0°**，所以拿弧长当判据会把
-「正在再部署」说成「不在再部署」，一条假事实。这一层因此只问**环带最暗的那一度还亮不亮**
-（`_ring_floor`）：环是画满一整圈的，它在，整圈就都在。
+「正在再部署」说成「不在再部署」，一条假事实。
+
+**「环在不在」问的是「环比它周围亮多少」，不是「环带本身够不够亮」**：环是一道**画在
+卡面上的笔画**，而卡面是立绘 —— 一张**亮卡面**（白发、亮底）会把环带那几行顶到跟真环
+一样高。实测的对照是**同一张卡面**（同一个干员、同一个费用）在批里出现两次：真环那一次
+环带最暗 **110**、环外中位 **35**；假环那一次 **102** 对 **214** —— **绝对亮度只差 8，
+真值却反着**。所以这一层量的是**环带减环外**（`_ring_gain`），两条线见
+`RING_GAIN_PRESENT_MIN`。
 
 **红罩不单独当判据**：实测它分不开 —— `shot26` 下标 1 那张**普通卡**的卡面红度
 （`R − max(G,B)` 的均值 **+64.8**）比再部署那张（**+48.5**）还高，普通卡里整片红的
-角色有的是。红罩是**外观**的一部分，不是这一层能用的信号。
+角色有的是。红罩是**外观**的一部分，不是这一层能用的信号；而且"暗"本身要一条**绝对线**
+才有意义 —— 那正是这一版要废掉的东西。
 """
 
 from __future__ import annotations
@@ -96,8 +103,11 @@ __all__ = [
     "RING_OUTER",
     "RING_BRIGHT_MIN",
     "RING_PRESENT_OUTER",
-    "RING_PRESENT_MIN",
-    "RING_PRESENT_ABSENT_MAX",
+    "RING_OUTSIDE_INNER",
+    "RING_OUTSIDE_OUTER",
+    "RING_GAIN_PERCENTILE",
+    "RING_GAIN_PRESENT_MIN",
+    "RING_GAIN_ABSENT_MAX",
     "COUNTDOWN_INK_THRESHOLD",
     "COUNTDOWN_MIN_DIGIT_WIDTH",
     "COUNTDOWN_MIN_DIGIT_HEIGHT",
@@ -225,32 +235,54 @@ RING_BRIGHT_MIN: Final[int] = 200
 """
 
 RING_PRESENT_OUTER: Final[int] = 57
-"""问「环在不在」时，环带**到哪一行为止**（px）—— 比 `RING_OUTER` 窄。
+"""问「环在不在」时，**环带**到哪一行为止（px）—— 比 `RING_OUTER` 窄。
 
 实测 `shot26` 那张：环的**实心部分**到 r ≈ 57 为止，r = 58 起就是环外的抗锯齿边与卡面
 （那一张在 r = 58 上已经是卡面的 93/34/31）。读白弧时多含两圈无妨（白弧是 255，卡面比不过
-它），但问「环带最暗的那一度」时**多含的两圈就是卡面** —— 实测把上界从 57 放到 60，
-普通卡里最高那个读数从 54 抬到 65，空档白窄一截。
+它），但比「环带 vs 环外」时**多含的两圈就是参照物** —— 那会把参照物算进被测物里。
 """
 
-RING_PRESENT_MIN: Final[int] = 95
-"""环带上**最暗的那一度**至少这么亮，才算「环在」。
+RING_OUTSIDE_INNER: Final[int] = 62
+RING_OUTSIDE_OUTER: Final[int] = 70
+"""**环外**那一条参照带（px）：半径 62…70。
 
-实测 6 帧 56 张真卡（环带 = 半径 50…57 上逐度取最亮的那个像素的 `min(R,G,B)`）：
+它**紧挨着环、又不碰环**：环的实心部分到 57，58–61 是环外的抗锯齿过渡，所以从 62 起才是
+干净的卡面。实测 6 帧 56 张卡：**真环那 14 张的环外中位亮度 12…35**，**假环那 42 张
+40…214** —— 真环的周围一定是暗的（红罩压着）。
 
-| 卡 | 环带最暗的那一度 |
+**到 70 为止是"周围"而不是"别处"**：再往外就出了卡（卡半宽 102、环心在卡心），而且
+62…70 这一段已经够宽，能把立绘的一个局部起伏摊掉。
+"""
+
+RING_GAIN_PERCENTILE: Final[int] = 10
+"""逐度算「环带 − 环外」，取整圈的**第几分位**当判据。
+
+**不用最小值**：卡面上偶尔有一度戳出来（立绘的一缕亮发）不该把整张卡判掉 —— 实测真环那
+14 张里有 2 张的最小值是 **−2**，而假环那 42 张最小到 **−231**，两者只差 51。
+**也不用中位数**：那会把"半圈有环"当成有环。取 10 分位（360 度里的第 36 小）——
+它问的是「**九成的角度上**环比周围亮」。
+"""
+
+RING_GAIN_PRESENT_MIN: Final[int] = 45
+"""环带比环外亮到这个程度，才算「环在」（量的是 `RING_GAIN_PERCENTILE` 那个分位）。
+
+实测 6 帧 56 张卡（环带 = 半径 50…57、环外 = 半径 62…70，两边都取该度上最亮的那个像素）：
+
+| 卡 | 逐度增益的第 10 分位 |
 | --- | --- |
-| `shot26` 下标 0（再部署中：红罩 + 灰环 + 白弧 + 中央数字） | **110** |
-| 其余 55 张**普通卡** | **≤ 54** |
+| **真环 14 张**（`shot26` 下标 0 · `cd01` 的 6 张 · `cd08` 的 7 张） | **70…86** |
+| **假环 42 张** | **−154…−12** |
 
-空档 54…110，取 95，两侧各留 41 / 15。**它问的是形状**：环是画满一整圈的，所以「最暗的
-那一度还亮着」= 有一圈东西在；普通卡上那 360° 落在卡面各处，总有一度是暗的。
+空档 **−12…70**。取 45 与 15 两条线：上面那条离真环最低的 70 还有 **25**，下面那条离假环
+最高的 −12 还有 **27**。**同一张卡面出现两次**那一对是最紧的证据：`cd01` 下标 2（真环）
+**80** 对 `cd60` 下标 2（假环）**−58** —— 而它们的**绝对亮度**只差 8（环带最暗 110 对
+102），任何画在绝对亮度上的线都会把其中一个说错。
 """
 
-RING_PRESENT_ABSENT_MAX: Final[int] = 70
-"""环带上最暗的那一度**暗到这个程度**，才算「环不在」。见 `RING_PRESENT_MIN`。
+RING_GAIN_ABSENT_MAX: Final[int] = 15
+"""环带比环外亮**不到**这个程度，才算「环不在」。见 `RING_GAIN_PRESENT_MIN`。
 
-70…95 之间**判不了** —— 那里有一圈不够亮的东西，报「是」或「不是」都是假事实。
+15…45 之间**判不了** —— 那里有一点对比、但不够一道笔画，报「是」或「不是」都是假事实。
 **这一档在 6 帧 56 张卡上一次都没触发**（纸上的防线，见报告）。
 """
 
@@ -306,7 +338,7 @@ class SquadCard:
       —— 两者差 ≤ 2 px，但「谁给的」是证据，不能吞掉；
     - `cost` / `seconds` 是槽值（精确 / 未知 / 未采样）；
     - `redeploying` 是三值：`True` / `False` / `None`（判不了）——
-      判据是**环在不在**，不是白弧多长（见模块文档）；
+      判据是**环比环外亮多少**（`_ring_gain`），不是白弧多长、也不是环带自己多亮；
     - `ring_fraction` 是环上白弧占整圈的比例 —— **已过比例**（0…1），不是进度、
       更不是剩余；不在再部署中就是 `None`。**它和 `seconds` 不同单位**，见模块文档。
     """
@@ -453,26 +485,34 @@ def _read_cost(
 
 
 def _ring_profile(frame: Frame, centre_x: float, card_top: float) -> np.ndarray:
-    """卡片正中那个圆环的**径向剖面**：`(360, RING_OUTER - RING_INNER + 1)`。
+    """卡片正中那个圆环的**径向剖面**：`(360, RING_OUTSIDE_OUTER - RING_INNER + 1)`。
 
     整圈按 1° 采样（0° = 12 点、顺时针增大）；每一度上，半径
-    `RING_INNER`…`RING_OUTER` 的每一个像素取 `min(R,G,B)`，存成一列。
+    `RING_INNER`…`RING_OUTSIDE_OUTER` 的每一个像素取 `min(R,G,B)`，存成一列。
+    第 `r - RING_INNER` 列就是半径 `r`。
 
-    **只采一次样**：白弧（要 `RING_OUTER` 那么宽）与「环在不在」（只要
-    `RING_PRESENT_OUTER` 那么宽）是同一批像素上的两个不同问题；分开采样会让同一个
-    圆环被读两遍，还会让两次读的圆心各自算一遍。
+    **一次采样喂三个读数**：白弧（`RING_INNER`…`RING_OUTER`）、环带
+    （`RING_INNER`…`RING_PRESENT_OUTER`）、环外参照（`RING_OUTSIDE_INNER`…
+    `RING_OUTSIDE_OUTER`）。分开采样会让同一个圆环被读三遍、三次的圆心各自算一遍；
+    更要紧的是 —— **被测物与参照物必须落在同一张剖面里**，否则「环带比环外亮多少」
+    两边量的根本不是同一张卡。
+
+    **取整的后果要记住**：`Frame.crop` 把 ROI 的原点取整（环心 1161.5 → 1161），
+    所以采样出来的「半径 r」落在**真半径 r ± 0.5** 上（方向不同、符号不同）。环带与
+    环外那两条带都是按**采样半径**定的，它们的边界因此带着半像素的斜 —— 实测它不影响
+    分离（见 `RING_GAIN_PRESENT_MIN`），但"往外让 1 px"的合成帧助手要记着这件事。
     """
-    radius = RING_OUTER
+    radius = RING_OUTSIDE_OUTER
     centre_y = card_top + RING_CENTER_DY
     rect = PixelRect(
         centre_x - radius, centre_y - radius, radius * 2, radius * 2
     )
     roi = frame.crop(rect)
-    profile = np.zeros((360, RING_OUTER - RING_INNER + 1), dtype=int)
+    profile = np.zeros((360, RING_OUTSIDE_OUTER - RING_INNER + 1), dtype=int)
     for degree in range(360):
         theta = np.radians(90.0 - degree)
         cos, sin = float(np.cos(theta)), float(np.sin(theta))
-        for step, r in enumerate(range(RING_INNER, RING_OUTER + 1)):
+        for step, r in enumerate(range(RING_INNER, RING_OUTSIDE_OUTER + 1)):
             x = int(round(radius + r * cos))
             y = int(round(radius - r * sin))
             if 0 <= y < roi.shape[0] and 0 <= x < roi.shape[1]:
@@ -489,10 +529,10 @@ def _ring_arc(profile: np.ndarray) -> int:
     **为什么按度数而不是按像素个数**：卡面本身也可能有大片白（白发角色），按个数会被
     它带偏；「连续多少度」问的是**形状**——环是圆的，卡面不是。
 
-    **它给的是「已过比例」，不是「是不是再部署中」**（判据是 `_ring_floor`）：
+    **它给的是「已过比例」，不是「是不是再部署中」**（判据是 `_ring_gain`）：
     刚撤退的卡这一路接近 0°，拿它当判据会把「正在再部署」说成「不在再部署」。
     """
-    hit = profile.max(axis=1) >= RING_BRIGHT_MIN
+    hit = profile[:, : RING_OUTER - RING_INNER + 1].max(axis=1) >= RING_BRIGHT_MIN
     doubled = np.concatenate([hit, hit])
     longest = run = 0
     for value in doubled:
@@ -502,14 +542,20 @@ def _ring_arc(profile: np.ndarray) -> int:
     return min(longest, 360)
 
 
-def _ring_floor(profile: np.ndarray) -> int:
-    """环带上**最暗的那一度**有多亮 —— 「环在不在」的判据。
+def _ring_gain(profile: np.ndarray) -> int:
+    """环比它周围亮多少 —— 「环在不在」的判据（逐度增益的第 `RING_GAIN_PERCENTILE` 分位）。
 
-    只看 `RING_INNER`…`RING_PRESENT_OUTER` 那几列（再往外就是卡面）。环是画满一整圈
-    的，所以「最暗的那一度还亮着」= 有一圈东西在。两条线见 `RING_PRESENT_MIN`。
+    每一度算两个数：
+
+    - **环带**：半径 `RING_INNER`…`RING_PRESENT_OUTER` 里**最亮**的那个像素；
+    - **环外**：半径 `RING_OUTSIDE_INNER`…`RING_OUTSIDE_OUTER` 里**最亮**的那个像素。
+
+    两边都取**最亮**：问的是"环这道笔画在不在"，所以参照物要按**对它最不利**的那个像素算
+    —— 卡面上戳出来的亮点不该被当成环。两条线见 `RING_GAIN_PRESENT_MIN`。
     """
-    width = RING_PRESENT_OUTER - RING_INNER + 1
-    return int(profile[:, :width].max(axis=1).min())
+    inside = profile[:, : RING_PRESENT_OUTER - RING_INNER + 1].max(axis=1)
+    outside = profile[:, RING_OUTSIDE_INNER - RING_INNER :].max(axis=1)
+    return int(np.percentile(inside - outside, RING_GAIN_PERCENTILE))
 
 
 def _read_countdown(
@@ -608,9 +654,10 @@ def read_squad_row(
     问到没有为止。右对齐 + 只有还没上场的才显示 ⇒ 有卡的那些格**一定是连着的一片**
     （中间缺一格说明那一格的跳变没读出来，那时**停在缺口处**、报出已经读到的那些）。
 
-    **再部署中的判据是环在不在**（`_ring_floor`），不是白弧多长 —— 白弧量的是
-    **已过比例**，刚撤退的卡白弧接近 0°，拿它当判据会把「正在再部署」说成「不在再部署」。
-    **红罩也不单独当判据**：普通卡里整片红的角色比红罩还红。
+    **再部署中的判据是环比它周围亮多少**（`_ring_gain`），不是白弧多长、也不是环带
+    自己够不够亮 —— 白弧量的是**已过比例**（刚撤退的卡接近 0°），而环带自己的亮度会被
+    **亮卡面**顶穿（实测同一张卡面在批里出现两次：真环那一次环带最暗 **110**、假环那一次
+    **102**，绝对亮度只差 8 而真值反着）。**红罩也不单独当判据**。
 
     **不在再部署中的卡，秒数一律 `Unsampled()`**（那里没有倒计时可读）——
     与「有笔画但认不出 → 未知」是两支，不许混。**判不了那一档照读**：那里有没有倒计时
@@ -661,10 +708,10 @@ def read_squad_row(
             ),
         )
         profile = _ring_profile(frame, centre, top)
-        floor = _ring_floor(profile)
-        if floor >= RING_PRESENT_MIN:
+        gain = _ring_gain(profile)
+        if gain >= RING_GAIN_PRESENT_MIN:
             redeploying: bool | None = True
-        elif floor <= RING_PRESENT_ABSENT_MAX:
+        elif gain <= RING_GAIN_ABSENT_MAX:
             redeploying = False
         else:
             redeploying = None
