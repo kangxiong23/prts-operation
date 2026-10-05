@@ -348,6 +348,72 @@ def check_countdown_seconds_are_never_guessed() -> str:
     return f"{checked} 张再部署中 ｜ " + " ".join(detail)
 
 
+def _ring_shortened(name: str, index: int) -> bytes:
+    """把某张卡的环**擦短**：把亮弧那一大段涂成环自己的暗色，只在顶上留约 60°。
+
+    这是**合成帧**，它编码的是一条实测事实：[视觉层/备战席] §判死与再部署 说
+    **白弧量的是「已过比例」**（`shot26` 剩 12.9 s → 278°；用户实例图剩 68.6 s → 约 20°）。
+    所以"刚撤退"的卡白弧就是短的，而它**仍然在再部署中** —— 环还在，红罩还在。
+
+    真实素材里**没有这一档**（6 帧只有 `shot26` 那一张，而且已经过了 77%），
+    所以只能合成。这是[tests/spec/README] 那张表里"第二张网"的做法：**验形状，不验值**。
+    """
+    e = _entry(name)
+    x, y = e["origin"]
+    w, h = e["size"]
+    canvas = np.zeros((CANVAS_H, CANVAS_W, 3), np.uint8)
+    canvas[y : y + h, x : x + w] = np.asarray(
+        Image.open(BATCH / e["file"]).convert("RGB")
+    )
+
+    cx = 2696.0 - index * 207.5          # 卡中心 x（锚点 − k × 卡距）
+    cy = 1045 + 116.5                    # 环心（卡顶下 116.5）
+    dim = np.median(                    # 环的暗色：从它自己那一段暗弧上取
+        [canvas[int(round(cy - 54 * np.cos(np.deg2rad(a)))),
+                int(round(cx + 54 * np.sin(np.deg2rad(a))))]
+         for a in range(300, 331, 3)],
+        axis=0,
+    )
+    yy, xx = np.mgrid[int(cy - 60) : int(cy + 61), int(cx - 60) : int(cx + 61)]
+    rr = np.hypot(xx - cx, yy - cy)
+    ang = (np.degrees(np.arctan2(xx - cx, -(yy - cy)))) % 360
+    hit = (rr >= 50) & (rr <= 58) & (ang >= 30) & (ang <= 330)
+    block = canvas[int(cy - 60) : int(cy + 61), int(cx - 60) : int(cx + 61)]
+    block[hit] = dim.astype(np.uint8)
+
+    rgba = np.dstack([canvas, np.full((CANVAS_H, CANVAS_W), 255, np.uint8)])
+    return struct.pack("<4I", CANVAS_W, CANVAS_H, 1, 1) + rgba.tobytes()
+
+
+def _read_raw(raw: bytes):
+    frame = _mod("ark.engine.vision.frame").frame_from_raw(raw)
+    glyphs = _mod("ark.engine.vision.glyphs").GlyphTable.load(GLYPH_DIR)
+    pitch = _mod("ark.engine.device.adb").SQUAD_CARD_PITCH
+    return _mod("ark.engine.vision.bench").read_squad_row(frame, glyphs, pitch=pitch)
+
+
+def check_redeploying_does_not_depend_on_the_arc_length() -> str:
+    """白弧擦短之后，那一张**仍然**必须判成"再部署中"。
+
+    出处是[视觉层/备战席] §判死与再部署：**判据只能是"环在不在"** —— 刚撤退的卡白弧
+    接近 0°，按"白弧够不够长"判会把它说成"不在再部署"，**那是假事实**。
+
+    合成帧的做法见 `_ring_shortened`：把亮弧压到约 60°，其余照旧（环还在、红罩还在）。
+    """
+    row = TRUTH["shot26"]
+    index = next(iter(row["redeploy"]))
+    cards = _read_raw(_ring_shortened("shot26", index))
+    assert len(cards) == row["cards"], (
+        f"擦短之后卡数从 {row['cards']} 变成 {len(cards)} —— 环被动过就数不出卡了"
+    )
+    card = cards[index]
+    assert card.redeploying is True, (
+        f"第 {index} 张的环还在（只是亮弧被压到约 60°），却判成 {card.redeploying!r} "
+        "—— 按白弧长度判会把刚撤退的卡说成不在再部署"
+    )
+    return f"环擦短到约 60° 后仍判 {card.redeploying}（卡数 {len(cards)} 不变）"
+
+
 CHECKS: tuple[Check, ...] = (
     Check("R1", "采集与验收/基准集 §2（字段表）",
           "清单里的必填字段一样不少地读出来，没记的前提头不许补",
@@ -367,6 +433,9 @@ CHECKS: tuple[Check, ...] = (
     Check("R6", "状态层/我方干员（再部署倒计时的形态）+ 零假事实",
           "再部署剩余秒数要么精确等于真值、要么落未知/未采样，不许猜一个数",
           check_countdown_seconds_are_never_guessed),
+    Check("R7", "视觉层/备战席 §判死与再部署（判据只能是「环在不在」）",
+          "把亮弧擦短到约 60° 之后，那一张仍然判成再部署中",
+          check_redeploying_does_not_depend_on_the_arc_length),
 )
 
 
