@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from ark.contracts import Canvas, GridCoord, Pixel, Projection, View
+from ark.contracts import Canvas, GridCoord, Pixel, Projection, UI_LAYOUT, View
 from ark.engine.device.adb import (
     DEFAULT_TIMEOUT_MS,
     DEVICE_TMP_DIR,
@@ -24,7 +24,6 @@ from ark.engine.device.adb import (
     PANEL_WAIT_MS,
     R_GRID,
     SQUAD_CARD_PITCH,
-    SQUAD_CARD_SLOTS,
     SWIPE_DURATION_MS,
     AdbDevice,
     AdbTimeout,
@@ -442,8 +441,9 @@ def test_deploy_is_one_swipe_from_the_card_to_grid_plus_r():
     device = _device(recorder, FakeAssets())
     device.deploy(0, GridCoord(3, 4), "右")
 
-    # 卡 0 = **最右那张**（T5 定）：UiLayout 那个锚点给 2592、卡高 214、上缘 1045。
-    start = (round(2592 + SQUAD_CARD_PITCH / 2), 1045 + 214 // 2)
+    # 卡 0 = **最右那张**（T5 定）：中心就是 UiLayout 那个锚点矩形的中心。
+    anchor = UI_LAYOUT.rects["squad_card_rightmost"]
+    start = (round(anchor.x + anchor.width / 2), round(anchor.y + anchor.height / 2))
     # 终点 = 格心 + 0.3 格向右 → 格 (3.3, 4) → 像素 (1330, 900)
     end = (round(1000 + 3.3 * 100), 500 + 4 * 100)
     assert _commands(recorder) == [
@@ -472,28 +472,36 @@ def test_deploy_endpoint_encodes_the_facing():
 def test_card_index_counts_from_the_rightmost_card():
     """T5 定：**下标 0 = 最右那张**，第 k 张沿卡距左移 k 步（右对齐 ⇒ 锚点是常量）。"""
     starts = []
-    for card in range(SQUAD_CARD_SLOTS):
+    for card in range(6):
         recorder = Recorder()
         _device(recorder, FakeAssets()).deploy(card, GridCoord(3, 4), "右")
         argv = _commands(recorder)[0]
         starts.append((int(argv[3]), int(argv[4])))
     # 第 0 张在最右，越往左 x 越小，每步正好一个卡距。
-    assert starts[0] == (round(2592 + SQUAD_CARD_PITCH / 2), 1045 + 214 // 2)
-    for k in range(1, SQUAD_CARD_SLOTS):
+    anchor = UI_LAYOUT.rects["squad_card_rightmost"]
+    assert starts[0] == (round(anchor.x + anchor.width / 2),
+                         round(anchor.y + anchor.height / 2))
+    for k in range(1, 6):
         # 每一步正好一个卡距 —— 逐个取整，所以差可以是 207 或 208。
         step = starts[k - 1][0] - starts[k][0]
         assert abs(step - SQUAD_CARD_PITCH) <= 1, (k, step)
         assert starts[k][1] == starts[0][1]
 
 
-def test_deploy_refuses_a_card_outside_the_measured_slots():
-    """超出量过的档位就报错、不猜（卡距只在 5 张卡那一档量过）。"""
+def test_deploy_refuses_a_negative_card():
+    """**负下标报错、不猜**：下标从 0 起（0 = 最右那张），负数没有来源。
+
+    **上限不设**（T5 补丁 2）：卡距量出来是常量（5 张卡与 10 张卡两档同值），
+    而锚点与卡数无关 —— 所以第 5、第 9 张照算。
+    """
     recorder = Recorder()
     device = _device(recorder, FakeAssets())
-    for bad in (SQUAD_CARD_SLOTS, SQUAD_CARD_SLOTS + 3, -1):
+    for bad in (-1, -7):
         with pytest.raises(IndexError):
             device.deploy(bad, GridCoord(3, 4), "右")
     assert recorder.calls == []
+    device.deploy(9, GridCoord(3, 4), "右")  # 10 张卡那一档也走得通
+    assert len(recorder.calls) == 1
 
 
 def test_deploy_refuses_an_unknown_facing_without_touching_the_device():
@@ -502,14 +510,6 @@ def test_deploy_refuses_an_unknown_facing_without_touching_the_device():
     for bad in ("斜", "up", "", None):
         with pytest.raises((ValueError, TypeError)):
             device.deploy(0, GridCoord(3, 4), bad)  # type: ignore[arg-type]
-    assert recorder.calls == []
-
-
-def test_deploy_refuses_a_card_the_table_does_not_have():
-    recorder = Recorder()
-    device = _device(recorder, FakeAssets())
-    with pytest.raises(IndexError):
-        device.deploy(9, GridCoord(3, 4), "右")
     assert recorder.calls == []
 
 
