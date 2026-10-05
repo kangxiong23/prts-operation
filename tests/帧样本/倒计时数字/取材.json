@@ -1,0 +1,26 @@
+{
+  "note": "这几帧的真值只用于开发。同目录里另外两帧（cd09 / cd20）的值不给 —— 那是验收用的。cd01 的秒数在 备战席/取材.json 里已经给过了，所以它在这一批里只能当取材；cd30 是全新的。",
+  "harvest": [
+    {
+      "file": "cd01.png",
+      "cards": 9,
+      "countdowns": [
+        {"index": 0, "seconds": 32.2},
+        {"index": 1, "seconds": 39.5},
+        {"index": 2, "seconds": 54.7},
+        {"index": 5, "seconds": 36.0},
+        {"index": 7, "seconds": 64.2},
+        {"index": 8, "seconds": 16.0}
+      ]
+    },
+    {
+      "file": "cd30.png",
+      "cards": 11,
+      "countdowns": [
+        {"index": 3, "seconds": 4.0},
+        {"index": 4, "seconds": 38.1},
+        {"index": 5, "seconds": 3.4}
+      ]
+    }
+  ]
+}

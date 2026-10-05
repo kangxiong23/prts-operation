@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "box": [
+    300,
+    1040,
+    2799,
+    1259
+  ],
+  "crops": [
+    {
+      "file": "cd01.png",
+      "shot": 1,
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd01.png",
+      "source_sha256": "24d89d1a126246b4586b333b40ee19dfff0f07aae4a078493efff51746eccb6d"
+    },
+    {
+      "file": "cd09.png",
+      "shot": 9,
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd09.png",
+      "source_sha256": "62be189c5bab9d524bf78fe58c3cc7125a3899d7d550af8c6e45e2b3977b33d6"
+    },
+    {
+      "file": "cd20.png",
+      "shot": 20,
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd20.png",
+      "source_sha256": "24a5cff49a7d6a2f16d2db7c5bc155106b6fde97b08d8ee7f428e27f8a5e1bde"
+    },
+    {
+      "file": "cd30.png",
+      "shot": 30,
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd30.png",
+      "source_sha256": "4e919fec25853da664d07f5e6413bca56929f4e03ecfb89d5fbae126afa1b9f4"
+    }
+  ]
+}
