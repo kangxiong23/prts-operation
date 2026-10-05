@@ -4,8 +4,8 @@
 
 | 读数 | 读什么 | 载荷 |
 | --- | --- | --- |
-| `read_enemy_count` | 顶部条带上并排的「甲 / 乙」（字形 + 一个分隔符） | 两侧各自：精确 / **区间** / 未知 / 未采样 |
-| `read_life_digits` | 蓝门血量（1–2 位，字形模板） | 精确 / **区间** / 未知 / 未采样 |
+| `read_enemy_count` | 顶部条带上并排的「甲 / 乙」（字形 + 一个分隔符） | 两侧各自：精确 / 未知 / 未采样 |
+| `read_life_digits` | 蓝门血量（1–2 位，字形模板） | 精确 / 未知 / 未采样 |
 
 **取墨口径是这一条链自己的事**（D-全局-24）：同一块条带上敌数是纯白
 `(255,255,255)`（`min(R,G,B) = 255`），生命是纯粉 `(255,120,120)`
@@ -26,7 +26,7 @@
   分隔符当一位数字读进去 —— 那会把 `0/8` 读成一个三位数）。
 
 **位数是数出来的，所以缺一位长得像一个更短的一位。** 这个复合体有三处锚点，
-每一处都钉住一段位置；缺的那一位落在哪一处，就在那一处插一位全候选（区间）：
+每一处都钉住一段位置；**任何一处判出缺了一位，这一侧就读不全 → 未知**：
 
 | 锚点 | 钉住什么 | 真读数 | 缺一位 |
 | --- | --- | --- | --- |
@@ -37,9 +37,17 @@
 **三处都是「位置」给的，不是「分数」给的** —— 分数说不出「少了一位」这件事，
 它只会让剩下的那一位看起来很像它自己。
 
-**降级方向照 `cost.py`**：整块没笔画 → 未采样（那里没有东西，或我们没能看到）；
-有笔画但某一位对不上任何字形 → 那一位的候选是全部十个数字 → 整块降成区间。
-**两个数各自带自己的三态**：一边的某一位认不出，只让那一边降级。
+**这一层只产三种东西：精确 / 未知 / 未采样。它不产区间**（《顶部两个数》§降级）：
+整块没笔画 → 未采样（那里没有东西，或我们没能看到）；有笔画但**读不全** → 未知；
+逐位都读出确切值、位数也对 → 精确。**「读不全」是三种情形**（某一位认不出 ·
+一块都认不出 · 缺一位），落法一样、理由不一样。
+
+> **为什么不产区间**：这三个字段的「允许的形态」里**没有区间**（生命 = 精确／上界／
+> 未知 · 已击杀 = 精确／下界／未知 · 总数 = 精确／未知），而**形态是字段级的决定**，
+> 读数链没有资格替它加一个。**`cost.py` 照样产区间** —— 费用的字段里有区间；
+> 两条链在这件事上不同，不是不一致，是**它们的字段不一样**。
+
+**两个数各自带自己的三态**：一边读不全，只让那一边落未知，不许把另一边一起丢掉。
 """
 
 from __future__ import annotations
@@ -50,7 +58,6 @@ import numpy as np
 
 from ark.contracts import (
     Exact,
-    Interval,
     PixelRect,
     SlotValue,
     UiLayout,
@@ -197,25 +204,30 @@ def _number_center(rect: PixelRect, boxes: list[tuple[int, int, int, int]]) -> f
     return rect.x + (left + right) / 2.0
 
 
-def _candidates(
+def _one_digit(
     glyphs: GlyphTable, ink: np.ndarray, box: tuple[int, int, int, int]
-) -> tuple[tuple[int, ...], float]:
-    """这一块墨迹的候选数字，以及最像的那个的分数（逐位歧义的口径照 `cost.py`）。
+) -> tuple[int | None, float]:
+    """这一块墨迹能不能读成**一位确切数字**：读得出给数字，读不出给 `None`。
 
-    - 最像的那个**够像**（`SOLID_MATCH_SCORE`）→ 候选是离它 `AMBIGUITY_MARGIN`
-      以内的那些（实测真数字与次像的差 0.083 以上，所以通常就一个）；
-    - 对不上任何字形 → 候选是**全部十个数字**。**不许在这里挑一个最像的**：
-      我们知道那里有一位数字，只是认不出是哪一位，所以这一位要让整块降成区间。
+    读不出的两种情形都归 `None`（这一层不产区间，见模块文档）：
+
+    - **对不上任何字形**（最像的那个低于 `SOLID_MATCH_SCORE`）—— 我们知道那里有
+      一位数字，但不知道它是几。**不许挑一个最像的**；
+    - **并排候选**（次像的离最像的不到 `AMBIGUITY_MARGIN`）—— 两个都中等分，
+      挑一个就是假事实。实测真数字与次像的差 0.083 以上，所以这一条只会抓住
+      真正并排的那两个。
+
+    第二个返回值是最像的那个的分数（置信度取这一串里最弱的那个）。
     """
     x0, y0, x1, y1 = box
     scores = glyphs.scores(normalize(ink[y0:y1, x0:x1]))
     best = max(scores.values())
-    if best >= SOLID_MATCH_SCORE:
-        return (
-            tuple(sorted(d for d, s in scores.items() if s >= best - AMBIGUITY_MARGIN)),
-            best,
-        )
-    return tuple(sorted(scores)), best
+    if best < SOLID_MATCH_SCORE:
+        return None, best
+    rivals = sorted(d for d, s in scores.items() if s >= best - AMBIGUITY_MARGIN)
+    if len(rivals) != 1:
+        return None, best
+    return rivals[0], best
 
 
 def _is_separator(ink: np.ndarray, box: tuple[int, int, int, int]) -> bool:
@@ -240,13 +252,12 @@ def _is_separator(ink: np.ndarray, box: tuple[int, int, int, int]) -> bool:
     return max(centroids) - min(centroids) >= SEPARATOR_TRAVEL_MIN
 
 
-def _inner_holes(boxes: list[tuple[int, int, int, int]]) -> list[int]:
-    """同一侧两块之间缝太大的那些位置 —— 缺的那一位在这两块**之间**。"""
-    return [
-        index + 1
+def _has_inner_gap(boxes: list[tuple[int, int, int, int]]) -> bool:
+    """同一侧两块之间**有没有**缝太大的地方 —— 缺的那一位在这两块**之间**。"""
+    return any(
+        boxes[index + 1][0] - boxes[index][2] > SEPARATOR_GAP_MAX
         for index in range(len(boxes) - 1)
-        if boxes[index + 1][0] - boxes[index][2] > SEPARATOR_GAP_MAX
-    ]
+    )
 
 
 def _read_digits(
@@ -255,54 +266,51 @@ def _read_digits(
     boxes: list[tuple[int, int, int, int]],
     *,
     max_digits: int,
-    holes: list[int],
+    missing: bool,
 ) -> SlotValue:
-    """一侧（或一个单独的窗口）里的那些字形 → 一个槽值。
+    """一侧（或一个单独的窗口）里的那些字形 → 一个槽值。**只有两种落法。**
 
-    `holes` 是**缺的那一位插在哪几个位置**（升序的插入下标）。每插一位，那一位
-    的候选就是全部十个数字 —— 于是整块落成区间。缺位由**位置**给出，不由分数
-    给出（分数说不出「少了一位」这件事）。
+    - **逐位都读出确切值、位数也对** → `Valued(Exact(n), 置信度)`；
+    - **其余一切「读不全」** → `Valued(Unknown(), None)`：某一位认不出 ·
+      一块都认不出 · **缺一位**（`missing`）· 块数超过上限。
 
-    **绝不猜一个更短的确切数**：认不出来要落成区间，不是落成「未知」——这里我们
-    确实知道那里有一位数字，只是认不出是哪一位。
+    `missing` 是**三处缝里任何一处判出缺了一位**。它**只用来举手**，不用来拼区间
+    —— 缺位由**位置**给出，不由分数给出（分数说不出「少了一位」这件事）。
+
+    **绝不猜一个更短的确切数**：缺一位时报的是未知，不是把剩下的那一位报成一个
+    整数 —— `10` 读成 `1` 是这条链最危险的一种假事实。**也绝不落未采样**：
+    那里有东西，只是读不出来（混掉就是假事实）。
     """
     if not boxes:
         return Unsampled()
     if len(boxes) > max_digits:
         return Valued(Unknown(), None)
-    holes = sorted(holes)
-    if len(boxes) + len(holes) > max_digits:
-        # 补上缺的那几位就超出这个窗口的位数上限了 —— 那不是「缺一位」，
-        # 是这块 ROI 里的东西我根本没法按位读。
+    if missing:
+        # 缺一位：位数是数出来的，所以这时剩下的那些块长得就像一个更短的确切数。
         return Valued(Unknown(), None)
-    positions: list[tuple[tuple[int, ...], float]] = [
-        _candidates(glyphs, ink, box) for box in boxes
-    ]
-    for at in holes:
-        every = tuple(range(10))
-        weakest = min(score for _, score in positions)
-        positions.insert(at, (every, weakest))
-    lowest = int("".join(str(candidates[0]) for candidates, _ in positions))
-    highest = int("".join(str(candidates[-1]) for candidates, _ in positions))
-    confidence = min(score for _, score in positions)
-    if lowest == highest:
-        return Valued(Exact(lowest), confidence)
-    return Valued(Interval(lowest, highest), confidence)
+    read = [_one_digit(glyphs, ink, box) for box in boxes]
+    if any(digit is None for digit, _ in read):
+        return Valued(Unknown(), None)
+    digits = [digit for digit, _ in read if digit is not None]
+    return Valued(
+        Exact(int("".join(str(digit) for digit in digits))),
+        min(score for _, score in read),
+    )
 
 
 def read_life_digits(frame: Frame, glyphs: GlyphTable, *, ui: UiLayout = UI) -> SlotValue:
     """读蓝门血量（1–2 位）。ROI 是 `life_digits`，取墨走**粉色**那条口径。
 
-    - 逐位都读出来、位数也没缺 → `Valued(Exact(n), 置信度)`；
-    - 有一位分不开（并排两个候选，或整个对不上任何字形）→
-      `Valued(Interval(lo, hi), 置信度)`（逐位歧义传播，照 `cost.py`）；
-    - **只读到 1 位、而它不在窗口中心附近**（`CENTER_TOLERANCE`）→ 那就是
-      **缺了一位**：偏左说明缺的在它右边（`1?` → `[10, 19]`），偏右说明缺的
-      在它左边（`?1`）。**不许把它报成一个更短的确切数** —— 那是这条链最危险
-      的一种假事实；
-    - 整块没笔画 → `Unsampled()`（「那里没有东西」与「我们没能看到」在这一层
+    - 逐位都读出确切值、位数也没缺 → `Valued(Exact(n), 置信度)`；
+    - **整块没笔画** → `Unsampled()`（「那里没有东西」与「我们没能看到」在这一层
       信息上等价）；
-    - 切出的块数超过 2（生命只有 1–2 位）→ `Valued(Unknown(), None)`。
+    - **其余一切「读不全」→ `Valued(Unknown(), None)`**：某一位对不上任何字形 ·
+      并排候选分不开 · 块数超过 2（生命只有 1–2 位）· **只读到 1 位而它不在窗口
+      中心附近**（`CENTER_TOLERANCE` —— 那就是**缺了一位**：偏左说明缺的在它
+      右边、偏右说明缺的在它左边）。
+
+    **缺一位这一条必须判出来**：不判就会报一个更短的确切数（`10` 读成 `1`），
+    那才是这条链最危险的假事实。**这一层不产区间**（见模块文档）。
 
     **窗口中心就是锚点**（文档 §每个区域必须知道的事实）：实测生命 `1` 的中心
     落在 1609.5、`3` 落在 1608.5，而窗口中心是 1609 —— 判据直接用窗口中心，
@@ -313,13 +321,12 @@ def read_life_digits(frame: Frame, glyphs: GlyphTable, *, ui: UiLayout = UI) -> 
     roi = frame.crop(rect)
     boxes = glyph_boxes(roi, take=LIFE_INK_TAKE, threshold=LIFE_INK_THRESHOLD)
     ink = ink_of(roi, take=LIFE_INK_TAKE)
-    holes: list[int] = []
+    missing = False
     if len(boxes) == 1:
         offset = _number_center(rect, boxes) - (rect.x + rect.width / 2.0)
-        if abs(offset) > CENTER_TOLERANCE:
-            holes.append(1 if offset < 0 else 0)
+        missing = abs(offset) > CENTER_TOLERANCE
     return _read_digits(
-        glyphs, ink, boxes, max_digits=MAX_LIFE_DIGITS, holes=holes
+        glyphs, ink, boxes, max_digits=MAX_LIFE_DIGITS, missing=missing
     )
 
 
@@ -338,7 +345,8 @@ def read_enemy_count(
     - 否则切开，**两个数各自带自己的三态**：一边的某一位认不出，只让那一边降级。
 
     缺一位的判据有三处锚点（见模块文档那张表）：贴着分隔符的内端、块与块之间、
-    整个复合体在窗口里居中。缺的那一位落在哪一处，就在那一处插一位全候选。
+    整个复合体在窗口里居中。**任何一处判出缺了一位，这一侧就落未知** —— 位置给
+    证据，分数给不出「少了一位」这件事。
     """
     _guard(frame, glyphs)
     rect = _rect(ui, "enemy_count")
@@ -355,17 +363,17 @@ def read_enemy_count(
     kills = boxes[:cut]
     total = boxes[cut + 1:]
 
-    kills_holes: list[int] = []
-    total_holes: list[int] = []
+    kills_missing = False
+    total_missing = False
     # 内端：甲右对齐、乙左对齐（实测间距 1–4 px）。缝一大，缺的那一位就在这一侧
     # 的**内端**（甲是末位、乙是首位）。
     if kills and separator[0] - kills[-1][2] > SEPARATOR_GAP_MAX:
-        kills_holes.append(len(kills))
+        kills_missing = True
     if total and total[0][0] - separator[2] > SEPARATOR_GAP_MAX:
-        total_holes.append(0)
+        total_missing = True
     # 块与块之间：同侧的数字是紧邻的（实测 1–5 px）。
-    kills_holes += _inner_holes(kills)
-    total_holes += _inner_holes(total)
+    kills_missing = kills_missing or _has_inner_gap(kills)
+    total_missing = total_missing or _has_inner_gap(total)
     # 外端：整个复合体在窗口里居中，所以它偏了就说明缺的那一位在复合体的外端。
     # 判的是**两端到窗口中心的距离差**（中心偏移的两倍，见 COMPOSITE_ASYM_MAX）：
     # 右端伸得更远 → 复合体整体偏右 → 它**左边**短了一截 → 甲的首位缺；
@@ -375,14 +383,14 @@ def read_enemy_count(
         right = rect.x + max(box[2] for box in boxes)
         middle = rect.x + rect.width / 2.0
         if (right - middle) - (middle - left) > COMPOSITE_ASYM_MAX:
-            kills_holes.append(0)
+            kills_missing = True
         elif (middle - left) - (right - middle) > COMPOSITE_ASYM_MAX:
-            total_holes.append(len(total))
+            total_missing = True
     return (
         _read_digits(
-            glyphs, ink, kills, max_digits=MAX_ENEMY_DIGITS, holes=kills_holes
+            glyphs, ink, kills, max_digits=MAX_ENEMY_DIGITS, missing=kills_missing
         ),
         _read_digits(
-            glyphs, ink, total, max_digits=MAX_ENEMY_DIGITS, holes=total_holes
+            glyphs, ink, total, max_digits=MAX_ENEMY_DIGITS, missing=total_missing
         ),
     )

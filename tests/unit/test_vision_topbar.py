@@ -257,12 +257,33 @@ def test_a_whole_roi_without_a_stroke_is_unsampled(batch: BenchBatch, table: Gly
     assert read_life_digits(blacked, table) == Unsampled()
 
 
+def test_a_side_without_any_stroke_is_unsampled_not_unknown(
+    batch: BenchBatch, table: GlyphTable
+) -> None:
+    """把甲那一片涂黑、留下分隔符与乙：那一边是**未采样**，另一边照读。
+
+    「整块没笔画」里的「整块」规格没说清是整窗还是这一个数的那一片 —— 我按
+    「两个数各自带自己的三态」取后者（见报告的规格洞）。**不许落未知**：
+    那里没有东西，不是「有东西读不出来」。
+    """
+    frame = _frame(batch, "shot26")  # 甲 14、乙 22
+    rect = UI.rects["enemy_count"]
+    kills, _, _ = _enemy_parts(frame, table)
+    span = (0, 0, kills[-1][2] + 1, rect.height)
+    assert span[2] < 82  # 这一片没盖到分隔符（它在 x82）
+    blacked = _paint(frame, rect, [span], (0, 0, 0))
+    got_kills, got_total = read_enemy_count(blacked, table)
+    assert got_kills == Unsampled()
+    assert isinstance(got_total, Valued) and isinstance(got_total.payload, Exact)
+    assert got_total.payload.value == 22
+
+
 # ---------------------------------------------------------------------------
-# 降级二：某一位对不上任何字形 → 区间（只那一边）
+# 降级二：某一位对不上任何字形 → 未知（只那一边）
 # ---------------------------------------------------------------------------
 
 
-def test_a_digit_that_matches_nothing_widens_only_that_side(
+def test_a_digit_that_matches_nothing_makes_only_that_side_unknown(
     batch: BenchBatch, table: GlyphTable
 ) -> None:
     """实心白块：有笔画、每一列都是整个字高，但哪个数字都不是。"""
@@ -272,19 +293,18 @@ def test_a_digit_that_matches_nothing_widens_only_that_side(
     assert len(kills) == 2 and len(total) == 2
     painted = _paint(frame, rect, [kills[1]], (255, 255, 255))
     got_kills, got_total = read_enemy_count(painted, table)
-    assert isinstance(got_kills, Valued) and isinstance(got_kills.payload, Interval)
-    assert (got_kills.payload.lo, got_kills.payload.hi) == (10, 19)
+    assert got_kills == Valued(Unknown(), None)
     # 另一边一位都没少
     assert isinstance(got_total, Valued) and isinstance(got_total.payload, Exact)
     assert got_total.payload.value == 22
 
 
 # ---------------------------------------------------------------------------
-# 降级三：缺一位 → 区间（不许报成更短的确切数）
+# 降级三：缺一位 → 未知（**必须判出来**，不许报成更短的确切数）
 # ---------------------------------------------------------------------------
 
 
-def test_a_missing_inner_digit_widens_only_that_side(
+def test_a_missing_inner_digit_makes_only_that_side_unknown(
     batch: BenchBatch, table: GlyphTable
 ) -> None:
     """抹掉甲的内端那位（末位）：它就不再贴着分隔符了。"""
@@ -293,8 +313,7 @@ def test_a_missing_inner_digit_widens_only_that_side(
     kills, _, _ = _enemy_parts(frame, table)
     erased = _paint(frame, rect, [kills[1]], (0, 0, 0))
     got_kills, got_total = read_enemy_count(erased, table)
-    assert isinstance(got_kills, Valued) and isinstance(got_kills.payload, Interval)
-    assert (got_kills.payload.lo, got_kills.payload.hi) == (10, 19)
+    assert got_kills == Valued(Unknown(), None)
     assert isinstance(got_total, Valued) and isinstance(got_total.payload, Exact)
     assert got_total.payload.value == 22
 
@@ -302,14 +321,13 @@ def test_a_missing_inner_digit_widens_only_that_side(
 def test_a_missing_outer_digit_is_not_a_shorter_number(
     batch: BenchBatch, table: GlyphTable
 ) -> None:
-    """抹掉甲的外端那位（首位）：整个复合体因此不再居中，剩下的那一位不许报成确切值。"""
+    """抹掉甲的外端那位（首位）：整个复合体因此不再居中 —— 剩下的 `4` 不许报成 4。"""
     frame = _frame(batch, "shot26")
     rect = UI.rects["enemy_count"]
     kills, _, _ = _enemy_parts(frame, table)
     erased = _paint(frame, rect, [kills[0]], (0, 0, 0))
     got_kills, got_total = read_enemy_count(erased, table)
-    assert isinstance(got_kills, Valued) and isinstance(got_kills.payload, Interval)
-    assert (got_kills.payload.lo, got_kills.payload.hi) == (4, 94)
+    assert got_kills == Valued(Unknown(), None)
     assert isinstance(got_total, Valued) and isinstance(got_total.payload, Exact)
     assert got_total.payload.value == 22
 
@@ -323,8 +341,7 @@ def test_a_missing_outer_digit_of_the_total_is_not_a_shorter_number(
     _, _, total = _enemy_parts(frame, table)
     erased = _paint(frame, rect, [total[1]], (0, 0, 0))
     got_kills, got_total = read_enemy_count(erased, table)
-    assert isinstance(got_total, Valued) and isinstance(got_total.payload, Interval)
-    assert (got_total.payload.lo, got_total.payload.hi) == (40, 49)
+    assert got_total == Valued(Unknown(), None)
     assert isinstance(got_kills, Valued) and isinstance(got_kills.payload, Exact)
     assert got_kills.payload.value == 25
 
@@ -366,9 +383,9 @@ def test_a_wide_blob_is_not_mistaken_for_the_separator(
 ) -> None:
     """把甲的两位涂成一整块：它自己过不了形状判据，**真分隔符照样是那一个**。
 
-    于是这一块被当成「一个认不出的字形」→ 那一位的候选是全部十个数字。
+    于是这一块被当成「一块都认不出的字」→ 这一侧落未知。
     （它其实盖住了两位 —— 规格里没有「一块太宽，当不了一位」这条判据，
-    见报告的「撞到的规格洞」。）
+    见报告的「撞到的规格洞」；而这一块**认不出**正好是规格说的那条防线。）
     """
     frame = _frame(batch, "shot26")
     rect = UI.rects["enemy_count"]
@@ -377,8 +394,7 @@ def test_a_wide_blob_is_not_mistaken_for_the_separator(
     assert separator[0] > span[2]  # 那一块确实没盖到分隔符
     painted = _paint(frame, rect, [span], (255, 255, 255))
     got_kills, got_total = read_enemy_count(painted, table)
-    assert isinstance(got_kills, Valued) and isinstance(got_kills.payload, Interval)
-    assert (got_kills.payload.lo, got_kills.payload.hi) == (0, 9)
+    assert got_kills == Valued(Unknown(), None)
     assert isinstance(got_total, Valued) and isinstance(got_total.payload, Exact)
     assert got_total.payload.value == 22
 
@@ -395,15 +411,13 @@ def test_life_without_a_stroke_is_unsampled(batch: BenchBatch, table: GlyphTable
     assert read_life_digits(erased, table) == Unsampled()
 
 
-def test_life_that_matches_nothing_widens_to_all_ten_digits(
+def test_life_that_matches_nothing_is_unknown(
     batch: BenchBatch, table: GlyphTable
 ) -> None:
     frame = _frame(batch, "shot01")
     rect = UI.rects["life_digits"]
     painted = _paint(frame, rect, [(30, 0, 41, rect.height)], (255, 255, 255))
-    got = read_life_digits(painted, table)
-    assert isinstance(got, Valued) and isinstance(got.payload, Interval)
-    assert (got.payload.lo, got.payload.hi) == (0, 9)
+    assert read_life_digits(painted, table) == Valued(Unknown(), None)
 
 
 def test_life_two_digits_centred_is_exact(batch: BenchBatch, table: GlyphTable) -> None:
@@ -415,14 +429,9 @@ def test_life_two_digits_centred_is_exact(batch: BenchBatch, table: GlyphTable) 
 
 def test_life_lone_digit_off_centre_is_a_missing_digit(batch: BenchBatch, table: GlyphTable) -> None:
     """偏左说明缺的在它右边，偏右说明缺的在它左边 —— 都不许报成更短的确切数。"""
-    frame = _life_with_ones(_frame(batch, "shot01"), [14])
-    got = read_life_digits(frame, table)
-    assert isinstance(got, Valued) and isinstance(got.payload, Interval)
-    assert (got.payload.lo, got.payload.hi) == (10, 19)
-    frame = _life_with_ones(_frame(batch, "shot01"), [44])
-    got = read_life_digits(frame, table)
-    assert isinstance(got, Valued) and isinstance(got.payload, Interval)
-    assert (got.payload.lo, got.payload.hi) == (1, 91)
+    for at in ([14], [44]):
+        got = read_life_digits(_life_with_ones(_frame(batch, "shot01"), at), table)
+        assert got == Valued(Unknown(), None)
 
 
 def test_life_more_than_two_blocks_is_unknown(batch: BenchBatch, table: GlyphTable) -> None:
@@ -430,6 +439,56 @@ def test_life_more_than_two_blocks_is_unknown(batch: BenchBatch, table: GlyphTab
     got = read_life_digits(frame, table)
     assert isinstance(got, Valued) and isinstance(got.payload, Unknown)
     assert got.confidence is None
+
+
+def test_every_digit_read_out_means_an_exact_integer(
+    batch: BenchBatch, table: GlyphTable
+) -> None:
+    """**逐位都读出确切值、位数也对** → 精确（两边各自一个，置信度是逐位里最弱的）。"""
+    frame = _frame(batch, "shot26")  # 甲 14、乙 22
+    got_kills, got_total = read_enemy_count(frame, table)
+    assert isinstance(got_kills, Valued) and isinstance(got_kills.payload, Exact)
+    assert got_kills.payload.value == 14
+    assert got_kills.confidence is not None
+    assert isinstance(got_total, Valued) and isinstance(got_total.payload, Exact)
+    assert got_total.payload.value == 22
+    assert got_total.confidence is not None
+
+
+def test_this_layer_never_produces_an_interval(batch: BenchBatch, table: GlyphTable) -> None:
+    """裁定：这三个字段的形态里没有区间 —— 读数链不许替它们加一个。
+
+    扫一遍三帧基准集 + 「读不全」的几种造法，断言**没有一支载荷是区间**。
+    """
+    base = _frame(batch, "shot26")  # 甲 14、乙 22 —— 两侧都是两位数，够改
+    enemy_rect = UI.rects["enemy_count"]
+    life_rect = UI.rects["life_digits"]
+    kills, separator, _ = _enemy_parts(base, table)
+    samples = [
+        frame_from_raw(case.raw())
+        for case in batch.cases
+        if case.name in ("shot01", "shot26", "raw_b")
+    ]
+    samples += [
+        # 未采样：整块涂黑
+        _paint(base, enemy_rect, [(0, 0, enemy_rect.width, enemy_rect.height)], (0, 0, 0)),
+        _paint(base, life_rect, [(0, 0, life_rect.width, life_rect.height)], (0, 0, 0)),
+        # 读不全：某一位认不出 / 缺一位（内端、外端）/ 分隔符认不出
+        _paint(base, enemy_rect, [kills[1]], (255, 255, 255)),
+        _paint(base, enemy_rect, [kills[1]], (0, 0, 0)),
+        _paint(base, enemy_rect, [kills[0]], (0, 0, 0)),
+        _paint(base, enemy_rect, [separator], (0, 0, 0)),
+        # 读不全：生命缺一位 / 块数超过上限
+        _life_with_ones(base, [14]),
+        _life_with_ones(base, [4, 27, 50]),
+    ]
+    for sample in samples:
+        got_kills, got_total = read_enemy_count(sample, table)
+        for got in (got_kills, got_total, read_life_digits(sample, table)):
+            assert isinstance(got, (Unsampled, Valued))
+            if isinstance(got, Valued):
+                assert isinstance(got.payload, (Exact, Unknown))
+                assert not isinstance(got.payload, Interval)
 
 
 # ---------------------------------------------------------------------------
