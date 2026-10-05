@@ -4,23 +4,40 @@
 
 ## 真值从哪来
 
-`tests/帧样本/备战席/` 的 6 张原生裁剪，规划者**逐帧目视确认**过三样：
-**卡数 · 每张的费用 · 每张的状态**。真值表在下面 `TRUTH`。**执行者不许读本文件。**
+`tests/帧样本/备战席/` 那 10 张原生裁剪，规划者**逐帧目视确认**过。真值表在下面 `TRUTH`。
+**执行者不许读本文件。**
+
+**费用那一列只有 `shotNN` 那 6 帧写**（`cdNN` 那 4 帧是 `None`）：那 4 帧上有几张卡的费用
+读数链**读不出来**，而那与"再部署那一列"是**两件事**（理由见批次 README §里面有什么）。
 
 ## 这一批覆盖到什么
 
 - **卡数六档**：12 · 11 · 10 · 9 · 8 · 6；
-- **费用一位数与两位数**：一位数 1 · 2 · 6，两位数 10–25；
+- **费用一位数与两位数**：一位数 1 · 2 · 6，两位数 10–25（**只在 `shotNN` 那 6 帧上**）；
 - **装置卡**：费用写 14 的那张，它不是干员（[视觉层/备战席点名](../../docs/10-规格/视觉层/备战席点名.md) §装置那一张长什么样）；
-- **再部署中那一档**：`shot26` 最右那张 —— 红罩 + 白色环形进度 + 中央 `12.9`。
+- **再部署中那一档**：`shot26` 最右那张 —— 红罩 + 白色环形进度 + 中央 `12.9`；
+- **再部署那一档的另外三副面孔**（`cdNN` 那 4 帧）：**刚撤退**（白弧 31°，`cd01` 下标 7）、
+  **真环落进判不了**（`cd08` 下标 5）、**亮卡面被误判**（`cd20` / `cd60` 下标 2）。
 
 **没覆盖到**：灰掉那一档（费用不足）、空席（一张卡都没有）、3 位数费用。
 
+## 这一批里的判据是「两个东西」而不是一个
+
+再部署那一列的三档（是 / 否 / 判不了）在 `cdNN` 那 4 帧上**同时**被抓到两处毛病，而它们是**两种性质**：
+
+- **假环**（`cd20` / `cd60` 下标 2）：那一张卡面很亮，环带上"最暗的那一度"也跟着亮，
+  于是判据说"环在"。**这是假事实** —— 它把"不在再部署"说成"在"（R8）；
+- **真环落进判不了**（`cd08` 下标 5）：环和数字都在（剩 16.3 s），读数链却报**判不了**。
+  这一条**不是假事实**（判不了是"不知道"，是诚实的），它是**丢信息**（R9）。
+
+两者同一个病根：**"环在不在"问的是"环带比它周围亮不亮"，不是"环带本身够不够亮"** ——
+一张亮卡面能把绝对亮度顶到真环的高度（实测：同一张卡面上，真环那一次环带最暗 110 / 环外 29，
+假环那一次 102 / 158，**绝对亮度只差 8、真值却反着**）。
+
 ## 还没写的是哪一半
 
-**已经补上了**（读数链 `engine/vision/bench.py` 落地那一轮）：R5 把 6 帧经重放路径读出来
-与真值逐张比，R6 管"再部署剩余秒数"那一列 —— 它现在**读不出来**（中央那个数字的字体
-与出厂字形表不是同一套，见 §尚未定），所以 R6 断言的是**"不许猜一个数"**，不是"等于 12.9"。
+R6 管"再部署剩余秒数"那一列 —— 它现在**读不出来**（中央那个数字的字体与出厂字形表
+不是同一套，见 §尚未定），所以 R6 断言的是**"不许猜一个数"**，不是"等于 12.9"。
 """
 
 from __future__ import annotations
@@ -49,10 +66,14 @@ CANVAS_W, CANVAS_H = 2800, 1260
 
 
 # ---------------------------------------------------------------------------
-# 真值：规划者逐帧目视确认（6 帧）
+# 真值：规划者逐帧目视确认（10 帧）
 #
-# `cost` 是**从右往左**排的：下标 0 = 最右那张（代码里 `card` 0 的约定）。
+# `cost` 是**从右往左**排的：下标 0 = 最右那张（代码里 `card` 0 的约定）；
+# `cdNN` 那 4 帧**不写费用**（`None`），理由见模块文档。
 # `device` 是"不是干员"的那些下标；`redeploy` 是"再部署中"的下标 → 中央那个秒数。
+#
+# `cd01` 下标 2 与 `cd20` 下标 2 是同一个干员、同一个费用：前者在再部署中（剩 54.7），
+# 后者不在 —— 这一对就是 R8。
 # ---------------------------------------------------------------------------
 
 TRUTH: Mapping[str, Mapping[str, object]] = {
@@ -92,7 +113,38 @@ TRUTH: Mapping[str, Mapping[str, object]] = {
         "device": [],
         "redeploy": {0: 12.9},
     },
+    "cd01": {
+        "cards": 9,
+        "cost": None,
+        "device": [],
+        "redeploy": {0: 32.2, 1: 39.5, 2: 54.7, 5: 36.0, 7: 64.2, 8: 16.0},
+    },
+    "cd08": {
+        "cards": 9,
+        "cost": None,
+        "device": [],
+        "redeploy": {0: 12.6, 1: 19.9, 2: 35.0, 3: 69.4, 4: 57.2, 5: 16.3, 7: 44.6},
+    },
+    "cd20": {
+        "cards": 11,
+        "cost": None,
+        "device": [],
+        "redeploy": {3: 34.3, 4: 68.4, 5: 33.6, 6: 21.4, 9: 8.8},
+    },
+    "cd60": {
+        "cards": 11,
+        "cost": None,
+        "device": [],
+        "redeploy": {},
+    },
 }
+
+PAIR = ("cd01", 2, "cd20", 2)
+"""R8 用的那一对：**同一个干员、同一个费用**，一次在再部署中、一次不在。
+
+两帧上的卡面像素几乎一样（实测整张卡的平均差 3.3 —— 差的是费用暗盒里那个数），
+所以"这两张必须一个是一个否"这句话，只有**把环和它周围比**才答得出来。
+"""
 
 
 # ---------------------------------------------------------------------------
@@ -244,38 +296,47 @@ def check_truth_covers_exactly_the_batch() -> str:
 
 
 def check_truth_table_has_the_shape_it_claims() -> str:
-    """真值表自己的形状：卡数 = 费用表的长度，装置与再部署的下标都在卡数之内。
+    """真值表自己的形状：卡数 = 费用表的长度（没写费用那几帧跳过），各处下标都在卡数之内。
 
     出处是[视觉层/备战席] §卡片怎么排（**只有还没上场的才显示**，所以卡数会变）与
     §点名（**一张卡不一定是干员**）。这一条不碰像素，它保证**真值本身不自相矛盾** ——
     真值错了，拿它当标准的验收就一起错。
     """
     worst: list[str] = []
+    no_cost: list[str] = []
     for name, row in TRUTH.items():
         cards = row["cards"]
         cost = row["cost"]
-        assert len(cost) == cards, (
-            f"{name}：卡数写 {cards}，费用表有 {len(cost)} 个数"
-        )
+        if cost is None:
+            no_cost.append(name)
+        else:
+            assert len(cost) == cards, (
+                f"{name}：卡数写 {cards}，费用表有 {len(cost)} 个数"
+            )
         for i in row["device"]:
             assert 0 <= i < cards, f"{name}：装置下标 {i} 不在 0..{cards - 1}"
         for i in row["redeploy"]:
             assert 0 <= i < cards, f"{name}：再部署下标 {i} 不在 0..{cards - 1}"
         worst.append(f"{name}:{cards}")
     counts = sorted({row["cards"] for row in TRUTH.values()})
-    return f"卡数 {counts} ｜ " + " ".join(worst)
+    tail = f" ｜不写费用 {len(no_cost)} 帧（{', '.join(no_cost)}）" if no_cost else ""
+    return f"卡数 {counts} ｜ " + " ".join(worst) + tail
 
 
 def check_readings_match_the_truth_on_every_frame() -> str:
-    """6 帧经重放路径读出来，**卡数 · 每张卡的费用 · 再部署状态**与真值逐张一致。
+    """10 帧经重放路径读出来，**卡数 · 每张卡的费用（写了的那些帧）· 再部署状态**逐张一致。
 
     出处是[开发路线] 段一那条判据（"这套识别不看真机也能跑，而且对着基准集逐帧对得上"）
     与[离线验收] §1。真值是规划者逐帧目视确认的（见本文件模块文档），**执行者看不到它**。
+
+    **一处不符也不放过**：这一条把每一处都收进来一起报，而不是撞到第一处就停 ——
+    一个病根在几帧上出几处，报全了才看得出是"一处"还是"一片"。
     """
     from ark.contracts import Exact, Valued
 
     names = _frame_names()
     detail: list[str] = []
+    wrong: list[str] = []
     for name in names:
         row = TRUTH[name]
         cards = _read(name)
@@ -285,24 +346,32 @@ def check_readings_match_the_truth_on_every_frame() -> str:
         assert len(cards) == row["cards"], (
             f"{name}：读出 {len(cards)} 张卡，真值是 {row['cards']} 张"
         )
-        got = [c.cost for c in cards]
-        bad = [
-            f"k{i}={v!r}"
-            for i, v in enumerate(got)
-            if not (isinstance(v, Valued) and isinstance(v.payload, Exact))
-        ]
-        assert not bad, f"{name}：这几张卡的费用不是精确值 —— " + ", ".join(bad)
-        values = [v.payload.value for v in got]
-        assert values == list(row["cost"]), (
-            f"{name}：费用读出 {values}，真值是 {list(row['cost'])}"
-        )
+        if row["cost"] is not None:
+            got = [c.cost for c in cards]
+            bad = [
+                f"k{i}={v!r}"
+                for i, v in enumerate(got)
+                if not (isinstance(v, Valued) and isinstance(v.payload, Exact))
+            ]
+            assert not bad, f"{name}：这几张卡的费用不是精确值 —— " + ", ".join(bad)
+            values = [v.payload.value for v in got]
+            assert values == list(row["cost"]), (
+                f"{name}：费用读出 {values}，真值是 {list(row['cost'])}"
+            )
         want_red = set(row["redeploy"])
         for card in cards:
-            assert card.redeploying == (card.index in want_red), (
-                f"{name}：第 {card.index} 张的再部署状态读成 {card.redeploying!r}，"
-                f"真值是 {card.index in want_red}"
-            )
+            if card.redeploying != (card.index in want_red):
+                said = {True: "再部署中", False: "不在再部署", None: "判不了"}[
+                    card.redeploying
+                ]
+                wrong.append(
+                    f"{name} 下标 {card.index} 读成「{said}」、真值是"
+                    f"「{'再部署中' if card.index in want_red else '不在再部署'}」"
+                )
         detail.append(f"{name}:{len(cards)}张")
+    assert not wrong, (
+        f"再部署那一列有 {len(wrong)} 处不符 ｜ " + "；".join(wrong)
+    )
     return f"{len(names)} 帧逐张一致 ｜ " + " ".join(detail)
 
 
@@ -414,6 +483,50 @@ def check_redeploying_does_not_depend_on_the_arc_length() -> str:
     return f"环擦短到约 60° 后仍判 {card.redeploying}（卡数 {len(cards)} 不变）"
 
 
+def check_a_bright_card_face_is_not_a_ring() -> str:
+    """同一个干员、同一个费用的两张卡，一次在再部署中、一次不在 —— 判据必须把它们分开。
+
+    出处是[视觉层/备战席] §判死与再部署：**判据是「环在不在」**，而环是一道**画在卡面上的
+    笔画**，所以"在不在"只能问**它比它周围亮不亮**：这两张卡面几乎一样（整张卡的平均差 3.3），
+    真值却反着 —— 拿卡面的**绝对亮度**当判据，任何一条线都会把其中一张说错。
+    """
+    left, li, right, ri = PAIR
+    a = _read(left)[li]
+    b = _read(right)[ri]
+    assert a.redeploying is True, (
+        f"{left} 下标 {li} 真值是在再部署中（剩 54.7 s），读数链读成 {a.redeploying!r}"
+    )
+    assert b.redeploying is False, (
+        f"{right} 下标 {ri} 没有环、没有红罩、卡面是全彩的，读数链却读成 {b.redeploying!r}"
+        f" —— 它与 {left} 下标 {li} 是同一个干员、同一个费用，"
+        "拿卡面的绝对亮度当判据分不开这两张"
+    )
+    return f"{left}#{li}={a.redeploying} ／ {right}#{ri}={b.redeploying}（同一张卡面）"
+
+
+def check_a_real_ring_never_lands_in_the_undecided_band() -> str:
+    """真环不许落「判不了」：环与中央数字都在的那些卡，读数链必须报「再部署中」。
+
+    出处是[视觉层/备战席] §判死与再部署（"红罩 + 那个圆环在，就是再部署中"）与
+    [状态层/我方干员] 那一行的三档。**这一条不是抓假事实** —— 报「判不了」是诚实的，
+    代价是**丢信息**；而这里的证据是**肯定证据**（环在、数字在），
+    所以"不知道"这个答案本身是错的。
+    """
+    undecided: list[str] = []
+    total = 0
+    for name, row in TRUTH.items():
+        cards = _read(name)
+        for index in sorted(row["redeploy"]):
+            total += 1
+            if cards[index].redeploying is not True:
+                undecided.append(f"{name}#{index}={cards[index].redeploying!r}")
+    assert not undecided, (
+        f"{len(undecided)} 张卡的环与数字都在，读数链却没报「再部署中」："
+        + "；".join(undecided)
+    )
+    return f"真环 {total} 张，一张都没落进判不了"
+
+
 CHECKS: tuple[Check, ...] = (
     Check("R1", "采集与验收/基准集 §2（字段表）",
           "清单里的必填字段一样不少地读出来，没记的前提头不许补",
@@ -428,7 +541,7 @@ CHECKS: tuple[Check, ...] = (
           "真值表自己的形状自洽：卡数 = 费用表长度，下标都在卡数之内",
           check_truth_table_has_the_shape_it_claims),
     Check("R5", "00-总览/开发路线 段一（判据）+ 采集与验收/离线验收 §1",
-          "6 帧经重放路径读出来，卡数 · 每张费用 · 再部署状态与真值逐张一致",
+          "10 帧经重放路径读出来，卡数 · 每张费用 · 再部署状态与真值逐张一致",
           check_readings_match_the_truth_on_every_frame),
     Check("R6", "状态层/我方干员（再部署倒计时的形态）+ 零假事实",
           "再部署剩余秒数要么精确等于真值、要么落未知/未采样，不许猜一个数",
@@ -436,6 +549,12 @@ CHECKS: tuple[Check, ...] = (
     Check("R7", "视觉层/备战席 §判死与再部署（判据只能是「环在不在」）",
           "把亮弧擦短到约 60° 之后，那一张仍然判成再部署中",
           check_redeploying_does_not_depend_on_the_arc_length),
+    Check("R8", "视觉层/备战席 §判死与再部署（环是笔画：只能问它比周围亮不亮）",
+          "同一个干员、同一个费用的两张卡，一次在再部署中、一次不在，判据要分开",
+          check_a_bright_card_face_is_not_a_ring),
+    Check("R9", "视觉层/备战席 §判死与再部署 + 状态层/我方干员（三档）",
+          "环与数字都在的那些卡，不许落「判不了」",
+          check_a_real_ring_never_lands_in_the_undecided_band),
 )
 
 
