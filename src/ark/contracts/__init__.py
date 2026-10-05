@@ -50,6 +50,8 @@ from .containers import (
 from .geometry import (
     UI_LAYOUT,
     Canvas,
+    squad_card_face_rect,
+    squad_card_rect,
     GridCoord,
     Pixel,
     PixelRect,
@@ -112,6 +114,8 @@ __all__ = [
     "Projection",
     "UiLayout",
     "UI_LAYOUT",
+    "squad_card_rect",
+    "squad_card_face_rect",
     # §4 容器
     "FieldRef",
     "SourceRef",

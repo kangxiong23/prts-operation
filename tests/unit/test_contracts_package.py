@@ -48,6 +48,8 @@ GEOMETRY_NAMES = [
     "Projection",
     "UiLayout",
     "UI_LAYOUT",
+    "squad_card_rect",
+    "squad_card_face_rect",
 ]
 
 CONTAINER_NAMES = [

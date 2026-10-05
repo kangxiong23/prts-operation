@@ -38,6 +38,8 @@ __all__ = [
     "Projection",
     "UiLayout",
     "UI_LAYOUT",
+    "squad_card_rect",
+    "squad_card_face_rect",
 ]
 
 
@@ -313,30 +315,19 @@ class UiLayout:
 
 UI_LAYOUT: Final[UiLayout] = UiLayout(
     {
-        # 备战席卡行。**整排一个矩形表达不了它**：它是右对齐的，右缘固定、左缘随
-        # 卡数变（视觉层/顶部HUD与数字）。这一段是 T5 段 0 那一帧量出来的 ——
-        # 原生 2800×1260、**5 张卡**：卡行上缘 **1045** · 下缘 **1259** ·
-        # 卡距 **207.5** · 最左那张卡的左缘 **1762**（抽验：五张卡上那个固定
-        # 特征点在 1884 / 2091 / 2299 / 2506 / 2714，间距 207–208）。
+        # 备战席卡行。**整排一个矩形表达不了它**（右对齐：右缘固定、左缘随卡数变），
+        # 所以这里只放**最右那张卡**与**它的身份识别区**这两个矩形；第 k 张由
+        # `squad_card_rect(k, 卡距, 档位)` 沿卡距左移 k 步得到（视觉层/顶部HUD与数字
+        # 「形状与下标」· T5 定）。
         #
-        # **下标 0 = 最左那张卡**，向右递增 —— 与特征库 §1 读卡的方向一致
-        # （那里说"四张卡从左到右是 7 / 10 / 10 / 14"，还说"下了第 2、3 张"）。
-        #
-        # **这张表只在 5 张卡那一档成立**：卡距随卡数变，规格里记的 189 是
-        # 12 张卡那一档（视觉层/顶部HUD与数字），两档对不上，见 T5 报告的规格洞。
-        "squad_card_0": PixelRect(1762, 1045, 207.5, 214),
-        "squad_card_1": PixelRect(1969.5, 1045, 207.5, 214),
-        "squad_card_2": PixelRect(2177, 1045, 207.5, 214),
-        "squad_card_3": PixelRect(2384.5, 1045, 207.5, 214),
-        "squad_card_4": PixelRect(2592, 1045, 207.5, 214),
+        # 这一段是 T5 段 0 那一帧量出来的（原生 2800×1260、**5 张卡**）：
+        # 卡行上缘 **1045** · 下缘 **1259** · 右缘 **2799.5** · 卡距 **207.5**
+        # （五张卡上那个固定特征点在 1884 / 2091 / 2299 / 2506 / 2714，间距 207–208）。
+        "squad_card_rightmost": PixelRect(2592, 1045, 207.5, 214),
         # 卡面上的**身份识别区**（卡面与指纹 §0）：整张卡去掉顶上那一条 ——
         # 职业图标与部署费用都长在那一条里，而两样都**不进身份区**（前者不唯一、
         # 后者会随死亡 / 撤退次数变）。顶上那一条量到 y 1045..1092。
-        "squad_card_face_0": PixelRect(1762, 1092, 207.5, 167),
-        "squad_card_face_1": PixelRect(1969.5, 1092, 207.5, 167),
-        "squad_card_face_2": PixelRect(2177, 1092, 207.5, 167),
-        "squad_card_face_3": PixelRect(2384.5, 1092, 207.5, 167),
-        "squad_card_face_4": PixelRect(2592, 1092, 207.5, 167),
+        "squad_card_rightmost_face": PixelRect(2592, 1092, 207.5, 167),
     }
 )
 """这一台设备上的 UI 布局常量（**值**在这里，类型在上面）。
@@ -347,4 +338,50 @@ UI_LAYOUT: Final[UiLayout] = UiLayout(
 
 **这张表不是"资产"**（用户裁定）：它不是生成物、不进资产库，所以它不走资产端口
 ——它住契约层，设备层与视觉层各自 import 它，不必互相 import。
+
+**卡距（标量）不在表里**：表的值只能是像素矩形，把间距塞成退化矩形就是假事实。
+它住**用它的那一层**自己的常量（设备层），由调用方传进来。
 """
+
+
+def _shifted_left(rect: PixelRect, index: int, pitch: float, slots: int) -> PixelRect:
+    """把某个矩形**沿卡距左移 index 步**。卡框与身份区共用这一处位移。"""
+    if isinstance(index, bool) or not isinstance(index, int):
+        raise TypeError(f"卡下标是整数，收到 {type(index).__name__}")
+    _check_number(pitch, "卡距")
+    if pitch <= 0:
+        raise ValueError(f"卡距必须为正，收到 {pitch}")
+    if isinstance(slots, bool) or not isinstance(slots, int):
+        raise TypeError(f"档位是整数，收到 {type(slots).__name__}")
+    if not 0 <= index < slots:
+        raise IndexError(
+            f"备战席第 {index} 张卡超出了量过的档位（0..{slots - 1}）：卡距只在"
+            f"「{slots} 张卡」那一档量过，别的档未验 —— 报错，不猜"
+        )
+    return PixelRect(rect.x - index * pitch, rect.y, rect.width, rect.height)
+
+
+def squad_card_rect(index: int, pitch: float, slots: int) -> PixelRect:
+    """备战席**第 index 张卡**的矩形。**下标 0 = 最右那张**（T5 定）。
+
+    卡行**右对齐**：右缘固定在 2799.5，所以「第 k 张」的**锚点是常量** ——
+    第 k 张 = 最右那张的矩形**沿卡距左移 k 步**。「从左数」等于把卡数偷偷塞进
+    下标（左缘随卡数变），所以不采用。
+
+    **下标 → 矩形只有这一份实现**：视觉层读卡与设备层算起点像素都走它，否则
+    两边的下标不同型（契约层 §2）。
+
+    - `pitch`（卡距）是**标量**，它不进 `UiLayout` —— 它住**用它的那一层**自己的
+      常量（设备层）；
+    - `slots` 是**量过的档位**：超出它就报错、不猜。卡距是不是随卡数变**还没答**
+      （5 张卡那一档是 207.5，而"12 格 530→2800"指向 189.2、口径不明），所以
+      卡框**只在量过的那一档成立**。
+    """
+    return _shifted_left(UI_LAYOUT.rects["squad_card_rightmost"], index, pitch, slots)
+
+
+def squad_card_face_rect(index: int, pitch: float, slots: int) -> PixelRect:
+    """备战席第 index 张卡的**身份识别区**（卡面与指纹 §0）。口径同 `squad_card_rect`。"""
+    return _shifted_left(
+        UI_LAYOUT.rects["squad_card_rightmost_face"], index, pitch, slots
+    )

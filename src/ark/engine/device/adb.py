@@ -60,8 +60,8 @@ from ark.contracts import (
     GridCoord,
     Pixel,
     Projection,
-    UI_LAYOUT,
     View,
+    squad_card_rect,
 )
 
 __all__ = [
@@ -74,6 +74,8 @@ __all__ = [
     "DEFAULT_TIMEOUT_MS",
     "DEVICE_TMP_DIR",
     "FRAME_FILE_NAME",
+    "SQUAD_CARD_PITCH",
+    "SQUAD_CARD_SLOTS",
     "R_GRID",
     "FACING_VECTORS",
     "SWIPE_DURATION_MS",
@@ -103,6 +105,22 @@ DEVICE_TMP_DIR: Final[str] = "/data/local/tmp"
 
 FRAME_FILE_NAME: Final[str] = "ark_frame.raw"
 """设备端与本地两侧共用的文件名。原始帧定长 14,112,016 字节，`.raw` 是它自己。"""
+
+SQUAD_CARD_PITCH: Final[float] = 207.5
+"""备战席**卡距**（像素）。**标量，所以它不进 `UiLayout`** —— 那张表的值只能是
+像素矩形（把间距塞成退化矩形就是假事实），所以标量住**用它的那一层**自己的常量
+（视觉层/顶部HUD与数字「形状与下标」· T5 定）。
+
+**它只在 5 张卡那一档量过**（T5 段 0 那一帧：卡左缘 1762 / 1969.5 / 2177 / 2384.5 /
+2592，卡上一个固定特征点在 1884 / 2091 / 2299 / 2506 / 2714，间距 207–208）。
+**"卡距是不是随卡数变"还没答**（规格里那个 189.2 的支撑口径不明），所以别的档
+未验 —— 见 `SQUAD_CARD_SLOTS`。
+"""
+
+SQUAD_CARD_SLOTS: Final[int] = 5
+"""卡框**量到几档**：这一帧是 **5 张卡**。下标超出它就报错、不猜 —— 卡距只在
+这一档量过，别的卡数下算出来的卡框没有来源。
+"""
 
 R_GRID: Final[float] = 0.3
 """部署终点相对格心的偏移 `r`（单位：格）。**估 0.3 格，真机待测。**
@@ -395,23 +413,25 @@ class AdbDevice:
     **不走 `exec-out` 直出**（设备层 §4 · D-全局-19）：原始帧 14 MB 走流式通道比
     取文件慢，而且 PowerShell 的 `>` 会毁掉二进制。
 
-    `assets` 与 `view` 都是**构造时收进来的**（T5 裁定三）：四个动词要像素时向
-    `assets.projection(view)` 要。**端口一个字不改** —— 切视图 = 重新装配
+    `transport` · `assets` · `view` **三样都要给全**（设备层 §5 · T5 定）：四个动词要
+    像素时向 `assets.projection(view)` 要。**端口一个字不改** —— 切视图 = 重新装配
     （代码结构 规则二那句「换一套参数 = 换一个适配器」）。
 
-    两个都**可以省略**（默认没有资产端口 + 常速视图）：取帧与设备事实**不需要投影**，
-    所以 `AdbDevice(transport)` 对那两条成立；而四个动词在拿不到投影时**一条命令
-    都不发**（T5 裁定五）—— 省略它们就是「没有投影」的一种。
+    **没有"省略资产端口"这一形态**：那样它只能取帧与查设备事实，而「设备端口接上了」
+    就成了一句半真话（与代码结构 §尚未落地 那条「留空 = 方法不存在」同一个道理）。
+    投影拿不到时（`EmptyAssetPort` 上根本没有 `projection`）四个动词**一条命令都不发**
+    —— 但那是**报错**，不是"少接了一样"（T5 裁定五）。
 
     **replay 适配器对四个动作方法都只记一笔、不点**（契约层 §5）。
     """
 
-    def __init__(
-        self,
-        transport: AdbTransport,
-        assets: AssetPort | None = None,
-        view: View = View.NORMAL,
-    ) -> None:
+    def __init__(self, transport: AdbTransport, assets: AssetPort, view: View) -> None:
+        """三样都要给全：传输 · 资产端口 · **此刻的视图**（设备层 §5 · T5 定）。
+
+        **一个"没接资产端口"的适配器不许存在**：那让「设备端口接上了」变成一句
+        半真话 —— 它其实只能取帧与查设备事实，四个动词一条都发不出去（与代码结构
+        §尚未落地 那条「留空 = 方法不存在」同一个道理）。
+        """
         if not isinstance(view, View):
             raise TypeError(f"此刻的视图要是 View，收到 {type(view).__name__}")
         self._transport = transport
@@ -510,20 +530,14 @@ class AdbDevice:
     def _projection(self) -> Projection:
         """此刻这一套投影。**拿不到就抛** —— 调用方一条命令都别发（T5 裁定五）。
 
-        三条"拿不到"，**报出来的是同一件事**：投影还没标定，所以像素算不出来。
+        两条"拿不到"，**报出来的是同一件事**：投影还没标定，所以像素算不出来。
 
-        ① **没接资产端口**（`assets` 是空的 —— 取帧与设备事实不需要它，所以那两条
-        命令允许单参数构造）；② 接了，但**那个实现上根本没有这个方法**（`EmptyAssetPort`
-        就是这一支：T5 裁定四说「留空 = 方法不存在」）；③ 方法在、调用时抛。
+        ① **那个实现上根本没有这个方法**（`EmptyAssetPort` 就是这一支：T5 裁定四说
+        「留空 = 方法不存在」）；② 方法在、调用时抛。
 
-        **② 不许落成一句光秃秃的 `AttributeError`** —— 那读起来像 bug，而它其实是
+        **① 不许落成一句光秃秃的 `AttributeError`** —— 那读起来像 bug，而它其实是
         「投影还没标定」。所以在这里转成一句带话的报错。
         """
-        if self._assets is None:
-            raise RuntimeError(
-                "投影还没有来源：这条设备适配器没有接资产端口（取帧与设备事实不需要它，"
-                "所以允许单参数构造）。像素算不出来，**一条命令都不发**"
-            )
         make = getattr(self._assets, "projection", None)
         if not callable(make):
             raise RuntimeError(
@@ -545,19 +559,15 @@ class AdbDevice:
 
     @staticmethod
     def _card_center(card: int) -> Pixel:
-        """备战席第 `card` 张卡的**中心**（UiLayout 的卡框）。
+        """备战席第 `card` 张卡的**中心**（UiLayout 那个最右卡框 + 设备层的卡距）。
 
-        表里没有那一张就**报错，不猜**：那张表是就着 T5 段 0 那一帧（5 张卡）量的，
-        而**卡距随卡数变**（见设备层 §6 与 T5 报告的规格洞）。
+        **下标 0 = 最右那张**（T5 定）：卡行右对齐，所以锚点是常量。位移由
+        `squad_card_rect` 算 —— **下标 → 矩形只有那一份实现**，视觉层读卡走的也是它。
+
+        超出量过的档位就**报错，不猜**（`SQUAD_CARD_SLOTS`）：卡距只在 5 张卡那一档
+        量过，别的卡数下算出来的卡框没有来源。
         """
-        if isinstance(card, bool) or not isinstance(card, int):
-            raise TypeError(f"卡下标是整数，收到 {type(card).__name__}")
-        rect = UI_LAYOUT.rects.get(f"squad_card_{card}")
-        if rect is None:
-            raise IndexError(
-                f"备战席卡框表里没有第 {card} 张卡：那张表是就着 T5 段 0 那一帧"
-                "（5 张卡）量的，只有 0..4；别的卡数下卡距不一样"
-            )
+        rect = squad_card_rect(card, SQUAD_CARD_PITCH, SQUAD_CARD_SLOTS)
         return Pixel(rect.x + rect.width / 2, rect.y + rect.height / 2)
 
     def _two_taps(self, at: GridCoord, button_at: GridCoord) -> None:

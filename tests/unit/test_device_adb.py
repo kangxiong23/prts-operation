@@ -23,6 +23,8 @@ from ark.engine.device.adb import (
     PANEL_SKILL_AT,
     PANEL_WAIT_MS,
     R_GRID,
+    SQUAD_CARD_PITCH,
+    SQUAD_CARD_SLOTS,
     SWIPE_DURATION_MS,
     AdbDevice,
     AdbTimeout,
@@ -89,6 +91,14 @@ class Recorder:
     @property
     def flat(self) -> list[str]:
         return [arg for argv, _ in self.calls for arg in argv]
+
+
+class NoAssets:
+    """假的资产端口：**什么都不给**。
+
+    取帧与设备事实**不需要投影**，所以那两条用得上它；四个动词撞上它就是
+    「投影还没有来源」那一支（`AssetsWithoutProjection` 是同一件事的另一种写法）。
+    """
 
 
 # ---------------------------------------------------------------------------
@@ -222,7 +232,7 @@ def test_grab_frame_goes_through_one_shell_and_one_pull(work_dir):
     frame = bytes(range(64))
     recorder = Recorder(frame=frame, write_local=True)
     transport = AdbTransport(run=recorder, serial="SERIAL-X", work_dir=work_dir)
-    raw = AdbDevice(transport).grab_frame()
+    raw = AdbDevice(transport, NoAssets(), View.NORMAL).grab_frame()
     assert raw == frame
     remote = f"{DEVICE_TMP_DIR}/{FRAME_FILE_NAME}"
     commands = [argv for argv, _ in recorder.calls]
@@ -258,7 +268,8 @@ def test_grab_frame_goes_through_one_shell_and_one_pull(work_dir):
 def test_grab_frame_never_issues_a_standalone_delete(work_dir):
     """取帧的参数表里**不许再出现单独的删除命令**（那是 ~200 ms 的两成）。"""
     recorder = Recorder(frame=b"x", write_local=True)
-    AdbDevice(AdbTransport(run=recorder, work_dir=work_dir)).grab_frame()
+    AdbDevice(AdbTransport(run=recorder, work_dir=work_dir), NoAssets(),
+              View.NORMAL).grab_frame()
     for argv, _ in recorder.calls:
         standalone = argv[0] == "shell" and argv[1] == "rm" and "screencap" not in argv
         assert not standalone
@@ -273,7 +284,7 @@ def test_grab_frame_refuses_to_hand_back_the_pull_stdout(work_dir):
     recorder = Recorder(frame=b"1 file pulled. 0 files skipped.", write_local=False)
     transport = AdbTransport(run=recorder, work_dir=work_dir)
     with pytest.raises(RuntimeError) as caught:
-        AdbDevice(transport).grab_frame()
+        AdbDevice(transport, NoAssets(), View.NORMAL).grab_frame()
     assert "stdout" in str(caught.value)
     assert not (work_dir / FRAME_FILE_NAME).exists()
 
@@ -281,7 +292,7 @@ def test_grab_frame_refuses_to_hand_back_the_pull_stdout(work_dir):
 def test_grab_frame_leaves_no_local_file_behind(work_dir):
     recorder = Recorder(frame=b"x" * 8, write_local=True)
     transport = AdbTransport(run=recorder, work_dir=work_dir)
-    AdbDevice(transport).grab_frame()
+    AdbDevice(transport, NoAssets(), View.NORMAL).grab_frame()
     assert not (work_dir / FRAME_FILE_NAME).exists()
     # 设备端那一份**不删**：它是固定槽位，靠同名覆盖（T4 定）—— 所以只有两条命令。
     assert len(recorder.calls) == 2
@@ -299,7 +310,8 @@ def test_grab_frame_clears_the_local_slot_before_taking_the_frame(work_dir):
         return b""
 
     with pytest.raises(RuntimeError):
-        AdbDevice(AdbTransport(run=spy, work_dir=work_dir)).grab_frame()
+        AdbDevice(AdbTransport(run=spy, work_dir=work_dir), NoAssets(),
+                  View.NORMAL).grab_frame()
     assert seen == [False]
 
 
@@ -308,11 +320,11 @@ def test_grab_frame_reports_timeout_instead_of_waiting_forever(work_dir):
         run=Recorder(delay_ms=80), timeout_ms=20, work_dir=work_dir
     )
     with pytest.raises(AdbTimeout):
-        AdbDevice(transport).grab_frame()
+        AdbDevice(transport, NoAssets(), View.NORMAL).grab_frame()
 
 
 def test_device_adapter_has_exactly_the_six_methods():
-    device = AdbDevice(AdbTransport(run=Recorder()))
+    device = AdbDevice(AdbTransport(run=Recorder()), NoAssets(), View.NORMAL)
     for name in ("grab_frame", "device_facts", "deploy", "retreat", "skill_on", "skill_off"):
         assert callable(getattr(device, name, None)), name
     assert not hasattr(device, "inject_gesture")
@@ -378,7 +390,7 @@ def test_parse_dumpsys_input_refuses_a_non_string():
 def test_device_facts_goes_through_one_dumpsys_and_needs_no_projection():
     """设备事实**不发手势**：所以没有投影也照样能查（T5 裁定五只约束四个动词）。"""
     recorder = Recorder(stdout=VIEWPORT_TEXT.encode())
-    device = AdbDevice(AdbTransport(run=recorder))
+    device = AdbDevice(AdbTransport(run=recorder), NoAssets(), View.NORMAL)
     facts = device.device_facts()
     assert facts.resolution == Canvas(width=2800, height=1260)
     assert facts.orientation == "1"
@@ -415,11 +427,9 @@ class FakeAssets:
         )
 
 
-def _device(recorder: Recorder, assets: object | None = None, view: View = View.NORMAL):
-    transport = AdbTransport(run=recorder)
-    if assets is None:
-        return AdbDevice(transport)
-    return AdbDevice(transport, assets, view)  # type: ignore[arg-type]
+def _device(recorder: Recorder, assets: object, view: View = View.NORMAL):
+    """三样都给全（设备层 §5 · T5 定）：**没有"省略资产端口"这一形态**。"""
+    return AdbDevice(AdbTransport(run=recorder), assets, view)  # type: ignore[arg-type]
 
 
 def _commands(recorder: Recorder) -> list[list[str]]:
@@ -432,8 +442,8 @@ def test_deploy_is_one_swipe_from_the_card_to_grid_plus_r():
     device = _device(recorder, FakeAssets())
     device.deploy(0, GridCoord(3, 4), "右")
 
-    # 卡 0（最左那张）的中心：UiLayout 那张表给 1762 + 207.5/2、1045 + 214/2。
-    start = (round(1762 + 207.5 / 2), 1045 + 214 // 2)
+    # 卡 0 = **最右那张**（T5 定）：UiLayout 那个锚点给 2592、卡高 214、上缘 1045。
+    start = (round(2592 + SQUAD_CARD_PITCH / 2), 1045 + 214 // 2)
     # 终点 = 格心 + 0.3 格向右 → 格 (3.3, 4) → 像素 (1330, 900)
     end = (round(1000 + 3.3 * 100), 500 + 4 * 100)
     assert _commands(recorder) == [
@@ -457,6 +467,33 @@ def test_deploy_endpoint_encodes_the_facing():
         _device(recorder, FakeAssets()).deploy(0, GridCoord(3, 4), facing)
         argv = _commands(recorder)[0]
         assert (int(argv[-3]), int(argv[-2])) == end, facing
+
+
+def test_card_index_counts_from_the_rightmost_card():
+    """T5 定：**下标 0 = 最右那张**，第 k 张沿卡距左移 k 步（右对齐 ⇒ 锚点是常量）。"""
+    starts = []
+    for card in range(SQUAD_CARD_SLOTS):
+        recorder = Recorder()
+        _device(recorder, FakeAssets()).deploy(card, GridCoord(3, 4), "右")
+        argv = _commands(recorder)[0]
+        starts.append((int(argv[3]), int(argv[4])))
+    # 第 0 张在最右，越往左 x 越小，每步正好一个卡距。
+    assert starts[0] == (round(2592 + SQUAD_CARD_PITCH / 2), 1045 + 214 // 2)
+    for k in range(1, SQUAD_CARD_SLOTS):
+        # 每一步正好一个卡距 —— 逐个取整，所以差可以是 207 或 208。
+        step = starts[k - 1][0] - starts[k][0]
+        assert abs(step - SQUAD_CARD_PITCH) <= 1, (k, step)
+        assert starts[k][1] == starts[0][1]
+
+
+def test_deploy_refuses_a_card_outside_the_measured_slots():
+    """超出量过的档位就报错、不猜（卡距只在 5 张卡那一档量过）。"""
+    recorder = Recorder()
+    device = _device(recorder, FakeAssets())
+    for bad in (SQUAD_CARD_SLOTS, SQUAD_CARD_SLOTS + 3, -1):
+        with pytest.raises(IndexError):
+            device.deploy(bad, GridCoord(3, 4), "右")
+    assert recorder.calls == []
 
 
 def test_deploy_refuses_an_unknown_facing_without_touching_the_device():
@@ -560,20 +597,6 @@ def test_the_four_verbs_send_nothing_when_the_method_does_not_exist():
             call()
         assert "投影还没有来源" in str(bad.value), label
         assert recorder.calls == [], label
-
-
-def test_the_four_verbs_send_nothing_when_there_is_no_asset_port():
-    recorder = Recorder()
-    device = _device(recorder)
-    for call in (
-        lambda: device.deploy(0, GridCoord(1, 1), "右"),
-        lambda: device.retreat(GridCoord(1, 1)),
-        lambda: device.skill_on(GridCoord(1, 1)),
-        lambda: device.skill_off(GridCoord(1, 1)),
-    ):
-        with pytest.raises(RuntimeError):
-            call()
-    assert recorder.calls == []
 
 
 def test_the_adapter_refuses_a_view_that_is_not_a_view():
