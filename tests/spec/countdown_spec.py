@@ -26,6 +26,7 @@
 from __future__ import annotations
 
 import importlib
+import inspect
 import json
 import struct
 import sys
@@ -317,6 +318,76 @@ def check_the_seconds_read_exactly() -> str:
     return f"{len(detail)} 个倒计时全部精确读出 ｜ " + " ".join(detail)
 
 
+def check_the_bold_table_lives_where_the_spec_says() -> str:
+    """那套粗体字形表住在规格钉的那个目录里，而且**加载得出十个数字**。
+
+    出处是[视觉层/识别方法] §已定（"那套粗体字形住在哪、读数链怎么拿到它"）：
+    它与费用那套**并列**住在 `assets/features/glyphs_countdown/`，**同一个表文件名**。
+
+    **这一条不看读数，只看资产在不在、认不认得。** 读得出读不出归 D7 —— 两件事分开报，
+    红了才知道是"资产没做"还是"做出来了但认不出"。
+    """
+    glyphs = _mod("ark.engine.vision.glyphs")
+    path = getattr(glyphs, "COUNTDOWN_GLYPHS_PATH", None)
+    assert path is not None, (
+        "`vision/glyphs.py` 里没有 `COUNTDOWN_GLYPHS_PATH` —— 那是那套粗体字形的默认落点"
+        "（见[视觉层/识别方法] §已定）。没有它，读数链**拿不到**那套表"
+    )
+    path = Path(path)
+    assert path.parent.name == "glyphs_countdown", (
+        f"那套表落在 {path.parent}；规格钉的是 `assets/features/glyphs_countdown/`"
+    )
+    assert path.is_file(), f"{path} 不在 —— 资产没进版本库"
+    table = glyphs.GlyphTable.load(path)
+    missing = sorted(set(range(10)) - set(table.digits))
+    assert not missing, f"{path} 里缺这几个数字的字形：{missing}"
+    return f"{path.name} ｜ 十个数字都在 ｜ {len(table.templates)} 张模板"
+
+
+def check_a_missing_bold_table_is_not_a_missing_countdown() -> str:
+    """把字形表指到一个**不存在的地方**，读数链必须**响亮报错** —— 不许静默落成"未采样"。
+
+    出处是[视觉层/识别方法] §已定："表没建好"与"这张卡没有倒计时"**不许看起来一样** ——
+    前者是**能力缺失**，要报出来，不是降级成一个"没有"。
+
+    **为什么这条要紧**：静默降级吐出来的是一个**假缺席** —— 拿这个读数的那一层会以为
+    "这张卡没有倒计时"，而链一声不吭。这是"零假事实"的另一面：**假的有**和**假的没有**
+    一样坏。
+
+    做法：`read_squad_row` 上那个可选的关键字参数（默认就是 D8 那个常量）**换成一条
+    不存在的路径**，然后要求它抛错。**报什么错不管**，只要不是"照样返回了一行读数"。
+    """
+    glyphs = _mod("ark.engine.vision.glyphs")
+    bench = _mod("ark.engine.vision.bench")
+    params = inspect.signature(bench.read_squad_row).parameters
+    assert "countdown_path" in params, (
+        "`read_squad_row` 上没有 `countdown_path` 这个可选的关键字参数 —— "
+        "那么「缺表」这件事**验不出来**（它现在收 "
+        f"{sorted(p for p in params if not p.startswith('_'))}）"
+    )
+    bogus = BATCH / "没有这一张表.npz"
+    assert not bogus.exists(), f"{bogus} 居然存在，这一条就没法验了"
+    frame = _mod("ark.engine.vision.frame").frame_from_raw(_raw("cd30"))
+    pitch = _mod("ark.engine.device.adb").SQUAD_CARD_PITCH
+    table = glyphs.GlyphTable.load(GLYPH_DIR)
+    try:
+        row = bench.read_squad_row(
+            frame, table, pitch=pitch, countdown_path=bogus
+        )
+    except AssertionError:
+        raise
+    except BaseException as bad:  # noqa: BLE001 —— 报什么错不管，报了就算过
+        return f"表指到不存在的 {bogus.name} 时，链抛了 {type(bad).__name__}"
+    said = [
+        repr(c.seconds) for c in row if c.redeploying is True
+    ]
+    raise AssertionError(
+        f"表指到不存在的 {bogus.name}，链却照样返回了 {len(row)} 张卡 —— "
+        f"再部署中的那些秒数落成 {said}。那是**假缺席**：下游会以为"
+        '"这张卡没有倒计时"，而链一声不吭'
+    )
+
+
 CHECKS: tuple[Check, ...] = (
     Check("D1", "采集与验收/基准集 §2（字段表）",
           "清单里的必填字段一样不少地读出来，没记的前提头不许补",
@@ -339,6 +410,12 @@ CHECKS: tuple[Check, ...] = (
     Check("D7", "状态层/我方干员（精确 / 未知 / 未采样）+ 视觉层/备战席 §尚未定",
           "中央那串数字逐位读出、精确等于真值 —— 现在是欠账，不是假事实",
           check_the_seconds_read_exactly),
+    Check("D8", "视觉层/识别方法 §已定（那套粗体字形住在哪）",
+          "粗体字形表住规格钉的那个目录里，而且加载得出十个数字",
+          check_the_bold_table_lives_where_the_spec_says),
+    Check("D9", "视觉层/识别方法 §已定（表没建好 ≠ 这张卡没有倒计时）",
+          "把表指到不存在的地方时必须响亮报错，不许静默落成一个「没有」",
+          check_a_missing_bold_table_is_not_a_missing_countdown),
 )
 
 
