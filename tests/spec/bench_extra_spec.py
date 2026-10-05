@@ -2,16 +2,18 @@
 
 ## 为什么单独一份，而不是并进 `bench_spec.py`
 
-`bench_spec.py` 的哈希已经写进了 T6 的派工单（[D-全局-18]）。改它 = 改那份哈希 =
-让执行者手里的对齐基准当场失效。所以这一份**另起一个文件**，`bench_spec.py` 一个字
-不动。
+`bench_spec.py` 问的是"**规格说的那些话成立吗**"；这一份问的是"**它是不是只对那
+唯一一批样本成立**"。两张网问的不是同一件事，所以分成两份——分开，这个区别就
+一直看得见。
+
+（历史：它当初另起一个文件，是因为 `bench_spec.py` 的哈希钉在 T6 的派工单里，
+改它就等于让执行者手里的对齐基准当场失效。**D-全局-22 之后哈希改盖「先读」那一
+列**，那条理由没有了，但分开的理由还在。）
 
 **它故意没有 pytest 外壳**（没有 `test_bench_extra_spec.py`），所以
-`pytest -q` **不收集它** —— 执行者被要求跑的那条命令仍然数到同样的条数。它的跑法只有一条：
+`pytest -q` **不收集它**——执行者跑自己的单元测试时不会连带跑它。跑法只有一条：
 
     python tests/spec/bench_extra_spec.py
-
-**下一轮它并回 `bench_spec.py`**（那时候哈希本来就要换）。
 
 ## 它补的是什么
 
@@ -571,6 +573,88 @@ def check_a_broken_manifest_is_refused_not_patched() -> str:
     return f"{len(cases)} 种坏清单全部被拒；同格式的好清单仍然读得出来"
 
 
+def check_the_loader_folds_the_recorded_facts() -> str:
+    """清单里那个映射**由加载器折成 `DeviceFacts`**，不许原样透给设备层。
+
+    出处是[基准集] §2 那段"前提头在清单里只记画布装不下的那一项"：清单的 `canvas`
+    就是录制时的分辨率，所以 `facts` 里只剩 `orientation`，而 `BenchBatch.facts`
+    的类型是 **`DeviceFacts | None`**。
+
+    这条与 X13 是一对：**折这件事只能发生在加载器里**。原样透出去，设备层就得去认
+    "清单里那个键叫 `orientation`"——那是把离线那套文件格式塞进引擎
+    （[代码结构] 规则三：引擎对外只认自己的语义）。费用那一批**没有 `facts`**，
+    所以它在 B1 上两条路都返回 `None`，看不出差别 —— 只有造一批带前提头的才分得开。
+    """
+    from ark.contracts import DeviceFacts
+
+    batch_mod = _batch_mod()
+    with _writable_tmp() as tmp:
+        root = _write_batch(
+            tmp / "带前提头",
+            [("a", (1, 1), (3, 2), 50)],
+            canvas=(64, 48),
+            facts={"orientation": "3"},
+        )
+        batch = batch_mod.load_batch(root)
+    got = batch.facts
+    assert isinstance(got, DeviceFacts), (
+        f"BenchBatch.facts 是 {type(got).__name__}，该是 DeviceFacts"
+        "——把清单里那个映射原样透出去，设备层就得去认离线的键名"
+    )
+    assert (got.resolution.width, got.resolution.height) == (64, 48), (
+        f"前提头的分辨率是 {got.resolution}，该取清单的 canvas 64×48"
+    )
+    assert got.orientation == "3", f"前提头的方向是 {got.orientation!r}，该是 '3'"
+    return f"清单里的 facts 折成了 {got!r}"
+
+
+def check_the_device_layer_does_not_read_the_manifest_shape() -> str:
+    """重放适配器**不认清单那套键名**，也**不在构造时预读帧源**。
+
+    出处是[设备层] §5 那段（前提头的类型是 `DeviceFacts` 或 `None` · "它一个像素
+    都不算、也不解帧头"）与[代码结构] 规则三。两半：
+
+    - 传一个**清单形状的映射**进去，不许悄悄把它当前提头用 —— 认键名是加载器的事；
+    - 构造的时候**不许去帧源里取一帧**。预读一帧就是把那个"一个像素都不算"破了：
+      帧源在段三是一条惰性的流（录下来的整局），谁在构造时就动它，谁就把"取像"
+      提前到了装配那一刻（[设备层] §5：只有"取一帧"，没有常驻取像）。
+    """
+    from ark.contracts import Canvas, DeviceFacts
+
+    replay = _replay_mod()
+    raw = _raw_blank(64, 48, 9)
+
+    raised = False
+    try:
+        loose = replay.ReplayDevice([raw], facts={"orientation": "3"})
+    except Exception:  # noqa: BLE001 —— 报错就是那条出路，类型不查
+        raised = True
+    if not raised:
+        try:
+            answered = loose.device_facts()
+        except Exception:  # noqa: BLE001 —— 报错也算没认它
+            answered = None
+        assert answered is None, (
+            f"把清单形状的映射（{{'orientation': '3'}}）传进去，它答出了 {answered!r}："
+            "设备层不许认离线那套键名"
+        )
+
+    pulled: list[int] = []
+
+    def source():
+        pulled.append(1)
+        yield raw
+
+    facts = DeviceFacts(resolution=Canvas(width=64, height=48), orientation="1")
+    device = replay.ReplayDevice(source(), facts=facts)
+    assert not pulled, (
+        "构造重放适配器的时候就去帧源里取了一帧：帧源是惰性的，"
+        "第一帧该由第一次 grab_frame() 取（设备层 §5）"
+    )
+    assert device.grab_frame() == raw, "第一次取帧没拿到帧源里的那一帧"
+    return "清单形状的映射不被认；构造时不预读帧源，第一帧由第一次取帧给"
+
+
 CHECKS: tuple[Check, ...] = (
     Check("X1", "采集与验收/基准集 §3（裁剪要贴回画布）+ §2（帧名 = 文件名去扩展名）",
           "31 条裁剪全量逐像素贴回，不是抽几条",
@@ -605,6 +689,12 @@ CHECKS: tuple[Check, ...] = (
     Check("X11", "采集与验收/基准集 §2（必填 · 必须落在画布内 · 批内唯一 · 不许补默认值）",
           "坏清单在加载时就拒绝，不许就地修补",
           check_a_broken_manifest_is_refused_not_patched),
+    Check("X12", "采集与验收/基准集 §2（前提头在清单里只记画布装不下的那一项）",
+          "清单里的 facts 由加载器折成 DeviceFacts",
+          check_the_loader_folds_the_recorded_facts),
+    Check("X13", "设备层 §5（前提头是 DeviceFacts 或 None · 一个像素都不算）",
+          "设备层不认清单那套键名，构造时也不预读帧源",
+          check_the_device_layer_does_not_read_the_manifest_shape),
 )
 
 

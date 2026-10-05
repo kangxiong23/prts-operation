@@ -18,7 +18,16 @@ from contracts_spec import CHECKS, Check
 @pytest.mark.parametrize("check", CHECKS, ids=[c.ident for c in CHECKS])
 def test_spec_check(check: Check) -> None:
     """每条规格检查各一条用例：失败时能一眼看出是哪条、出处在哪。"""
+    # **别在 `except` 里 raise**：那样 pytest 会把探针的源码行打进
+    # "During handling of the above exception" 那一段 —— 那是 `tests/spec/`
+    # 的一条侧信道，D-全局-17 那句"不许读"挡不住它（D-全局-22 注意②）。
+    # 所以先把证据收进变量，出了 `except` 再报。
+    evidence: str | None = None
     try:
         check.probe()
     except AssertionError as bad:
-        pytest.fail(f"{check.claim} ｜ 出处 {check.spec} ｜ 证据 {bad}")
+        evidence = str(bad)
+    except BaseException as broken:  # noqa: BLE001 —— 探针自己炸了也要报清楚
+        evidence = f"{type(broken).__name__}: {broken}"
+    if evidence is not None:
+        pytest.fail(f"{check.claim} ｜ 出处 {check.spec} ｜ 证据 {evidence}")
