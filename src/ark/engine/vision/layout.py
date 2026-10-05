@@ -1,6 +1,10 @@
 """视觉层的 UI 常量：8 个具名矩形。
 
-值**逐字抄**《视觉层/顶部HUD与数字》§区域与常量 那张表，一个数没改。
+值**逐字抄**规格那两张表，一个数没改：`cost_*` / `deploy_limit_row` /
+`pause_button` 抄《视觉层/顶部HUD与数字》§区域与常量；`enemy_count` /
+`life_digits` 抄《视觉层/顶部两个数》§两个窗口（T7 复量之后从那两份里拆开的，
+原来那两行是**比例换算**来的，实测把它们推翻了）。
+
 表里写的是 `(x0, y0, x1, y1)`、**含两端**；契约层 §2 的 `PixelRect` 要的是
 `x / y / 宽 / 高`，所以这里做一次换算：`宽 = x1 - x0 + 1`、`高 = y1 - y0 + 1`。
 
@@ -32,11 +36,11 @@ DOCUMENTED_WINDOWS: dict[str, tuple[int, int, int, int]] = {
     "cost_digits": (2666, 868, 2776, 936),
     "cost_bar": (2589, 945, 2741, 954),
     "deploy_limit_row": (2462, 968, 2755, 998),
-    "enemy_count": (1200, 29, 1372, 76),
-    "life_digits": (1585, 29, 1623, 76),
+    "enemy_count": (1200, 33, 1385, 72),
+    "life_digits": (1574, 33, 1643, 72),
     "pause_button": (2594, 54, 2710, 130),
 }
-"""文档 §区域与常量 那张表，去掉不是矩形的 `squad_row` 之后剩下的 8 行。"""
+"""上面那两张表，去掉不是矩形的 `squad_row` 之后剩下的 8 行。"""
 
 RECT_NAMES: tuple[str, ...] = tuple(DOCUMENTED_WINDOWS)
 """8 个具名矩形，顺序就是文档表里的顺序。"""

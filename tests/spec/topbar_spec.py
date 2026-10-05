@@ -79,7 +79,7 @@ TRUTH: Mapping[str, tuple[int, int, int]] = {
     "shot30": (15, 22, 1), "shot31": (17, 22, 1), "shot32": (17, 22, 1),
     "shot33": (19, 22, 1), "shot34": (20, 22, 1), "shot35": (20, 22, 1),
     "shot36": (21, 22, 1), "shot37": (22, 22, 1),
-    "m2_view": (40, 41, 3), "m2x_pview": (0, 41, 3), "raw_a": (21, 41, 3), "raw_b": (25, 41, 3),
+    "m2_view": (40, 41, 3), "m2x_pview": (40, 41, 3), "raw_a": (21, 41, 3), "raw_b": (25, 41, 3),
 }
 
 # ---------------------------------------------------------------------------
@@ -101,6 +101,13 @@ DOC_WINDOWS: Mapping[str, tuple[int, int, int, int]] = {
     "enemy_count": (1200, 33, 1385, 72),
     "life_digits": (1574, 33, 1643, 72),
 }
+
+PINNED: Mapping[str, int] = {
+    "MAX_ENEMY_DIGITS": 3,
+    "MAX_LIFE_DIGITS": 2,
+    "LIFE_INK_THRESHOLD": 150,
+}
+"""文档钉住的那三个数（位数上限两个 + 生命那条墨线）。三处缝的线**不钉**。"""
 
 # 一处实测的墨迹坐标，用来造"挡住某一位"的合成帧（原生绝对像素，含两端）
 SEP_SHOT01 = (1287, 38, 1303, 67)
@@ -185,6 +192,29 @@ def _window(name: str) -> tuple[int, int, int, int]:
     "实现把窗口挪到哪、我就跟着挪到哪"——那样 T1 之外谁也抓不住窗口挪错。
     """
     return DOC_WINDOWS[name]
+
+
+GLYPH_BOXES: Mapping[str, tuple[str, int, int, int, int]] = {
+    "1": ("shot26", 1240, 34, 1254, 72),
+    "3": ("shot05", 1259, 34, 1282, 72),
+}
+"""能从既有帧里整块搬的真字形（框比紧外框宽一圈，对齐时按墨收回来）。"""
+
+
+def _paste_glyph(ch: str, left: int, top: int) -> tuple:
+    """把一个真字形**整块**搬到 `(left, top)`（对齐的是它的**墨**，不是整块）。
+
+    **整块原样搬，不按阈值裁墨**：裁墨会把抗锯齿那一圈切掉、把字搬瘦 ——
+    实测那样搬过来的 `0` 对字形表只得到 0.914（原帧上同一个字形 0.947），
+    离 `SOLID_MATCH_SCORE = 0.90` 只剩 0.014。摆位置时按墨的紧外框对齐，
+    所以多带一圈背景不影响它落在哪。
+    """
+    frame_name, x0, y0, x1, y1 = GLYPH_BOXES[ch]
+    block = _canvas(frame_name)[y0 : y1 + 1, x0 : x1 + 1].copy()
+    ys, xs = np.nonzero(block.min(axis=2) >= 128)
+    assert len(xs) > 0, f"字形 {ch!r} 的框 {GLYPH_BOXES[ch]} 里没有墨"
+    px, py = left - int(xs.min()), top - int(ys.min())
+    return _patch(px, py, px + block.shape[1] - 1, py + block.shape[0] - 1, block)
 
 
 def _raw(name: str, *patches: tuple) -> bytes:
@@ -420,12 +450,43 @@ def check_blank_life_window_is_unsampled() -> str:
     return "生命窗口整块涂黑 → 未采样"
 
 
-def check_unreadable_life_glyph_is_an_interval() -> str:
-    """生命那一位**有笔画但对不上任何字形** → 区间，不是未知、更不是挑一个。
+def check_unreadable_digit_with_known_count_is_an_interval() -> str:
+    """**位数已经数对、只是某一位认不出** → 区间，不是未知、更不是挑一个。
 
     出处：《识别方法》§已定（"对不上任何字形"要分两种情形）+《视觉层/顶部两个数》
-    §降级第二条。用的墨是**这个 HUD 上真实的那个分隔符**（实测对最像的数字只得
-    0.63–0.78，远在 0.90 之下）—— 它是货真价实的"有东西、认不出"。
+    §降级第二条。生命窗口里放**两块**：左边是真实的 `1`，右边是一块实心块（实测
+    对最像的数字只得 0.54）。位数是 2，所以那一位的候选是全部十个数字 → `[10,19]`。
+    """
+    ui = _ui()
+    solid = np.full((LIFE_UNION[3] - LIFE_UNION[1] + 1, 19, 3), 255, np.uint8)
+    frame = _patched(
+        "shot26",
+        _blank(*_window("life_digits")),
+        _paste_glyph("1", 1589, LIFE_UNION[1]),
+        _patch(1604, LIFE_UNION[1], 1622, LIFE_UNION[3], solid),
+    )
+    got = _topbar().read_life_digits(frame, _glyphs(), ui=ui)
+    contracts = _mod("ark.contracts")
+    assert isinstance(got, contracts.Valued), f"该是有值，读成 {_slot_value(got)}"
+    assert isinstance(got.payload, contracts.Interval), (
+        f"位数已定、某一位认不出该落成区间，读成 {_slot_value(got)}"
+    )
+    assert (got.payload.lo, got.payload.hi) == (10, 19), (
+        f"`1` 后面那一位候选全十个数字 → [10,19]，读成 {_slot_value(got)}"
+    )
+    return "两块、其中一块认不出 → 区间 [10,19]"
+
+
+def check_single_unreadable_block_does_not_claim_a_digit_count() -> str:
+    """**只有一块、而这一块认不出** → 不许给出一个"位数确定"的区间。
+
+    出处：《视觉层/顶部两个数》§降级第四条（T7 补）。区间那条规则的前提是"位数
+    已经数对了"；只有一块且认不出时，**位数本身就没定下来**（可能是一位认不出的
+    数字，也可能是两位被桥接成一块）。用这个 HUD 上真实的那个分隔符当"认不出的
+    墨"（实测对最像的数字只得 0.63–0.78）。
+
+    落法可以是**未知**，也可以是一个**不排除任何合法位数**的区间 —— 判据是
+    "不许把一个位数确定的区间当成读数"。
     """
     ui = _ui()
     src = _canvas("shot01")
@@ -443,13 +504,17 @@ def check_unreadable_life_glyph_is_an_interval() -> str:
     got = _topbar().read_life_digits(frame, _glyphs(), ui=ui)
     contracts = _mod("ark.contracts")
     assert isinstance(got, contracts.Valued), f"该是有值，读成 {_slot_value(got)}"
-    assert isinstance(got.payload, contracts.Interval), (
-        f"对不上任何字形该落成区间（候选是全部十个数字），读成 {_slot_value(got)}"
+    payload = got.payload
+    if isinstance(payload, contracts.Unknown):
+        return "只有一块且认不出 → 未知"
+    assert isinstance(payload, contracts.Interval), (
+        f"该落成未知或一个不排除任何位数的区间，读成 {_slot_value(got)}"
     )
-    assert (got.payload.lo, got.payload.hi) == (0, 9), (
-        f"一位的候选是 0–9，区间该是 [0,9]，读成 {_slot_value(got)}"
+    assert payload.lo <= 0 and payload.hi >= 99, (
+        f"只有一块且认不出时，位数没定下来，区间不许窄到排除合法值（生命 1–2 位），"
+        f"读成 {_slot_value(got)}"
     )
-    return "一位对不上任何字形 → 区间 [0,9]"
+    return f"只有一块且认不出 → {_slot_value(got)}"
 
 
 def check_missing_life_digit_does_not_shrink_the_number() -> str:
@@ -539,6 +604,24 @@ def check_the_two_readers_do_not_look_at_each_other() -> str:
     return "抹掉任一边，另一边的读数一字不变"
 
 
+def check_pinned_constants_match_the_doc() -> str:
+    """规格钉住的三个数，代码里必须相等。
+
+    出处：《视觉层/顶部两个数》§每个区域必须知道的事实（"这几个数住在代码里，
+    规格这边把它们钉住"）。**同一个数不许只在文档写一遍、代码写一遍而没人比对**
+    —— 改一处忘一处就是静默漂移，`check_docs.py` 抓不到（它只看状态行 / 链接 /
+    废词）。**三处缝那几条线不在表里**：它们是实现挑的，规格钉的是观测到的空档。
+    """
+    topbar = _topbar()
+    bad = []
+    for name, want in PINNED.items():
+        got = getattr(topbar, name, None)
+        if got != want:
+            bad.append(f"{name} 该是 {want}，收到 {got!r}")
+    assert not bad, "；".join(bad)
+    return f"钉住的 {len(PINNED)} 个数与文档一致：{dict(PINNED)}"
+
+
 def check_cost_chain_did_not_move() -> str:
     """改墨迹口径**不许把费用那条链挪走**。
 
@@ -576,12 +659,14 @@ CHECKS: list[Check] = [
     Check("T4", "《视觉层/顶部两个数》§每个区域必须知道的事实", "35 帧生命全部读成精确值", check_life_reads_on_every_frame),
     Check("T5", "《视觉层/顶部两个数》§每个区域必须知道的事实", "35 帧敌数全部读成两个精确值", check_enemy_reads_on_every_frame),
     Check("T6", "《视觉层/顶部两个数》§降级", "生命整块涂黑 → 未采样", check_blank_life_window_is_unsampled),
-    Check("T7", "《识别方法》§已定", "一位对不上任何字形 → 区间", check_unreadable_life_glyph_is_an_interval),
+    Check("T7", "《识别方法》§已定", "位数已定、某一位认不出 → 区间", check_unreadable_digit_with_known_count_is_an_interval),
     Check("T8", "《视觉层/顶部两个数》§降级", "只剩一块且偏左 → 区间 [10,19]", check_missing_life_digit_does_not_shrink_the_number),
     Check("T9", "《视觉层/顶部两个数》§每个区域必须知道的事实", "分隔符认不出 → 两个数都未知", check_missing_separator_makes_both_numbers_unknown),
     Check("T10", "《视觉层/顶部两个数》§每个区域必须知道的事实", "挡住一位只让那一边降级", check_one_blocked_digit_only_degrades_its_own_side),
     Check("T11", "《视觉层/顶部两个数》§两个窗口", "两条读数各看各的窗口", check_the_two_readers_do_not_look_at_each_other),
     Check("T12", "《视觉层/顶部两个数》§每个区域必须知道的事实 · D-全局-24", "费用那条链没被挪走", check_cost_chain_did_not_move),
+    Check("T13", "《视觉层/顶部两个数》§降级", "只有一块且认不出 → 不许报出位数确定的区间", check_single_unreadable_block_does_not_claim_a_digit_count),
+    Check("T14", "《视觉层/顶部两个数》§每个区域必须知道的事实", "钉住的三个数与文档相等", check_pinned_constants_match_the_doc),
 ]
 
 

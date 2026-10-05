@@ -37,6 +37,9 @@ __all__ = [
     "TEMPLATE_HEIGHT",
     "TEMPLATE_WIDTH",
     "INK_THRESHOLD",
+    "INK_MIN",
+    "INK_MAX",
+    "INK_TAKES",
     "SHIFT_SEARCH",
     "GLYPH_TABLE_FORMAT",
     "TABLE_FILENAME",
@@ -56,6 +59,28 @@ INK_THRESHOLD: Final[int] = 128
 **建表与读表用的是同一个值**：两边不一致，切出来的框就会差一列。
 """
 
+INK_MIN: Final[str] = "min"
+"""按通道取墨：逐像素取**最小的那个通道**（`min(R,G,B)`）。
+
+白字（三通道都亮）用这一条 —— 「有多白」就是最小值。**它是默认口径**：
+`ink_of` / `glyph_boxes` 不传 `take` 时走的就是它，与今天逐位一致。
+"""
+
+INK_MAX: Final[str] = "max"
+"""按通道取墨：逐像素取**最大的那个通道**（`max(R,G,B)`）。
+
+给**低对比的彩色笔画**用：蓝门血量那个纯粉是 `(255,120,120)`，它的
+`min(R,G,B)` 只有 120，用 `INK_MIN` 在原生 35 帧上**一块字形都切不出来**，
+而 `max` 是 255。
+
+**这一条不改默认路径**：取墨口径是读数链自己的事（D-全局-24），把共用的
+那一个改掉的代价落在费用上 —— 费用面板的轨道灰是 117–189，把线降下来就会
+把它数成笔画。
+"""
+
+INK_TAKES: Final[tuple[str, ...]] = (INK_MIN, INK_MAX)
+"""两个取墨口径。别的值一律报错 —— 没见过的口径按哪一个解都是假事实。"""
+
 SHIFT_SEARCH: Final[int] = 2
 """比对时允许的水平平移（±px）。字形是按紧外框居中的，两次读数最多差 1–2 px。"""
 
@@ -74,21 +99,42 @@ DEFAULT_GLYPHS_PATH: Final[Path] = (
 # ---------------------------------------------------------------------------
 
 
-def ink_of(rgb: np.ndarray) -> np.ndarray:
-    """墨迹：`min(R,G,B)`，逐像素。
+def ink_of(rgb: np.ndarray, *, take: str = INK_MIN) -> np.ndarray:
+    """墨迹：逐像素取一个通道统计量，返回 `(高, 宽)` 的 uint8。
 
-    白字的三通道都亮，所以取**最小值**就是「有多白」；取最大值或均值会让
-    带色偏的像素（例如半透明的粉）显得比实际亮。返回 `(高, 宽)` 的 uint8。
+    `take=INK_MIN`（**默认**）取 `min(R,G,B)`：白字的三通道都亮，所以最小值
+    就是「有多白」；取最大值或均值会让带色偏的像素（例如半透明的粉）显得比
+    实际亮。
+
+    `take=INK_MAX` 取 `max(R,G,B)`：给**低对比的彩色笔画**用 —— 粉字的
+    `min` 只有 120，而 `max` 是 255（D-全局-24）。
+
+    **口径是调用方的事**：这一层只负责「按哪个通道统计」，线画在哪由
+    `glyph_boxes` 的 `threshold` 给。
     """
     if not isinstance(rgb, np.ndarray) or rgb.ndim != 3 or rgb.shape[2] < 3:
         raise TypeError(
             f"墨迹要从 (高, 宽, ≥3) 的像素里取，收到 {getattr(rgb, 'shape', rgb)}"
         )
-    return rgb[:, :, :3].min(axis=2)
+    channels = rgb[:, :, :3]
+    if take == INK_MIN:
+        return channels.min(axis=2)
+    if take == INK_MAX:
+        return channels.max(axis=2)
+    raise ValueError(f"取墨口径只有 {INK_TAKES}，收到 {take!r}")
 
 
-def glyph_boxes(rgb: np.ndarray) -> list[tuple[int, int, int, int]]:
+def glyph_boxes(
+    rgb: np.ndarray,
+    *,
+    take: str = INK_MIN,
+    threshold: int = INK_THRESHOLD,
+) -> list[tuple[int, int, int, int]]:
     """把 ROI 的笔画切成一块一块，返回 `(x0, y0, x1, y1)`，**右/下开**。
+
+    `take` 与 `threshold` 是**取墨口径**（见 `ink_of`）。默认就是今天那条路
+    （`INK_MIN` + `INK_THRESHOLD`，费用那条链走的就是它）；读数链要按自己的
+    通道取墨时显式传 —— 例如蓝门血量走 `INK_MAX` + 150。
 
     判据是「这一列有没有笔画」：有笔画的列连成一段就是一块。数字是横向排的，
     块与块之间必然有空白列（实测 9–12 px），所以不需要更聪明的分割 ——
@@ -97,8 +143,10 @@ def glyph_boxes(rgb: np.ndarray) -> list[tuple[int, int, int, int]]:
 
     返回的框是**紧外框**（那一块里笔画真正占到的行与列），不是整块 ROI。
     """
-    ink = ink_of(rgb)
-    mask = ink >= INK_THRESHOLD
+    if isinstance(threshold, bool) or not isinstance(threshold, int):
+        raise TypeError(f"墨线要是整数，收到 {type(threshold).__name__}")
+    ink = ink_of(rgb, take=take)
+    mask = ink >= threshold
     columns = mask.any(axis=0)
     boxes: list[tuple[int, int, int, int]] = []
     width = int(columns.shape[0])
