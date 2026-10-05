@@ -7,9 +7,9 @@
 | --- | --- | --- |
 | 卡位 | 卡上「职业标识牌 → 费用暗盒」那道黑↔白跳变（= 卡的水平正中心） | 一个中心 x |
 | 每张卡的费用 | 卡中心右边那个暗盒里的数字（1–2 位） | 精确 / 未知 / 未采样 |
-| 是否再部署中 | 卡片正中那个圆环的白色弧有多长 | 是 / 否 / 判不了 |
+| 是否再部署中 | 卡片正中**那一圈环在不在**（环带最暗的那一度还是亮的） | 是 / 否 / 判不了 |
 | 再部署剩余秒数 | 圆环中央那个数字（一位小数） | 精确 / 未知 / 未采样 |
-| 环形进度 | 同一圈上白色弧占整圈的比例 | 0…1，或判不了 |
+| 环形进度 | 同一圈上白色弧占整圈的比例 = **已过比例** | 0…1，或判不了 |
 
 **身份不归这一层**（《备战席》§点名）：这一栏的顺序是**进场时的顺序** —— 进场那一刻
 从右往左按费用降序，之后**相对位置不动**，费用再怎么变卡也不换位（《备战席》§卡片怎么排）。
@@ -32,17 +32,22 @@
 —— 「左边一大块亮、右边一大块暗」，不是「哪条边最陡」：卡面上别处也有黑白边
 （费用牌自己的边、职业图标自己的边、卡与卡之间那道缝），只认「最陡的那一条」会认错。
 所以每一格**先用网格定出该往哪儿看，再问像素那儿有没有那道跳变** —— 有就采信像素读出的
-中心（实测与网格差 ≤ 1.5 px），没有就**不认这一格有卡**。
+中心（实测与网格差 ≤ 2 px），没有就**不认这一格有卡**。
 
 **卡距不进这一层**：它是**标量**，`UiLayout` 装不下（契约层 §2），所以它住**用它的那
 一层**自己的常量（设备层的 `SQUAD_CARD_PITCH`），**由调用方传进来** —— 导入规则不许
 `ark.engine.vision` import `ark.engine.device`（`tests/contract/import_rules.py`）。
 下标 → 矩形只有一份实现：`ark.contracts.squad_card_rect`。
 
-**再部署那一路的两条读数不是同一个单位**（《备战席》§判死与再部署）：环上白弧给的是
-**进度占比**，中央数字给的是**秒**。把占比换成秒要知道这张卡的**总再部署时长**，而它在
-数据库里、**不在这张卡上** —— 所以这一层只把两条读数**各自如实吐出来**（`ring_fraction`
-与 `seconds`），"两者一致不一致"由**拿得到总时长的那一层**去判，这一层不替它挑一个。
+**再部署中的判据是「环在不在」，不是「白弧多长」**（《备战席》§判死与再部署）：那道白弧
+量的是**已过比例**（从 12 点起顺时针长的角度 ÷ 360）—— 剩 12.9 s 的那张白弧 278°，
+而剩 68.6 s 的那张只有约 20°。**刚撤退的卡白弧接近 0°**，所以拿弧长当判据会把
+「正在再部署」说成「不在再部署」，一条假事实。这一层因此只问**环带最暗的那一度还亮不亮**
+（`_ring_floor`）：环是画满一整圈的，它在，整圈就都在。
+
+**红罩不单独当判据**：实测它分不开 —— `shot26` 下标 1 那张**普通卡**的卡面红度
+（`R − max(G,B)` 的均值 **+64.8**）比再部署那张（**+48.5**）还高，普通卡里整片红的
+角色有的是。红罩是**外观**的一部分，不是这一层能用的信号。
 """
 
 from __future__ import annotations
@@ -56,7 +61,6 @@ from ark.contracts import (
     Exact,
     PixelRect,
     SlotValue,
-    UiLayout,
     Unknown,
     Unsampled,
     Valued,
@@ -91,8 +95,9 @@ __all__ = [
     "RING_INNER",
     "RING_OUTER",
     "RING_BRIGHT_MIN",
-    "RING_ARC_REDEPLOYING",
-    "RING_ARC_PLAIN",
+    "RING_PRESENT_OUTER",
+    "RING_PRESENT_MIN",
+    "RING_PRESENT_ABSENT_MAX",
     "COUNTDOWN_INK_THRESHOLD",
     "COUNTDOWN_MIN_DIGIT_WIDTH",
     "COUNTDOWN_MIN_DIGIT_HEIGHT",
@@ -119,9 +124,9 @@ JUMP_DARK_MAX: Final[int] = 45
 CENTER_MATCH_TOL: Final[int] = 5
 """像素读出的中心离网格那一格最多差多少像素，还算**同一格**。
 
-实测 6 帧 47 张卡：像素中心与 `squad_card_rect` 给的中心**最多差 1.5 px**；
-而**没有卡的那些格**上，最近的跳变候选离网格 **131 px 以上**。空档 1.5…131，
-取 5 —— 两侧各留 3.5 / 126。
+实测 6 帧 56 张卡：像素中心与 `squad_card_rect` 给的中心**最多差 2 px**；
+而**没有卡的那些格**上，最近的跳变候选离网格 **131 px 以上**。空档 2…131，
+取 5 —— 两侧各留 3 / 126。
 """
 
 COST_BOX_WIDTH: Final[int] = 54
@@ -139,7 +144,7 @@ COST_DIGITS_TOP: Final[int] = 12
 """
 
 COST_DIGITS_HEIGHT: Final[int] = 29
-"""费用数字那一条的高度（px）。实测 6 帧 47 张卡：数字都是 **29 px 高**（1057–1085）。
+"""费用数字那一条的高度（px）。实测 6 帧 56 张卡：数字都是 **29 px 高**（1057–1085）。
 
 **上面不能再宽**：再往上 2 行就吃到图标；**下面也不能再宽**：再往下 2 行就吃到卡面
 （暗盒下缘之外那一片亮起来，数字块被拉长，匹配分数从 0.94 掉到 0.50）。
@@ -155,7 +160,7 @@ COST_INK_THRESHOLD: Final[int] = 64
 """费用的墨线。**它与 `glyphs.INK_THRESHOLD = 128` 不是同一个数**：那个是给
 「白字压在 47–67 的渐变底上」用的，这一格的暗盒底色更低、笔画也更暗。
 
-**实测这一栏的卡面是两档，不是一档**（6 帧 47 张卡）：
+**实测这一栏的卡面是两档，不是一档**（6 帧 56 张卡）：
 
 | 档 | 职业标识牌那一片的中位亮度 | 费用数字的峰值 | 是哪几张 |
 | --- | --- | --- | --- |
@@ -167,7 +172,7 @@ COST_INK_THRESHOLD: Final[int] = 64
 
 **64 对两档都成立**：压暗那一档的数字峰值是 128、正常那一档是 255，而两档的暗盒底色都
 ≤29、两档的卡面那一侧都 ≥100。所以 64 落在 **29…100** 那条空档里，**两档共用一条线**
-—— 实测 47 张卡的费用**全部读成精确值**，没有一张掉进未知或未采样。
+—— 实测 56 张卡的费用**全部读成精确值**，没有一张掉进未知或未采样。
 """
 
 MIN_DIGIT_WIDTH: Final[int] = 8
@@ -184,8 +189,8 @@ MAX_COST_DIGITS: Final[int] = 2
 COST_SOLID_MATCH_SCORE: Final[float] = 0.86
 """这一位至少要像到什么程度，才配被认出来。
 
-实测 6 帧 47 张卡 78 位：**正确那一位最低 0.8827**（`shot05` 第 8 张的费用 `10`），
-而**不是数字的碎块最高 0.6169**。空档 0.6169…0.8827，取 0.86，两侧各留 0.243 / 0.023。
+实测 6 帧 56 张卡 109 位：**正确那一位最低 0.8827**（`shot05` 第 8 张的费用 `10`），
+而**不是数字的碎块最高 0.7527**。空档 0.7527…0.8827，取 0.86，两侧各留 0.107 / 0.023。
 
 **它比 `cost.py` 的 `SOLID_MATCH_SCORE = 0.90` 低**：那一条是拿费用面板那一档量的
 （笔画是 255 的纯白），而备战席这一档的笔画核心只有 128、卡面是半透明的，同一套模板
@@ -195,7 +200,7 @@ COST_SOLID_MATCH_SCORE: Final[float] = 0.86
 COST_AMBIGUITY_MARGIN: Final[float] = 0.03
 """次像的离最像的有多近才算「分不开」（照 `cost.py` 那个数）。
 
-实测 6 帧 78 位：正确那一位与次像的差**最小 0.106**，所以 0.03 只会抓住真正并排的两个
+实测 6 帧 109 位：正确那一位与次像的差**最小 0.106**，所以 0.03 只会抓住真正并排的两个
 —— 这一版在 6 帧上一次都没触发（**纸上的防线**，见报告）。
 """
 
@@ -219,16 +224,34 @@ RING_BRIGHT_MIN: Final[int] = 200
 实测 `shot26` 那张：白弧的像素 `min = 250–255`，环带里其余地方 `min ≤ 40`。
 """
 
-RING_ARC_REDEPLOYING: Final[int] = 240
-"""白弧**至少**连续多少度才算「再部署中」。
+RING_PRESENT_OUTER: Final[int] = 57
+"""问「环在不在」时，环带**到哪一行为止**（px）—— 比 `RING_OUTER` 窄。
 
-实测 6 帧 47 张卡：再部署中那张的白弧 **278°**，其余 **≤ 57°**。空档 57…278。
+实测 `shot26` 那张：环的**实心部分**到 r ≈ 57 为止，r = 58 起就是环外的抗锯齿边与卡面
+（那一张在 r = 58 上已经是卡面的 93/34/31）。读白弧时多含两圈无妨（白弧是 255，卡面比不过
+它），但问「环带最暗的那一度」时**多含的两圈就是卡面** —— 实测把上界从 57 放到 60，
+普通卡里最高那个读数从 54 抬到 65，空档白窄一截。
 """
 
-RING_ARC_PLAIN: Final[int] = 90
-"""白弧**最多**连续多少度还算是「普通卡片」。见 `RING_ARC_REDEPLOYING`。
+RING_PRESENT_MIN: Final[int] = 95
+"""环带上**最暗的那一度**至少这么亮，才算「环在」。
 
-两者之间（90…240）**判不了** —— 报「是」或「不是」都是假事实，所以那一档落 `None`。
+实测 6 帧 56 张真卡（环带 = 半径 50…57 上逐度取最亮的那个像素的 `min(R,G,B)`）：
+
+| 卡 | 环带最暗的那一度 |
+| --- | --- |
+| `shot26` 下标 0（再部署中：红罩 + 灰环 + 白弧 + 中央数字） | **110** |
+| 其余 55 张**普通卡** | **≤ 54** |
+
+空档 54…110，取 95，两侧各留 41 / 15。**它问的是形状**：环是画满一整圈的，所以「最暗的
+那一度还亮着」= 有一圈东西在；普通卡上那 360° 落在卡面各处，总有一度是暗的。
+"""
+
+RING_PRESENT_ABSENT_MAX: Final[int] = 70
+"""环带上最暗的那一度**暗到这个程度**，才算「环不在」。见 `RING_PRESENT_MIN`。
+
+70…95 之间**判不了** —— 那里有一圈不够亮的东西，报「是」或「不是」都是假事实。
+**这一档在 6 帧 56 张卡上一次都没触发**（纸上的防线，见报告）。
 """
 
 COUNTDOWN_MASK_RADIUS: Final[int] = 45
@@ -280,11 +303,12 @@ class SquadCard:
 
     - `center_x` 是这张卡的**水平正中心**（画布像素）；
     - `center_from_jump` 说这个中心是**像素读出来的**还是**网格备选给的**
-      —— 两者差 ≤ 1.5 px，但「谁给的」是证据，不能吞掉；
+      —— 两者差 ≤ 2 px，但「谁给的」是证据，不能吞掉；
     - `cost` / `seconds` 是槽值（精确 / 未知 / 未采样）；
-    - `redeploying` 是三值：`True` / `False` / `None`（判不了）；
-    - `ring_fraction` 是环形进度的**占比**（0…1），不在再部署中就是 `None`。
-      **它和 `seconds` 不同单位**，见模块文档。
+    - `redeploying` 是三值：`True` / `False` / `None`（判不了）——
+      判据是**环在不在**，不是白弧多长（见模块文档）；
+    - `ring_fraction` 是环上白弧占整圈的比例 —— **已过比例**（0…1），不是进度、
+      更不是剩余；不在再部署中就是 `None`。**它和 `seconds` 不同单位**，见模块文档。
     """
 
     index: int
@@ -296,43 +320,44 @@ class SquadCard:
     ring_fraction: float | None
 
 
-def _guard(frame: object, glyphs: object, ui: object, pitch: object) -> None:
+def _guard(frame: object, glyphs: object, pitch: object) -> None:
     """入口的类型闸门（照 `cost.py` / `topbar.py` 的样子）。"""
     if not isinstance(frame, Frame):
         raise TypeError(f"要读的是一帧，收到 {type(frame).__name__}")
     if not isinstance(glyphs, GlyphTable):
         raise TypeError(f"要一张字形表，收到 {type(glyphs).__name__}")
-    if not isinstance(ui, UiLayout):
-        raise TypeError(f"ui 要是 UiLayout，收到 {type(ui).__name__}")
     if isinstance(pitch, bool) or not isinstance(pitch, (int, float)):
         raise TypeError(f"卡距要是数，收到 {type(pitch).__name__}")
     if pitch <= 0:
         raise ValueError(f"卡距必须为正，收到 {pitch}")
 
 
-def _anchors(ui: UiLayout) -> tuple[PixelRect, PixelRect]:
+def _anchors() -> tuple[PixelRect, PixelRect]:
     """最右那张卡的**卡框**与**身份区**（`"squad_card_rightmost"` 那两个键）。
 
     名字是契约层 `UI_LAYOUT` 里定的，这一层只管取 —— 取不到就报出来，
     **不另抄一份坐标**。
+
+    **只有这一份表**：卡框那两个键住契约层，`squad_card_rect` 也写死读它。所以这一层
+    **不收 `ui` 参数** —— 一个只能换掉锚点、换不掉位移的参数比没有参数更危险。
     """
     names = ("squad_card_rightmost", "squad_card_rightmost_face")
-    missing = [name for name in names if name not in ui.rects]
+    missing = [name for name in names if name not in UI_LAYOUT.rects]
     if missing:
         raise KeyError(
-            f"UI 常量里没有 {missing}：这一版认识 {sorted(ui.rects)}"
+            f"UI 常量里没有 {missing}：这一版认识 {sorted(UI_LAYOUT.rects)}"
         )
-    return ui.rects[names[0]], ui.rects[names[1]]
+    return UI_LAYOUT.rects[names[0]], UI_LAYOUT.rects[names[1]]
 
 
-def _row_strip(frame: Frame, ui: UiLayout) -> PixelRect:
+def _row_strip(frame: Frame) -> PixelRect:
     """整条卡行的**窗口**：左右铺满画布，上下取「卡片上缘 → 身份区上缘」。
 
     上下那两条边**走 `squad_card_rect` / `squad_card_face_rect`**：卡上缘 1045、
     身份区上缘 1092，那中间那 47 行住着职业标识牌与费用暗盒（`"顶上那一条"`）。
     左右铺满是因为**卡数会变、左缘随卡数变**，而这一层不许拿卡数去推左缘。
     """
-    card, face = _anchors(ui)
+    card, face = _anchors()
     return PixelRect(0, card.y, frame.canvas.width, face.y - card.y)
 
 
@@ -427,14 +452,15 @@ def _read_cost(
     )
 
 
-def _ring_arc(frame: Frame, centre_x: float, card_top: float) -> int:
-    """卡片正中那个圆环，**白色弧最长连续多少度**。
+def _ring_profile(frame: Frame, centre_x: float, card_top: float) -> np.ndarray:
+    """卡片正中那个圆环的**径向剖面**：`(360, RING_OUTER - RING_INNER + 1)`。
 
-    整圈按 1° 采样；每一度取环带（半径 `RING_INNER`…`RING_OUTER`）里**最亮**的那个
-    像素，它过 `RING_BRIGHT_MIN` 就算这一度是白的。然后取**环形最长连续段**。
+    整圈按 1° 采样（0° = 12 点、顺时针增大）；每一度上，半径
+    `RING_INNER`…`RING_OUTER` 的每一个像素取 `min(R,G,B)`，存成一列。
 
-    **为什么按度数而不是按像素个数**：卡面本身也可能有大片白（白发角色），按个数会被
-    它带偏；「连续多少度」问的是**形状**——环是圆的，卡面不是。
+    **只采一次样**：白弧（要 `RING_OUTER` 那么宽）与「环在不在」（只要
+    `RING_PRESENT_OUTER` 那么宽）是同一批像素上的两个不同问题；分开采样会让同一个
+    圆环被读两遍，还会让两次读的圆心各自算一遍。
     """
     radius = RING_OUTER
     centre_y = card_top + RING_CENTER_DY
@@ -442,19 +468,31 @@ def _ring_arc(frame: Frame, centre_x: float, card_top: float) -> int:
         centre_x - radius, centre_y - radius, radius * 2, radius * 2
     )
     roi = frame.crop(rect)
-    hit = np.zeros(360, dtype=bool)
+    profile = np.zeros((360, RING_OUTER - RING_INNER + 1), dtype=int)
     for degree in range(360):
         theta = np.radians(90.0 - degree)
         cos, sin = float(np.cos(theta)), float(np.sin(theta))
-        best = 0
-        for r in range(RING_INNER, RING_OUTER + 1):
+        for step, r in enumerate(range(RING_INNER, RING_OUTER + 1)):
             x = int(round(radius + r * cos))
             y = int(round(radius - r * sin))
             if 0 <= y < roi.shape[0] and 0 <= x < roi.shape[1]:
-                value = int(roi[y, x].min())
-                if value > best:
-                    best = value
-        hit[degree] = best >= RING_BRIGHT_MIN
+                profile[degree, step] = int(roi[y, x].min())
+    return profile
+
+
+def _ring_arc(profile: np.ndarray) -> int:
+    """白弧**最长连续多少度**（0° = 12 点、顺时针）。
+
+    每一度取环带里**最亮**的那个像素，它过 `RING_BRIGHT_MIN` 就算这一度是白的。
+    然后取**环形最长连续段**。
+
+    **为什么按度数而不是按像素个数**：卡面本身也可能有大片白（白发角色），按个数会被
+    它带偏；「连续多少度」问的是**形状**——环是圆的，卡面不是。
+
+    **它给的是「已过比例」，不是「是不是再部署中」**（判据是 `_ring_floor`）：
+    刚撤退的卡这一路接近 0°，拿它当判据会把「正在再部署」说成「不在再部署」。
+    """
+    hit = profile.max(axis=1) >= RING_BRIGHT_MIN
     doubled = np.concatenate([hit, hit])
     longest = run = 0
     for value in doubled:
@@ -462,6 +500,16 @@ def _ring_arc(frame: Frame, centre_x: float, card_top: float) -> int:
         if run > longest:
             longest = run
     return min(longest, 360)
+
+
+def _ring_floor(profile: np.ndarray) -> int:
+    """环带上**最暗的那一度**有多亮 —— 「环在不在」的判据。
+
+    只看 `RING_INNER`…`RING_PRESENT_OUTER` 那几列（再往外就是卡面）。环是画满一整圈
+    的，所以「最暗的那一度还亮着」= 有一圈东西在。两条线见 `RING_PRESENT_MIN`。
+    """
+    width = RING_PRESENT_OUTER - RING_INNER + 1
+    return int(profile[:, :width].max(axis=1).min())
 
 
 def _read_countdown(
@@ -544,7 +592,6 @@ def read_squad_row(
     glyphs: GlyphTable,
     *,
     pitch: float,
-    ui: UiLayout = UI_LAYOUT,
 ) -> tuple[SquadCard, ...]:
     """读备战席那一栏：**一帧 → 每张卡一条读数**（下标 0 = 最右那张）。
 
@@ -552,21 +599,26 @@ def read_squad_row(
     视觉层 import 设备层，所以**由调用方传进来** —— 契约层 `squad_card_rect` 的
     docstring 写的就是这个口径。
 
-    `ui` 默认是**契约层**那份 `UI_LAYOUT`（卡框那两个键
-    `squad_card_rightmost` / `squad_card_rightmost_face` 在那儿），**不是**
-    视觉层那份 `layout.UI` —— 传视觉层那份进来会响亮地报 `KeyError`
-    （那正说明两边的表不是一张）。
+    **不收 `ui` 参数**：卡框那两个键只有一份表（契约层 `UI_LAYOUT`），而
+    `squad_card_rect` 也写死读它 —— 传一张别的表进来只能换掉锚点、换不掉位移，
+    **一个只能换一半的参数比没有参数更危险**（调用方会以为换了表）。要换表就换契约层
+    那一份，这里不开口子。
 
     **卡数是数出来的**：从最右那张起，一格一格往左问「这一格有没有跳变证据」，
     问到没有为止。右对齐 + 只有还没上场的才显示 ⇒ 有卡的那些格**一定是连着的一片**
     （中间缺一格说明那一格的跳变没读出来，那时**停在缺口处**、报出已经读到的那些）。
 
+    **再部署中的判据是环在不在**（`_ring_floor`），不是白弧多长 —— 白弧量的是
+    **已过比例**，刚撤退的卡白弧接近 0°，拿它当判据会把「正在再部署」说成「不在再部署」。
+    **红罩也不单独当判据**：普通卡里整片红的角色比红罩还红。
+
     **不在再部署中的卡，秒数一律 `Unsampled()`**（那里没有倒计时可读）——
-    与「有笔画但认不出 → 未知」是两支，不许混。
+    与「有笔画但认不出 → 未知」是两支，不许混。**判不了那一档照读**：那里有没有倒计时
+    是**肯定证据**，读到了就是读到了；读不到就按秒数自己的三档落。
     """
-    _guard(frame, glyphs, ui, pitch)
-    anchor, _ = _anchors(ui)
-    strip = _row_strip(frame, ui)
+    _guard(frame, glyphs, pitch)
+    anchor, _ = _anchors()
+    strip = _row_strip(frame)
     jumps = _jump_columns(frame, strip)
     top = float(anchor.y)
     anchor_centre = float(squad_card_rect(0, pitch).x) + float(anchor.width) / 2.0
@@ -608,14 +660,15 @@ def read_squad_row(
                 COST_DIGITS_HEIGHT,
             ),
         )
-        arc = _ring_arc(frame, centre, top)
-        if arc >= RING_ARC_REDEPLOYING:
+        profile = _ring_profile(frame, centre, top)
+        floor = _ring_floor(profile)
+        if floor >= RING_PRESENT_MIN:
             redeploying: bool | None = True
-        elif arc <= RING_ARC_PLAIN:
+        elif floor <= RING_PRESENT_ABSENT_MAX:
             redeploying = False
         else:
             redeploying = None
-        ring_fraction = float(arc) / 360.0
+        ring_fraction = float(_ring_arc(profile)) / 360.0
         if redeploying is False:
             seconds: SlotValue = Unsampled()
             ring_fraction = None
