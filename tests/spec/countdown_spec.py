@@ -388,6 +388,50 @@ def check_a_missing_bold_table_is_not_a_missing_countdown() -> str:
     )
 
 
+def check_the_truth_agrees_with_the_harvest_file() -> str:
+    """**手抄的真值要有网盯着**：`TRUTH` 与夹具那份 `取材.json` **逐位一致**。
+
+    出处是[视觉层/识别方法] §已知的缺口（"手抄的数会静默过期"）与
+    [基准集] §写一条检查的三条纪律 3（数要**算出来**，不能手抄了就算完）。
+
+    **只在有值的那些帧上比**：`cd09` · `cd20` 是验收用的，夹具里**本来就没有**它们的
+    值 —— 那两帧的真值只住这里、不参与比对（**不许**为了"能比"就把它们挪进夹具，
+    那等于把验收降级成取材）。
+
+    **也不改成运行时读夹具**：`tests/帧样本/` 执行者读得到（D-全局-22 只挡住
+    `tests/spec/`），真值住这里才是**独立的那一份**。这一条是给"两份对得上"上的闩，
+    不是把真值交出去。
+    """
+    raw = json.loads((BATCH / "取材.json").read_text(encoding="utf-8"))
+    given: dict[str, dict[int, float]] = {
+        Path(entry["file"]).stem: {
+            int(item["index"]): float(item["seconds"])
+            for item in (entry.get("countdowns") or [])
+        }
+        for entry in raw["harvest"]
+    }
+    with_values = {name: values for name, values in given.items() if values}
+    drift: list[str] = []
+    for name, values in with_values.items():
+        mine = TRUTH[name]["countdown"]
+        for index in sorted(set(values) | set(mine)):
+            if index not in mine:
+                drift.append(f"{name}#{index}：夹具给了 {values[index]}，TRUTH 里没有")
+            elif index not in values:
+                drift.append(f"{name}#{index}：TRUTH 写了 {mine[index]}，夹具里没有")
+            elif abs(float(mine[index]) - values[index]) > 1e-9:
+                drift.append(
+                    f"{name}#{index}：TRUTH 写 {mine[index]}、夹具写 {values[index]}"
+                )
+    assert not drift, "手抄的真值与夹具对不上：" + "；".join(drift)
+    readings = sum(len(values) for values in with_values.values())
+    held = sorted(set(TRUTH) - set(with_values))
+    return (
+        f"{len(with_values)} 帧 / {readings} 个读数逐位一致 ｜ "
+        f"只有 TRUTH 有的帧（验收，不参与比对）：{held}"
+    )
+
+
 CHECKS: tuple[Check, ...] = (
     Check("D1", "采集与验收/基准集 §2（字段表）",
           "清单里的必填字段一样不少地读出来，没记的前提头不许补",
@@ -416,6 +460,9 @@ CHECKS: tuple[Check, ...] = (
     Check("D9", "视觉层/识别方法 §已定（表没建好 ≠ 这张卡没有倒计时）",
           "把表指到不存在的地方时必须响亮报错，不许静默落成一个「没有」",
           check_a_missing_bold_table_is_not_a_missing_countdown),
+    Check("D10", "视觉层/识别方法 §已知的缺口（手抄的数会静默过期）",
+          "TRUTH 与夹具那份取材.json 逐位一致 —— 只在有值的帧上比",
+          check_the_truth_agrees_with_the_harvest_file),
 )
 
 
