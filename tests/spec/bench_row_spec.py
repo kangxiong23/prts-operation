@@ -18,18 +18,23 @@
 
 ## 还没写的是哪一半
 
-读数链（`engine/vision/bench.py`）**还不存在**，所以这一层现在只有**真值 + 批次完整性**；
-"读出来与真值全对"那一条要等读数链落地，**落进本文件，不另开一份**。
+**已经补上了**（读数链 `engine/vision/bench.py` 落地那一轮）：R5 把 6 帧经重放路径读出来
+与真值逐张比，R6 管"再部署剩余秒数"那一列 —— 它现在**读不出来**（中央那个数字的字体
+与出厂字形表不是同一套，见 §尚未定），所以 R6 断言的是**"不许猜一个数"**，不是"等于 12.9"。
 """
 
 from __future__ import annotations
 
 import importlib
 import json
+import struct
 import sys
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
+
+import numpy as np
+from PIL import Image
 
 _HERE = Path(__file__).resolve().parent
 REPO = _HERE.parents[1]
@@ -38,6 +43,7 @@ for _entry in (str(REPO / "src"), str(_HERE)):
         sys.path.insert(0, _entry)
 
 BATCH = REPO / "tests" / "帧样本" / "备战席"
+GLYPH_DIR = REPO / "assets" / "features" / "glyphs"
 
 CANVAS_W, CANVAS_H = 2800, 1260
 
@@ -134,6 +140,44 @@ def _frame_names() -> list[str]:
     return [Path(c["file"]).stem for c in _index()["crops"]]
 
 
+def _entry(name: str) -> dict:
+    for e in _index()["crops"]:
+        if Path(e["file"]).stem == name:
+            return e
+    raise AssertionError(f"夹具里没有 {name}")
+
+
+def _raw(name: str) -> bytes:
+    """把夹具裁剪**贴回** 2800×1260 的黑底，编成设备层 §4 定义的原始 RGBA 字节。
+
+    这样 ROI 的取法仍然是真的在被测 —— 没有把 ROI 预先替读数链做好。
+    """
+    e = _entry(name)
+    x, y = e["origin"]
+    w, h = e["size"]
+    canvas = np.zeros((CANVAS_H, CANVAS_W, 3), np.uint8)
+    canvas[y : y + h, x : x + w] = np.asarray(
+        Image.open(BATCH / e["file"]).convert("RGB")
+    )
+    rgba = np.dstack([canvas, np.full((CANVAS_H, CANVAS_W), 255, np.uint8)])
+    return struct.pack("<4I", CANVAS_W, CANVAS_H, 1, 1) + rgba.tobytes()
+
+
+_READ_CACHE: dict[str, tuple] = {}
+
+
+def _read(name: str):
+    """走**设备层 §5 的重放路径**读一帧：字节 → 帧 → 读数链。同一帧只读一次。"""
+    if name not in _READ_CACHE:
+        frame = _mod("ark.engine.vision.frame").frame_from_raw(_raw(name))
+        glyphs = _mod("ark.engine.vision.glyphs").GlyphTable.load(GLYPH_DIR)
+        pitch = _mod("ark.engine.device.adb").SQUAD_CARD_PITCH
+        _READ_CACHE[name] = _mod("ark.engine.vision.bench").read_squad_row(
+            frame, glyphs, pitch=pitch
+        )
+    return _READ_CACHE[name]
+
+
 # ---------------------------------------------------------------------------
 # R 族：这一批长什么样
 # ---------------------------------------------------------------------------
@@ -222,6 +266,88 @@ def check_truth_table_has_the_shape_it_claims() -> str:
     return f"卡数 {counts} ｜ " + " ".join(worst)
 
 
+def check_readings_match_the_truth_on_every_frame() -> str:
+    """6 帧经重放路径读出来，**卡数 · 每张卡的费用 · 再部署状态**与真值逐张一致。
+
+    出处是[开发路线] 段一那条判据（"这套识别不看真机也能跑，而且对着基准集逐帧对得上"）
+    与[离线验收] §1。真值是规划者逐帧目视确认的（见本文件模块文档），**执行者看不到它**。
+    """
+    from ark.contracts import Exact, Valued
+
+    names = _frame_names()
+    detail: list[str] = []
+    for name in names:
+        row = TRUTH[name]
+        cards = _read(name)
+        assert [c.index for c in cards] == list(range(len(cards))), (
+            f"{name}：下标不是从 0 起连着排的 —— {[c.index for c in cards]}"
+        )
+        assert len(cards) == row["cards"], (
+            f"{name}：读出 {len(cards)} 张卡，真值是 {row['cards']} 张"
+        )
+        got = [c.cost for c in cards]
+        bad = [
+            f"k{i}={v!r}"
+            for i, v in enumerate(got)
+            if not (isinstance(v, Valued) and isinstance(v.payload, Exact))
+        ]
+        assert not bad, f"{name}：这几张卡的费用不是精确值 —— " + ", ".join(bad)
+        values = [v.payload.value for v in got]
+        assert values == list(row["cost"]), (
+            f"{name}：费用读出 {values}，真值是 {list(row['cost'])}"
+        )
+        want_red = set(row["redeploy"])
+        for card in cards:
+            assert card.redeploying == (card.index in want_red), (
+                f"{name}：第 {card.index} 张的再部署状态读成 {card.redeploying!r}，"
+                f"真值是 {card.index in want_red}"
+            )
+        detail.append(f"{name}:{len(cards)}张")
+    return f"{len(names)} 帧逐张一致 ｜ " + " ".join(detail)
+
+
+def check_countdown_seconds_are_never_guessed() -> str:
+    """再部署剩余秒数：**要么精确等于真值，要么落未知 / 未采样 —— 不许是别的数**。
+
+    出处是[状态层/我方干员] 那一行的形态（精确 / 未知 / 未采样）与"零假事实"这条验收标准。
+
+    **这一条现在为什么不是"等于 12.9"**：实测中央那个数字的字体**不在出厂字形表里**
+    （`1` 带底衬线、笔画更粗，最像的字形反而是 `2`），所以读数链如实落**未知**。
+    那是一条**已知缺口**（[视觉层/备战席] §尚未定），不是这一条要抓的假事实 ——
+    这一条抓的是"**为了交差猜一个数**"。缺口补上之后这一条照样绿。
+    """
+    from ark.contracts import Exact, Unknown, Unsampled, Valued
+
+    checked = 0
+    detail: list[str] = []
+    for name, row in TRUTH.items():
+        cards = _read(name)
+        for card in cards:
+            want = row["redeploy"].get(card.index)
+            if want is None:
+                continue
+            checked += 1
+            slot = card.seconds
+            if isinstance(slot, Unsampled):
+                detail.append(f"{name}#{card.index}=未采样")
+                continue
+            assert isinstance(slot, Valued), (
+                f"{name} 第 {card.index} 张：秒数落成了 {slot!r}"
+            )
+            payload = slot.payload
+            if isinstance(payload, Unknown):
+                detail.append(f"{name}#{card.index}=未知")
+                continue
+            assert isinstance(payload, Exact), f"{name} 第 {card.index} 张：{payload!r}"
+            assert abs(payload.value - want) < 0.05, (
+                f"{name} 第 {card.index} 张：秒数读成 {payload.value}，真值是 {want} "
+                "—— 猜错了比报未知危险"
+            )
+            detail.append(f"{name}#{card.index}={payload.value}")
+    assert checked, "真值里一张再部署中的卡都没有，这一条什么都没验到"
+    return f"{checked} 张再部署中 ｜ " + " ".join(detail)
+
+
 CHECKS: tuple[Check, ...] = (
     Check("R1", "采集与验收/基准集 §2（字段表）",
           "清单里的必填字段一样不少地读出来，没记的前提头不许补",
@@ -235,6 +361,12 @@ CHECKS: tuple[Check, ...] = (
     Check("R4", "视觉层/备战席 §卡片怎么排 + §点名",
           "真值表自己的形状自洽：卡数 = 费用表长度，下标都在卡数之内",
           check_truth_table_has_the_shape_it_claims),
+    Check("R5", "00-总览/开发路线 段一（判据）+ 采集与验收/离线验收 §1",
+          "6 帧经重放路径读出来，卡数 · 每张费用 · 再部署状态与真值逐张一致",
+          check_readings_match_the_truth_on_every_frame),
+    Check("R6", "状态层/我方干员（再部署倒计时的形态）+ 零假事实",
+          "再部署剩余秒数要么精确等于真值、要么落未知/未采样，不许猜一个数",
+          check_countdown_seconds_are_never_guessed),
 )
 
 
