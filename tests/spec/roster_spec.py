@@ -635,8 +635,8 @@ def check_every_redeploying_card_is_read_by_the_new_rule() -> str:
 def check_the_margin_line_really_bites() -> str:
     """把一条**孪生条目**塞进库：最像与次像几乎同分 → 必须落未知。
 
-    这一条盯的是"同时看最高分与余量"那半条 —— 只看最高分时，孪生条目的最高分
-    照样过线，判据会**挑一个**。孪生块 = 真块横移 2 px、换个名字。
+    这一条盯的是判据里"次高要退开"那半条（`required_runner_up`）—— 只看最高分时，
+    孪生条目的最高分照样过线，判据会**挑一个**。孪生块 = 真块横移 2 px、换个名字。
     """
     got = _names(_read("cd01", faces=_twin_faces(), tag="孪生库"))
     if got[4] != UNKNOWN:
@@ -648,9 +648,9 @@ def check_the_scale_step_really_searches() -> str:
     """尺度那一步真的在扫：库整体放大 3% 之后，还挪得动的那些仍必须认得出。
 
     `214 ÷ 204 = 1.049` 那个尺度关系一变，能认出来的当前提是链在**扫尺度**；
-    只试 1.00 的链会整帧落空。**只对"基线上定下的尺度 ≤ 1.11"的卡断言** ——
-    放大 3% 之后它们需要的尺度 ≤ 1.143，还在 [1.05, 1.15] 里；贴着上界的那些
-    （1.15）本来就会被推出区间，不该拿来判这条。
+    只试 1.00 的链会整帧落空。**只对"放大 3% 之后仍落在区间里"的卡断言** ——
+    贴着上界的那些本来就会被推出区间，不该拿来判这条。所以筛法是
+    `基线上的尺度 × 1.03 ≤ IDENTITY_SCALE_MAX`：**区间一挪它自动跟着走**，不写死数。
 
     **基线尺度是按"一条库、一档尺度"问回来的**，没重跑一遍全库扫：`roster_scores`
     是**一条一条算**的，条目之间互不影响，所以这样量到的尺度与全库扫出来的
@@ -662,6 +662,7 @@ def check_the_scale_step_really_searches() -> str:
     frame = _frame("cd60")
     pitch = _pitch()
     library = dict(_faces())
+    scale_max = float(_attr("IDENTITY_SCALE_MAX"))
     baseline: list[tuple[str, float]] = []
     for (centre, _), slot in zip(bench.squad_card_centres(frame, pitch=pitch), _read("cd60")):
         payload = _payload_of(slot)
@@ -677,7 +678,9 @@ def check_the_scale_step_really_searches() -> str:
     movable = [
         (index, name, scale)
         for index, (name, scale) in enumerate(baseline)
-        if name != UNKNOWN and scale <= 1.11 and TRUTH["cd60"][index] != UNKNOWN
+        if name != UNKNOWN
+        and scale * 1.03 <= scale_max
+        and TRUTH["cd60"][index] != UNKNOWN
     ]
     if len(movable) < 3:
         raise AssertionError(f"只有 {len(movable)} 张还挪得动，这条检查试不出东西")
@@ -688,7 +691,8 @@ def check_the_scale_step_really_searches() -> str:
         detail = " · ".join(f"#{i} 基线={n} 读成={g}" for i, n, g in wrong)
         raise AssertionError(f"放大 3% 之后认不出来了：{detail}")
     return (
-        f"{len(movable)} 张基线上尺度 ≤ 1.11（{sorted({round(s, 2) for _, _, s in movable})}）"
+        f"{len(movable)} 张放大 3% 后仍落在区间里（尺度 "
+        f"{sorted({round(s, 2) for _, _, s in movable})}，上界 {scale_max:.2f}）"
         f"，放大 3% 后仍全部认出"
     )
 
@@ -1031,10 +1035,13 @@ def check_the_geometry_table_matches_the_constants() -> str:
 # 只答两件事、不产否定存在、代价不随库长、判据那条线是全扫那条线。
 #
 # **两头的夹法（这是这一族的核心）**：
-#   - 全扫给了一张卡确切的名字 `n`、次高与它的差又过了余量线，那么**任何别人**在那张卡上的
-#     分数 ≤ 1 − 余量线 = **0.70**，而分线是 **0.85** —— 所以「认错人」不是要量的事，
-#     是**代数**（N17 顺带把 `1 − 余量线 < 分线` 这个前提本身钉住）。
-#   - 于是唯一出得了假事实的地方是**没人的卡**：整列够不到线，它就认不出名字（N16）。
+#   - 「认错人」的保证**不再是代数**了。从前的判据是「过一条固定的分线 **并且** 余量过一条
+#     固定的余量线」，于是能从 `1 − 余量线 < 分线` **推**出"别人到不了线"；现在那半条换成了
+#     `次高 <= required_runner_up(最高)`（随分数走），那个推论**不成立**。
+#     分线的依据从"代数"变成**实测的非匹配天花板**（读数住《备战席点名》§单条查询，
+#     两处抄本由 N18 对齐）—— 这是**弱化**，要如实说。
+#   - 所以这一族的两个头都得自己量：**没人的卡**上整列够不到线（N16），
+#     以及**全扫说未知的红罩卡**上单条那条路指到谁（N17）。
 # ---------------------------------------------------------------------------
 
 
@@ -1244,7 +1251,6 @@ def check_no_name_can_reach_the_line_on_a_card_with_nobody_on_it() -> str:
     roster = _mod("ark.engine.vision.roster")
     bench = _mod("ark.engine.vision.bench")
     line = float(_attr("ROSTER_SOLID_MATCH_SCORE"))
-    margin_line = float(_attr("ROSTER_AMBIGUITY_MARGIN"))
     faces = _faces()
     pitch = _pitch()
     regions = {frame_name: _card_regions(frame_name) for frame_name in ALL_FRAMES}
@@ -1296,18 +1302,20 @@ def check_no_name_can_reach_the_line_on_a_card_with_nobody_on_it() -> str:
         ranked = ruler.scores(region)
         best, who = ranked[0][0], ranked[0][1]
         runner = ranked[1][0] if len(ranked) > 1 else -2.0
-        if best < line:
+        # 单条那条路**只看分线**，所以"分够、而判据不成立"的这一批，正是它会多指出一张的地方。
+        # 判据走 `roster.identity_is_exact` —— 它是判据的**唯一定义**，这里不另写一遍。
+        if not (best >= line and not roster.identity_is_exact(best, runner)):
             continue
         answer = roster.find_squad_card(_frame(frame_name), who, faces, pitch=pitch)
         if answer is not None and answer != index:
             raise AssertionError(
                 f"{frame_name} 第 {index} 张卡（红罩卡）全扫落未知，可是圆盘那一块上"
-                f"「{who}」给到 {best:.4f} ≥ 线（余量只有 {best - runner:.4f} < {margin_line}）；"
-                f"单条那条路只看分线，它把「{who}」指到了第 {answer} 张卡 —— "
-                "指到别人头上才是假事实"
+                f"「{who}」给到 {best:.4f} ≥ 线、次高 {runner:.4f} 却没退到 "
+                f"{roster.required_runner_up(best):.4f} 以下；单条那条路只看分线，"
+                f"它把「{who}」指到了第 {answer} 张卡 —— 指到别人头上才是假事实"
             )
         risky.append(
-            f"{frame_name}#{index} {who} {best:.4f}/余量 {best - runner:.4f} → "
+            f"{frame_name}#{index} {who} {best:.4f}/次高 {runner:.4f} → "
             + ("没能指出" if answer is None else f"指到他自己（第 {answer} 张卡）")
         )
     clean_line = (
@@ -1326,7 +1334,17 @@ def check_no_name_can_reach_the_line_on_a_card_with_nobody_on_it() -> str:
 
 def check_the_single_path_cost_does_not_follow_the_library() -> str:
     """**代价不随库长增长**：数 `cv2.matchTemplate` 的次数 —— 库 11 条与库 110 条必须
-    **同值**，而且等于 `卡位 × 尺度档数`。顺带钉住那条代数前提 `1 − 余量线 < 分线`。
+    **同值**，而且**有上界** `卡位 × 档数 × 库长`。顺带钉住判据那半条线的**形状**。
+
+    **"等于 `卡位 × 尺度档数`"那条已经死了**：单条那条路现在也走三层扫法、判据满足即停
+    （实测 12 张卡 × 18 档 = 216，实调 **376**），所以绝对公式不再是它该有的样子；
+    活下来的是"有上界"与"不随库长变"两条 —— 那才是"单条"这两个字的意思。
+
+    **形状，不是那条已经退役的代数推论。** 从前这里钉的是 `1 − 余量线 < 分线`，而那半条
+    已经换成随分数走的 `次高 <= required_runner_up(最高)` —— 那个推论**不成立了**。
+    现在钉它的两条性质：在最高分 1.0 处**连续**（=> `1 − 垫片`，没有特例），
+    以及随最高分**单调**。**"分线为什么够"不在这里** —— 那已经换成实测的非匹配天花板，
+    住《备战席点名》§单条查询（两处抄本由 N18 对齐）。
 
     **这一条必须串行跑**：计数器是全局的，池子里有别的活在跑时它就不是一个人的了。
     而它也是这一族里唯一**不能被行为测试替代**的一条 —— 扫完全库再挑出那一条，
@@ -1335,12 +1353,19 @@ def check_the_single_path_cost_does_not_follow_the_library() -> str:
     cv2 = _mod("cv2")
     roster = _mod("ark.engine.vision.roster")
     line = float(_attr("ROSTER_SOLID_MATCH_SCORE"))
-    margin = float(_attr("ROSTER_AMBIGUITY_MARGIN"))
-    if not 1.0 - margin < line:
+    factor = float(_attr("ROSTER_AMBIGUITY_FACTOR"))
+    pad = float(_attr("ROSTER_AMBIGUITY_PAD"))
+    if abs(roster.required_runner_up(1.0) - (1.0 - pad)) > 1e-12:
         raise AssertionError(
-            f"1 − 余量线 = {1.0 - margin:.4f}，不小于分线 {line} —— "
-            "「全扫给了确切名字的卡上，别人到不了线」那条推论就不成立了，"
-            "「认错人」会重新变成一件可能的事"
+            f"required_runner_up(1.0) = {roster.required_runner_up(1.0):.6f}，"
+            f"而不是 1 − 垫片 = {1.0 - pad:.6f} —— 顶部出现了一个特例"
+        )
+    if factor <= 0:
+        raise AssertionError(f"那半条线的斜率是 {factor} —— 不随最高分单调就说不通")
+    if not roster.required_runner_up(line) < line:
+        raise AssertionError(
+            f"在分线 {line} 处它要求次高 ≤ {roster.required_runner_up(line):.4f}，"
+            f"并不比分线低 —— 过了分线就什么都不用退，那半条线等于没有"
         )
     frame_name = "shot01"
     name = "维什戴尔"
@@ -1372,12 +1397,14 @@ def check_the_single_path_cost_does_not_follow_the_library() -> str:
 
     cards = len(_names(_read(frame_name)))
     scales = len(_attr("IDENTITY_SCALES"))
-    expect = cards * scales
     for size, calls, got in measured:
-        if calls != expect:
+        # 上界照《备战席点名》§单条查询 那条写：`卡位 × 档数 × 库长`。
+        # 绝对公式（`卡位 × 尺度`）已经死了，所以这里只问"有没有越界"。
+        ceiling = cards * scales * size
+        if calls > ceiling:
             raise AssertionError(
-                f"库 {size} 条：`matchTemplate` 调了 {calls} 次，而不是 "
-                f"卡位 {cards} × 尺度 {scales} = {expect}"
+                f"库 {size} 条：`matchTemplate` 调了 {calls} 次，越过上界 "
+                f"卡位 {cards} × 档数 {scales} × 库长 {size} = {ceiling}"
             )
         if got != truth_index:
             raise AssertionError(
@@ -1390,7 +1417,8 @@ def check_the_single_path_cost_does_not_follow_the_library() -> str:
         )
     return (
         f"{frame_name} 查「{name}」：库 11 条与库 110 条都是 {measured[0][1]} 次匹配"
-        f"（= 卡位 {cards} × 尺度 {scales}）｜ 1 − 余量线 {1.0 - margin:.2f} < 分线 {line}"
+        f"（= 卡位 {cards} × 尺度 {scales}）｜ 判据在 1.0 处连续、"
+        f"在分线 {line} 处要求次高 ≤ {roster.required_runner_up(line):.4f}"
     )
 
 
@@ -1536,16 +1564,16 @@ def check_the_illustration_is_the_identity() -> str:
     1. **自己那一套认得出**：每条带 10 张卡里**至少 9 张**落精确，而落精确的那几位必须
        正好是**这一条带自己那一组**的那一条（真值见 `ART_TRUTH`）—— 孪生那一条赢一次
        就算失败；
-    2. **只有孪生那一条在库里的那 10 条上**（把库缩到**另一组**），**20 张卡一张都不许
-       落精确**：判据照线上那一条写 —— **两半至少有一半没够到线**才算未知，两半同时够到
-       就成了假事实。**不写成"两个量分别都没够到"**：余量线挪一档，那一档就可能变成
-       "分够、余量也够"，而判据问的从来不是"两个量都低"，是"**没有同时过线**"；
+    2. **只有孪生那一条在库里的那 10 条**（把库缩到**另一组**），**20 张卡一张都不许
+       落精确**：判据不另写一遍 —— 调 `roster.identity_is_exact`，**它不成立**才算未知，
+       成立就成了假事实。**不写成"两个量分别都没够到"**：判据挪一档，那一档就可能变成
+       "分够、次高也退开了"，而判据问的从来不是"两个量都低"，是"**没有同时过线**"；
     3. **孪生一次都不许当第一**：20 条库下面，20 张卡的第一名一个都不是另一组那一条。
 
-    判据是**自己按那两个常量走一遍**（`roster_scores` 的最高分 + 余量），与
-    `read_squad_identities` 在干净卡上走的是同一条（这一批全是干净卡）。**线一个都不
-    写死**：分线与余量线一律走 `ROSTER_SOLID_MATCH_SCORE` / `ROSTER_AMBIGUITY_MARGIN`
-    两个常量 —— 线挪一档（余量线调低那种），这一条要跟着走，不许红。
+    判据不在这条检查里另写一遍：一律调 `roster.identity_is_exact(最高, 次高)` ——
+    **它是判据的唯一定义**（扫法的停止条件与最后的判定都调它），所以线或那条公式挪一档，
+    这一条自动跟着走，不许红。读数走 `roster.roster_scores`（这一批全是干净卡，
+    与 `read_squad_identities` 在干净卡上走的是同一条）。
 
     **什么会让这一条红**：某张卡落精确而第一名是**另一组**的同名条目（立绘张冠李戴）；
     某条带上精确的少于 9 张；把库缩到另一组之后**有卡两半同时过线**；库不是 20 条、
@@ -1554,7 +1582,6 @@ def check_the_illustration_is_the_identity() -> str:
     """
     roster = _mod("ark.engine.vision.roster")
     line = float(_attr("ROSTER_SOLID_MATCH_SCORE"))
-    margin_line = float(_attr("ROSTER_AMBIGUITY_MARGIN"))
     libraries = _art_libraries()
     library = tuple(entry for group in ART_GROUPS for entry in libraries[group])
     labels = [name for name, _ in library]
@@ -1611,7 +1638,7 @@ def check_the_illustration_is_the_identity() -> str:
                     f"组{group} 第 {index} 张卡的第一名是「{who}」—— 那是**另一组**的同名条目。"
                     "立绘就是身份：读出另一套立绘算失败"
                 )
-            if best >= line and best - runner >= margin_line:
+            if roster.identity_is_exact(best, runner):
                 want = f"组{group}·{ART_TRUTH[index]}"
                 if who != want:
                     raise AssertionError(
@@ -1647,12 +1674,13 @@ def check_the_illustration_is_the_identity() -> str:
             worst_score = (best, key)
         if margin > worst_margin[0]:
             worst_margin = (margin, key)
-        # **两半至少有一半没够到线**才落未知 —— 判据照线上那一条写，不写成"两个量
-        # 分别都没够到"：余量线挪一档，那一档就可能变成"分够、余量也够"
-        if best >= line and margin >= margin_line:
+        # **判据不成立**才落未知 —— 照线上那一条问，不写成"两个量分别都没够到"：
+        # 判据问的从来不是"两个量都低"，是"**没有同时过线**"。
+        if roster.identity_is_exact(best, runner):
             raise AssertionError(
                 f"库缩到另一组之后，组{key[0]} 第 {key[1]} 张卡上**两半都过**：孪生那一条"
-                f"给到 {best:.4f} ≥ 线 {line}，余量 {margin:.4f} ≥ 余量线 {margin_line}"
+                f"给到 {best:.4f} ≥ 线 {line}，次高 {runner:.4f} 也退到了 "
+                f"{roster.required_runner_up(best):.4f} 以下"
                 "（那张卡上只有**孪生**那一条在库里）—— 那就是拿另一套立绘认出了本人，"
                 "成了一个假事实"
             )
@@ -1664,8 +1692,8 @@ def check_the_illustration_is_the_identity() -> str:
         ) + "）"
         + "，第一名一次都不是孪生 ｜ 缩到另一组的 10 条："
         f"{len(ART_GROUPS) * len(ART_TRUTH)} 张**两半都没同时过**（最险的分 "
-        f"{worst_score[0]:.4f} · 最险的余量 {worst_margin[0]:.4f}，线是 {line} / "
-        f"{margin_line}）"
+        f"{worst_score[0]:.4f} · 最险的次高差 {worst_margin[0]:.4f}，"
+        f"分线 {line} · 在分线处要求次高 ≤ {roster.required_runner_up(line):.4f}）"
     )
 
 

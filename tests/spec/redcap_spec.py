@@ -10,7 +10,7 @@
 又当反解的取材帧了。所以这一族叫 **R**，从 R1 起，自己一张 `CHECKS`。
 
 **这一套只用公开面**：`roster.roster_scores` / `identity_region` / `IDENTITY_BOX_*` /
-`IDENTITY_SCALE_MAX` / `ROSTER_SOLID_MATCH_SCORE` / `ROSTER_AMBIGUITY_MARGIN` ·
+`IDENTITY_SCALE_MAX` / `ROSTER_SOLID_MATCH_SCORE` / `identity_is_exact` ·
 `redcap.fit_redcap` / `undo_redcap` · `margin.MaskedRuler` / `identity_disc_region` /
 `IDENTITY_DISC_BOX` / `IDENTITY_DISC_RADIUS` / `IDENTITY_DISC_STRIP_HALF` ·
 `bench.squad_card_centres` / `RING_*` ·
@@ -39,7 +39,7 @@ clean=255 只能给出 112/57/52）—— 所以那 92.5% 是**死像素**。拿
   这一族必须含**角上的小块** —— 执行者那张取区表只试了 10 块，**漏掉了它们**，
   而它们**分数真的到得了线**（`cd59#4` 的 `(0, 47, 60, 23)` 干净卡 **0.9588**；
   反解之后 `cd27#6` 到 **0.9303**）—— **但余量立不住**（那两个余量实测是 0.2032 /
-  0.1847；够不够线一律看 `ROSTER_AMBIGUITY_MARGIN`，这里不把线的值写死）。
+  0.1847；够不够**判据**一律调 `roster.identity_is_exact`（判据的唯一定义），这里不把线写死）。
   **所以「圆外挪不出去」这个结论是对的，它错的是理由**：不是"分数够不到线"，
   是"**余量够不到**"。**只看分数那一半，就会得出相反的结论** —— 这一条网自己先踩过
   一次（第一版 R6 只断言分数，红了；红的是网，不是那一单）；
@@ -100,9 +100,10 @@ from ark.engine.vision.roster import (  # noqa: E402
     IDENTITY_BOX_Y,
     IDENTITY_SCALE_MAX,
     IDENTITY_SCALES,
-    ROSTER_AMBIGUITY_MARGIN,
     ROSTER_SOLID_MATCH_SCORE,
+    identity_is_exact,
     identity_region,
+    required_runner_up,
     roster_scores,
 )
 from ark.offline.assets_gen.cardface import load_cardfaces  # noqa: E402
@@ -396,10 +397,11 @@ def check_the_truth_under_the_cap_is_remeasured() -> str:
                 f"{pair['clean']['file']} 位 {index} 的干净读数给的是「{name}」，"
                 f"而取材表写的是「{pair['under_the_cap']}」"
             )
-        if best < ROSTER_SOLID_MATCH_SCORE or margin < ROSTER_AMBIGUITY_MARGIN:
+        if not identity_is_exact(best, runner):
             raise AssertionError(
-                f"{pair['clean']['file']} 位 {index}：{best:.4f} · 余量 {margin:.4f} —— "
-                "那次干净读数自己都没过线（或余量不够），它当不了真值"
+                f"{pair['clean']['file']} 位 {index}：{best:.4f} · 次高 {runner:.4f} —— "
+                "那次干净读数自己都没过判据（分数不够，或次高没退到 "
+                f"{required_runner_up(best):.4f} 以下），它当不了真值"
             )
         if abs(best - float(pair["clean_score"])) > 5e-4:
             raise AssertionError(
@@ -469,11 +471,12 @@ def check_undoing_the_cap_still_misses_the_line() -> str:
             _cut(solved, (offset[0], offset[1], IDENTITY_BOX_WIDTH, IDENTITY_BOX_HEIGHT)),
             _faces(),
         )
-        margin = ranked[0][0] - (ranked[1][0] if len(ranked) > 1 else -2.0)
-        if ranked[0][0] >= ROSTER_SOLID_MATCH_SCORE and margin >= ROSTER_AMBIGUITY_MARGIN:
+        runner = ranked[1][0] if len(ranked) > 1 else -2.0
+        margin = ranked[0][0] - runner
+        if identity_is_exact(ranked[0][0], runner):
             raise AssertionError(
                 f"{pair['capped']['file']}#{index} 反解之后到了 {ranked[0][0]:.4f}"
-                f"（余量 {margin:.4f}），**过线了** —— 那《特征库》§1 那张表要重判"
+                f"（次高 {runner:.4f}），**过了判据** —— 那《特征库》§1 那张表要重判"
             )
         capped_score = _identity_reading(frame, index)[0]
         lines.append(
@@ -520,10 +523,10 @@ def check_undoing_misses_the_line_on_every_region_outside_the_graphics() -> str:
             margin = ranked[0][0] - (ranked[1][0] if len(ranked) > 1 else -2.0)
             scored.append((ranked[0][0], margin, label, box))
         best = max(scored)
-        if best[0] >= ROSTER_SOLID_MATCH_SCORE and best[1] >= ROSTER_AMBIGUITY_MARGIN:
+        if identity_is_exact(best[0], best[0] - best[1]):
             raise AssertionError(
                 f"{pair['capped']['file']}#{index} 在一块**圆外**取区 {best[3]} 上，"
-                f"反解之后到了 {best[0]:.4f}（余量 {best[1]:.4f}）—— **过线了**。"
+                f"反解之后到了 {best[0]:.4f}（次高 {best[0] - best[1]:.4f}）—— **过了判据**。"
                 "那「不够」不成立，这一单要按「够」重做"
             )
         clean_ranked = _score(clean, best[3])
@@ -834,10 +837,7 @@ def check_the_masked_reading_does_not_hinge_on_one_pixel() -> str:
             ranked = ruler.scores(region)
             margin = ranked[0][0] - ranked[1][0]
             scores.append(ranked[0][0])
-            verdicts.append(
-                ranked[0][0] >= ROSTER_SOLID_MATCH_SCORE
-                and margin >= ROSTER_AMBIGUITY_MARGIN
-            )
+            verdicts.append(identity_is_exact(ranked[0][0], ranked[1][0]))
         if len(set(verdicts)) > 1:
             flips += 1
         lines.append(
@@ -883,7 +883,7 @@ def check_the_masked_reading_on_the_red_capped_cards() -> str:
                 f"{pair['capped']['file']}#{pair['capped']['index']}：排掉倒计时图形之后，"
                 f"反解出来的第一名是「{ranked[0][1]}」，而真值是「{pair['under_the_cap']}」"
             )
-        ok = ranked[0][0] >= ROSTER_SOLID_MATCH_SCORE and margin >= ROSTER_AMBIGUITY_MARGIN
+        ok = identity_is_exact(ranked[0][0], ranked[1][0])
         both += 1 if ok else 0
         lines.append(
             f"{pair['capped']['file']}#{pair['capped']['index']} {pair['under_the_cap']}: "
@@ -1001,8 +1001,8 @@ def check_an_outside_block_can_pass_on_a_clean_card() -> str:
         passing = [
             item
             for item in scored
-            if item[0] >= ROSTER_SOLID_MATCH_SCORE
-            and item[1] >= ROSTER_AMBIGUITY_MARGIN
+            # 判据的唯一定义：这里的 item[1] 是余量，次高 = 分 − 余量
+            if identity_is_exact(item[0], item[0] - item[1])
         ]
         passing_total += len(passing)
         best = max(scored)
