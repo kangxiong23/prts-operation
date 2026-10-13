@@ -767,52 +767,46 @@ def _corner_boxes(limit: int = 8) -> tuple[Box, ...]:
     return tuple(kept)
 
 
-def check_the_masked_ruler_reproduces_the_chain_when_the_mask_is_open() -> str:
-    """**R8** —— 换了尺子必须先给基线：掩码全开时它要把 `roster_scores` 逐位复现。
+_TRUTH_KEYS = frozenset({"set", "capped", "clean", "under_the_cap", "truth_from", "capped_name"})
+"""真值表里**每一对**许有的键 —— 多一个键就是多一份会过期的假话。"""
 
-    **两把尺子各测一次**：执行者那把（`margin.MaskedRuler`）对着 `roster_scores` 要求**逐位**
-    （它报的是 1.9e-06）；这一套自己写的那把只要求**判据用得上的那几个数**一致（次序 ·
-    最高分 · 余量）—— 自写那把是 float32 复算，末尾几位本来就对不齐（实测 1.5e-04，
-    是**这一套**的精度不够，不是它那把的问题）。
+
+def check_the_truth_table_carries_no_readings() -> str:
+    """**R13** —— 真值表只认**名字 · 位号 · 判决 · 出处**，**不许存读数**（分数/余量那类）。
+
+    **为什么这条要钉住**：读数会随语义**静默过期** —— 报分语义改成「第一个满足判据的
+    那一档」（D-全局-43）之后，表里那些旧分数就变成了假话，而 R3 那次红就是这么来的
+    （复量 0.9636 对表里 0.9848）。把分数从真值表里赶出去，那类红才不会再长出来：
+    分数由秤现算。
+
+    **顺带记一笔旧账**：原来这条位置上是 **R8**（「掩码全开时那把尺子逐位复现
+    `roster_scores`」）。**它退役了** —— 那条网比的是**两个不同的数**：`roster_scores`
+    报的是「定下判据的那一档」，它**判据一满足就停**、还会在粗层直接接受；而
+    `MaskedRuler.scores` 是**每一档整张滑、取全局最大**。差别全在**报哪一个数**，
+    不在算式（同档同位置两把逐位同值）。两把尺子于是**不是同一个量**，
+    而新尺子靠**它自己那 44 对的实测**站住（见规格）。
     """
-    from ark.engine.vision.margin import MaskedRuler
-
-    frames = _frames()
-    open_mask = np.ones((IDENTITY_BOX_HEIGHT, IDENTITY_BOX_WIDTH), bool)
-    lines: list[str] = []
-    for pair in _by_set("validation"):
-        frame = frames[Path(pair["clean"]["file"]).stem]
-        index = pair["clean"]["index"]
-        region = _cut(
-            _card(frame, index),
-            (IDENTITY_BOX_X, IDENTITY_BOX_Y, IDENTITY_BOX_WIDTH, IDENTITY_BOX_HEIGHT),
-        )
-        old = roster_scores(region, _faces())
-        theirs = MaskedRuler(open_mask, _faces()).scores(region)
-        mine = _masked_scores(region, open_mask, _faces())
-        tight = max(abs(a[0] - b[0]) for a, b in zip(old, theirs))
-        if tight > 1e-5:
+    pairs = json.loads(HARVEST.read_text(encoding="utf-8"))["pairs"]
+    if not pairs:
+        raise AssertionError("真值表一对都没有")
+    for pair in pairs:
+        extra = sorted(set(pair) - _TRUTH_KEYS)
+        if extra:
             raise AssertionError(
-                f"{pair['clean']['file']}#{index}：掩码全开时那把尺子与 `roster_scores` "
-                f"差 {tight:.2e} —— 那它就不是同一个统计量，新尺子上的数不能与 0.85 那条线比"
+                f"{pair.get('set', '?')} 这一对多了键 {extra} —— 真值只认 "
+                f"{sorted(_TRUTH_KEYS)}（读数一律由秤现算）"
             )
-        if [item[1] for item in old] != [item[1] for item in mine]:
-            raise AssertionError(
-                f"{pair['clean']['file']}#{index}：次序/名字不一样 —— "
-                f"{[i[1] for i in old][:3]} 对 {[i[1] for i in mine][:3]}"
-            )
-        loose = max(abs(a[0] - b[0]) for a, b in zip(old, mine))
-        margin_diff = abs((old[0][0] - old[1][0]) - (mine[0][0] - mine[1][0]))
-        if margin_diff > 1e-3:
-            raise AssertionError(
-                f"{pair['clean']['file']}#{index}：这一套自己写的那把，余量与 `roster_scores` "
-                f"差 {margin_diff:.2e} —— 大到会影响判定，那就不是浮点末尾的问题了"
-            )
-        lines.append(
-            f"{pair['clean']['file']}#{index}: 执行者那把 {tight:.2e} · "
-            f"这一套自己写的 {loose:.2e}（余量差 {margin_diff:.2e}）"
-        )
-    return " ｜ ".join(lines) + f" ｜ {len(_faces())} 条库 · {len(IDENTITY_SCALES)} 档尺度"
+        for slot in ("capped", "clean"):
+            keys = set(pair[slot])
+            if keys != {"file", "index"}:
+                raise AssertionError(f"{pair['set']} 的 {slot} 只有 file/index，实际 {sorted(keys)}")
+        for key in _TRUTH_KEYS - {"capped", "clean"}:
+            value = pair[key]
+            if not isinstance(value, str) or not value:
+                raise AssertionError(
+                    f"{pair['set']} 的 {key} 该是非空字符串（判决/出处/名字），收到 {value!r}"
+                )
+    return f"{len(pairs)} 对：键只有 {sorted(_TRUTH_KEYS)}，一处读数都没有"
 
 
 def check_the_masked_reading_does_not_hinge_on_one_pixel() -> str:
@@ -1087,12 +1081,6 @@ CHECKS: tuple[Check, ...] = (
         check_the_identity_box_cannot_be_moved_off_the_graphics,
     ),
     Check(
-        "R8",
-        "任务单 A2b【做】4（换了尺子必须先给基线）+ 任务单 A2【不许做】（不许另写一份匹配）",
-        "掩码全开时，掩码那把尺子把 `roster_scores` 逐位复现 —— 它才是同一个统计量",
-        check_the_masked_ruler_reproduces_the_chain_when_the_mask_is_open,
-    ),
-    Check(
         "R9",
         "任务单 A2b【做】4 + 特征库 §1 那张表（够 / 不够）",
         "排掉倒计时图形之后，反解出来的卡真值排得到第一，并与同卡干净时同一档",
@@ -1115,6 +1103,12 @@ CHECKS: tuple[Check, ...] = (
         "**规格洞**：A2b 单子里没写这一条（它只要求报分数与余量）—— 这一套复量时发现 · §两块取区",
         "判「够 / 不够」的那条读数，**现在这块取区**（圆盘 − 中央秒数那一条）的原点动 1 px 必须给出同一个判定",
         check_the_masked_reading_does_not_hinge_on_one_pixel,
+    ),
+    Check(
+        "R13",
+        "视觉层/备战席点名 §红罩卡（真值只认名字 · 位号 · 判决 · 出处）",
+        "真值表里一对多一个键都不许 —— 读数会随语义静默过期，分数一律由秤现算",
+        check_the_truth_table_carries_no_readings,
     ),
 )
 
