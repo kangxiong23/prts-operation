@@ -384,7 +384,11 @@ def check_the_model_is_far_smaller_than_its_sample() -> str:
 
 
 def check_the_truth_under_the_cap_is_remeasured() -> str:
-    """**R3** —— 「罩下是谁」那条真值，这一套自己复量一遍（不是照抄取材表）。"""
+    """**R3** —— 「罩下是谁」那条真值，这一套自己复量一遍（不是照抄取材表）。
+
+    **分数不比**：取材表里那几个读数会随语义静默过期（报分语义现在是「第一个满足判据的
+    那一档」，D-全局-43 —— 它本就小于等于整段尺子上的最大）。真值只认**名字与判决**。
+    """
     frames = _frames()
     lines: list[str] = []
     for pair in _pairs():
@@ -403,11 +407,8 @@ def check_the_truth_under_the_cap_is_remeasured() -> str:
                 "那次干净读数自己都没过判据（分数不够，或次高没退到 "
                 f"{required_runner_up(best):.4f} 以下），它当不了真值"
             )
-        if abs(best - float(pair["clean_score"])) > 5e-4:
-            raise AssertionError(
-                f"{pair['clean']['file']} 位 {index}：复量 {best:.4f}，"
-                f"取材表写 {pair['clean_score']} —— 两处对不上"
-            )
+        # **不跟取材表里的分数比**：分数随语义变（报分语义是「第一个满足判据的那一档」，
+        # D-全局-43），留在真值表里就会静默过期。真值只认名字与判决，分数由这一套现算。
         lines.append(f"{pair['clean']['file']}#{index} {name} {best:.4f}(余量 {margin:.4f})")
     return " ｜ ".join(lines)
 
@@ -486,18 +487,32 @@ def check_undoing_the_cap_still_misses_the_line() -> str:
     return " ｜ ".join(lines) + f" ｜ 这一块只有 **{live:.4f}** 是活的（{1 - live:.1%} 是死像素）"
 
 
+def _spec_says_why_the_outside_region_is_not_used() -> str:
+    """规格里那句理由在不在：**判据不挡它，挡它的是准确率**。"""
+    doc = (REPO / "docs" / "10-规格" / "视觉层" / "备战席点名.md").read_text(encoding="utf-8")
+    needle = "认错率太高"
+    if needle not in doc:
+        raise AssertionError(
+            f"规格里没有「{needle}」那句 —— 圆外那块取区为什么不用它，得写着（理由是这个实测，"
+            "不是代数）"
+        )
+    return needle
+
+
 def check_undoing_misses_the_line_on_every_region_outside_the_graphics() -> str:
-    """**R6** —— 真正的检验：圆外那一族取区，**反解之后**没有一块过得了线。
+    """**R6** —— 圆外那一族取区：**过得了判据，但认人不行**，所以不取它。
 
-    这一族含角上的小块（执行者那张表漏掉的那些）。**有哪一块过线，这一条就翻了。**
+    **口径改过一次**（旧说法是「圆外没有一块过得了线」）：那是**旧余量线**下面的代数结论，
+    已经翻 —— 实测里就有区域过得了（`cd27#6` 在一块圆外取区上反解到 0.9303、次高 0.7567，
+    按现在的判据是**过**的）。**真正不取它的理由是这个实测**：圆外那块**认错率太高**
+    （约六成准），不是代数不成立。所以这一条改成两头钉：**把过线的那些如实报出来**，
+    而且**规格里那句理由得过在**。
 
-    **它现在量的是哪条路**：**反解**那条路（`undo_redcap`）。线上不反解了 —— 红罩卡
-    换的是**圆内那一块**（圆盘 − 中央秒数那一条，原样喂 `MaskedRuler`）。所以这条的
-    读数**仍然成立**，但它已经不是支点，而是"**圆外那条路不是出路**"这句事实的账：
-    圆外没有一块两半都过，所以取区只能待在圆内（那正是线上走的那一条，支点在 R12）。
+    **它现在量的是哪条路**：**反解**那条路（`undo_redcap`）。线上不反解 —— 红罩卡换的是
+    **圆内那一块**（圆盘 − 中央秒数那一条，原样喂 `MaskedRuler`，支点在 R12）。
 
-    **什么会让这一条红**：验收对里任何一张，在**任意一块整块在圆外的取区**上反解之后
-    分数过线**且**余量过线。
+    **什么会让这一条红**：规格里那句理由不见了；**或者一块圆外取区都没过判据**（那说明
+    判据又变了，这句理由该翻回来）。
     """
     model = _model()
     frames = _frames()
@@ -511,6 +526,7 @@ def check_undoing_misses_the_line_on_every_region_outside_the_graphics() -> str:
             seen.add(box)
             unique.append((label, box))
     lines: list[str] = []
+    passed: list[str] = []
     for pair in _by_set("validation"):
         index = pair["capped"]["index"]
         capped_frame = frames[Path(pair["capped"]["file"]).stem]
@@ -523,19 +539,24 @@ def check_undoing_misses_the_line_on_every_region_outside_the_graphics() -> str:
             margin = ranked[0][0] - (ranked[1][0] if len(ranked) > 1 else -2.0)
             scored.append((ranked[0][0], margin, label, box))
         best = max(scored)
-        if identity_is_exact(best[0], best[0] - best[1]):
-            raise AssertionError(
-                f"{pair['capped']['file']}#{index} 在一块**圆外**取区 {best[3]} 上，"
-                f"反解之后到了 {best[0]:.4f}（次高 {best[0] - best[1]:.4f}）—— **过了判据**。"
-                "那「不够」不成立，这一单要按「够」重做"
-            )
         clean_ranked = _score(clean, best[3])
+        if identity_is_exact(best[0], best[0] - best[1]):
+            passed.append(
+                f"{pair['capped']['file']}#{index} 圆外 {best[3]} 反解 {best[0]:.4f}"
+                f"（次高 {best[0] - best[1]:.4f}）**过判据**"
+            )
         lines.append(
             f"{pair['capped']['file']}#{index}: 圆外 {len(unique)} 块，反解最好 {best[0]:.4f}"
             f"（{best[3]}，余量 {best[1]:.4f}）· 同一块干净卡 {clean_ranked[0][0]:.4f}"
-            f" —— 差 {ROSTER_SOLID_MATCH_SCORE - best[0]:.4f}"
         )
-    return " ｜ ".join(lines)
+    if not passed:
+        raise AssertionError(
+            "一块圆外取区都没过判据 —— 那「判据不挡它、挡它的是准确率」这句该翻回来"
+        )
+    needle = _spec_says_why_the_outside_region_is_not_used()
+    return (
+        f"过判据的 {len(passed)} 块：{' ｜ '.join(passed[:3])} ｜ 规格里那句理由在（「{needle}」）"
+    )
 
 
 def check_the_identity_box_cannot_be_moved_off_the_graphics() -> str:
@@ -1038,7 +1059,7 @@ CHECKS: tuple[Check, ...] = (
     Check(
         "R3",
         "任务单 A2【做】5（真值来源必须写明）+ 帧样本/红罩/取材.json",
-        "四次干净读数这一套自己复量：名字 · 过线 · 余量 · 与取材表逐位一致",
+        "四次干净读数这一套自己复量：名字与判决都对得上（分数不比 —— 它由这一套现算）",
         check_the_truth_under_the_cap_is_remeasured,
     ),
     Check(
