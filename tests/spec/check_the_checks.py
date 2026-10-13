@@ -331,6 +331,85 @@ FIELD_CASES: tuple[
 )
 
 
+def _always_present(*_args: object, **_kwargs: object) -> object:
+    """判决：一律「在」—— 拿去盖**黄**那条链，试「灰的帧上黄那条报在」那一条断言。"""
+    return contracts.Valued(contracts.Exact(True), 0.99)
+
+
+def _gray_absent_ceiling() -> float:
+    """灰那条链「不在」那 16 条里**最高**的分 —— 量出来，不抄一个数。
+
+    注意这 16 条**跨两批**（灰那批 2 条 + 场上干员那批 14 条），所以两批都要量 ——
+    只量灰那批会得到一个小得多的数，那样一盖上去先炸的是"丢掉读数"那一条，
+    "坐在空档里"那条就永远没人试过。
+    """
+    template = field_mod.load_close_diamond()
+    gray, yellow = field_spec._gray_frames(), field_spec._frames()
+    scores = []
+    for name, present in field_spec.CLOSE_DIAMOND_PRESENT.items():
+        if present:
+            continue
+        if name in gray:
+            frame, window = gray[name], field_spec._gray_window_of(name)
+        else:
+            frame, window = yellow[name], field_spec._window_of(name)
+        scores.append(field_mod.diamond_score(frame, window, template)[0])
+    return max(scores)
+
+
+_GRAY_CEILING = _gray_absent_ceiling()
+"""模块加载时量一次（10 次模板匹配，代价可忽略）。"""
+
+GRAY_CASES: tuple[
+    tuple[str, object, Callable[[], str], dict[str, object], str | None], ...
+] = (
+    (
+        "F17 灰的真值两处对翻（一处在→不在、一处不在→在）",
+        field_spec,
+        field_spec._f17_close_diamond_matches_truth_and_does_not_mix,
+        {
+            "CLOSE_DIAMOND_PRESENT": {
+                **field_spec.CLOSE_DIAMOND_PRESENT,
+                "cd26": False,
+                "cd03": True,
+            }
+        },
+        "误报",
+    ),
+    (
+        "F17 灰那条链永远「认不出」",
+        field_mod,
+        field_spec._f17_close_diamond_matches_truth_and_does_not_mix,
+        {"find_close_diamond": _always_unsampled},
+        "明明白白的读数被丢掉了",
+    ),
+    (
+        "F17 灰的线抬到灰自己空档的上缘",
+        field_mod,
+        field_spec._f17_close_diamond_matches_truth_and_does_not_mix,
+        {"CLOSE_DIAMOND_ABSENT_SCORE": _GRAY_CEILING},
+        "灰那两条线没坐在",
+    ),
+    (
+        "F17 黄那条链被换成「永远报在」（跨色那一格）",
+        field_mod,
+        field_spec._f17_close_diamond_matches_truth_and_does_not_mix,
+        {"find_ready_diamond": _always_present},
+        "两个布尔混了",
+    ),
+    (
+        "F18 灰那条链抄了黄那一对线",
+        field_mod,
+        field_spec._f18_close_diamond_is_its_own_asset,
+        {
+            "CLOSE_DIAMOND_ABSENT_SCORE": field_mod.DIAMOND_ABSENT_SCORE,
+            "CLOSE_DIAMOND_SOLID_SCORE": field_mod.DIAMOND_SOLID_SCORE,
+        },
+        "抄了黄那一对线",
+    ),
+)
+
+
 def main() -> int:
     print("把公开面换成坏的那一版，检查是否变红：")
     results = [_goes_red(name, check, patch) for name, check, patch in CASES]
@@ -345,6 +424,12 @@ def main() -> int:
     results += [
         _goes_red_in(module, name, check, patch, must_mention=mention)
         for name, module, check, patch, mention in FIELD_CASES
+    ]
+    print()
+    print("灰菱形那批（盖在灰的判决入口、灰的真值表、黄那条链上）：")
+    results += [
+        _goes_red_in(module, name, check, patch, must_mention=mention)
+        for name, module, check, patch, mention in GRAY_CASES
     ]
     print()
     print(f"{sum(results)}/{len(results)} 条检查被证明会红")

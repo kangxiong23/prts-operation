@@ -54,6 +54,8 @@ for _entry in (str(REPO / "src"), str(_HERE)):
         sys.path.insert(0, _entry)
 
 BATCH = REPO / "tests" / "帧样本" / "场上干员"
+GRAY_BATCH = REPO / "tests" / "帧样本" / "灰菱形"
+"""灰菱形那一批（10 条：8 条「在」+ 2 条「不在」）。灰那条链的真值**跨两批**（见 F17）。"""
 TRUTH_BATCH = REPO / "tests" / "帧样本" / "场上干员真值"
 READINGS = BATCH / "判据读数.json"
 TRUTH_READINGS = TRUTH_BATCH / "判据读数.json"
@@ -143,6 +145,43 @@ DIAMOND_PRESENT: dict[str, bool] = {
 **它不来自执行者的 `取材.json`**（那份是它自己看图的产物）—— 两者相符由 F16 自己核出来：
 我这张表是**主本**，夹具那份只是抄本。"""
 
+CLOSE_DIAMOND_PRESENT: dict[str, bool] = {
+    "cd26": True,
+    "cd18": True,
+    "cd35": True,
+    "cd49": True,
+    "cd33": True,
+    "cd46": True,
+    "cd41": True,
+    "cd02": True,
+    "cd03": False,
+    "cd08": False,
+    "cd01_c": True,
+    "cd12_a": True,
+    "cd01_a": False,
+    "cd01_b": False,
+    "shot01_a": False,
+    "shot02_a": False,
+    "shot04_a": False,
+    "shot21_a": False,
+    "shot22_a": False,
+    "shot26_a": False,
+    "shot30_a": False,
+    "shot31_a": False,
+    "board_a": False,
+    "board_b": False,
+    "field_a": False,
+    "field_b": False,
+}
+"""**规划者看图逐帧读出来的**「那个**灰**菱形在不在」—— 26 帧 = **10 在 / 16 不在**。
+
+取证图两张：`data/probe/gray_truth_sheet.png`（灰那批 8 在 + 2 不在）与
+`data/probe/gray_cross_sheet.png`（黄的 8 格 / 灰的 10 格并排）。「在」＝**灰色**菱形
+（外框里是一个**浅灰方块**）。「不在」那 16 条里：8 条上画着**黄**菱形、6 条上是干员立绘
+或空条、2 条（`cd03` · `cd08`）那一格是**墙**（镜头已经离开这位干员）。
+
+**它不来自执行者的 `取材.json`** —— 那份是它自己看图的产物；两者相符由 F17 核出来。"""
+
 TOLERANCE = 0.025
 """**条是 146 列**，1 列 = 0.0068。取 0.025 ≈ 3.7 列 —— 规划者自己量同一根条时，
 填充的左缘会比取区声明的 (40, 320) 偏左 2–3 列（不同帧的条实例有自己的亚像素偏移），
@@ -197,6 +236,31 @@ def _window_of(name: str):
         if crop["file"][:-4] == name:
             return _rect(*[float(v) for v in crop["window"]])
     raise KeyError(name)
+
+
+_GRAY_TAKING = json.loads((GRAY_BATCH / "取材.json").read_text("utf-8"))
+
+
+def _gray_frames() -> dict:
+    build = _frame_mod().frame_from_raw
+    batch = importlib.import_module("ark.offline.bench.batch").load_batch(GRAY_BATCH)
+    return {case.name: build(case.raw()) for case in batch.cases}
+
+
+def _gray_window_of(name: str):
+    """灰那批的取区（**画布坐标**）：它**自己的** `取材.json` 里那一条。"""
+    for crop in _GRAY_TAKING["crops"]:
+        if crop["file"][:-4] == name:
+            return _rect(*[float(v) for v in crop["window"]])
+    raise KeyError(name)
+
+
+def _diamond_verdict(slot: object) -> str:
+    """一个槽 → 「在」/「不在」/「认不出」—— **只看形态，不看分数**。"""
+    payload = getattr(slot, "payload", None)
+    if type(payload).__name__ != "Exact":
+        return "认不出"
+    return "在" if bool(getattr(payload, "value", False)) else "不在"
 
 
 def _bar_of(name: str):
@@ -445,7 +509,7 @@ def _f5_diamond_is_searched() -> None:
 
     present = [name for name in frames if verdict(name, _window_of(name))]
     assert present, (
-        "整批里一条「菱形在」都没搜到 —— 夹具声明 8 条有它；要么这条用例的坐标错了，"
+        "整批里一条「黄菱形在」都没搜到 —— 夹具声明 8 条有它；要么这条用例的坐标错了，"
         "要么搜索本身不成立"
     )
     for name in present:
@@ -637,6 +701,111 @@ def _f16_diamond_verdicts_match_truth() -> None:
     )
 
 
+def _f17_close_diamond_matches_truth_and_does_not_mix() -> None:
+    """**灰**菱形那个布尔：判决 == 我逐帧读的真值，而且**黄 ↔ 灰 不许混**（四格）。
+
+    混了就是假事实：灰的认成黄的 ⇒ AI 以为技能**能放**（其实正开着）；黄的认成灰的 ⇒
+    AI 以为技能**开着**（会去关一个没开的技能）。所以四格里那两格跨色的必须**一个都不许有**。
+
+    两个方向分开：**误报**（画面里没有灰菱形却报「在」）与**漏检**（有却报「不在」）。
+    「认不出」不算错，但**分数落在空档之外却报认不出**要红 —— 那是把明明白白的读数丢掉。
+
+    余量**只写规则**：灰那两条线必须**严格坐在灰自己的空档里**（`max(不在) < ABSENT <
+    SOLID < min(在)`）。**不许拿黄那一对线来判灰的** —— 空档宽度差一倍（0.4620 对 0.2638），
+    那是**两个量**。灰那一对线现在**有口径**（空档三等分），黄那一对**没有**（记在规格 §3）。
+    """
+    field = _field()
+    gray_template = field.load_close_diamond()
+    yellow_template = field.load_ready_diamond()
+    gray, yellow = _gray_frames(), _frames()
+    where = {name: ("gray", name) for name in gray} | {name: ("yellow", name) for name in yellow}
+
+    close_scores: dict[str, float] = {}
+    close_verdicts: dict[str, str] = {}
+    ready_verdicts: dict[str, str] = {}
+    for name in CLOSE_DIAMOND_PRESENT:
+        group, key = where[name]
+        frame = (gray if group == "gray" else yellow)[key]
+        window = _gray_window_of(key) if group == "gray" else _window_of(key)
+        close_scores[name] = field.diamond_score(frame, window, gray_template)[0]
+        close_verdicts[name] = _diamond_verdict(field.find_close_diamond(frame, window, gray_template))
+        ready_verdicts[name] = _diamond_verdict(field.find_ready_diamond(frame, window, yellow_template))
+
+    present = [s for n, s in close_scores.items() if CLOSE_DIAMOND_PRESENT[n]]
+    absent = [s for n, s in close_scores.items() if not CLOSE_DIAMOND_PRESENT[n]]
+    assert len(present) == 10 and len(absent) == 16, (len(present), len(absent))
+
+    missed: list[str] = []
+    false_positives: list[str] = []
+    undecided: list[str] = []
+    for name, want in CLOSE_DIAMOND_PRESENT.items():
+        got = close_verdicts[name]
+        if got == "认不出":
+            undecided.append(name)
+            continue
+        if (got == "在") == want:
+            continue
+        (missed if want else false_positives).append(name)
+    assert not false_positives, (
+        f"灰那条链误报（画面里没有灰菱形，却报「在」）：{false_positives} —— 假事实那个方向"
+    )
+    assert not missed, f"灰那条链漏检（画面里有灰菱形，却报「不在」）：{missed}"
+    lost = [
+        f"{name}（分 {close_scores[name]:.6f}）"
+        for name in undecided
+        if close_scores[name] <= max(absent) or close_scores[name] >= min(present)
+    ]
+    assert not lost, f"分数在空档之外、判决却落「认不出」—— 明明白白的读数被丢掉了：{lost}"
+    assert (
+        max(absent)
+        < field.CLOSE_DIAMOND_ABSENT_SCORE
+        < field.CLOSE_DIAMOND_SOLID_SCORE
+        < min(present)
+    ), (
+        f"灰那两条线没坐在**灰自己的**空档里：不在最高 {max(absent):.6f} · 在最低 {min(present):.6f} · "
+        f"线是 {field.CLOSE_DIAMOND_ABSENT_SCORE} / {field.CLOSE_DIAMOND_SOLID_SCORE}"
+    )
+
+    yellow_on = [n for n, want in DIAMOND_PRESENT.items() if want]
+    gray_on = [n for n, want in CLOSE_DIAMOND_PRESENT.items() if want]
+    assert len(yellow_on) == 8 and len(gray_on) == 10, (yellow_on, gray_on)
+    crossed = [n for n in yellow_on if close_verdicts[n] == "在"]
+    assert not crossed, f"**黄的**帧上灰那条报了「在」—— 两个布尔混了：{crossed}"
+    crossed = [n for n in gray_on if ready_verdicts[n] == "在"]
+    assert not crossed, f"**灰的**帧上黄那条报了「在」—— 两个布尔混了：{crossed}"
+
+
+def _f18_close_diamond_is_its_own_asset() -> None:
+    """灰那条链是**新的一条**：另一个模板、另一组线（不许把黄那条改造成二选一）。"""
+    field = _field()
+    assert field.CLOSE_DIAMOND_PATH != field.READY_DIAMOND_PATH
+    for path in (field.CLOSE_DIAMOND_PATH, field.READY_DIAMOND_PATH):
+        assert Path(path).is_file(), f"模板资产不在：{path}"
+    assert (
+        field.CLOSE_DIAMOND_ABSENT_SCORE,
+        field.CLOSE_DIAMOND_SOLID_SCORE,
+    ) != (field.DIAMOND_ABSENT_SCORE, field.DIAMOND_SOLID_SCORE), (
+        "灰那条链抄了黄那一对线 —— 两份空档宽度差一倍（0.4620 对 0.2638），抄了就是拿错的量判"
+    )
+    with np.load(field.CLOSE_DIAMOND_PATH, allow_pickle=False) as asset:
+        gray_source = str(asset["source"].item())
+    with np.load(field.READY_DIAMOND_PATH, allow_pickle=False) as asset:
+        yellow_source = str(asset["source"].item())
+    assert gray_source != yellow_source, "两个模板取自同一帧 —— 那不该是两个布尔"
+    assert gray_source not in _all_batch_sources(), (
+        f"灰的模板取自验收批的帧：{gray_source}（模板不许取自验收批）"
+    )
+
+
+def _all_batch_sources() -> set[str]:
+    """两批夹具用到的**源帧**（`index.json` 里那一条条）。"""
+    sources: set[str] = set()
+    for batch_dir in (BATCH, GRAY_BATCH):
+        index = json.loads((batch_dir / "index.json").read_text("utf-8"))
+        sources.update(crop["source"] for crop in index["crops"] if "source" in crop)
+    return sources
+
+
 CHECKS: tuple[Check, ...] = (
     Check("F1", "血条只出字段表允许的形态，且九档填充看得见", "状态层/我方干员 §字段表（血量那一行）", _f1_health_forms),
     Check("F2", "技力字段只出精确/区间/未采样，不许出下界", "状态层/我方干员 §字段表（技力那一行）", _f2_skill_forms),
@@ -652,4 +821,6 @@ CHECKS: tuple[Check, ...] = (
     Check("F12", "执行者没见过的 3 帧也与真值相容", "field_ops_truth.md §第二批真值帧（sp_series）", _f12_new_frames_match_truth),
     Check("F13", "自己画的技力条（含亮轨道）也读得出亮区比例", "视觉层/场上我方干员 §2 · §1（绿条 = 充能中）", _f13_skill_fill_known),
     Check("F16", "菱形的判决与规划者读的真值相符（16 帧），两条线坐在空档里", "视觉层/场上我方干员 §3 · 真值主本是本文件的 DIAMOND_PRESENT", _f16_diamond_verdicts_match_truth),
+    Check("F17", "灰菱形的判决对真值（26 帧）· **黄↔灰不许混**（四格）· 灰的线坐在灰自己的空档里", "视觉层/场上我方干员 §3.1 · 真值主本是本文件的 CLOSE_DIAMOND_PRESENT", _f17_close_diamond_matches_truth_and_does_not_mix),
+    Check("F18", "灰那条链是另一条：另一个模板、另一组线、模板不取自验收批", "视觉层/识别方法 §已定（不许拿验收帧当素材）· 视觉层/场上我方干员 §3.1", _f18_close_diamond_is_its_own_asset),
 )
