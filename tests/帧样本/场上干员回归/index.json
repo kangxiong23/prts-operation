@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "note": "技力那一侧的**回归批**：五帧都是亮底（橙条纹地板 / 青地板 / 花丛）。它**不是**独立真值批 —— 判据是拿这一批的现象改的，所以它见过；它的用处是「以后技力那一侧的读数不许再变」。**这一批没有任何真值**（真值住规划者那边）。",
+  "crops": [
+    {
+      "file": "s00.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/sp_series/s00.png",
+      "source_sha256": "ceb5f5e12a9a9e01fb7e32c19c2c3efa705bca3be0979f35b867406e6424ad6c"
+    },
+    {
+      "file": "s01.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/sp_series/s01.png",
+      "source_sha256": "e051ee59ef417283cd8766f87122b7e4277a5d6bab0f071797dc8bdefdbdc2c5"
+    },
+    {
+      "file": "s02.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/sp_series/s02.png",
+      "source_sha256": "0aaf8a30a20f27ec8c28f81fe088cfd63c4378c33ed7b16e9fe04edf49f394fd"
+    },
+    {
+      "file": "s03.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/sp_series/s03.png",
+      "source_sha256": "149228cfe1cc67154bbb7d1a6c18a7dd0190c46f87d27839e326952ea6873c8a"
+    },
+    {
+      "file": "s04.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/sp_series/s04.png",
+      "source_sha256": "0f346bacee4fa4787b118d0ece27c6979a99805a3fdf89e0840ea2a6338e94b4"
+    }
+  ]
+}

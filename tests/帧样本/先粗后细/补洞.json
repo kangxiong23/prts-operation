@@ -1,0 +1,1297 @@
+{
+ "note": "甲：补洞（粗层铺满 + 细层覆盖整格）三个走法。只量不改。",
+ "truth": {
+  "file": "tests/帧样本/先粗后细/曲线.json",
+  "pairs": 4030
+ },
+ "today": {
+  "source": "tests/帧样本/先粗后细/读数.json 的 cost_measured（复用 · 折半）",
+  "chain_calls": 968,
+  "chain_s": 14.0836
+ },
+ "family": {
+  "甲-D 对照：旧四层（11档步0.01 · ±3/±2/±1 · 位12/8/6）": [
+   {
+    "pixels": 12,
+    "factor": 0.12,
+    "step": 0.01,
+    "scale_half": null,
+    "pos_half": null,
+    "interval": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "first_grid": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "final": false
+   },
+   {
+    "pixels": 25,
+    "factor": 0.25,
+    "step": 0.01,
+    "scale_half": 3,
+    "pos_half": 12,
+    "interval": "窄区间",
+    "first_grid": null,
+    "final": false
+   },
+   {
+    "pixels": 50,
+    "factor": 0.5,
+    "step": 0.01,
+    "scale_half": 2,
+    "pos_half": 8,
+    "interval": "窄区间",
+    "first_grid": null,
+    "final": false
+   },
+   {
+    "pixels": 100,
+    "factor": 1.0,
+    "step": 0.01,
+    "scale_half": 1,
+    "pos_half": 6,
+    "interval": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "first_grid": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "final": true
+   }
+  ],
+  "甲-A 旧四层 + 细层加宽到 ±2（位12/8/6）": [
+   {
+    "pixels": 12,
+    "factor": 0.12,
+    "step": 0.01,
+    "scale_half": null,
+    "pos_half": null,
+    "interval": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "first_grid": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "final": false
+   },
+   {
+    "pixels": 25,
+    "factor": 0.25,
+    "step": 0.01,
+    "scale_half": 3,
+    "pos_half": 12,
+    "interval": "窄区间",
+    "first_grid": null,
+    "final": false
+   },
+   {
+    "pixels": 50,
+    "factor": 0.5,
+    "step": 0.01,
+    "scale_half": 2,
+    "pos_half": 8,
+    "interval": "窄区间",
+    "first_grid": null,
+    "final": false
+   },
+   {
+    "pixels": 100,
+    "factor": 1.0,
+    "step": 0.01,
+    "scale_half": 2,
+    "pos_half": 6,
+    "interval": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "first_grid": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "final": true
+   }
+  ],
+  "甲-B 旧四层 + 细层加宽到 ±3（位12/8/6）": [
+   {
+    "pixels": 12,
+    "factor": 0.12,
+    "step": 0.01,
+    "scale_half": null,
+    "pos_half": null,
+    "interval": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "first_grid": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "final": false
+   },
+   {
+    "pixels": 25,
+    "factor": 0.25,
+    "step": 0.01,
+    "scale_half": 3,
+    "pos_half": 12,
+    "interval": "窄区间",
+    "first_grid": null,
+    "final": false
+   },
+   {
+    "pixels": 50,
+    "factor": 0.5,
+    "step": 0.01,
+    "scale_half": 2,
+    "pos_half": 8,
+    "interval": "窄区间",
+    "first_grid": null,
+    "final": false
+   },
+   {
+    "pixels": 100,
+    "factor": 1.0,
+    "step": 0.01,
+    "scale_half": 3,
+    "pos_half": 6,
+    "interval": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "first_grid": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "final": true
+   }
+  ],
+  "甲-C 粗层铺满 26 档步0.01 + 细层±2": [
+   {
+    "pixels": 12,
+    "factor": 0.12,
+    "step": 0.01,
+    "scale_half": null,
+    "pos_half": null,
+    "interval": [
+     0.95,
+     0.96,
+     0.97,
+     0.98,
+     0.99,
+     1.0,
+     1.01,
+     1.02,
+     1.03,
+     1.04,
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15,
+     1.16,
+     1.17,
+     1.18,
+     1.19,
+     1.2
+    ],
+    "first_grid": [
+     0.95,
+     0.96,
+     0.97,
+     0.98,
+     0.99,
+     1.0,
+     1.01,
+     1.02,
+     1.03,
+     1.04,
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15,
+     1.16,
+     1.17,
+     1.18,
+     1.19,
+     1.2
+    ],
+    "final": false
+   },
+   {
+    "pixels": 25,
+    "factor": 0.25,
+    "step": 0.01,
+    "scale_half": 3,
+    "pos_half": 12,
+    "interval": "宽区间",
+    "first_grid": null,
+    "final": false
+   },
+   {
+    "pixels": 50,
+    "factor": 0.5,
+    "step": 0.01,
+    "scale_half": 2,
+    "pos_half": 8,
+    "interval": "宽区间",
+    "first_grid": null,
+    "final": false
+   },
+   {
+    "pixels": 100,
+    "factor": 1.0,
+    "step": 0.01,
+    "scale_half": 2,
+    "pos_half": 6,
+    "interval": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "first_grid": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "final": true
+   }
+  ],
+  "甲-E 粗层铺满 26 档步0.03 + 细层±2": [
+   {
+    "pixels": 12,
+    "factor": 0.12,
+    "step": 0.03,
+    "scale_half": null,
+    "pos_half": null,
+    "interval": [
+     0.95,
+     0.96,
+     0.97,
+     0.98,
+     0.99,
+     1.0,
+     1.01,
+     1.02,
+     1.03,
+     1.04,
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15,
+     1.16,
+     1.17,
+     1.18,
+     1.19,
+     1.2
+    ],
+    "first_grid": [
+     0.95,
+     0.98,
+     1.01,
+     1.04,
+     1.07,
+     1.1,
+     1.13,
+     1.16,
+     1.19,
+     1.2
+    ],
+    "final": false
+   },
+   {
+    "pixels": 25,
+    "factor": 0.25,
+    "step": 0.01,
+    "scale_half": 3,
+    "pos_half": 12,
+    "interval": "宽区间",
+    "first_grid": null,
+    "final": false
+   },
+   {
+    "pixels": 50,
+    "factor": 0.5,
+    "step": 0.01,
+    "scale_half": 2,
+    "pos_half": 8,
+    "interval": "宽区间",
+    "first_grid": null,
+    "final": false
+   },
+   {
+    "pixels": 100,
+    "factor": 1.0,
+    "step": 0.01,
+    "scale_half": 2,
+    "pos_half": 6,
+    "interval": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "first_grid": [
+     1.05,
+     1.06,
+     1.07,
+     1.08,
+     1.09,
+     1.1,
+     1.11,
+     1.12,
+     1.13,
+     1.14,
+     1.15
+    ],
+    "final": true
+   }
+  ]
+ },
+ "designs": {
+  "甲-D 对照：旧四层（11档步0.01 · ±3/±2/±1 · 位12/8/6）": {
+   "plan": [
+    {
+     "pixels": 12,
+     "factor": 0.12,
+     "step": 0.01,
+     "scale_half": null,
+     "pos_half": null,
+     "interval": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "first_grid": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "final": false
+    },
+    {
+     "pixels": 25,
+     "factor": 0.25,
+     "step": 0.01,
+     "scale_half": 3,
+     "pos_half": 12,
+     "interval": "窄区间",
+     "first_grid": null,
+     "final": false
+    },
+    {
+     "pixels": 50,
+     "factor": 0.5,
+     "step": 0.01,
+     "scale_half": 2,
+     "pos_half": 8,
+     "interval": "窄区间",
+     "first_grid": null,
+     "final": false
+    },
+    {
+     "pixels": 100,
+     "factor": 1.0,
+     "step": 0.01,
+     "scale_half": 1,
+     "pos_half": 6,
+     "interval": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "first_grid": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "final": true
+    }
+   ],
+   "pairs": 4030,
+   "scale_exact": 2783,
+   "scale_within_1": 3038,
+   "scale_within_2": 3272,
+   "cards": 350,
+   "before": {
+    "exact": 209
+   },
+   "after": {
+    "exact": 209
+   },
+   "gained_n": 0,
+   "lost_n": 0,
+   "wrong_new_n": 0,
+   "gained": [],
+   "lost": [],
+   "name_moved_n": 20,
+   "coverage_by_layer": [
+    {
+     "depth": 1,
+     "hit": 4030,
+     "total": 4030
+    },
+    {
+     "depth": 2,
+     "hit": 3207,
+     "total": 4030
+    },
+    {
+     "depth": 3,
+     "hit": 3017,
+     "total": 4030
+    },
+    {
+     "depth": 4,
+     "hit": 2898,
+     "total": 4030
+    }
+   ],
+   "edge_narrow_n": 136,
+   "edge_wide_n": 66,
+   "on_final_edge_n": 159,
+   "cards_total": 350,
+   "calls_per_pair": 21.713,
+   "seconds": 46.678,
+   "per_pair": []
+  },
+  "甲-A 旧四层 + 细层加宽到 ±2（位12/8/6）": {
+   "plan": [
+    {
+     "pixels": 12,
+     "factor": 0.12,
+     "step": 0.01,
+     "scale_half": null,
+     "pos_half": null,
+     "interval": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "first_grid": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "final": false
+    },
+    {
+     "pixels": 25,
+     "factor": 0.25,
+     "step": 0.01,
+     "scale_half": 3,
+     "pos_half": 12,
+     "interval": "窄区间",
+     "first_grid": null,
+     "final": false
+    },
+    {
+     "pixels": 50,
+     "factor": 0.5,
+     "step": 0.01,
+     "scale_half": 2,
+     "pos_half": 8,
+     "interval": "窄区间",
+     "first_grid": null,
+     "final": false
+    },
+    {
+     "pixels": 100,
+     "factor": 1.0,
+     "step": 0.01,
+     "scale_half": 2,
+     "pos_half": 6,
+     "interval": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "first_grid": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "final": true
+    }
+   ],
+   "pairs": 4030,
+   "scale_exact": 2969,
+   "scale_within_1": 3225,
+   "scale_within_2": 3446,
+   "cards": 350,
+   "before": {
+    "exact": 209
+   },
+   "after": {
+    "exact": 209
+   },
+   "gained_n": 0,
+   "lost_n": 0,
+   "wrong_new_n": 0,
+   "gained": [],
+   "lost": [],
+   "name_moved_n": 20,
+   "coverage_by_layer": [
+    {
+     "depth": 1,
+     "hit": 4030,
+     "total": 4030
+    },
+    {
+     "depth": 2,
+     "hit": 3207,
+     "total": 4030
+    },
+    {
+     "depth": 3,
+     "hit": 3017,
+     "total": 4030
+    },
+    {
+     "depth": 4,
+     "hit": 3166,
+     "total": 4030
+    }
+   ],
+   "edge_narrow_n": 136,
+   "edge_wide_n": 66,
+   "on_final_edge_n": 133,
+   "cards_total": 350,
+   "calls_per_pair": 22.946,
+   "seconds": 59.001,
+   "per_pair": []
+  },
+  "甲-B 旧四层 + 细层加宽到 ±3（位12/8/6）": {
+   "plan": [
+    {
+     "pixels": 12,
+     "factor": 0.12,
+     "step": 0.01,
+     "scale_half": null,
+     "pos_half": null,
+     "interval": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "first_grid": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "final": false
+    },
+    {
+     "pixels": 25,
+     "factor": 0.25,
+     "step": 0.01,
+     "scale_half": 3,
+     "pos_half": 12,
+     "interval": "窄区间",
+     "first_grid": null,
+     "final": false
+    },
+    {
+     "pixels": 50,
+     "factor": 0.5,
+     "step": 0.01,
+     "scale_half": 2,
+     "pos_half": 8,
+     "interval": "窄区间",
+     "first_grid": null,
+     "final": false
+    },
+    {
+     "pixels": 100,
+     "factor": 1.0,
+     "step": 0.01,
+     "scale_half": 3,
+     "pos_half": 6,
+     "interval": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "first_grid": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "final": true
+    }
+   ],
+   "pairs": 4030,
+   "scale_exact": 3115,
+   "scale_within_1": 3339,
+   "scale_within_2": 3471,
+   "cards": 350,
+   "before": {
+    "exact": 209
+   },
+   "after": {
+    "exact": 209
+   },
+   "gained_n": 0,
+   "lost_n": 0,
+   "wrong_new_n": 0,
+   "gained": [],
+   "lost": [],
+   "name_moved_n": 21,
+   "coverage_by_layer": [
+    {
+     "depth": 1,
+     "hit": 4030,
+     "total": 4030
+    },
+    {
+     "depth": 2,
+     "hit": 3207,
+     "total": 4030
+    },
+    {
+     "depth": 3,
+     "hit": 3017,
+     "total": 4030
+    },
+    {
+     "depth": 4,
+     "hit": 3369,
+     "total": 4030
+    }
+   ],
+   "edge_narrow_n": 136,
+   "edge_wide_n": 66,
+   "on_final_edge_n": 156,
+   "cards_total": 350,
+   "calls_per_pair": 24.094,
+   "seconds": 64.127,
+   "per_pair": []
+  },
+  "甲-C 粗层铺满 26 档步0.01 + 细层±2": {
+   "plan": [
+    {
+     "pixels": 12,
+     "factor": 0.12,
+     "step": 0.01,
+     "scale_half": null,
+     "pos_half": null,
+     "interval": [
+      0.95,
+      0.96,
+      0.97,
+      0.98,
+      0.99,
+      1.0,
+      1.01,
+      1.02,
+      1.03,
+      1.04,
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15,
+      1.16,
+      1.17,
+      1.18,
+      1.19,
+      1.2
+     ],
+     "first_grid": [
+      0.95,
+      0.96,
+      0.97,
+      0.98,
+      0.99,
+      1.0,
+      1.01,
+      1.02,
+      1.03,
+      1.04,
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15,
+      1.16,
+      1.17,
+      1.18,
+      1.19,
+      1.2
+     ],
+     "final": false
+    },
+    {
+     "pixels": 25,
+     "factor": 0.25,
+     "step": 0.01,
+     "scale_half": 3,
+     "pos_half": 12,
+     "interval": "宽区间",
+     "first_grid": null,
+     "final": false
+    },
+    {
+     "pixels": 50,
+     "factor": 0.5,
+     "step": 0.01,
+     "scale_half": 2,
+     "pos_half": 8,
+     "interval": "宽区间",
+     "first_grid": null,
+     "final": false
+    },
+    {
+     "pixels": 100,
+     "factor": 1.0,
+     "step": 0.01,
+     "scale_half": 2,
+     "pos_half": 6,
+     "interval": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "first_grid": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "final": true
+    }
+   ],
+   "pairs": 4030,
+   "scale_exact": 459,
+   "scale_within_1": 600,
+   "scale_within_2": 781,
+   "cards": 350,
+   "before": {
+    "exact": 209
+   },
+   "after": {
+    "exact": 209
+   },
+   "gained_n": 0,
+   "lost_n": 0,
+   "wrong_new_n": 0,
+   "gained": [],
+   "lost": [],
+   "name_moved_n": 20,
+   "coverage_by_layer": [
+    {
+     "depth": 1,
+     "hit": 4030,
+     "total": 4030
+    },
+    {
+     "depth": 2,
+     "hit": 2386,
+     "total": 4030
+    },
+    {
+     "depth": 3,
+     "hit": 2210,
+     "total": 4030
+    },
+    {
+     "depth": 4,
+     "hit": 530,
+     "total": 4030
+    }
+   ],
+   "edge_narrow_n": 136,
+   "edge_wide_n": 66,
+   "on_final_edge_n": 45,
+   "cards_total": 350,
+   "calls_per_pair": 43.595,
+   "seconds": 158.865,
+   "per_pair": []
+  },
+  "甲-E 粗层铺满 26 档步0.03 + 细层±2": {
+   "plan": [
+    {
+     "pixels": 12,
+     "factor": 0.12,
+     "step": 0.03,
+     "scale_half": null,
+     "pos_half": null,
+     "interval": [
+      0.95,
+      0.96,
+      0.97,
+      0.98,
+      0.99,
+      1.0,
+      1.01,
+      1.02,
+      1.03,
+      1.04,
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15,
+      1.16,
+      1.17,
+      1.18,
+      1.19,
+      1.2
+     ],
+     "first_grid": [
+      0.95,
+      0.98,
+      1.01,
+      1.04,
+      1.07,
+      1.1,
+      1.13,
+      1.16,
+      1.19,
+      1.2
+     ],
+     "final": false
+    },
+    {
+     "pixels": 25,
+     "factor": 0.25,
+     "step": 0.01,
+     "scale_half": 3,
+     "pos_half": 12,
+     "interval": "宽区间",
+     "first_grid": null,
+     "final": false
+    },
+    {
+     "pixels": 50,
+     "factor": 0.5,
+     "step": 0.01,
+     "scale_half": 2,
+     "pos_half": 8,
+     "interval": "宽区间",
+     "first_grid": null,
+     "final": false
+    },
+    {
+     "pixels": 100,
+     "factor": 1.0,
+     "step": 0.01,
+     "scale_half": 2,
+     "pos_half": 6,
+     "interval": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "first_grid": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+     ],
+     "final": true
+    }
+   ],
+   "pairs": 4030,
+   "scale_exact": 575,
+   "scale_within_1": 674,
+   "scale_within_2": 849,
+   "cards": 350,
+   "before": {
+    "exact": 209
+   },
+   "after": {
+    "exact": 209
+   },
+   "gained_n": 0,
+   "lost_n": 0,
+   "wrong_new_n": 0,
+   "gained": [],
+   "lost": [],
+   "name_moved_n": 20,
+   "coverage_by_layer": [
+    {
+     "depth": 1,
+     "hit": 2619,
+     "total": 4030
+    },
+    {
+     "depth": 2,
+     "hit": 2353,
+     "total": 4030
+    },
+    {
+     "depth": 3,
+     "hit": 2287,
+     "total": 4030
+    },
+    {
+     "depth": 4,
+     "hit": 653,
+     "total": 4030
+    }
+   ],
+   "edge_narrow_n": 136,
+   "edge_wide_n": 66,
+   "on_final_edge_n": 101,
+   "cards_total": 350,
+   "calls_per_pair": 27.946,
+   "seconds": 135.791,
+   "per_pair": []
+  }
+ },
+ "measure": {
+  "甲-D 对照：旧四层（11档步0.01 · ±3/±2/±1 · 位12/8/6）": {
+   "match_template_calls": 1873,
+   "median_s": 1.19,
+   "rounds_s": [
+    1.1609,
+    1.19,
+    2.6893
+   ],
+   "ratio": 11.83
+  },
+  "甲-A 旧四层 + 细层加宽到 ±2（位12/8/6）": {
+   "match_template_calls": 1983,
+   "median_s": 1.2505,
+   "rounds_s": [
+    1.2589,
+    1.2505,
+    1.1715
+   ],
+   "ratio": 11.26
+  },
+  "甲-B 旧四层 + 细层加宽到 ±3（位12/8/6）": {
+   "match_template_calls": 2081,
+   "median_s": 1.3905,
+   "rounds_s": [
+    1.4676,
+    1.3905,
+    1.3855
+   ],
+   "ratio": 10.13
+  },
+  "甲-C 粗层铺满 26 档步0.01 + 细层±2": {
+   "match_template_calls": 3821,
+   "median_s": 3.1969,
+   "rounds_s": [
+    3.1969,
+    3.2377,
+    2.887
+   ],
+   "ratio": 4.41
+  },
+  "甲-E 粗层铺满 26 档步0.03 + 细层±2": {
+   "match_template_calls": 2435,
+   "median_s": 2.6973,
+   "rounds_s": [
+    2.6307,
+    2.8152,
+    2.6973
+   ],
+   "ratio": 5.22
+  }
+ },
+ "seconds": 496.718
+}

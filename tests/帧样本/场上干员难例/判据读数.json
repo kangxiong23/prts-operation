@@ -1,0 +1,3057 @@
+{
+  "note": "补测批的判据读数。**它不判断够不够** —— 只逐块落三条链的读数、另一条算法给的填充列数、以及三条可判的线。",
+  "batch": "tests/帧样本/场上干员难例",
+  "version": 1,
+  "device": "vivo V2338A",
+  "ruler": {
+    "health": "链读出来的比例 × BAR_WIDTH = 链数到的列数；旁证 = 条中间那一行自候选左缘逐像素数下去、遇断口即停",
+    "tolerance_columns": 2
+  },
+  "proof_caveat": "旁证在**紧挨着的两条**上是错的：条宽 146、相邻两条左缘差 138 → 重叠 8 列，重叠处的底色加深，旁证会停在那道接缝上（把满条数成 136/137 列），而链按 GAP_TOLERANCE=4 跨过去报 146。凡 `tight_adjacent` 为真的块，`delta_columns` 不许当成链的毛病读。**另一处（同一个根因）**：条右端被压暗时旁证**在压暗那一列就停**（它只认 ≤ HP_COLOUR_TOL=24），而链报 146（满）—— 这一档**有三块**：`r01_06_04`（最后 6 列 25–29、条外 186，旁证数成 140）、`r01_05_04`（24 / 25 / 26 / 27 / 27、条外 191，旁证 142）、`r01_07_02`（32 / 36 / 40 / 41 / 41、条外 203，旁证 143）。这三处都是**旁证错、链对**。",
+  "frame_count": 12,
+  "crops": 52,
+  "reads": [
+    {
+      "name": "r01_01_01",
+      "frame": "hard_多个技能条紧挨着.png",
+      "label": "多个技能条紧挨着",
+      "bar": [
+        1327,
+        485
+      ],
+      "candidate_lit": 106,
+      "independent_fill": 106,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.726027397260274
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 106.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.0696078431372549
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.4690139889717102
+      },
+      "score": 0.469014,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_01_02",
+      "frame": "hard_多个技能条紧挨着.png",
+      "label": "多个技能条紧挨着",
+      "bar": [
+        1050,
+        630
+      ],
+      "candidate_lit": 20,
+      "independent_fill": 17,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.10273972602739725
+        },
+        "confidence": 0.00196078431372549
+      },
+      "health_columns": 15.0,
+      "delta_columns": -2.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.410958904109589
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.06666666666666667
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.410958904109589,
+          "hi": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.6882603168487549
+      },
+      "score": 0.68826,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": true
+    },
+    {
+      "name": "r01_01_03",
+      "frame": "hard_多个技能条紧挨着.png",
+      "label": "多个技能条紧挨着",
+      "bar": [
+        1189,
+        630
+      ],
+      "candidate_lit": 137,
+      "independent_fill": 136,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.0
+      },
+      "health_columns": 146.0,
+      "delta_columns": 10.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.0803921568627451
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.17636938393115997
+      },
+      "score": 0.176369,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": true
+    },
+    {
+      "name": "r01_01_04",
+      "frame": "hard_多个技能条紧挨着.png",
+      "label": "多个技能条紧挨着",
+      "bar": [
+        1327,
+        630
+      ],
+      "candidate_lit": 276,
+      "independent_fill": 137,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.0
+      },
+      "health_columns": 146.0,
+      "delta_columns": 9.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.815068493150685
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.06470588235294118
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.815068493150685,
+          "hi": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.1535908281803131
+      },
+      "score": 0.153591,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": true
+    },
+    {
+      "name": "r01_01_05",
+      "frame": "hard_多个技能条紧挨着.png",
+      "label": "多个技能条紧挨着",
+      "bar": [
+        1604,
+        630
+      ],
+      "candidate_lit": 59,
+      "independent_fill": 55,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.3972602739726027
+        },
+        "confidence": 0.00196078431372549
+      },
+      "health_columns": 58.0,
+      "delta_columns": 3.0,
+      "skill_fill": {
+        "state": "unsampled"
+      },
+      "skill_meaning": {
+        "state": "unsampled"
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.22415195405483246
+      },
+      "score": 0.224152,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": true
+    },
+    {
+      "name": "r01_01_06",
+      "frame": "hard_多个技能条紧挨着.png",
+      "label": "多个技能条紧挨着",
+      "bar": [
+        1465,
+        631
+      ],
+      "candidate_lit": 138,
+      "independent_fill": 137,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.0
+      },
+      "health_columns": 146.0,
+      "delta_columns": 9.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.3150684931506849
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "unsampled"
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.15845298767089844
+      },
+      "score": 0.158453,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": true
+    },
+    {
+      "name": "r01_02_01",
+      "frame": "hard_多个技能条错位挨着.png",
+      "label": "多个技能条错位挨着",
+      "bar": [
+        1434,
+        499
+      ],
+      "candidate_lit": 90,
+      "independent_fill": 90,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.6164383561643836
+        },
+        "confidence": 0.09019607843137255
+      },
+      "health_columns": 90.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.1232876712328767
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.05196078431372549
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.1232876712328767,
+          "hi": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.17851275205612183
+      },
+      "score": 0.178513,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_02_02",
+      "frame": "hard_多个技能条错位挨着.png",
+      "label": "多个技能条错位挨着",
+      "bar": [
+        1567,
+        564
+      ],
+      "candidate_lit": 94,
+      "independent_fill": 94,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.6438356164383562
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 94.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.8493150684931506
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "生效中"
+        },
+        "confidence": 0.1450980392156863
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.22837643325328827
+      },
+      "score": 0.228376,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_02_03",
+      "frame": "hard_多个技能条错位挨着.png",
+      "label": "多个技能条错位挨着",
+      "bar": [
+        1444,
+        633
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 146.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.21232876712328766
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.11568627450980393
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.21232876712328766
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.14615778625011444
+      },
+      "score": 0.146158,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_02_04",
+      "frame": "hard_多个技能条错位挨着.png",
+      "label": "多个技能条错位挨着",
+      "bar": [
+        1318,
+        645
+      ],
+      "candidate_lit": 128,
+      "independent_fill": 125,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.8561643835616438,
+          "hi": 0.863013698630137
+        },
+        "confidence": 0.00784313725490196
+      },
+      "health_columns": 125.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.0784313725490196
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.13242483139038086
+      },
+      "score": 0.132425,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_02_05",
+      "frame": "hard_多个技能条错位挨着.png",
+      "label": "多个技能条错位挨着",
+      "bar": [
+        1194,
+        656
+      ],
+      "candidate_lit": 28,
+      "independent_fill": 25,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.1506849315068493
+        },
+        "confidence": 0.0
+      },
+      "health_columns": 22.0,
+      "delta_columns": -3.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.4452054794520548
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.047058823529411764
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.4452054794520548,
+          "hi": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.4901019036769867
+      },
+      "score": 0.490102,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_03_01",
+      "frame": "shot_20261007-202939-929.png",
+      "label": "",
+      "bar": [
+        1447,
+        597
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 145.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.678082191780822
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.06666666666666667
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.678082191780822
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.22337408363819122
+      },
+      "score": 0.223374,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_03_02",
+      "frame": "shot_20261007-202939-929.png",
+      "label": "",
+      "bar": [
+        905,
+        648
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": 0.08235294117647059
+      },
+      "health_columns": 145.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.6575342465753424
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.0784313725490196
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.6575342465753424
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.12108099460601807
+      },
+      "score": 0.121081,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_03_03",
+      "frame": "shot_20261007-202939-929.png",
+      "label": "",
+      "bar": [
+        1043,
+        785
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 146.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.0784313725490196
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.6115393042564392
+      },
+      "score": 0.611539,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_04_01",
+      "frame": "shot_20261007-202959-919.png",
+      "label": "",
+      "bar": [
+        2045,
+        540
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 145.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.8767123287671232
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.056862745098039215
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.8767123287671232
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.14234039187431335
+      },
+      "score": 0.14234,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_04_02",
+      "frame": "shot_20261007-202959-919.png",
+      "label": "",
+      "bar": [
+        1738,
+        569
+      ],
+      "candidate_lit": 89,
+      "independent_fill": 86,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.589041095890411,
+          "hi": 0.6986301369863014
+        },
+        "confidence": 0.00196078431372549
+      },
+      "health_columns": 86.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.5753424657534246
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "生效中"
+        },
+        "confidence": 0.12352941176470589
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.23124058544635773
+      },
+      "score": 0.231241,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_04_03",
+      "frame": "shot_20261007-202959-919.png",
+      "label": "",
+      "bar": [
+        1447,
+        597
+      ],
+      "candidate_lit": 144,
+      "independent_fill": 144,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9863013698630136
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 144.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.9452054794520548
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.07254901960784314
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.9452054794520548,
+          "hi": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.1551590859889984
+      },
+      "score": 0.155159,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_04_04",
+      "frame": "shot_20261007-202959-919.png",
+      "label": "",
+      "bar": [
+        1593,
+        616
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 105,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.7191780821917808
+        },
+        "confidence": 0.027450980392156862
+      },
+      "health_columns": 105.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "unsampled"
+      },
+      "skill_meaning": {
+        "state": "unsampled"
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.1336524784564972
+      },
+      "score": 0.133652,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_04_05",
+      "frame": "shot_20261007-202959-919.png",
+      "label": "",
+      "bar": [
+        1604,
+        740
+      ],
+      "candidate_lit": 41,
+      "independent_fill": 41,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.2808219178082192
+        },
+        "confidence": 0.050980392156862744
+      },
+      "health_columns": 41.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.1095890410958904
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.052941176470588235
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.1095890410958904,
+          "hi": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.11417054384946823
+      },
+      "score": 0.114171,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_05_01",
+      "frame": "shot_20261007-203019-925.png",
+      "label": "",
+      "bar": [
+        547,
+        427
+      ],
+      "candidate_lit": 23,
+      "independent_fill": 17,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.15753424657534246,
+          "hi": 0.2054794520547945
+        },
+        "confidence": 0.00196078431372549
+      },
+      "health_columns": 23.0,
+      "delta_columns": 6.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.3424657534246575
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.3205882352941177
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.3424657534246575,
+          "hi": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.1181851476430893
+      },
+      "score": 0.118185,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_05_02",
+      "frame": "shot_20261007-203019-925.png",
+      "label": "",
+      "bar": [
+        1447,
+        597
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 145.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.3082191780821918
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.06274509803921569
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.3082191780821918
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.28363969922065735
+      },
+      "score": 0.28364,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_05_03",
+      "frame": "shot_20261007-203019-925.png",
+      "label": "",
+      "bar": [
+        1306,
+        610
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 140,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.958904109589041
+        },
+        "confidence": 0.00980392156862745
+      },
+      "health_columns": 140.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "弹药分格"
+        },
+        "confidence": 0.09803921568627451
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.19563868641853333
+      },
+      "score": 0.195639,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_05_04",
+      "frame": "shot_20261007-203019-925.png",
+      "label": "",
+      "bar": [
+        1036,
+        636
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 142,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.0
+      },
+      "health_columns": 146.0,
+      "delta_columns": 4.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "生效中"
+        },
+        "confidence": 0.12941176470588237
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.3069372773170471
+      },
+      "score": 0.306937,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_05_05",
+      "frame": "shot_20261007-203019-925.png",
+      "label": "",
+      "bar": [
+        927,
+        677
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.025490196078431372
+      },
+      "health_columns": 146.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.0136986301369863
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "弹药分格"
+        },
+        "confidence": 0.013725490196078431
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.0929594486951828
+      },
+      "score": 0.092959,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_05_06",
+      "frame": "shot_20261007-203019-925.png",
+      "label": "",
+      "bar": [
+        911,
+        796
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.043137254901960784
+      },
+      "health_columns": 146.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.726027397260274
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.07647058823529412
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.726027397260274
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.1146397516131401
+      },
+      "score": 0.11464,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_06_01",
+      "frame": "shot_20261007-203049-920.png",
+      "label": "",
+      "bar": [
+        1590,
+        583
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 146.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.4657534246575342
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.060784313725490195
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.4657534246575342
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.19769138097763062
+      },
+      "score": 0.197691,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_06_02",
+      "frame": "shot_20261007-203049-920.png",
+      "label": "",
+      "bar": [
+        1447,
+        597
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 143,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9794520547945206
+        },
+        "confidence": 0.01764705882352941
+      },
+      "health_columns": 143.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.8082191780821918
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "弹药分格"
+        },
+        "confidence": 0.09803921568627451
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.2638320326805115
+      },
+      "score": 0.263832,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_06_03",
+      "frame": "shot_20261007-203049-920.png",
+      "label": "",
+      "bar": [
+        905,
+        648
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 146.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.09607843137254903
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.5955839157104492
+      },
+      "score": 0.595584,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_06_04",
+      "frame": "shot_20261007-203049-920.png",
+      "label": "",
+      "bar": [
+        1054,
+        666
+      ],
+      "candidate_lit": 141,
+      "independent_fill": 140,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.00392156862745098
+      },
+      "health_columns": 146.0,
+      "delta_columns": 6.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "unknown"
+        },
+        "confidence": null
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.11151371151208878
+      },
+      "score": 0.111514,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_06_05",
+      "frame": "shot_20261007-203049-920.png",
+      "label": "",
+      "bar": [
+        1043,
+        785
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 146.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.0784313725490196
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.5307285189628601
+      },
+      "score": 0.530729,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_07_01",
+      "frame": "shot_20261007-203958-894.png",
+      "label": "",
+      "bar": [
+        1721,
+        452
+      ],
+      "candidate_lit": 47,
+      "independent_fill": 43,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.2876712328767123
+        },
+        "confidence": 0.0
+      },
+      "health_columns": 42.0,
+      "delta_columns": -1.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.6712328767123288
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "生效中"
+        },
+        "confidence": 0.11176470588235295
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.29371482133865356
+      },
+      "score": 0.293715,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_07_02",
+      "frame": "shot_20261007-203958-894.png",
+      "label": "",
+      "bar": [
+        1580,
+        467
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 143,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.025490196078431372
+      },
+      "health_columns": 146.0,
+      "delta_columns": 3.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.4041095890410959
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "弹药分格"
+        },
+        "confidence": 0.09803921568627451
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.25031477212905884
+      },
+      "score": 0.250315,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_07_03",
+      "frame": "shot_20261007-203958-894.png",
+      "label": "",
+      "bar": [
+        1047,
+        523
+      ],
+      "candidate_lit": 140,
+      "independent_fill": 135,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.9246575342465754,
+          "hi": 0.9863013698630136
+        },
+        "confidence": 0.00196078431372549
+      },
+      "health_columns": 135.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.0803921568627451
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.7362692952156067
+      },
+      "score": 0.736269,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_07_04",
+      "frame": "shot_20261007-203958-894.png",
+      "label": "",
+      "bar": [
+        1453,
+        629
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 146.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.8835616438356164
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.09215686274509804
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.8835616438356164
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.09894062578678131
+      },
+      "score": 0.098941,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_08_01",
+      "frame": "shot_20261007-204615-988.png",
+      "label": "",
+      "bar": [
+        1738,
+        569
+      ],
+      "candidate_lit": 45,
+      "independent_fill": 45,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.3082191780821918
+        },
+        "confidence": 0.08431372549019608
+      },
+      "health_columns": 45.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.5684931506849316
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "生效中"
+        },
+        "confidence": 0.13333333333333333
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.1990731805562973
+      },
+      "score": 0.199073,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_08_02",
+      "frame": "shot_20261007-204615-988.png",
+      "label": "",
+      "bar": [
+        1447,
+        597
+      ],
+      "candidate_lit": 144,
+      "independent_fill": 144,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9863013698630136
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 144.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.6712328767123288
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "生效中"
+        },
+        "confidence": 0.12941176470588237
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.18035919964313507
+      },
+      "score": 0.180359,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_09_01",
+      "frame": "shot_20261007-205107-116.png",
+      "label": "",
+      "bar": [
+        1309,
+        512
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": 0.049019607843137254
+      },
+      "health_columns": 145.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.07058823529411765
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.759704053401947
+      },
+      "score": 0.759704,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_09_02",
+      "frame": "shot_20261007-205107-116.png",
+      "label": "",
+      "bar": [
+        1432,
+        577
+      ],
+      "candidate_lit": 144,
+      "independent_fill": 144,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9863013698630136
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 144.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.726027397260274
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "生效中"
+        },
+        "confidence": 0.1450980392156863
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.17809566855430603
+      },
+      "score": 0.178096,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_09_03",
+      "frame": "shot_20261007-205107-116.png",
+      "label": "",
+      "bar": [
+        1318,
+        645
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 146.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.5068493150684932
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.04803921568627451
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.5068493150684932
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.13128525018692017
+      },
+      "score": 0.131285,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_09_04",
+      "frame": "shot_20261007-205107-116.png",
+      "label": "",
+      "bar": [
+        1194,
+        656
+      ],
+      "candidate_lit": 28,
+      "independent_fill": 25,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.1643835616438356
+        },
+        "confidence": 0.00196078431372549
+      },
+      "health_columns": 24.0,
+      "delta_columns": -1.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.363013698630137
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.0784313725490196
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.363013698630137,
+          "hi": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.5851355195045471
+      },
+      "score": 0.585136,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_09_05",
+      "frame": "shot_20261007-205107-116.png",
+      "label": "",
+      "bar": [
+        1074,
+        667
+      ],
+      "candidate_lit": 120,
+      "independent_fill": 119,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.8082191780821918,
+          "hi": 0.821917808219178
+        },
+        "confidence": 0.00196078431372549
+      },
+      "health_columns": 118.0,
+      "delta_columns": -1.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.07450980392156863
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.5326719284057617
+      },
+      "score": 0.532672,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_10_01",
+      "frame": "special_带弹药机制的有竖线间隔的橙色技能条.png",
+      "label": "带弹药机制的有竖线间隔的橙色技能条",
+      "bar": [
+        1738,
+        569
+      ],
+      "candidate_lit": 89,
+      "independent_fill": 86,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.589041095890411,
+          "hi": 0.6986301369863014
+        },
+        "confidence": 0.00196078431372549
+      },
+      "health_columns": 86.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.4520547945205479
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "生效中"
+        },
+        "confidence": 0.13333333333333333
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.15028086304664612
+      },
+      "score": 0.150281,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_10_02",
+      "frame": "special_带弹药机制的有竖线间隔的橙色技能条.png",
+      "label": "带弹药机制的有竖线间隔的橙色技能条",
+      "bar": [
+        1447,
+        597
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_columns": 145.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.6027397260273972
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "弹药分格"
+        },
+        "confidence": 0.09803921568627451
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.179732546210289
+      },
+      "score": 0.179733,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_11_01",
+      "frame": "special_护盾机制.png",
+      "label": "护盾机制",
+      "bar": [
+        1438,
+        606
+      ],
+      "candidate_lit": 48,
+      "independent_fill": 48,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.3287671232876712
+        },
+        "confidence": 0.09019607843137255
+      },
+      "health_columns": 48.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.5958904109589042
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "生效中"
+        },
+        "confidence": 0.13725490196078433
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.19119766354560852
+      },
+      "score": 0.191198,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_11_02",
+      "frame": "special_护盾机制.png",
+      "label": "护盾机制",
+      "bar": [
+        1577,
+        682
+      ],
+      "candidate_lit": 44,
+      "independent_fill": 44,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.3013698630136986
+        },
+        "confidence": 0.09019607843137255
+      },
+      "health_columns": 44.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.4931506849315068
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "生效中"
+        },
+        "confidence": 0.1450980392156863
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.18405698239803314
+      },
+      "score": 0.184057,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_11_03",
+      "frame": "special_护盾机制.png",
+      "label": "护盾机制",
+      "bar": [
+        1318,
+        757
+      ],
+      "candidate_lit": 22,
+      "independent_fill": 17,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.11643835616438356
+        },
+        "confidence": 0.00196078431372549
+      },
+      "health_columns": 17.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.3150684931506849
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.07254901960784314
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.3150684931506849,
+          "hi": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.23134028911590576
+      },
+      "score": 0.23134,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_11_04",
+      "frame": "special_护盾机制.png",
+      "label": "护盾机制",
+      "bar": [
+        1189,
+        768
+      ],
+      "candidate_lit": 128,
+      "independent_fill": 127,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.863013698630137,
+          "hi": 0.8767123287671232
+        },
+        "confidence": 0.00196078431372549
+      },
+      "health_columns": 126.0,
+      "delta_columns": -1.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.07647058823529412
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.5789925456047058
+      },
+      "score": 0.578993,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_12_01",
+      "frame": "special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "label": "黄色菱形挡住了技能条，很难判准，应报未采样",
+      "bar": [
+        1438,
+        606
+      ],
+      "candidate_lit": 39,
+      "independent_fill": 36,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.2534246575342466,
+          "hi": 0.2602739726027397
+        },
+        "confidence": 0.021568627450980392
+      },
+      "health_columns": 37.0,
+      "delta_columns": 1.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.4931506849315068
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "生效中"
+        },
+        "confidence": 0.12941176470588237
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.24954503774642944
+      },
+      "score": 0.249545,
+      "diamonds_on_this_bar": [
+        {
+          "score": 0.6579,
+          "at": [
+            1487,
+            581
+          ],
+          "bar_columns": 64,
+          "skill_columns": 64
+        }
+      ],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_12_02",
+      "frame": "special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "label": "黄色菱形挡住了技能条，很难判准，应报未采样",
+      "bar": [
+        1583,
+        736
+      ],
+      "candidate_lit": 42,
+      "independent_fill": 42,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.2876712328767123
+        },
+        "confidence": 0.0392156862745098
+      },
+      "health_columns": 42.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "弹药分格"
+        },
+        "confidence": 0.12450980392156863
+      },
+      "sp": {
+        "state": "unsampled"
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.13711604475975037
+      },
+      "score": 0.137116,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_12_03",
+      "frame": "special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "label": "黄色菱形挡住了技能条，很难判准，应报未采样",
+      "bar": [
+        1449,
+        751
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": 0.07450980392156863
+      },
+      "health_columns": 145.0,
+      "delta_columns": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.0958904109589041
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.153921568627451
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.0958904109589041,
+          "hi": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.1934957653284073
+      },
+      "score": 0.193496,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_12_04",
+      "frame": "special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "label": "黄色菱形挡住了技能条，很难判准，应报未采样",
+      "bar": [
+        1318,
+        757
+      ],
+      "candidate_lit": 22,
+      "independent_fill": 17,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.0958904109589041
+        },
+        "confidence": 0.00196078431372549
+      },
+      "health_columns": 14.0,
+      "delta_columns": -3.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "lower_bound",
+          "lo": 0.273972602739726
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.1480392156862745
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.273972602739726,
+          "hi": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.78892982006073
+      },
+      "score": 0.78893,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    },
+    {
+      "name": "r01_12_05",
+      "frame": "special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "label": "黄色菱形挡住了技能条，很难判准，应报未采样",
+      "bar": [
+        1189,
+        768
+      ],
+      "candidate_lit": 128,
+      "independent_fill": 127,
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "interval",
+          "lo": 0.863013698630137,
+          "hi": 0.8767123287671232
+        },
+        "confidence": 0.00196078431372549
+      },
+      "health_columns": 126.0,
+      "delta_columns": -1.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.07450980392156863
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.5918375253677368
+      },
+      "score": 0.591838,
+      "diamonds_on_this_bar": [],
+      "tight_adjacent": false
+    }
+  ],
+  "lines": {
+    "full_should_read_one": {
+      "which": "旁证 ≥ 145 列的块",
+      "count": 9,
+      "not_one": []
+    },
+    "delta_over_tolerance": {
+      "count": 10,
+      "rows": [
+        {
+          "name": "r01_01_03",
+          "frame": "hard_多个技能条紧挨着.png",
+          "bar": [
+            1189,
+            630
+          ],
+          "independent": 136,
+          "chain_columns": 146.0,
+          "delta": 10.0,
+          "tight_adjacent": true
+        },
+        {
+          "name": "r01_01_04",
+          "frame": "hard_多个技能条紧挨着.png",
+          "bar": [
+            1327,
+            630
+          ],
+          "independent": 137,
+          "chain_columns": 146.0,
+          "delta": 9.0,
+          "tight_adjacent": true
+        },
+        {
+          "name": "r01_01_05",
+          "frame": "hard_多个技能条紧挨着.png",
+          "bar": [
+            1604,
+            630
+          ],
+          "independent": 55,
+          "chain_columns": 58.0,
+          "delta": 3.0,
+          "tight_adjacent": true
+        },
+        {
+          "name": "r01_01_06",
+          "frame": "hard_多个技能条紧挨着.png",
+          "bar": [
+            1465,
+            631
+          ],
+          "independent": 137,
+          "chain_columns": 146.0,
+          "delta": 9.0,
+          "tight_adjacent": true
+        },
+        {
+          "name": "r01_02_05",
+          "frame": "hard_多个技能条错位挨着.png",
+          "bar": [
+            1194,
+            656
+          ],
+          "independent": 25,
+          "chain_columns": 22.0,
+          "delta": -3.0,
+          "tight_adjacent": false
+        },
+        {
+          "name": "r01_05_01",
+          "frame": "shot_20261007-203019-925.png",
+          "bar": [
+            547,
+            427
+          ],
+          "independent": 17,
+          "chain_columns": 23.0,
+          "delta": 6.0,
+          "tight_adjacent": false
+        },
+        {
+          "name": "r01_05_04",
+          "frame": "shot_20261007-203019-925.png",
+          "bar": [
+            1036,
+            636
+          ],
+          "independent": 142,
+          "chain_columns": 146.0,
+          "delta": 4.0,
+          "tight_adjacent": false
+        },
+        {
+          "name": "r01_06_04",
+          "frame": "shot_20261007-203049-920.png",
+          "bar": [
+            1054,
+            666
+          ],
+          "independent": 140,
+          "chain_columns": 146.0,
+          "delta": 6.0,
+          "tight_adjacent": false
+        },
+        {
+          "name": "r01_07_02",
+          "frame": "shot_20261007-203958-894.png",
+          "bar": [
+            1580,
+            467
+          ],
+          "independent": 143,
+          "chain_columns": 146.0,
+          "delta": 3.0,
+          "tight_adjacent": false
+        },
+        {
+          "name": "r01_12_04",
+          "frame": "special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+          "bar": [
+            1318,
+            757
+          ],
+          "independent": 17,
+          "chain_columns": 14.0,
+          "delta": -3.0,
+          "tight_adjacent": false
+        }
+      ]
+    },
+    "chain_wider_than_proof": {
+      "count": 8,
+      "names": [
+        "r01_01_03",
+        "r01_01_04",
+        "r01_01_05",
+        "r01_01_06",
+        "r01_05_01",
+        "r01_05_04",
+        "r01_06_04",
+        "r01_07_02"
+      ]
+    },
+    "health_unsampled": {
+      "count": 0,
+      "names": []
+    },
+    "skill_unsampled": {
+      "count": 2,
+      "names": [
+        "r01_01_05",
+        "r01_04_04"
+      ]
+    },
+    "diamond_occluded": {
+      "which": "有黄菱形压在血条那一行或技力条那一行上 ≥ 8 列的块",
+      "count": 1,
+      "rows": [
+        {
+          "name": "r01_12_01",
+          "frame": "special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+          "label": "黄色菱形挡住了技能条，很难判准，应报未采样",
+          "bar": [
+            1438,
+            606
+          ],
+          "diamond": [
+            {
+              "score": 0.6579,
+              "at": [
+                1487,
+                581
+              ],
+              "bar_columns": 64,
+              "skill_columns": 64
+            }
+          ],
+          "health": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.2534246575342466,
+              "hi": 0.2602739726027397
+            },
+            "confidence": 0.021568627450980392
+          },
+          "skill_fill": {
+            "state": "valued",
+            "payload": {
+              "form": "lower_bound",
+              "lo": 0.4931506849315068
+            },
+            "confidence": null
+          },
+          "skill_meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "生效中"
+            },
+            "confidence": 0.12941176470588237
+          }
+        }
+      ]
+    }
+  },
+  "coverage": {
+    "covered": [
+      "一格里有好几根条：12 帧里 9 帧的候选数 ≥ 4（最多 6 根）",
+      "相邻两条挨着（左缘差 138 px，条宽 146 → 邻条盖住本条轨道尾巴 8 列）",
+      "上下错位挨着（相邻候选的 y 差 12 / 11 / 11 行）",
+      "被黄菱形压住的那一档：用户标了「应报未采样」的那一帧",
+      "详情面板开着的那一档（面板自己那条宽蓝条与脚底条同一高度）",
+      "**「满」与「差最后一小截」分开**：`r01_04_03` 那一块的尾巴（8 列）是外来颜色（离填充色 30–44，按距离尺子算「填着」）—— 现在落`LowerBound(138/146)`（技能那个字段加宽成区间），**不再读成 `Exact(1.0)`**",
+      "**技力含义的「认不出」那一档**（颜色两族都不是）现在有真帧了 —— **覆盖文本的正文就是这一条**（其余批次只引用它，不重抄）：`r01_01_05` / `r01_01_06`（技力条被详情界面的图标盖住）→ 技力那三个槽落**未采样**；`r01_06_04`（空轨道被背景染了色）→ 技力落**精确 0**、**含义照实交 `Unknown`**（「认得出有东西、但读不准」那一族 —— **不是**未采样：技力未知与技力为 0 是两个完全不同的行为）、血条落**满**。**这两档的分法是「条内比条外暗了多少」**（`field._looks_like_an_empty_track`）：空的条是半透明的、在那一格留下一条**条形变暗区** → 两条长边各自量一次，两端都要有落差、而且落差要落在半透明该有的那一段里（`r01_06_04` 是 **0.159 / 0.300**；`r01_01_05` 的左缘 **0.860** 过头了、`r01_01_06` 的右缘 **−0.155** 是反过来的）。所以 **「条在、只是空了」与「条不在」分得开**。**「空轨道单独可见」与「技力条掉到零」这两档就是 `r01_06_04`**：它是「条在、只是空了」，不是「一条全暗的条」；**空轨道的颜色落在一族里**（透出来的背景是绿或橙）时含义读得出，那一档仍然没有真帧"
+    ],
+    "not_covered": [
+      "**没有真值**：这一批不带面板上的 生命 当前/上限，所以判不出「链读的比对不对」，只判得出「链与旁证同不同」",
+      "**极低填充**（< 3%）仍然一帧都没有",
+      "**没有可见接缝的外来尾巴**：外来色**平滑过渡**进填充色（与填充色连着、中间没有断口）时，最右那一截仍然算「本条填充色」 → 仍读满。这一档一帧都没有，现在也**判不出来**",
+      "**「满条 + 两端落差落在带子里」**：一根**颜色两族都不是**、而两端落差又恰好落在半透明那一段里的**满条**，会被读成**空轨道 → 精确 0**（假事实）。这一档**一帧都没有**（`shot30_a` 原位就是这个形状，只是它今天到不了那一支）",
+      "**那条带子的上下沿不是统计来的**：空条那一簇与被压住那一簇**各只有一块帧**（`r01_06_04` 对 `r01_01_05`），上下沿取的是两块之间的中项 —— 余量只有 1.7 倍",
+      "**只有一边能量的块**：`r01_01_06` 的左缘被旁边那根条带偏（`_left_edge` 锁到了邻居的蓝带、左外那 8 列越出取区）→ 那一块只有**半边证据**，判据只由右缘一票定"
+    ]
+  }
+}

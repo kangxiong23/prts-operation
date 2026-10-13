@@ -1,0 +1,937 @@
+{
+ "note": "红罩那条路（MaskedRuler）的判定账：档从 11 收成粗层挑出来的 5 档。只量不改。",
+ "baseline_source": {
+  "file": "tests/帧样本/红罩/点名.json",
+  "red": 28,
+  "exact": 22,
+  "unknown": 6,
+  "reused": true
+ },
+ "lines": {
+  "score": 0.85,
+  "margin": 0.25
+ },
+ "coarse": {
+  "factor": 0.25,
+  "half_steps": 2,
+  "mask_pixels": 3986,
+  "coarse_build_calls": 726,
+  "fine_rulers_built": 4
+ },
+ "self_check": [
+  {
+   "frame": "cd14",
+   "index": 1,
+   "mine": {
+    "name": "维什戴尔",
+    "score": 0.984065,
+    "scale": 1.13,
+    "margin": 0.317264,
+    "verdict": "精确"
+   },
+   "landed": {
+    "name": "维什戴尔",
+    "score": 0.984065,
+    "scale": 1.13
+   },
+   "score_delta": 0.0
+  },
+  {
+   "frame": "cd14",
+   "index": 2,
+   "mine": {
+    "name": "圣聆初雪",
+    "score": 0.970915,
+    "scale": 1.06,
+    "margin": 0.373319,
+    "verdict": "精确"
+   },
+   "landed": {
+    "name": "圣聆初雪",
+    "score": 0.970915,
+    "scale": 1.06
+   },
+   "score_delta": 0.0
+  },
+  {
+   "frame": "cd14",
+   "index": 3,
+   "mine": {
+    "name": "乌尔比安",
+    "score": 0.970116,
+    "scale": 1.09,
+    "margin": 0.290089,
+    "verdict": "精确"
+   },
+   "landed": {
+    "name": "乌尔比安",
+    "score": 0.970116,
+    "scale": 1.09
+   },
+   "score_delta": 0.0
+  }
+ ],
+ "cards": 28,
+ "before": {
+  "exact": 22,
+  "unknown": 6
+ },
+ "after": {
+  "exact": 21,
+  "unknown": 7
+ },
+ "gained_n": 0,
+ "lost_n": 1,
+ "wrong_new_n": 0,
+ "wrong_before_n": 0,
+ "wrong_after_n": 0,
+ "landed_scale_in_window": 13,
+ "windows": {
+  "1.05+1.06+1.07": 6,
+  "1.09+1.10+1.11+1.12+1.13": 14,
+  "1.10+1.11+1.12+1.13+1.14": 4,
+  "1.05+1.06+1.07+1.08+1.09": 4
+ },
+ "match_template_calls": {
+  "coarse_build": 726,
+  "fine_build_and_scores": 5984,
+  "today_28_cards_estimate": 4114
+ },
+ "rows": [
+  {
+   "frame": "cd14",
+   "index": 1,
+   "coarse_pick": 1.05,
+   "coarse_name": "极境",
+   "coarse_score": 0.580007,
+   "window": [
+    1.05,
+    1.06,
+    1.07
+   ],
+   "landed_scale": 1.13,
+   "landed_in_window": false,
+   "landed": {
+    "name": "维什戴尔",
+    "score": 0.984065,
+    "margin": 0.317264,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "维什戴尔",
+    "score": 0.871246,
+    "scale": 1.06,
+    "margin": 0.204445,
+    "verdict": "未知"
+   }
+  },
+  {
+   "frame": "cd14",
+   "index": 2,
+   "coarse_pick": 1.11,
+   "coarse_name": "Mon3tr",
+   "coarse_score": 0.414857,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.06,
+   "landed_in_window": false,
+   "landed": {
+    "name": "圣聆初雪",
+    "score": 0.970915,
+    "margin": 0.373319,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "圣聆初雪",
+    "score": 0.865993,
+    "scale": 1.09,
+    "margin": 0.280273,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd14",
+   "index": 3,
+   "coarse_pick": 1.11,
+   "coarse_name": "乌尔比安",
+   "coarse_score": 0.761008,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.09,
+   "landed_in_window": true,
+   "landed": {
+    "name": "乌尔比安",
+    "score": 0.970116,
+    "margin": 0.290089,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "乌尔比安",
+    "score": 0.970116,
+    "scale": 1.09,
+    "margin": 0.294692,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd14",
+   "index": 4,
+   "coarse_pick": 1.11,
+   "coarse_name": "Mon3tr",
+   "coarse_score": 0.899204,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.13,
+   "landed_in_window": true,
+   "landed": {
+    "name": null,
+    "score": 0.989704,
+    "margin": 0.204034,
+    "blocked_by": "余量不够"
+   },
+   "layered": {
+    "name": "Mon3tr",
+    "score": 0.989704,
+    "scale": 1.13,
+    "margin": 0.204586,
+    "verdict": "未知"
+   }
+  },
+  {
+   "frame": "cd14",
+   "index": 5,
+   "coarse_pick": 1.12,
+   "coarse_name": "新约能天使",
+   "coarse_score": 0.479883,
+   "window": [
+    1.1,
+    1.11,
+    1.12,
+    1.13,
+    1.14
+   ],
+   "landed_scale": 1.06,
+   "landed_in_window": false,
+   "landed": {
+    "name": "白面鸮",
+    "score": 0.974809,
+    "margin": 0.550692,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "白面鸮",
+    "score": 0.926361,
+    "scale": 1.1,
+    "margin": 0.50615,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd14",
+   "index": 8,
+   "coarse_pick": 1.11,
+   "coarse_name": "新约能天使",
+   "coarse_score": 0.507941,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": true,
+   "landed": {
+    "name": "新约能天使",
+    "score": 0.977536,
+    "margin": 0.317141,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "新约能天使",
+    "score": 0.977536,
+    "scale": 1.1,
+    "margin": 0.317141,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd15",
+   "index": 2,
+   "coarse_pick": 1.11,
+   "coarse_name": "Mon3tr",
+   "coarse_score": 0.414643,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.06,
+   "landed_in_window": false,
+   "landed": {
+    "name": "圣聆初雪",
+    "score": 0.971017,
+    "margin": 0.373621,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "圣聆初雪",
+    "score": 0.866156,
+    "scale": 1.09,
+    "margin": 0.280386,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd15",
+   "index": 3,
+   "coarse_pick": 1.11,
+   "coarse_name": "乌尔比安",
+   "coarse_score": 0.768932,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.09,
+   "landed_in_window": true,
+   "landed": {
+    "name": "乌尔比安",
+    "score": 0.967626,
+    "margin": 0.287663,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "乌尔比安",
+    "score": 0.967626,
+    "scale": 1.09,
+    "margin": 0.292638,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd15",
+   "index": 4,
+   "coarse_pick": 1.11,
+   "coarse_name": "Mon3tr",
+   "coarse_score": 0.89982,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.13,
+   "landed_in_window": true,
+   "landed": {
+    "name": null,
+    "score": 0.989639,
+    "margin": 0.203774,
+    "blocked_by": "余量不够"
+   },
+   "layered": {
+    "name": "Mon3tr",
+    "score": 0.989639,
+    "scale": 1.13,
+    "margin": 0.204174,
+    "verdict": "未知"
+   }
+  },
+  {
+   "frame": "cd15",
+   "index": 5,
+   "coarse_pick": 1.12,
+   "coarse_name": "新约能天使",
+   "coarse_score": 0.480449,
+   "window": [
+    1.1,
+    1.11,
+    1.12,
+    1.13,
+    1.14
+   ],
+   "landed_scale": 1.06,
+   "landed_in_window": false,
+   "landed": {
+    "name": "白面鸮",
+    "score": 0.974744,
+    "margin": 0.55047,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "白面鸮",
+    "score": 0.926084,
+    "scale": 1.1,
+    "margin": 0.505322,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd15",
+   "index": 8,
+   "coarse_pick": 1.11,
+   "coarse_name": "新约能天使",
+   "coarse_score": 0.503973,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": true,
+   "landed": {
+    "name": "新约能天使",
+    "score": 0.977239,
+    "margin": 0.317931,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "新约能天使",
+    "score": 0.977239,
+    "scale": 1.1,
+    "margin": 0.317931,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd22",
+   "index": 3,
+   "coarse_pick": 1.07,
+   "coarse_name": "乌尔比安",
+   "coarse_score": 0.603154,
+   "window": [
+    1.05,
+    1.06,
+    1.07,
+    1.08,
+    1.09
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": false,
+   "landed": {
+    "name": "乌尔比安",
+    "score": 0.965461,
+    "margin": 0.28546,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "乌尔比安",
+    "score": 0.957652,
+    "scale": 1.08,
+    "margin": 0.277651,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd22",
+   "index": 4,
+   "coarse_pick": 1.05,
+   "coarse_name": "极境",
+   "coarse_score": 0.516379,
+   "window": [
+    1.05,
+    1.06,
+    1.07
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": false,
+   "landed": {
+    "name": "黍",
+    "score": 0.972755,
+    "margin": 0.553901,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "黍",
+    "score": 0.949241,
+    "scale": 1.06,
+    "margin": 0.531629,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd22",
+   "index": 5,
+   "coarse_pick": 1.11,
+   "coarse_name": "Mon3tr",
+   "coarse_score": 0.644356,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": true,
+   "landed": {
+    "name": null,
+    "score": 0.98818,
+    "margin": 0.198266,
+    "blocked_by": "余量不够"
+   },
+   "layered": {
+    "name": "Mon3tr",
+    "score": 0.98818,
+    "scale": 1.1,
+    "margin": 0.198569,
+    "verdict": "未知"
+   }
+  },
+  {
+   "frame": "cd22",
+   "index": 6,
+   "coarse_pick": 1.12,
+   "coarse_name": "Mon3tr",
+   "coarse_score": 0.47237,
+   "window": [
+    1.1,
+    1.11,
+    1.12,
+    1.13,
+    1.14
+   ],
+   "landed_scale": 1.06,
+   "landed_in_window": false,
+   "landed": {
+    "name": "白面鸮",
+    "score": 0.971595,
+    "margin": 0.547686,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "白面鸮",
+    "score": 0.926788,
+    "scale": 1.1,
+    "margin": 0.507268,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd22",
+   "index": 9,
+   "coarse_pick": 1.11,
+   "coarse_name": "新约能天使",
+   "coarse_score": 0.519163,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": true,
+   "landed": {
+    "name": "新约能天使",
+    "score": 0.981559,
+    "margin": 0.325128,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "新约能天使",
+    "score": 0.981559,
+    "scale": 1.1,
+    "margin": 0.325128,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd23",
+   "index": 3,
+   "coarse_pick": 1.07,
+   "coarse_name": "乌尔比安",
+   "coarse_score": 0.604809,
+   "window": [
+    1.05,
+    1.06,
+    1.07,
+    1.08,
+    1.09
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": false,
+   "landed": {
+    "name": "乌尔比安",
+    "score": 0.965685,
+    "margin": 0.28567,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "乌尔比安",
+    "score": 0.960849,
+    "scale": 1.08,
+    "margin": 0.280835,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd23",
+   "index": 4,
+   "coarse_pick": 1.05,
+   "coarse_name": "极境",
+   "coarse_score": 0.588675,
+   "window": [
+    1.05,
+    1.06,
+    1.07
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": false,
+   "landed": {
+    "name": "黍",
+    "score": 0.974139,
+    "margin": 0.554546,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "黍",
+    "score": 0.949698,
+    "scale": 1.06,
+    "margin": 0.531419,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd23",
+   "index": 5,
+   "coarse_pick": 1.11,
+   "coarse_name": "Mon3tr",
+   "coarse_score": 0.65256,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": true,
+   "landed": {
+    "name": null,
+    "score": 0.988398,
+    "margin": 0.198232,
+    "blocked_by": "余量不够"
+   },
+   "layered": {
+    "name": "Mon3tr",
+    "score": 0.988398,
+    "scale": 1.1,
+    "margin": 0.198697,
+    "verdict": "未知"
+   }
+  },
+  {
+   "frame": "cd23",
+   "index": 6,
+   "coarse_pick": 1.11,
+   "coarse_name": "新约能天使",
+   "coarse_score": 0.470311,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.06,
+   "landed_in_window": false,
+   "landed": {
+    "name": "白面鸮",
+    "score": 0.971601,
+    "margin": 0.547546,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "白面鸮",
+    "score": 0.926335,
+    "scale": 1.1,
+    "margin": 0.506918,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd27",
+   "index": 3,
+   "coarse_pick": 1.07,
+   "coarse_name": "乌尔比安",
+   "coarse_score": 0.610581,
+   "window": [
+    1.05,
+    1.06,
+    1.07,
+    1.08,
+    1.09
+   ],
+   "landed_scale": 1.08,
+   "landed_in_window": true,
+   "landed": {
+    "name": "乌尔比安",
+    "score": 0.966823,
+    "margin": 0.286724,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "乌尔比安",
+    "score": 0.966823,
+    "scale": 1.08,
+    "margin": 0.286724,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd27",
+   "index": 4,
+   "coarse_pick": 1.05,
+   "coarse_name": "极境",
+   "coarse_score": 0.515591,
+   "window": [
+    1.05,
+    1.06,
+    1.07
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": false,
+   "landed": {
+    "name": "黍",
+    "score": 0.974682,
+    "margin": 0.555524,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "黍",
+    "score": 0.950003,
+    "scale": 1.06,
+    "margin": 0.531807,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd27",
+   "index": 5,
+   "coarse_pick": 1.11,
+   "coarse_name": "Mon3tr",
+   "coarse_score": 0.65102,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": true,
+   "landed": {
+    "name": null,
+    "score": 0.98833,
+    "margin": 0.198032,
+    "blocked_by": "余量不够"
+   },
+   "layered": {
+    "name": "Mon3tr",
+    "score": 0.98833,
+    "scale": 1.1,
+    "margin": 0.198128,
+    "verdict": "未知"
+   }
+  },
+  {
+   "frame": "cd27",
+   "index": 6,
+   "coarse_pick": 1.12,
+   "coarse_name": "Mon3tr",
+   "coarse_score": 0.486043,
+   "window": [
+    1.1,
+    1.11,
+    1.12,
+    1.13,
+    1.14
+   ],
+   "landed_scale": 1.06,
+   "landed_in_window": false,
+   "landed": {
+    "name": "白面鸮",
+    "score": 0.972069,
+    "margin": 0.548104,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "白面鸮",
+    "score": 0.925935,
+    "scale": 1.1,
+    "margin": 0.505582,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd28",
+   "index": 3,
+   "coarse_pick": 1.07,
+   "coarse_name": "乌尔比安",
+   "coarse_score": 0.615028,
+   "window": [
+    1.05,
+    1.06,
+    1.07,
+    1.08,
+    1.09
+   ],
+   "landed_scale": 1.08,
+   "landed_in_window": true,
+   "landed": {
+    "name": "乌尔比安",
+    "score": 0.976185,
+    "margin": 0.295919,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "乌尔比安",
+    "score": 0.976185,
+    "scale": 1.08,
+    "margin": 0.295919,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd28",
+   "index": 4,
+   "coarse_pick": 1.05,
+   "coarse_name": "极境",
+   "coarse_score": 0.401346,
+   "window": [
+    1.05,
+    1.06,
+    1.07
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": false,
+   "landed": {
+    "name": "黍",
+    "score": 0.974403,
+    "margin": 0.553203,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "黍",
+    "score": 0.949879,
+    "scale": 1.06,
+    "margin": 0.530243,
+    "verdict": "精确"
+   }
+  },
+  {
+   "frame": "cd28",
+   "index": 5,
+   "coarse_pick": 1.11,
+   "coarse_name": "Mon3tr",
+   "coarse_score": 0.649971,
+   "window": [
+    1.09,
+    1.1,
+    1.11,
+    1.12,
+    1.13
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": true,
+   "landed": {
+    "name": null,
+    "score": 0.988229,
+    "margin": 0.198606,
+    "blocked_by": "余量不够"
+   },
+   "layered": {
+    "name": "Mon3tr",
+    "score": 0.988229,
+    "scale": 1.1,
+    "margin": 0.199088,
+    "verdict": "未知"
+   }
+  },
+  {
+   "frame": "cd37",
+   "index": 4,
+   "coarse_pick": 1.05,
+   "coarse_name": "极境",
+   "coarse_score": 0.448886,
+   "window": [
+    1.05,
+    1.06,
+    1.07
+   ],
+   "landed_scale": 1.1,
+   "landed_in_window": false,
+   "landed": {
+    "name": "黍",
+    "score": 0.973745,
+    "margin": 0.554398,
+    "blocked_by": null
+   },
+   "layered": {
+    "name": "黍",
+    "score": 0.949512,
+    "scale": 1.06,
+    "margin": 0.531675,
+    "verdict": "精确"
+   }
+  }
+ ],
+ "side_position_window": {
+  "基线": {
+   "pairs": 44,
+   "exact": 40,
+   "unknown": 4
+  },
+  "窗0": {
+   "pairs": 44,
+   "exact": 44,
+   "unknown": 0
+  },
+  "窗1": {
+   "pairs": 44,
+   "exact": 44,
+   "unknown": 0
+  },
+  "窗2": {
+   "pairs": 44,
+   "exact": 44,
+   "unknown": 0
+  },
+  "窗4": {
+   "pairs": 44,
+   "exact": 44,
+   "unknown": 0
+  },
+  "窗8": {
+   "pairs": 44,
+   "exact": 44,
+   "unknown": 0
+  },
+  "corpus": "tests/帧样本/预处理（**不是**红罩那 28 张）",
+  "note": "这一栏是另一批语料上位置窗的读数，只作旁证，不混进判定账。"
+ },
+ "seconds": 40.672
+}

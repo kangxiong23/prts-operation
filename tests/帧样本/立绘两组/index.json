@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "box": [
+    0,
+    0,
+    2799,
+    1259
+  ],
+  "crops": [
+    {
+      "file": "组1_编队页.png",
+      "origin": [
+        0,
+        0
+      ],
+      "size": [
+        2800,
+        1260
+      ],
+      "source": "screenshots/run-03/卡片余量强化测试1-0.png",
+      "source_sha256": "ad4b6881cdaef86071b664e1a74506350745b97946613bdd007f2695c168da62"
+    },
+    {
+      "file": "组1_备战席.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "screenshots/run-03/卡片余量强化测试1-1.png",
+      "source_sha256": "89eafe4967848331dfe3fdaec8516f6b3f85a8c05d19b2789fe087c3f53f1eb8"
+    },
+    {
+      "file": "组2_编队页.png",
+      "origin": [
+        0,
+        0
+      ],
+      "size": [
+        2800,
+        1260
+      ],
+      "source": "screenshots/run-03/卡片余量强化测试2-0.png",
+      "source_sha256": "d0616016916cebdaacd4aa6a38af074326e7b5fc3b32c748ba736a6e033b7aa9"
+    },
+    {
+      "file": "组2_备战席.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "screenshots/run-03/卡片余量强化测试2-1.png",
+      "source_sha256": "74187d513e3ff6dcdd2e1eb228083c0c01279dfa12cbd5579a73cacef9bd1c09"
+    }
+  ]
+}

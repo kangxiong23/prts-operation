@@ -1,0 +1,219 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "note": "场上我方干员那三条读数链的基准集。每一条是原生帧上 300×420 的一块，比取区（240×360）大一圈；血条左上角在每一块里的位置见 取材.json。",
+  "crops": [
+    {
+      "file": "cd01_a.png",
+      "origin": [
+        962,
+        289
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd01.png",
+      "source_sha256": "24d89d1a126246b4586b333b40ee19dfff0f07aae4a078493efff51746eccb6d"
+    },
+    {
+      "file": "cd01_b.png",
+      "origin": [
+        945,
+        460
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd01.png",
+      "source_sha256": "24d89d1a126246b4586b333b40ee19dfff0f07aae4a078493efff51746eccb6d"
+    },
+    {
+      "file": "cd01_c.png",
+      "origin": [
+        1517,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd01.png",
+      "source_sha256": "24d89d1a126246b4586b333b40ee19dfff0f07aae4a078493efff51746eccb6d"
+    },
+    {
+      "file": "cd12_a.png",
+      "origin": [
+        1517,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd12.png",
+      "source_sha256": "68cd30d894438358b7fa4010e4b9b210bcc823bad9c68451f29dc0724d4a020c"
+    },
+    {
+      "file": "shot01_a.png",
+      "origin": [
+        1326,
+        146
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/live/shot01.png",
+      "source_sha256": "721f0ff195be5838848430b190ec794d3c113816499adb568bf52a1b3705fae8"
+    },
+    {
+      "file": "shot02_a.png",
+      "origin": [
+        1326,
+        146
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/live/shot02.png",
+      "source_sha256": "daba34d3d2c6a096b2fe29904d02c940b6695f14d66b4376b5a6d8f9e5c128c9"
+    },
+    {
+      "file": "shot04_a.png",
+      "origin": [
+        1326,
+        146
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/live/shot04.png",
+      "source_sha256": "b21e874369ed775f835ec9964897c2301a2db9c0538bd52765f008f43869ccb6"
+    },
+    {
+      "file": "shot21_a.png",
+      "origin": [
+        1343,
+        437
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/live/shot21.png",
+      "source_sha256": "2c57db16bd844fd5040326495a54f6af294323ead633ae69ed36155cb8370dd9"
+    },
+    {
+      "file": "shot26_a.png",
+      "origin": [
+        1142,
+        596
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/live/shot26.png",
+      "source_sha256": "e7ab528de460c011e37437c3ba96d901e4f4f8d5baed833248aea9578c08f43d"
+    },
+    {
+      "file": "shot31_a.png",
+      "origin": [
+        1529,
+        244
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/live/shot31.png",
+      "source_sha256": "337c9333bfc7b071d530768929ed0d3ce6cb9e1c20d72f82b3488e452514a773"
+    },
+    {
+      "file": "shot30_a.png",
+      "origin": [
+        1349,
+        619
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/live/shot30.png",
+      "source_sha256": "741d586e098c307e8e8690d1b342c628a6ee341612ed2748c5e7a7ba095a2ac2"
+    },
+    {
+      "file": "shot22_a.png",
+      "origin": [
+        1349,
+        619
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/live/shot22.png",
+      "source_sha256": "4a3ed92c4670d2b9045082d929608e14607c06cf356cac3a855234a8f13980eb"
+    },
+    {
+      "file": "board_a.png",
+      "origin": [
+        1532,
+        289
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/_t5_board/board.raw",
+      "source_sha256": "b42627afe553a81816bf50cd6760d3173734d0e16569f509f6f6426b0cc46b5a"
+    },
+    {
+      "file": "board_b.png",
+      "origin": [
+        797,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/_t5_board/board.raw",
+      "source_sha256": "b42627afe553a81816bf50cd6760d3173734d0e16569f509f6f6426b0cc46b5a"
+    },
+    {
+      "file": "field_a.png",
+      "origin": [
+        1532,
+        289
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/_t5_field/field.raw",
+      "source_sha256": "58d164f914f78ef68b5d3ccb76d47825508696d765dbed3e1c1f3013ec828ce1"
+    },
+    {
+      "file": "field_b.png",
+      "origin": [
+        797,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/_t5_field/field.raw",
+      "source_sha256": "58d164f914f78ef68b5d3ccb76d47825508696d765dbed3e1c1f3013ec828ce1"
+    }
+  ]
+}

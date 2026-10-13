@@ -1,0 +1,1135 @@
+{
+  "note": "**这一批的真值来自面板**（生命 当前/上限；技力那一侧是场上技能按钮上的 N/M）。真值只在对照那一步用，链的参数一个都不是从这一批来的。",
+  "window_size": [
+    240,
+    360
+  ],
+  "bars_in_window": [
+    40,
+    320
+  ],
+  "crop_size": [
+    300,
+    420
+  ],
+  "crop_left_margin": 80,
+  "pairing": {
+    "rule": "点场上干员开面板时，被点中的干员会被挪到屏幕较中心的位置（场景跟着一起挪）→ 被选中的那根条 = 离画布中心最近的那根",
+    "centre": [
+      1400.0,
+      630.0
+    ],
+    "min_lit_columns": 12,
+    "min_height": 6
+  },
+  "crops": [
+    {
+      "file": "p00.png",
+      "source": "data/probe/panel_run/p00.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 120,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1496,
+            870
+          ],
+          "lit": 145,
+          "distance_to_centre": 296.811
+        },
+        {
+          "bar": [
+            1850,
+            678
+          ],
+          "lit": 83,
+          "distance_to_centre": 525.579
+        },
+        {
+          "bar": [
+            1705,
+            1039
+          ],
+          "lit": 22,
+          "distance_to_centre": 559.869
+        },
+        {
+          "bar": [
+            2124,
+            1016
+          ],
+          "lit": 146,
+          "distance_to_centre": 887.304
+        },
+        {
+          "bar": [
+            2502,
+            799
+          ],
+          "lit": 27,
+          "distance_to_centre": 1187.667
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 2351,
+          "max": 2867,
+          "ratio": 0.820021
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "note": "面板 新约能天使；血条读到 120/146"
+    },
+    {
+      "file": "p01.png",
+      "source": "data/probe/panel_run/p01.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 119,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1496,
+            870
+          ],
+          "lit": 145,
+          "distance_to_centre": 296.811
+        },
+        {
+          "bar": [
+            1850,
+            678
+          ],
+          "lit": 84,
+          "distance_to_centre": 525.579
+        },
+        {
+          "bar": [
+            1705,
+            1039
+          ],
+          "lit": 22,
+          "distance_to_centre": 559.869
+        },
+        {
+          "bar": [
+            2124,
+            1016
+          ],
+          "lit": 146,
+          "distance_to_centre": 887.304
+        },
+        {
+          "bar": [
+            2502,
+            799
+          ],
+          "lit": 27,
+          "distance_to_centre": 1187.667
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 2322,
+          "max": 2867,
+          "ratio": 0.809906
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "note": "同一场；血条 119/146"
+    },
+    {
+      "file": "p02.png",
+      "source": "data/probe/panel_run/p02.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 146,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1496,
+            870
+          ],
+          "lit": 145,
+          "distance_to_centre": 296.811
+        },
+        {
+          "bar": [
+            1850,
+            678
+          ],
+          "lit": 83,
+          "distance_to_centre": 525.579
+        },
+        {
+          "bar": [
+            1705,
+            1039
+          ],
+          "lit": 22,
+          "distance_to_centre": 559.869
+        },
+        {
+          "bar": [
+            2124,
+            1016
+          ],
+          "lit": 146,
+          "distance_to_centre": 887.304
+        },
+        {
+          "bar": [
+            2502,
+            799
+          ],
+          "lit": 27,
+          "distance_to_centre": 1187.667
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 2867,
+          "max": 2867,
+          "ratio": 1.0
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "note": "满血那一档"
+    },
+    {
+      "file": "p03.png",
+      "source": "data/probe/panel_run/p03.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 145,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1496,
+            870
+          ],
+          "lit": 145,
+          "distance_to_centre": 296.811
+        },
+        {
+          "bar": [
+            1850,
+            678
+          ],
+          "lit": 83,
+          "distance_to_centre": 525.579
+        },
+        {
+          "bar": [
+            1705,
+            1039
+          ],
+          "lit": 22,
+          "distance_to_centre": 559.869
+        },
+        {
+          "bar": [
+            2124,
+            1016
+          ],
+          "lit": 146,
+          "distance_to_centre": 887.304
+        },
+        {
+          "bar": [
+            2502,
+            799
+          ],
+          "lit": 27,
+          "distance_to_centre": 1187.667
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 2839,
+          "max": 2867,
+          "ratio": 0.990234
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "note": "血条 145/146"
+    },
+    {
+      "file": "p04.png",
+      "source": "data/probe/panel_run/p04.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 145,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1496,
+            870
+          ],
+          "lit": 145,
+          "distance_to_centre": 296.811
+        },
+        {
+          "bar": [
+            1850,
+            678
+          ],
+          "lit": 78,
+          "distance_to_centre": 525.579
+        },
+        {
+          "bar": [
+            1705,
+            1039
+          ],
+          "lit": 22,
+          "distance_to_centre": 559.869
+        },
+        {
+          "bar": [
+            2124,
+            1016
+          ],
+          "lit": 146,
+          "distance_to_centre": 887.304
+        },
+        {
+          "bar": [
+            2502,
+            799
+          ],
+          "lit": 27,
+          "distance_to_centre": 1187.667
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 2839,
+          "max": 2867,
+          "ratio": 0.990234
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "note": "与 p03 同一个数"
+    },
+    {
+      "file": "p05.png",
+      "source": "data/probe/panel_run/p05.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 143,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1496,
+            870
+          ],
+          "lit": 145,
+          "distance_to_centre": 296.811
+        },
+        {
+          "bar": [
+            1850,
+            678
+          ],
+          "lit": 83,
+          "distance_to_centre": 525.579
+        },
+        {
+          "bar": [
+            1705,
+            1039
+          ],
+          "lit": 22,
+          "distance_to_centre": 559.869
+        },
+        {
+          "bar": [
+            2124,
+            1016
+          ],
+          "lit": 146,
+          "distance_to_centre": 887.304
+        },
+        {
+          "bar": [
+            2502,
+            799
+          ],
+          "lit": 27,
+          "distance_to_centre": 1187.667
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 2810,
+          "max": 2867,
+          "ratio": 0.980119
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "note": "血条 143/146"
+    },
+    {
+      "file": "p06.png",
+      "source": "data/probe/panel_run/p06.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 142,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1496,
+            870
+          ],
+          "lit": 145,
+          "distance_to_centre": 296.811
+        },
+        {
+          "bar": [
+            1850,
+            678
+          ],
+          "lit": 83,
+          "distance_to_centre": 525.579
+        },
+        {
+          "bar": [
+            1705,
+            1039
+          ],
+          "lit": 22,
+          "distance_to_centre": 559.869
+        },
+        {
+          "bar": [
+            2124,
+            1016
+          ],
+          "lit": 146,
+          "distance_to_centre": 887.304
+        },
+        {
+          "bar": [
+            2502,
+            799
+          ],
+          "lit": 27,
+          "distance_to_centre": 1187.667
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 2781,
+          "max": 2867,
+          "ratio": 0.970003
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "note": "血条 142/146"
+    },
+    {
+      "file": "p07.png",
+      "source": "data/probe/panel_run/p07.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 140,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1496,
+            870
+          ],
+          "lit": 145,
+          "distance_to_centre": 296.811
+        },
+        {
+          "bar": [
+            1850,
+            678
+          ],
+          "lit": 83,
+          "distance_to_centre": 525.579
+        },
+        {
+          "bar": [
+            1705,
+            1039
+          ],
+          "lit": 22,
+          "distance_to_centre": 559.869
+        },
+        {
+          "bar": [
+            2124,
+            1016
+          ],
+          "lit": 146,
+          "distance_to_centre": 887.304
+        },
+        {
+          "bar": [
+            2502,
+            799
+          ],
+          "lit": 27,
+          "distance_to_centre": 1187.667
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 2753,
+          "max": 2867,
+          "ratio": 0.960237
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "note": "血条 140/146"
+    },
+    {
+      "file": "p08.png",
+      "source": "data/probe/panel_run/p08.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1000,
+          609
+        ],
+        "distance_to_centre": 327.442
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 27,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1000,
+            609
+          ],
+          "lit": 108,
+          "distance_to_centre": 327.442
+        },
+        {
+          "bar": [
+            1137,
+            896
+          ],
+          "lit": 146,
+          "distance_to_centre": 330.151
+        },
+        {
+          "bar": [
+            1313,
+            1065
+          ],
+          "lit": 144,
+          "distance_to_centre": 439.223
+        },
+        {
+          "bar": [
+            897,
+            920
+          ],
+          "lit": 49,
+          "distance_to_centre": 520.899
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 329,
+          "max": 1801,
+          "ratio": 0.182676
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        565,
+        1300,
+        660
+      ],
+      "note": "另一场；血条 27/146"
+    },
+    {
+      "file": "p09.png",
+      "source": "data/probe/panel_run/p09.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1000,
+          609
+        ],
+        "distance_to_centre": 327.442
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 27,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1000,
+            609
+          ],
+          "lit": 108,
+          "distance_to_centre": 327.442
+        },
+        {
+          "bar": [
+            1137,
+            896
+          ],
+          "lit": 146,
+          "distance_to_centre": 330.151
+        },
+        {
+          "bar": [
+            1313,
+            1065
+          ],
+          "lit": 142,
+          "distance_to_centre": 439.223
+        },
+        {
+          "bar": [
+            897,
+            920
+          ],
+          "lit": 49,
+          "distance_to_centre": 520.899
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 329,
+          "max": 1801,
+          "ratio": 0.182676
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        565,
+        1300,
+        660
+      ],
+      "note": "与 p08 同一个数"
+    },
+    {
+      "file": "p10.png",
+      "source": "data/probe/panel_run/p10.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1000,
+          609
+        ],
+        "distance_to_centre": 327.442
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 27,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1000,
+            609
+          ],
+          "lit": 108,
+          "distance_to_centre": 327.442
+        },
+        {
+          "bar": [
+            1137,
+            896
+          ],
+          "lit": 146,
+          "distance_to_centre": 330.151
+        },
+        {
+          "bar": [
+            1313,
+            1065
+          ],
+          "lit": 141,
+          "distance_to_centre": 439.223
+        },
+        {
+          "bar": [
+            897,
+            920
+          ],
+          "lit": 49,
+          "distance_to_centre": 520.899
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 329,
+          "max": 1801,
+          "ratio": 0.182676
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        565,
+        1300,
+        660
+      ],
+      "note": "与 p08 同一个数"
+    },
+    {
+      "file": "p11.png",
+      "source": "data/probe/panel_run/p11.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1000,
+          609
+        ],
+        "distance_to_centre": 327.442
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 27,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1000,
+            609
+          ],
+          "lit": 108,
+          "distance_to_centre": 327.442
+        },
+        {
+          "bar": [
+            1137,
+            896
+          ],
+          "lit": 146,
+          "distance_to_centre": 330.151
+        },
+        {
+          "bar": [
+            1313,
+            1065
+          ],
+          "lit": 145,
+          "distance_to_centre": 439.223
+        },
+        {
+          "bar": [
+            897,
+            920
+          ],
+          "lit": 49,
+          "distance_to_centre": 520.899
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 329,
+          "max": 1801,
+          "ratio": 0.182676
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        565,
+        1300,
+        660
+      ],
+      "note": "与 p08 同一个数"
+    },
+    {
+      "file": "sp_now.png",
+      "source": "data/probe/sp_now.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1000,
+          609
+        ],
+        "distance_to_centre": 327.442
+      },
+      "candidates": [
+        {
+          "bar": [
+            1487,
+            709
+          ],
+          "lit": 27,
+          "distance_to_centre": 180.247
+        },
+        {
+          "bar": [
+            1000,
+            609
+          ],
+          "lit": 108,
+          "distance_to_centre": 327.442
+        },
+        {
+          "bar": [
+            1137,
+            896
+          ],
+          "lit": 146,
+          "distance_to_centre": 330.151
+        },
+        {
+          "bar": [
+            1313,
+            1065
+          ],
+          "lit": 146,
+          "distance_to_centre": 439.223
+        },
+        {
+          "bar": [
+            897,
+            920
+          ],
+          "lit": 49,
+          "distance_to_centre": 520.899
+        }
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "truth": {
+        "life": {
+          "current": 329,
+          "max": 1801,
+          "ratio": 0.182676
+        },
+        "sp": {
+          "current": 16,
+          "max": 26,
+          "ratio": 0.615385
+        }
+      },
+      "truth_row": [
+        100,
+        565,
+        1300,
+        660
+      ],
+      "note": "面板 极境；技力按钮上读到 16/26"
+    }
+  ]
+}

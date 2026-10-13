@@ -1,0 +1,198 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "box": [
+    300,
+    1040,
+    2799,
+    1259
+  ],
+  "crops": [
+    {
+      "file": "cd01.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd01.png",
+      "source_sha256": "24d89d1a126246b4586b333b40ee19dfff0f07aae4a078493efff51746eccb6d"
+    },
+    {
+      "file": "cd07.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd07.png",
+      "source_sha256": "7d658a9fa7b69494d9ca089abdd298200e41c773660472b51a3cc2a5152840cc"
+    },
+    {
+      "file": "cd13.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd13.png",
+      "source_sha256": "7606e3a987dc8092eed76546dcca31918c4a84bfd96345d3723c4f40cf7bc1de"
+    },
+    {
+      "file": "cd17.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd17.png",
+      "source_sha256": "47bc13456aece4cc7c2a1452af4efa0f2f2c8f9061ed25bb87f1d063ab62d8fb"
+    },
+    {
+      "file": "cd21.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd21.png",
+      "source_sha256": "de66999b5078fa1e6cb6001d4f19658a965be8ddef7a0e261e20851f6938219d"
+    },
+    {
+      "file": "cd25.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd25.png",
+      "source_sha256": "91c52f10c581b1e111282b9bce36021d34ed6791f6a193962de8ca39d6e30e2f"
+    },
+    {
+      "file": "cd29.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd29.png",
+      "source_sha256": "832618f4eae7f316ec29f05d7b6c9ddfb66c38b33863d6197dbca14515230295"
+    },
+    {
+      "file": "cd32.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd32.png",
+      "source_sha256": "1f9a3228f58a9f83a2b6a47c83e7b86ccd2f8acf583cf10d5dc69e0c4f3b784e"
+    },
+    {
+      "file": "cd38.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd38.png",
+      "source_sha256": "c098d627565b95a033b058fb7cc221b9a60249220f3e132be9d563e1d1655a23"
+    },
+    {
+      "file": "cd43.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd43.png",
+      "source_sha256": "24c60275dff982c9a7595672b7ce5f28966b98ff4c7a3cf8b051d92435f49c78"
+    },
+    {
+      "file": "cd48.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd48.png",
+      "source_sha256": "361d6624539d2b1b8ca2c0f7ba6d1d807834a977c1daa16c7c36fddc6abb0b63"
+    },
+    {
+      "file": "cd52.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd52.png",
+      "source_sha256": "162b6bcc06c0550bc1e5d42f2eb490c9f508d62d0a45554384280f96b5b0f2d9"
+    },
+    {
+      "file": "cd56.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd56.png",
+      "source_sha256": "923c333454a14000eff050f87597646a34abb90237d69814707b0d40537a49b0"
+    },
+    {
+      "file": "cd60.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd60.png",
+      "source_sha256": "71d37a96ad9ceb496a560705bd0697d05f775333af23561cf0c98b6862eb4ae8"
+    }
+  ]
+}

@@ -1,0 +1,2204 @@
+{
+  "note": "红罩卡接上今天那条入口之后的读数表：**只换取区**，判据 · 线 · 取区形状一个字节没动（D-全局-34）。真值来自两份取材表的 `under_the_cap`；「改动前」= **同一段代码把 `redeploying` 钉成 `False`**（那就是接红罩之前那条路）。",
+  "batch": "tests/帧样本/红罩",
+  "harvest": "tests/帧样本/红罩/取材.json",
+  "library": "tests/帧样本/点名/编队页.json",
+  "entry": "ark.engine.vision.roster.read_squad_identities",
+  "region": {
+    "red_capped": {
+      "who": "roster.redcap_region",
+      "box_in_card": [
+        58,
+        70,
+        89,
+        94
+      ],
+      "pixels": 3986,
+      "shape": "环带以内的圆盘 − 中央秒数那一条；形状住 margin.IDENTITY_DISC_RADIUS / IDENTITY_DISC_STRIP_HALF（一处定义）"
+    },
+    "clean": {
+      "who": "roster.identity_region",
+      "box_in_card": [
+        52,
+        76,
+        100,
+        100
+      ],
+      "pixels": 10000
+    },
+    "note": "两块取区**分开记、不互相顶替**：哪一格用哪块由 `bench.redeploying` 说。两条路**共用**同一条线（ROSTER_SOLID_MATCH_SCORE / ROSTER_AMBIGUITY_MARGIN）。"
+  },
+  "criterion": {
+    "score": 0.85,
+    "margin": 0.25,
+    "note": "读得出 ⇒ 精确（分数就是定下它的那个）；读不出 ⇒ 未知，**不带分数**。**每一格都把次高分（runner_up / runner_up_score）· 余量（margin）· 被哪条线挡的（blocked_by）一起落下来** —— 以前只落了判定，所以挪一次线就要把整批重跑。"
+  },
+  "blocked_by": {
+    "counts": {
+      "余量不够": 6,
+      "分数不够 + 余量不够": 8
+    },
+    "note": "仍未知的那些卡被哪一条线挡的（分数不够 / 余量不够 / 两条都没够）——**这两样现在分得开**；判定与入口读数逐位核对过（_crosscheck）。"
+  },
+  "cost": {
+    "components": {
+      "calls": {
+        "one_clean_card": 121,
+        "build_ruler": 726,
+        "one_red_card": 121
+      },
+      "calls_note": "`cv2.matchTemplate` 次数 —— **这份账比墙钟稳**（墙钟同代码差 1.5 倍）。红罩卡与干净卡**同为 121 次**；多花的是墙钟：掩码那把尺子在每个（条目, 尺度）上多做几处整张相关图的逐元素运算。**每帧第一次用红罩那条路 +726 次**（建尺子，只建一次；没有红罩卡的帧不建）。",
+      "build_ruler_s": 5.4828,
+      "one_red_card_s": 5.3029,
+      "one_clean_card_s": 3.6178,
+      "redeploying_s": 0.00429,
+      "note": "同一块画面上各跑 3 次取中位（单线程）。**每张红罩卡多花** = 一张红罩卡 − 一张干净卡；**有红罩卡的帧再多花**一次建尺子。"
+    },
+    "frames": {
+      "after_s": 401.118,
+      "as_before_s": 316.499,
+      "delta_s": 84.619,
+      "frames": 8,
+      "note": "同一份进程里跑两遍：一遍真的、一遍把 `redeploying` 钉成 `False`（= 接红罩之前那条路）。差就是这一单在**这一批帧**上的账。"
+    }
+  },
+  "totals": {
+    "red": 28,
+    "exact": 22,
+    "unknown": 6,
+    "truth": 5,
+    "truth_ok": 5,
+    "clean": 58,
+    "clean_changed": 0
+  },
+  "frames": [
+    {
+      "name": "cd14",
+      "cards": 10,
+      "seconds_after": 52.507,
+      "seconds_as_before": 34.568,
+      "slots": [
+        {
+          "index": 0,
+          "centre_x": 2696.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.96754390001297
+          },
+          "score": 0.967544,
+          "scale": 1.1,
+          "runner_up": "流明",
+          "runner_up_score": 0.45331,
+          "margin": 0.514234,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.96754390001297
+          },
+          "truth": null
+        },
+        {
+          "index": 1,
+          "centre_x": 2488.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9840648729934118
+          },
+          "score": 0.984065,
+          "scale": 1.13,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.666801,
+          "margin": 0.317264,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": "维什戴尔"
+        },
+        {
+          "index": 2,
+          "centre_x": 2281.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9709148692122449
+          },
+          "score": 0.970915,
+          "scale": 1.06,
+          "runner_up": "流明",
+          "runner_up_score": 0.597595,
+          "margin": 0.373319,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 3,
+          "centre_x": 2073.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "乌尔比安",
+            "score": 0.9701163825700178
+          },
+          "score": 0.970116,
+          "scale": 1.09,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.680027,
+          "margin": 0.290089,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 4,
+          "centre_x": 1865.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.989704,
+          "scale": 1.13,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.78567,
+          "margin": 0.204034,
+          "blocked_by": "余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 5,
+          "centre_x": 1658.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "白面鸮",
+            "score": 0.974809041393178
+          },
+          "score": 0.974809,
+          "scale": 1.06,
+          "runner_up": "极境",
+          "runner_up_score": 0.424117,
+          "margin": 0.550692,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 6,
+          "centre_x": 1450.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9762206077575684
+          },
+          "score": 0.976221,
+          "scale": 1.15,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.559715,
+          "margin": 0.416505,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9762206077575684
+          },
+          "truth": null
+        },
+        {
+          "index": 7,
+          "centre_x": 1243.5,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.469914,
+          "scale": 1.15,
+          "runner_up": "流明",
+          "runner_up_score": 0.463926,
+          "margin": 0.005988,
+          "blocked_by": "分数不够 + 余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 8,
+          "centre_x": 1035.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.977535638181734
+          },
+          "score": 0.977536,
+          "scale": 1.1,
+          "runner_up": "Mon3tr",
+          "runner_up_score": 0.660395,
+          "margin": 0.317141,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 9,
+          "centre_x": 827.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.982093095779419
+          },
+          "score": 0.982093,
+          "scale": 1.13,
+          "runner_up": "流明",
+          "runner_up_score": 0.394135,
+          "margin": 0.587958,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.982093095779419
+          },
+          "truth": null
+        }
+      ]
+    },
+    {
+      "name": "cd15",
+      "cards": 10,
+      "seconds_after": 56.829,
+      "seconds_as_before": 42.877,
+      "slots": [
+        {
+          "index": 0,
+          "centre_x": 2696.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.9676110744476318
+          },
+          "score": 0.967611,
+          "scale": 1.1,
+          "runner_up": "流明",
+          "runner_up_score": 0.453306,
+          "margin": 0.514305,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.9676110744476318
+          },
+          "truth": null
+        },
+        {
+          "index": 1,
+          "centre_x": 2488.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "score": 0.984765,
+          "scale": 1.13,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.512818,
+          "margin": 0.471947,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "truth": null
+        },
+        {
+          "index": 2,
+          "centre_x": 2281.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9710167789047327
+          },
+          "score": 0.971017,
+          "scale": 1.06,
+          "runner_up": "流明",
+          "runner_up_score": 0.597396,
+          "margin": 0.373621,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 3,
+          "centre_x": 2073.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "乌尔比安",
+            "score": 0.967626443955548
+          },
+          "score": 0.967626,
+          "scale": 1.09,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.679963,
+          "margin": 0.287663,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 4,
+          "centre_x": 1865.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.989639,
+          "scale": 1.13,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.785865,
+          "margin": 0.203774,
+          "blocked_by": "余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 5,
+          "centre_x": 1658.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "白面鸮",
+            "score": 0.9747438905830127
+          },
+          "score": 0.974744,
+          "scale": 1.06,
+          "runner_up": "极境",
+          "runner_up_score": 0.424274,
+          "margin": 0.55047,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 6,
+          "centre_x": 1450.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9762206077575684
+          },
+          "score": 0.976221,
+          "scale": 1.15,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.559715,
+          "margin": 0.416505,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9762206077575684
+          },
+          "truth": null
+        },
+        {
+          "index": 7,
+          "centre_x": 1243.5,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.469914,
+          "scale": 1.15,
+          "runner_up": "流明",
+          "runner_up_score": 0.463926,
+          "margin": 0.005988,
+          "blocked_by": "分数不够 + 余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 8,
+          "centre_x": 1035.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.9772386164274265
+          },
+          "score": 0.977239,
+          "scale": 1.1,
+          "runner_up": "Mon3tr",
+          "runner_up_score": 0.659308,
+          "margin": 0.317931,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 9,
+          "centre_x": 827.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9820934534072876
+          },
+          "score": 0.982093,
+          "scale": 1.13,
+          "runner_up": "流明",
+          "runner_up_score": 0.394136,
+          "margin": 0.587958,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9820934534072876
+          },
+          "truth": null
+        }
+      ]
+    },
+    {
+      "name": "cd22",
+      "cards": 11,
+      "seconds_after": 56.408,
+      "seconds_as_before": 55.532,
+      "slots": [
+        {
+          "index": 0,
+          "centre_x": 2696.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.9676331877708435
+          },
+          "score": 0.967633,
+          "scale": 1.1,
+          "runner_up": "流明",
+          "runner_up_score": 0.45328,
+          "margin": 0.514354,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.9676331877708435
+          },
+          "truth": null
+        },
+        {
+          "index": 1,
+          "centre_x": 2488.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "score": 0.984765,
+          "scale": 1.13,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.512818,
+          "margin": 0.471947,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "truth": null
+        },
+        {
+          "index": 2,
+          "centre_x": 2281.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9793593287467957
+          },
+          "score": 0.979359,
+          "scale": 1.06,
+          "runner_up": "黍",
+          "runner_up_score": 0.387725,
+          "margin": 0.591634,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9793593287467957
+          },
+          "truth": null
+        },
+        {
+          "index": 3,
+          "centre_x": 2073.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "乌尔比安",
+            "score": 0.9654610784560879
+          },
+          "score": 0.965461,
+          "scale": 1.1,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.680001,
+          "margin": 0.28546,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 4,
+          "centre_x": 1865.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "黍",
+            "score": 0.9727547663160926
+          },
+          "score": 0.972755,
+          "scale": 1.1,
+          "runner_up": "圣聆初雪",
+          "runner_up_score": 0.418853,
+          "margin": 0.553901,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 5,
+          "centre_x": 1658.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.98818,
+          "scale": 1.1,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.789913,
+          "margin": 0.198266,
+          "blocked_by": "余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 6,
+          "centre_x": 1450.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "白面鸮",
+            "score": 0.9715945867213197
+          },
+          "score": 0.971595,
+          "scale": 1.06,
+          "runner_up": "极境",
+          "runner_up_score": 0.423909,
+          "margin": 0.547686,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 7,
+          "centre_x": 1242.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9840916395187378
+          },
+          "score": 0.984092,
+          "scale": 1.15,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.55803,
+          "margin": 0.426061,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9840916395187378
+          },
+          "truth": null
+        },
+        {
+          "index": 8,
+          "centre_x": 1036.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.468805,
+          "scale": 1.15,
+          "runner_up": "流明",
+          "runner_up_score": 0.464265,
+          "margin": 0.00454,
+          "blocked_by": "分数不够 + 余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 9,
+          "centre_x": 827.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.9815591670782614
+          },
+          "score": 0.981559,
+          "scale": 1.1,
+          "runner_up": "Mon3tr",
+          "runner_up_score": 0.656431,
+          "margin": 0.325128,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": "新约能天使"
+        },
+        {
+          "index": 10,
+          "centre_x": 619.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9740384817123413
+          },
+          "score": 0.974038,
+          "scale": 1.12,
+          "runner_up": "流明",
+          "runner_up_score": 0.395403,
+          "margin": 0.578635,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9740384817123413
+          },
+          "truth": null
+        }
+      ]
+    },
+    {
+      "name": "cd23",
+      "cards": 11,
+      "seconds_after": 51.483,
+      "seconds_as_before": 28.257,
+      "slots": [
+        {
+          "index": 0,
+          "centre_x": 2696.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.967636227607727
+          },
+          "score": 0.967636,
+          "scale": 1.1,
+          "runner_up": "流明",
+          "runner_up_score": 0.453271,
+          "margin": 0.514365,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.967636227607727
+          },
+          "truth": null
+        },
+        {
+          "index": 1,
+          "centre_x": 2488.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "score": 0.984765,
+          "scale": 1.13,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.512818,
+          "margin": 0.471947,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "truth": null
+        },
+        {
+          "index": 2,
+          "centre_x": 2281.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9793593287467957
+          },
+          "score": 0.979359,
+          "scale": 1.06,
+          "runner_up": "黍",
+          "runner_up_score": 0.387725,
+          "margin": 0.591634,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9793593287467957
+          },
+          "truth": null
+        },
+        {
+          "index": 3,
+          "centre_x": 2073.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "乌尔比安",
+            "score": 0.9656847594650846
+          },
+          "score": 0.965685,
+          "scale": 1.1,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.680015,
+          "margin": 0.28567,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 4,
+          "centre_x": 1865.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "黍",
+            "score": 0.9741385944907354
+          },
+          "score": 0.974139,
+          "scale": 1.1,
+          "runner_up": "圣聆初雪",
+          "runner_up_score": 0.419593,
+          "margin": 0.554546,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 5,
+          "centre_x": 1658.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.988398,
+          "scale": 1.1,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.790166,
+          "margin": 0.198232,
+          "blocked_by": "余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 6,
+          "centre_x": 1450.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "白面鸮",
+            "score": 0.9716011298797806
+          },
+          "score": 0.971601,
+          "scale": 1.06,
+          "runner_up": "极境",
+          "runner_up_score": 0.424055,
+          "margin": 0.547546,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": "白面鸮"
+        },
+        {
+          "index": 7,
+          "centre_x": 1242.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9840916395187378
+          },
+          "score": 0.984092,
+          "scale": 1.15,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.55803,
+          "margin": 0.426061,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9840916395187378
+          },
+          "truth": null
+        },
+        {
+          "index": 8,
+          "centre_x": 1036.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.468805,
+          "scale": 1.15,
+          "runner_up": "流明",
+          "runner_up_score": 0.464265,
+          "margin": 0.00454,
+          "blocked_by": "分数不够 + 余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 9,
+          "centre_x": 827.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.9868751764297485
+          },
+          "score": 0.986875,
+          "scale": 1.12,
+          "runner_up": "Mon3tr",
+          "runner_up_score": 0.484149,
+          "margin": 0.502726,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.9868751764297485
+          },
+          "truth": null
+        },
+        {
+          "index": 10,
+          "centre_x": 619.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9740384817123413
+          },
+          "score": 0.974038,
+          "scale": 1.12,
+          "runner_up": "流明",
+          "runner_up_score": 0.395403,
+          "margin": 0.578635,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9740384817123413
+          },
+          "truth": null
+        }
+      ]
+    },
+    {
+      "name": "cd27",
+      "cards": 11,
+      "seconds_after": 46.476,
+      "seconds_as_before": 32.781,
+      "slots": [
+        {
+          "index": 0,
+          "centre_x": 2696.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.9676840901374817
+          },
+          "score": 0.967684,
+          "scale": 1.1,
+          "runner_up": "流明",
+          "runner_up_score": 0.453153,
+          "margin": 0.514532,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.9676840901374817
+          },
+          "truth": null
+        },
+        {
+          "index": 1,
+          "centre_x": 2488.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "score": 0.984765,
+          "scale": 1.13,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.512818,
+          "margin": 0.471947,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "truth": null
+        },
+        {
+          "index": 2,
+          "centre_x": 2281.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9793593287467957
+          },
+          "score": 0.979359,
+          "scale": 1.06,
+          "runner_up": "黍",
+          "runner_up_score": 0.387725,
+          "margin": 0.591634,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9793593287467957
+          },
+          "truth": null
+        },
+        {
+          "index": 3,
+          "centre_x": 2073.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "乌尔比安",
+            "score": 0.96682330394965
+          },
+          "score": 0.966823,
+          "scale": 1.08,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.680099,
+          "margin": 0.286724,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 4,
+          "centre_x": 1865.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "黍",
+            "score": 0.9746818161553232
+          },
+          "score": 0.974682,
+          "scale": 1.1,
+          "runner_up": "圣聆初雪",
+          "runner_up_score": 0.419157,
+          "margin": 0.555524,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 5,
+          "centre_x": 1658.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.98833,
+          "scale": 1.1,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.790297,
+          "margin": 0.198032,
+          "blocked_by": "余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 6,
+          "centre_x": 1450.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "白面鸮",
+            "score": 0.9720690094183844
+          },
+          "score": 0.972069,
+          "scale": 1.06,
+          "runner_up": "极境",
+          "runner_up_score": 0.423965,
+          "margin": 0.548104,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": "白面鸮"
+        },
+        {
+          "index": 7,
+          "centre_x": 1242.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9840916395187378
+          },
+          "score": 0.984092,
+          "scale": 1.15,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.55803,
+          "margin": 0.426061,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9840916395187378
+          },
+          "truth": null
+        },
+        {
+          "index": 8,
+          "centre_x": 1036.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.468805,
+          "scale": 1.15,
+          "runner_up": "流明",
+          "runner_up_score": 0.464265,
+          "margin": 0.00454,
+          "blocked_by": "分数不够 + 余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 9,
+          "centre_x": 827.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.9868751764297485
+          },
+          "score": 0.986875,
+          "scale": 1.12,
+          "runner_up": "Mon3tr",
+          "runner_up_score": 0.484149,
+          "margin": 0.502726,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.9868751764297485
+          },
+          "truth": null
+        },
+        {
+          "index": 10,
+          "centre_x": 619.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9740384817123413
+          },
+          "score": 0.974038,
+          "scale": 1.12,
+          "runner_up": "流明",
+          "runner_up_score": 0.395403,
+          "margin": 0.578635,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9740384817123413
+          },
+          "truth": null
+        }
+      ]
+    },
+    {
+      "name": "cd28",
+      "cards": 11,
+      "seconds_after": 50.586,
+      "seconds_as_before": 39.357,
+      "slots": [
+        {
+          "index": 0,
+          "centre_x": 2696.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.96754390001297
+          },
+          "score": 0.967544,
+          "scale": 1.1,
+          "runner_up": "流明",
+          "runner_up_score": 0.45331,
+          "margin": 0.514234,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.96754390001297
+          },
+          "truth": null
+        },
+        {
+          "index": 1,
+          "centre_x": 2488.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "score": 0.984765,
+          "scale": 1.13,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.512818,
+          "margin": 0.471947,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "truth": null
+        },
+        {
+          "index": 2,
+          "centre_x": 2281.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9793593287467957
+          },
+          "score": 0.979359,
+          "scale": 1.06,
+          "runner_up": "黍",
+          "runner_up_score": 0.387725,
+          "margin": 0.591634,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9793593287467957
+          },
+          "truth": null
+        },
+        {
+          "index": 3,
+          "centre_x": 2073.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "乌尔比安",
+            "score": 0.9761849166686357
+          },
+          "score": 0.976185,
+          "scale": 1.08,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.680266,
+          "margin": 0.295919,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 4,
+          "centre_x": 1865.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "黍",
+            "score": 0.9744030488837231
+          },
+          "score": 0.974403,
+          "scale": 1.1,
+          "runner_up": "圣聆初雪",
+          "runner_up_score": 0.4212,
+          "margin": 0.553203,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 5,
+          "centre_x": 1658.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.988229,
+          "scale": 1.1,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.789624,
+          "margin": 0.198606,
+          "blocked_by": "余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 6,
+          "centre_x": 1450.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "白面鸮",
+            "score": 0.9920939207077026
+          },
+          "score": 0.992094,
+          "scale": 1.06,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.398943,
+          "margin": 0.593151,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "白面鸮",
+            "score": 0.9920939207077026
+          },
+          "truth": null
+        },
+        {
+          "index": 7,
+          "centre_x": 1242.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9840916395187378
+          },
+          "score": 0.984092,
+          "scale": 1.15,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.55803,
+          "margin": 0.426061,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9840916395187378
+          },
+          "truth": null
+        },
+        {
+          "index": 8,
+          "centre_x": 1036.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.468805,
+          "scale": 1.15,
+          "runner_up": "流明",
+          "runner_up_score": 0.464265,
+          "margin": 0.00454,
+          "blocked_by": "分数不够 + 余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 9,
+          "centre_x": 827.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.9868751764297485
+          },
+          "score": 0.986875,
+          "scale": 1.12,
+          "runner_up": "Mon3tr",
+          "runner_up_score": 0.484149,
+          "margin": 0.502726,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.9868751764297485
+          },
+          "truth": null
+        },
+        {
+          "index": 10,
+          "centre_x": 619.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9740384817123413
+          },
+          "score": 0.974038,
+          "scale": 1.12,
+          "runner_up": "流明",
+          "runner_up_score": 0.395403,
+          "margin": 0.578635,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9740384817123413
+          },
+          "truth": null
+        }
+      ]
+    },
+    {
+      "name": "cd37",
+      "cards": 11,
+      "seconds_after": 46.436,
+      "seconds_as_before": 41.279,
+      "slots": [
+        {
+          "index": 0,
+          "centre_x": 2696.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.9675470590591431
+          },
+          "score": 0.967547,
+          "scale": 1.1,
+          "runner_up": "流明",
+          "runner_up_score": 0.453306,
+          "margin": 0.514241,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.9675470590591431
+          },
+          "truth": null
+        },
+        {
+          "index": 1,
+          "centre_x": 2488.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "score": 0.984765,
+          "scale": 1.13,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.512818,
+          "margin": 0.471947,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "truth": null
+        },
+        {
+          "index": 2,
+          "centre_x": 2281.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9793593287467957
+          },
+          "score": 0.979359,
+          "scale": 1.06,
+          "runner_up": "黍",
+          "runner_up_score": 0.387725,
+          "margin": 0.591634,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9793593287467957
+          },
+          "truth": null
+        },
+        {
+          "index": 3,
+          "centre_x": 2073.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "乌尔比安",
+            "score": 0.9821436405181885
+          },
+          "score": 0.982144,
+          "scale": 1.08,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.507108,
+          "margin": 0.475036,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "乌尔比安",
+            "score": 0.9821436405181885
+          },
+          "truth": null
+        },
+        {
+          "index": 4,
+          "centre_x": 1865.0,
+          "redeploying": true,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "黍",
+            "score": 0.9737449360994791
+          },
+          "score": 0.973745,
+          "scale": 1.1,
+          "runner_up": "圣聆初雪",
+          "runner_up_score": 0.419347,
+          "margin": 0.554398,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": "黍"
+        },
+        {
+          "index": 5,
+          "centre_x": 1658.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "Mon3tr",
+            "score": 0.9813688397407532
+          },
+          "score": 0.981369,
+          "scale": 1.13,
+          "runner_up": "新约能天使",
+          "runner_up_score": 0.523003,
+          "margin": 0.458366,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "Mon3tr",
+            "score": 0.9813688397407532
+          },
+          "truth": null
+        },
+        {
+          "index": 6,
+          "centre_x": 1450.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "白面鸮",
+            "score": 0.9920939207077026
+          },
+          "score": 0.992094,
+          "scale": 1.06,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.398943,
+          "margin": 0.593151,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "白面鸮",
+            "score": 0.9920939207077026
+          },
+          "truth": null
+        },
+        {
+          "index": 7,
+          "centre_x": 1242.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9840916395187378
+          },
+          "score": 0.984092,
+          "scale": 1.15,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.55803,
+          "margin": 0.426061,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9840916395187378
+          },
+          "truth": null
+        },
+        {
+          "index": 8,
+          "centre_x": 1036.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.468805,
+          "scale": 1.15,
+          "runner_up": "流明",
+          "runner_up_score": 0.464265,
+          "margin": 0.00454,
+          "blocked_by": "分数不够 + 余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 9,
+          "centre_x": 827.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.9868751764297485
+          },
+          "score": 0.986875,
+          "scale": 1.12,
+          "runner_up": "Mon3tr",
+          "runner_up_score": 0.484149,
+          "margin": 0.502726,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.9868751764297485
+          },
+          "truth": null
+        },
+        {
+          "index": 10,
+          "centre_x": 619.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9740384817123413
+          },
+          "score": 0.974038,
+          "scale": 1.12,
+          "runner_up": "流明",
+          "runner_up_score": 0.395403,
+          "margin": 0.578635,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9740384817123413
+          },
+          "truth": null
+        }
+      ]
+    },
+    {
+      "name": "cd59",
+      "cards": 11,
+      "seconds_after": 40.394,
+      "seconds_as_before": 41.849,
+      "slots": [
+        {
+          "index": 0,
+          "centre_x": 2696.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.96754390001297
+          },
+          "score": 0.967544,
+          "scale": 1.1,
+          "runner_up": "流明",
+          "runner_up_score": 0.45331,
+          "margin": 0.514234,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "斩业星熊",
+            "score": 0.96754390001297
+          },
+          "truth": null
+        },
+        {
+          "index": 1,
+          "centre_x": 2488.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "score": 0.984765,
+          "scale": 1.13,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.512818,
+          "margin": 0.471947,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "维什戴尔",
+            "score": 0.9847650527954102
+          },
+          "truth": null
+        },
+        {
+          "index": 2,
+          "centre_x": 2281.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9793593287467957
+          },
+          "score": 0.979359,
+          "scale": 1.06,
+          "runner_up": "黍",
+          "runner_up_score": 0.387725,
+          "margin": 0.591634,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "圣聆初雪",
+            "score": 0.9793593287467957
+          },
+          "truth": null
+        },
+        {
+          "index": 3,
+          "centre_x": 2073.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "乌尔比安",
+            "score": 0.9821436405181885
+          },
+          "score": 0.982144,
+          "scale": 1.08,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.507108,
+          "margin": 0.475036,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "乌尔比安",
+            "score": 0.9821436405181885
+          },
+          "truth": null
+        },
+        {
+          "index": 4,
+          "centre_x": 1865.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "黍",
+            "score": 0.9773579239845276
+          },
+          "score": 0.977358,
+          "scale": 1.09,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.365588,
+          "margin": 0.61177,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "黍",
+            "score": 0.9773579239845276
+          },
+          "truth": null
+        },
+        {
+          "index": 5,
+          "centre_x": 1658.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "Mon3tr",
+            "score": 0.9813688397407532
+          },
+          "score": 0.981369,
+          "scale": 1.13,
+          "runner_up": "新约能天使",
+          "runner_up_score": 0.523003,
+          "margin": 0.458366,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "Mon3tr",
+            "score": 0.9813688397407532
+          },
+          "truth": null
+        },
+        {
+          "index": 6,
+          "centre_x": 1450.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "白面鸮",
+            "score": 0.9920939207077026
+          },
+          "score": 0.992094,
+          "scale": 1.06,
+          "runner_up": "歌蕾蒂娅",
+          "runner_up_score": 0.398943,
+          "margin": 0.593151,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "白面鸮",
+            "score": 0.9920939207077026
+          },
+          "truth": null
+        },
+        {
+          "index": 7,
+          "centre_x": 1242.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9840916395187378
+          },
+          "score": 0.984092,
+          "scale": 1.15,
+          "runner_up": "白面鸮",
+          "runner_up_score": 0.55803,
+          "margin": 0.426061,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "歌蕾蒂娅",
+            "score": 0.9840916395187378
+          },
+          "truth": null
+        },
+        {
+          "index": 8,
+          "centre_x": 1036.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "score": 0.468805,
+          "scale": 1.15,
+          "runner_up": "流明",
+          "runner_up_score": 0.464265,
+          "margin": 0.00454,
+          "blocked_by": "分数不够 + 余量不够",
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Unknown",
+            "name": null,
+            "score": null
+          },
+          "truth": null
+        },
+        {
+          "index": 9,
+          "centre_x": 827.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.9868751764297485
+          },
+          "score": 0.986875,
+          "scale": 1.12,
+          "runner_up": "Mon3tr",
+          "runner_up_score": 0.484149,
+          "margin": 0.502726,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "新约能天使",
+            "score": 0.9868751764297485
+          },
+          "truth": null
+        },
+        {
+          "index": 10,
+          "centre_x": 619.0,
+          "redeploying": false,
+          "reading": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9740384817123413
+          },
+          "score": 0.974038,
+          "scale": 1.12,
+          "runner_up": "流明",
+          "runner_up_score": 0.395403,
+          "margin": 0.578635,
+          "blocked_by": null,
+          "as_before": {
+            "shape": "Valued",
+            "payload": "Exact",
+            "name": "极境",
+            "score": 0.9740384817123413
+          },
+          "truth": null
+        }
+      ]
+    }
+  ]
+}

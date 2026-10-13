@@ -1,0 +1,210 @@
+{
+  "note": "裁剪的写法与取区的关系。取区由血条左上角折出来（operator_ui_window），裁剪再比取区大一圈 —— 这样测的是「窗里的哪一块是条」，不是「把条摆好给链子」。",
+  "window_size": [
+    240,
+    360
+  ],
+  "bars_in_window": [
+    40,
+    320
+  ],
+  "crop_size": [
+    300,
+    420
+  ],
+  "crop_left_margin": 80,
+  "crops": [
+    {
+      "file": "cd01_a.png",
+      "covers": "血条满 + 技力充能中（绿）",
+      "window": [
+        1002,
+        309,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1042, 629) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd01.png"
+    },
+    {
+      "file": "cd01_b.png",
+      "covers": "血条满 + 技力生效中（橙实心）",
+      "window": [
+        985,
+        480,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1025, 800) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd01.png"
+    },
+    {
+      "file": "cd01_c.png",
+      "covers": "血条 0.884 + 技力弹药分格（满）",
+      "window": [
+        1557,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1597, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd01.png"
+    },
+    {
+      "file": "cd12_a.png",
+      "covers": "血条 0.740 + 弹药分格",
+      "window": [
+        1557,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1597, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd12.png"
+    },
+    {
+      "file": "shot01_a.png",
+      "covers": "血条满 + 充能中 + 菱形不在",
+      "window": [
+        1366,
+        166,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1406, 486) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/live/shot01.png"
+    },
+    {
+      "file": "shot02_a.png",
+      "covers": "血条 0.288（很低）+ 充能中 + 菱形在",
+      "window": [
+        1366,
+        166,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1406, 486) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/live/shot02.png"
+    },
+    {
+      "file": "shot04_a.png",
+      "covers": "血条 0.301 + 技力条被别的条压住（下界）+ 菱形在",
+      "window": [
+        1366,
+        166,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1406, 486) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/live/shot04.png"
+    },
+    {
+      "file": "shot21_a.png",
+      "covers": "血条满 + 技力 0.863（没满）",
+      "window": [
+        1383,
+        457,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1423, 777) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/live/shot21.png"
+    },
+    {
+      "file": "shot26_a.png",
+      "covers": "血条满 + 弹药分格**没填满 → 下界**",
+      "window": [
+        1182,
+        616,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1222, 936) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/live/shot26.png"
+    },
+    {
+      "file": "shot31_a.png",
+      "covers": "血条 0.993 + 技力 0.527（没满）",
+      "window": [
+        1569,
+        264,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1609, 584) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/live/shot31.png"
+    },
+    {
+      "file": "shot30_a.png",
+      "covers": "血条满 + 充能中 + 菱形在（低分那一侧）",
+      "window": [
+        1389,
+        639,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1429, 959) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/live/shot30.png"
+    },
+    {
+      "file": "shot22_a.png",
+      "covers": "血条满 + 充能中 + 菱形在（最低分那一侧）",
+      "window": [
+        1389,
+        639,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1429, 959) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/live/shot22.png"
+    },
+    {
+      "file": "board_a.png",
+      "covers": "血条满 + 菱形在（另一个场景）",
+      "window": [
+        1572,
+        309,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1612, 629) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/probe/_t5_board/board.raw"
+    },
+    {
+      "file": "board_b.png",
+      "covers": "血条 0.829 + 菱形在",
+      "window": [
+        837,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (877, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/probe/_t5_board/board.raw"
+    },
+    {
+      "file": "field_a.png",
+      "covers": "血条满 + 菱形在",
+      "window": [
+        1572,
+        309,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1612, 629) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/probe/_t5_field/field.raw"
+    },
+    {
+      "file": "field_b.png",
+      "covers": "血条 0.781 + 菱形在",
+      "window": [
+        837,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (877, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/probe/_t5_field/field.raw"
+    }
+  ]
+}

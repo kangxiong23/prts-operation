@@ -1,0 +1,1230 @@
+{
+  "note": "面板真值批的判据读数：**链读出来的比例 vs 面板那一行的真值**，逐帧一个误差。它**不判断够不够** —— 这里只放误差分布、逐帧对照与覆盖说明。",
+  "hard_rule": "面板上的数字**只进对照这一步**：链先把 13 帧读完，之后才做减法。链的参数一个都不是从这一批来的 —— 拿它回头改 field.py 的常量，这一批就不再是独立判据。",
+  "batch": "tests/帧样本/场上干员真值",
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "how_truth": "面板上「生命 当前/上限」那一行逐帧看图读出；技力那一侧是场上那个技能按钮上的 N/M。每一帧**从哪一块读的**记在 truth_row 里，谁都能重读一遍。",
+  "ruler": {
+    "health": "逐列中位颜色离 HP_BLUE (110,190,228) 的逐通道最大差 ≤ HP_COLOUR_TOL=24；填着的那一截 = 自左缘起的连续亮列（容 GAP_TOLERANCE=4 列）",
+    "skill": "逐列中位颜色离**这一条自己的填充色**（自左缘起跳过 2 列、取 8 列的中位颜色）的逐通道最大差 ≤ SKILL_FILL_TOL=48；填着的那一截 = 自左缘起的连续同色列（容 GAP_TOLERANCE=4 列）；被压住那一档另有缝宽容度 COVER_GAP_TOLERANCE=10（≤ 它 → 跨过去接着算；> 它 → 下界）；含义按填着那一截的逐列中位 (R−G)：≤ 0 绿 / ≥ 40 橙 / 正的那一段认不出",
+    "diamond": "cv2.matchTemplate(TM_CCOEFF_NORMED, RGB 三通道)，模板 64×64，在取区里 ±60 px 的邻域上滑"
+  },
+  "window": {
+    "size": [
+      240,
+      360
+    ],
+    "bars_in_window": [
+      40,
+      320
+    ],
+    "diamond_in_window": [
+      112,
+      87
+    ]
+  },
+  "pairing": {
+    "rule": "被选中的那根条 = 离画布中心最近的那根（点场上干员开面板时，被点中的干员会被挪到屏幕较中心）",
+    "centre": [
+      1400.0,
+      630.0
+    ],
+    "evidence": "每一帧的 bar / distance_to_centre / runner_up / 全部候选都在 取材.json 里 —— 挑错了看得见"
+  },
+  "frames": [
+    {
+      "name": "p00",
+      "source": "data/probe/panel_run/p00.png",
+      "truth": {
+        "life": {
+          "current": 2351,
+          "max": 2867,
+          "ratio": 0.820021
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "note": "面板 新约能天使；血条读到 120/146",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.821917808219178
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": 0.001897,
+      "health_error_px": 0.277,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.0892156862745098
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "sp_error": null,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.8103897571563721
+      },
+      "diamond_score": 0.81039,
+      "diamond_at": [
+        1559,
+        475
+      ]
+    },
+    {
+      "name": "p01",
+      "source": "data/probe/panel_run/p01.png",
+      "truth": {
+        "life": {
+          "current": 2322,
+          "max": 2867,
+          "ratio": 0.809906
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "note": "同一场；血条 119/146",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.815068493150685
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": 0.005162,
+      "health_error_px": 0.754,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.0892156862745098
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "sp_error": null,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.8410797715187073
+      },
+      "diamond_score": 0.84108,
+      "diamond_at": [
+        1559,
+        475
+      ]
+    },
+    {
+      "name": "p02",
+      "source": "data/probe/panel_run/p02.png",
+      "truth": {
+        "life": {
+          "current": 2867,
+          "max": 2867,
+          "ratio": 1.0
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "note": "满血那一档",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": 0.0,
+      "health_error_px": 0.0,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.08823529411764706
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "sp_error": null,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.7845622897148132
+      },
+      "diamond_score": 0.784562,
+      "diamond_at": [
+        1559,
+        475
+      ]
+    },
+    {
+      "name": "p03",
+      "source": "data/probe/panel_run/p03.png",
+      "truth": {
+        "life": {
+          "current": 2839,
+          "max": 2867,
+          "ratio": 0.990234
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "note": "血条 145/146",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": 0.002917,
+      "health_error_px": 0.426,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.09019607843137255
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "sp_error": null,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.8109606504440308
+      },
+      "diamond_score": 0.810961,
+      "diamond_at": [
+        1559,
+        475
+      ]
+    },
+    {
+      "name": "p04",
+      "source": "data/probe/panel_run/p04.png",
+      "truth": {
+        "life": {
+          "current": 2839,
+          "max": 2867,
+          "ratio": 0.990234
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "note": "与 p03 同一个数",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9931506849315068
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": 0.002917,
+      "health_error_px": 0.426,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.08823529411764706
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "sp_error": null,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.753339409828186
+      },
+      "diamond_score": 0.753339,
+      "diamond_at": [
+        1559,
+        475
+      ]
+    },
+    {
+      "name": "p05",
+      "source": "data/probe/panel_run/p05.png",
+      "truth": {
+        "life": {
+          "current": 2810,
+          "max": 2867,
+          "ratio": 0.980119
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "note": "血条 143/146",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9794520547945206
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": -0.000667,
+      "health_error_px": -0.097,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.09019607843137255
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "sp_error": null,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.7980263829231262
+      },
+      "diamond_score": 0.798026,
+      "diamond_at": [
+        1559,
+        475
+      ]
+    },
+    {
+      "name": "p06",
+      "source": "data/probe/panel_run/p06.png",
+      "truth": {
+        "life": {
+          "current": 2781,
+          "max": 2867,
+          "ratio": 0.970003
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "note": "血条 142/146",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.9726027397260274
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": 0.0026,
+      "health_error_px": 0.38,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.08823529411764706
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "sp_error": null,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.7889066934585571
+      },
+      "diamond_score": 0.788907,
+      "diamond_at": [
+        1559,
+        475
+      ]
+    },
+    {
+      "name": "p07",
+      "source": "data/probe/panel_run/p07.png",
+      "truth": {
+        "life": {
+          "current": 2753,
+          "max": 2867,
+          "ratio": 0.960237
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        560,
+        1300,
+        655
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1496,
+          870
+        ],
+        "distance_to_centre": 296.811
+      },
+      "note": "血条 140/146",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.958904109589041
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": -0.001333,
+      "health_error_px": -0.195,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.09019607843137255
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "sp_error": null,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.825149416923523
+      },
+      "diamond_score": 0.825149,
+      "diamond_at": [
+        1559,
+        475
+      ]
+    },
+    {
+      "name": "p08",
+      "source": "data/probe/panel_run/p08.png",
+      "truth": {
+        "life": {
+          "current": 329,
+          "max": 1801,
+          "ratio": 0.182676
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        565,
+        1300,
+        660
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1000,
+          609
+        ],
+        "distance_to_centre": 327.442
+      },
+      "note": "另一场；血条 27/146",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.18493150684931506
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": 0.002256,
+      "health_error_px": 0.329,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.011764705882352941
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "sp_error": null,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.8533651232719421
+      },
+      "diamond_score": 0.853365,
+      "diamond_at": [
+        1559,
+        475
+      ]
+    },
+    {
+      "name": "p09",
+      "source": "data/probe/panel_run/p09.png",
+      "truth": {
+        "life": {
+          "current": 329,
+          "max": 1801,
+          "ratio": 0.182676
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        565,
+        1300,
+        660
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1000,
+          609
+        ],
+        "distance_to_centre": 327.442
+      },
+      "note": "与 p08 同一个数",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.18493150684931506
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": 0.002256,
+      "health_error_px": 0.329,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.05588235294117647
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "sp_error": null,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.8338723182678223
+      },
+      "diamond_score": 0.833872,
+      "diamond_at": [
+        1559,
+        475
+      ]
+    },
+    {
+      "name": "p10",
+      "source": "data/probe/panel_run/p10.png",
+      "truth": {
+        "life": {
+          "current": 329,
+          "max": 1801,
+          "ratio": 0.182676
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        565,
+        1300,
+        660
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1000,
+          609
+        ],
+        "distance_to_centre": 327.442
+      },
+      "note": "与 p08 同一个数",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.18493150684931506
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": 0.002256,
+      "health_error_px": 0.329,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.05
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "sp_error": null,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.8988768458366394
+      },
+      "diamond_score": 0.898877,
+      "diamond_at": [
+        1559,
+        475
+      ]
+    },
+    {
+      "name": "p11",
+      "source": "data/probe/panel_run/p11.png",
+      "truth": {
+        "life": {
+          "current": 329,
+          "max": 1801,
+          "ratio": 0.182676
+        },
+        "sp": null
+      },
+      "truth_row": [
+        100,
+        565,
+        1300,
+        660
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1000,
+          609
+        ],
+        "distance_to_centre": 327.442
+      },
+      "note": "与 p08 同一个数",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.18493150684931506
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": 0.002256,
+      "health_error_px": 0.329,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.011764705882352941
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1.0
+        },
+        "confidence": null
+      },
+      "sp_error": null,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.8413299918174744
+      },
+      "diamond_score": 0.84133,
+      "diamond_at": [
+        1559,
+        475
+      ]
+    },
+    {
+      "name": "sp_now",
+      "source": "data/probe/sp_now.png",
+      "truth": {
+        "life": {
+          "current": 329,
+          "max": 1801,
+          "ratio": 0.182676
+        },
+        "sp": {
+          "current": 16,
+          "max": 26,
+          "ratio": 0.615385
+        }
+      },
+      "truth_row": [
+        100,
+        565,
+        1300,
+        660
+      ],
+      "bar": [
+        1487,
+        709
+      ],
+      "distance_to_centre": 180.247,
+      "runner_up": {
+        "bar": [
+          1000,
+          609
+        ],
+        "distance_to_centre": 327.442
+      },
+      "note": "面板 极境；技力按钮上读到 16/26",
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "health": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.18493150684931506
+        },
+        "confidence": 0.08627450980392157
+      },
+      "health_error": 0.002256,
+      "health_error_px": 0.329,
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.636986301369863
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.011764705882352941
+      },
+      "sp": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.636986301369863
+        },
+        "confidence": null
+      },
+      "sp_error": 0.021601,
+      "diamond": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.06585901230573654
+      },
+      "diamond_score": 0.065859,
+      "diamond_at": [
+        1573,
+        472
+      ]
+    }
+  ],
+  "health_errors": {
+    "count": 13,
+    "min": -0.001333,
+    "max": 0.005162,
+    "median": 0.002256,
+    "abs_max": 0.005162,
+    "sided": "双边（有高有低）",
+    "in_pixels": {
+      "min": -0.195,
+      "max": 0.754,
+      "median": 0.329,
+      "abs_max": 0.754
+    },
+    "rule": "误差 = 链读出来的比例 − 面板 当前/上限；正 = 读高了，负 = 读低了",
+    "median_note": "偶数个时取上中位"
+  },
+  "sp_errors": {
+    "count": 1,
+    "min": 0.021601,
+    "max": 0.021601,
+    "median": 0.021601,
+    "abs_max": 0.021601,
+    "sided": "单边（全部 ≥ 0：链读高了）",
+    "in_pixels": {
+      "min": 3.154,
+      "max": 3.154,
+      "median": 3.154,
+      "abs_max": 3.154
+    },
+    "rule": "误差 = 链读出来的技力条填充比例 − 技能按钮上的 N/M",
+    "note": "这一批里只有 sp_now 一帧有可读的 N/M"
+  },
+  "observed": {
+    "health_unsampled": [],
+    "sp_frame": {
+      "name": "sp_now",
+      "truth": {
+        "current": 16,
+        "max": 26,
+        "ratio": 0.615385
+      },
+      "skill_fill": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0.636986301369863
+        },
+        "confidence": null
+      },
+      "skill_meaning": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": "充能中"
+        },
+        "confidence": 0.011764705882352941
+      },
+      "error": 0.021601,
+      "error_px": 3.154
+    },
+    "what_i_did_not_do": "这一批的 13 帧**一帧都没有参与定参** —— 面板上的数字只进对照那一步，链的参数一个都不是从这一批来的。**要说清楚的一件事**：这一版链在**这一批之外**改过（技力那一侧的填充判据与 GREEN_MAX_RG 是拿 data/probe/sp_series 那五帧定的，见 field.SKILL_FILL_TOL），改完这一批的读数**重跑了一遍** —— 所以它对**下一次**改动才重新算「没见过」。下一轮再改链必须换一批（[基准集] §4）。"
+  },
+  "coverage": {
+    "truth_available": {
+      "life": "全部 13 帧都有（面板那一行的 生命 当前/上限）",
+      "sp": "只有 sp_now 一帧有（场上那个技能按钮上的 16/26）—— 另外 12 帧上那个按钮根本没画出来，所以技力那一侧的误差样本量是 1"
+    },
+    "covered": [
+      "血条八档：1.000（p02）、0.990、0.980、0.971、0.960、0.820、0.810、0.183",
+      "**同一场内的连续帧**：p00–p07 一场、p08–p11 与 sp_now 另一场 —— 误差可以看趋势，不是一个孤立点",
+      "**另一个场景**：p08–p11 与 sp_now 那一场是青地板，与 p00–p07 那一场不同"
+    ],
+    "not_covered": [
+      "**只有一种真值来源**（面板那一行 + sp_now 那个按钮），没有第二种独立来源去交叉核",
+      "**技力那一侧只有 1 帧**：12 帧上没有可读的 N/M",
+      "**没有满/空的极值对**：最低那一档是 0.183，没有接近 0 的真值",
+      "**没有暂停态 / 没有退场动画**：这一批全是常速帧"
+    ],
+    "pairing_caveat": "**这一批 13 帧全是「点场上干员开面板」那一档。** 原来还有一帧，它是**备战席干员的详情页**（点的是备战席卡片，不是场上干员），按裁定**整个拿掉**了 ——这一帧**不属于本批的取帧场景**：配对规则（被选中的那根条 = 离画布中心最近的那根）**管不到它**，点备战席时整个场景朝固定的右上方挪、与被点的卡在哪无关。"
+  }
+}

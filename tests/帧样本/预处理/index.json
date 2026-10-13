@@ -1,0 +1,518 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "note": "红罩/干净**配对**的卡片裁剪（A2c）。每一条是**一整张备战席卡**，原生像素、一个都不缩；原点是这一帧像素读出来的卡心减 102（卡宽/2），纵原点是契约层 squad_card_rect 的 y=1045。",
+  "crops": [
+    {
+      "file": "cd01_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd01.png",
+      "source_sha256": "24d89d1a126246b4586b333b40ee19dfff0f07aae4a078493efff51746eccb6d"
+    },
+    {
+      "file": "cd02_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd02.png",
+      "source_sha256": "6e02ca776e64e7ced533bfbfc82964d856fe0c30ada19c9109a6dd6a65d7c33c"
+    },
+    {
+      "file": "cd04_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd04.png",
+      "source_sha256": "dfb239d5eefeb8b040c77df46f9d167e70cbebe8b54c9a9b4b959005746d078b"
+    },
+    {
+      "file": "cd04_8.png",
+      "origin": [
+        933,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd04.png",
+      "source_sha256": "dfb239d5eefeb8b040c77df46f9d167e70cbebe8b54c9a9b4b959005746d078b"
+    },
+    {
+      "file": "cd05_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd05.png",
+      "source_sha256": "da5e8c3b331a01d5914786e5c18fb251705c6b51d32ae6962e05f5ffd8a6eed5"
+    },
+    {
+      "file": "cd05_8.png",
+      "origin": [
+        933,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd05.png",
+      "source_sha256": "da5e8c3b331a01d5914786e5c18fb251705c6b51d32ae6962e05f5ffd8a6eed5"
+    },
+    {
+      "file": "cd06_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd06.png",
+      "source_sha256": "bfb431adfd81c44b05eb0cffd5448ca399878be412f025db128bf2d26b1ed6e2"
+    },
+    {
+      "file": "cd06_8.png",
+      "origin": [
+        933,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd06.png",
+      "source_sha256": "bfb431adfd81c44b05eb0cffd5448ca399878be412f025db128bf2d26b1ed6e2"
+    },
+    {
+      "file": "cd07_8.png",
+      "origin": [
+        933,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd07.png",
+      "source_sha256": "7d658a9fa7b69494d9ca089abdd298200e41c773660472b51a3cc2a5152840cc"
+    },
+    {
+      "file": "cd09_0.png",
+      "origin": [
+        2594,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd09.png",
+      "source_sha256": "62be189c5bab9d524bf78fe58c3cc7125a3899d7d550af8c6e45e2b3977b33d6"
+    },
+    {
+      "file": "cd10_0.png",
+      "origin": [
+        2594,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd10.png",
+      "source_sha256": "ac7ab2f50499ee3f03d673de2e760605084ef52d8e9f42d5e5b5c2881439f3a0"
+    },
+    {
+      "file": "cd11_0.png",
+      "origin": [
+        2594,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd11.png",
+      "source_sha256": "8652b52d41ef4800a1450d7d5ca2f9c597bd895e22e2588e708f375af3b1104c"
+    },
+    {
+      "file": "cd12_0.png",
+      "origin": [
+        2594,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd12.png",
+      "source_sha256": "68cd30d894438358b7fa4010e4b9b210bcc823bad9c68451f29dc0724d4a020c"
+    },
+    {
+      "file": "cd13_0.png",
+      "origin": [
+        2594,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd13.png",
+      "source_sha256": "7606e3a987dc8092eed76546dcca31918c4a84bfd96345d3723c4f40cf7bc1de"
+    },
+    {
+      "file": "cd13_6.png",
+      "origin": [
+        1348,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd13.png",
+      "source_sha256": "7606e3a987dc8092eed76546dcca31918c4a84bfd96345d3723c4f40cf7bc1de"
+    },
+    {
+      "file": "cd14_1.png",
+      "origin": [
+        2386,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd14.png",
+      "source_sha256": "4aadb8fddebcc90980add5772fdef2a8cb4d63b357078ab570b6cb41c04def2c"
+    },
+    {
+      "file": "cd14_6.png",
+      "origin": [
+        1348,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd14.png",
+      "source_sha256": "4aadb8fddebcc90980add5772fdef2a8cb4d63b357078ab570b6cb41c04def2c"
+    },
+    {
+      "file": "cd15_1.png",
+      "origin": [
+        2386,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd15.png",
+      "source_sha256": "1a62261ede10a105f94191fc752b771b8cf8c93e6a49b51d9d04bd2ee9ce3ea1"
+    },
+    {
+      "file": "cd16_1.png",
+      "origin": [
+        2386,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd16.png",
+      "source_sha256": "591b3d662dfc38f20d19c18594d27b4051de02079cf567ec2964e79ec4c9683c"
+    },
+    {
+      "file": "cd22_9.png",
+      "origin": [
+        725,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd22.png",
+      "source_sha256": "6a3545ed4433583c144afe7d2360a723fd530bcea2b8a1cfd98da4aaa34ed35c"
+    },
+    {
+      "file": "cd23_6.png",
+      "origin": [
+        1348,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd23.png",
+      "source_sha256": "738645b00bfd7bb415547753444ddcd368de9718759a570ee765e00c5cb8cb18"
+    },
+    {
+      "file": "cd23_9.png",
+      "origin": [
+        725,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd23.png",
+      "source_sha256": "738645b00bfd7bb415547753444ddcd368de9718759a570ee765e00c5cb8cb18"
+    },
+    {
+      "file": "cd27_6.png",
+      "origin": [
+        1348,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd27.png",
+      "source_sha256": "76b3b3c7acbe212afbec143d8424829838b99d241edda6b2e5cc467158653b85"
+    },
+    {
+      "file": "cd27_9.png",
+      "origin": [
+        725,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd27.png",
+      "source_sha256": "76b3b3c7acbe212afbec143d8424829838b99d241edda6b2e5cc467158653b85"
+    },
+    {
+      "file": "cd28_6.png",
+      "origin": [
+        1348,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd28.png",
+      "source_sha256": "bf6d6bd0b6678745206c8aadf4d695728ca072494cde614782bdc6b33dc30f17"
+    },
+    {
+      "file": "cd29_6.png",
+      "origin": [
+        1348,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd29.png",
+      "source_sha256": "832618f4eae7f316ec29f05d7b6c9ddfb66c38b33863d6197dbca14515230295"
+    },
+    {
+      "file": "cd31_6.png",
+      "origin": [
+        1348,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd31.png",
+      "source_sha256": "137cfb768947abc450b16320cdcbdb099ca25d3a62baf7f7d72d051dd7096b79"
+    },
+    {
+      "file": "cd37_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd37.png",
+      "source_sha256": "52ffaa9bd8bfd31f8c941de6508332bb82e13b0db796a46c53d7271bd82e2dc5"
+    },
+    {
+      "file": "cd38_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd38.png",
+      "source_sha256": "c098d627565b95a033b058fb7cc221b9a60249220f3e132be9d563e1d1655a23"
+    },
+    {
+      "file": "cd39_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd39.png",
+      "source_sha256": "04cea88a6c78f1370605862d86d562692fea2f0712207325952d3fb997f0ae6d"
+    },
+    {
+      "file": "cd42_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd42.png",
+      "source_sha256": "c727e377872a90ffe9f38ecd396803a003dc9195a90a845fd6418e3a18fb7b40"
+    },
+    {
+      "file": "cd44_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd44.png",
+      "source_sha256": "ea889c42bc3dfd771d9ea2e40d65f93ffdb0b1505f3ded05bdff120904d66a16"
+    },
+    {
+      "file": "cd47_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd47.png",
+      "source_sha256": "3e79df099eeac3d98ff182919a99152741991ed3860ce61bb11288a4464ffcf3"
+    },
+    {
+      "file": "cd50_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd50.png",
+      "source_sha256": "e1476d4213d18fbe0e86d60e94bc37fd1fd33cf03abc33daa22b5a2e048945f0"
+    },
+    {
+      "file": "cd54_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd54.png",
+      "source_sha256": "6cb6ea19fc4c93281d23d7bfbb174fd58e85db95a017c545f14199486443518d"
+    },
+    {
+      "file": "cd56_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd56.png",
+      "source_sha256": "923c333454a14000eff050f87597646a34abb90237d69814707b0d40537a49b0"
+    },
+    {
+      "file": "cd57_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd57.png",
+      "source_sha256": "3eeefbe72ed9d1b334eeda1c4c13494d7b2fae9def3d0bc0ce4da7bfd7d06fd0"
+    },
+    {
+      "file": "cd59_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd59.png",
+      "source_sha256": "55c66d4f40a8020c8b63ad178d88a5aa5212ab0460cc0c54af16f163a75c142d"
+    },
+    {
+      "file": "cd60_4.png",
+      "origin": [
+        1763,
+        1045
+      ],
+      "size": [
+        204,
+        214
+      ],
+      "source": "data/precheck/cd/cd60.png",
+      "source_sha256": "71d37a96ad9ceb496a560705bd0697d05f775333af23561cf0c98b6862eb4ae8"
+    }
+  ]
+}

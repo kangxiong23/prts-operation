@@ -1,0 +1,3214 @@
+{
+ "note": "乙：红罩那条路的多层细化（掩码内点抽样 + top-k 候选 + 覆盖整格 + 收位置窗）。只量不改。两个口径并排：全库（余量可与今天比）与 top-3（省得多但余量会被抬高）。",
+ "design": {
+  "stride": 4,
+  "sample_ratio": "1/16",
+  "mask_pixels_full": 3986,
+  "mask_pixels_coarse": 248,
+  "coarse_step": 0.02,
+  "coarse_grid": [
+   1.05,
+   1.07,
+   1.09,
+   1.11,
+   1.13,
+   1.15
+  ],
+  "top_k": 3,
+  "position_half_px": 12,
+  "cell_half_steps": 1.0,
+  "fine_windows_seen": [
+   [
+    1.05,
+    1.06,
+    1.07,
+    1.08,
+    1.1,
+    1.11,
+    1.12
+   ],
+   [
+    1.05,
+    1.06,
+    1.1,
+    1.11,
+    1.12
+   ],
+   [
+    1.1,
+    1.11,
+    1.12
+   ]
+  ],
+  "mask_box": [
+   58,
+   70,
+   89,
+   94
+  ]
+ },
+ "baseline_source": {
+  "file": "tests/帧样本/红罩/点名.json",
+  "red": 28,
+  "exact": 22,
+  "unknown": 6,
+  "build_ruler_s": 5.4828,
+  "one_red_card_s": 5.3029,
+  "today_s": 153.964,
+  "reused": true
+ },
+ "lines": {
+  "score": 0.85,
+  "margin": 0.25
+ },
+ "coarse_build_calls": 396,
+ "self_check": {
+  "scores_top": [
+   0.675696643,
+   "维什戴尔",
+   1.11
+  ],
+  "argmax": {
+   "score": 0.675696643,
+   "x": 17,
+   "y": 24,
+   "scale": 1.11
+  },
+  "delta": 0.0
+ },
+ "calibration": {
+  "build_s": 0.6334,
+  "cards_s": [
+   0.5423,
+   0.5547,
+   0.5503
+  ],
+  "median_card_s": 0.5503,
+  "calls": 1089,
+  "check": [
+   {
+    "frame": "cd14",
+    "index": 1,
+    "mine": {
+     "name": "维什戴尔",
+     "score": 0.984065,
+     "scale": 1.13,
+     "runner_up": "白面鸮",
+     "margin": 0.317264,
+     "verdict": "精确"
+    },
+    "landed": {
+     "name": "维什戴尔",
+     "score": 0.984065,
+     "scale": 1.13
+    },
+    "delta": 0.0
+   },
+   {
+    "frame": "cd14",
+    "index": 2,
+    "mine": {
+     "name": "圣聆初雪",
+     "score": 0.970915,
+     "scale": 1.06,
+     "runner_up": "流明",
+     "margin": 0.373319,
+     "verdict": "精确"
+    },
+    "landed": {
+     "name": "圣聆初雪",
+     "score": 0.970915,
+     "scale": 1.06
+    },
+    "delta": 0.0
+   },
+   {
+    "frame": "cd14",
+    "index": 3,
+    "mine": {
+     "name": "乌尔比安",
+     "score": 0.970116,
+     "scale": 1.09,
+     "runner_up": "白面鸮",
+     "margin": 0.290089,
+     "verdict": "精确"
+    },
+    "landed": {
+     "name": "乌尔比安",
+     "score": 0.970116,
+     "scale": 1.09
+    },
+    "delta": 0.0
+   }
+  ],
+  "note": "同机同刻重跑今天的红罩路，3 张 —— 标定用，不是基线重跑"
+ },
+ "cards": 28,
+ "results": {
+  "全库 11 条": {
+   "before": {
+    "exact": 22,
+    "unknown": 6
+   },
+   "after": {
+    "exact": 26,
+    "unknown": 2
+   },
+   "gained_n": 6,
+   "lost_n": 2,
+   "gained": [
+    {
+     "frame": "cd14",
+     "index": 4,
+     "landed": {
+      "blocked_by": "余量不够",
+      "name": null,
+      "runner_up": "歌蕾蒂娅"
+     },
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.987397,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.329032,
+      "verdict": "精确"
+     },
+     "runner_up_in_topk": true
+    },
+    {
+     "frame": "cd15",
+     "index": 4,
+     "landed": {
+      "blocked_by": "余量不够",
+      "name": null,
+      "runner_up": "歌蕾蒂娅"
+     },
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.987266,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.32886,
+      "verdict": "精确"
+     },
+     "runner_up_in_topk": true
+    },
+    {
+     "frame": "cd22",
+     "index": 5,
+     "landed": {
+      "blocked_by": "余量不够",
+      "name": null,
+      "runner_up": "歌蕾蒂娅"
+     },
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.98818,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.330282,
+      "verdict": "精确"
+     },
+     "runner_up_in_topk": true
+    },
+    {
+     "frame": "cd23",
+     "index": 5,
+     "landed": {
+      "blocked_by": "余量不够",
+      "name": null,
+      "runner_up": "歌蕾蒂娅"
+     },
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.988398,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.330219,
+      "verdict": "精确"
+     },
+     "runner_up_in_topk": true
+    },
+    {
+     "frame": "cd27",
+     "index": 5,
+     "landed": {
+      "blocked_by": "余量不够",
+      "name": null,
+      "runner_up": "歌蕾蒂娅"
+     },
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.98833,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.329905,
+      "verdict": "精确"
+     },
+     "runner_up_in_topk": true
+    },
+    {
+     "frame": "cd28",
+     "index": 5,
+     "landed": {
+      "blocked_by": "余量不够",
+      "name": null,
+      "runner_up": "歌蕾蒂娅"
+     },
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.988229,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.330008,
+      "verdict": "精确"
+     },
+     "runner_up_in_topk": true
+    }
+   ],
+   "lost": [
+    {
+     "frame": "cd14",
+     "index": 2,
+     "landed": {
+      "blocked_by": null
+     },
+     "layered": {
+      "name": "流明",
+      "score": 0.585718,
+      "scale": 1.1,
+      "runner_up": "斩业星熊",
+      "margin": 0.13951,
+      "verdict": "未知"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 2,
+     "landed": {
+      "blocked_by": null
+     },
+     "layered": {
+      "name": "流明",
+      "score": 0.58577,
+      "scale": 1.1,
+      "runner_up": "斩业星熊",
+      "margin": 0.139527,
+      "verdict": "未知"
+     }
+    }
+   ],
+   "wrong_after_n": 0,
+   "wrong_rows": [],
+   "coarse_has_landed": 20,
+   "coarse_has_runner_up": 20,
+   "landed_scale_in_window": 17,
+   "rounds_s": [
+    11.4821,
+    11.8021,
+    11.2748
+   ],
+   "median_s": 11.4821,
+   "speedup_vs_landed_today": 13.409,
+   "speedup_vs_calibration": 1.397,
+   "calls_one_pass": 10206,
+   "rows": [
+    {
+     "frame": "cd14",
+     "index": 1,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      56,
+      84,
+      180,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "维什戴尔",
+       "score": 0.675697,
+       "scale": 1.11
+      },
+      {
+       "name": "极境",
+       "score": 0.583109,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.574473,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "维什戴尔",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.13,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "维什戴尔",
+      "score": 0.972619,
+      "scale": 1.12,
+      "runner_up": "歌蕾蒂娅",
+      "margin": 0.427175,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd14",
+     "index": 2,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      84,
+      76,
+      208,
+      205
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "流明",
+       "score": 0.430878,
+       "scale": 1.11
+      },
+      {
+       "name": "新约能天使",
+       "score": 0.428648,
+       "scale": 1.11
+      },
+      {
+       "name": "黍",
+       "score": 0.414155,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "圣聆初雪",
+     "landed_runner_up": "流明",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "流明",
+      "score": 0.585718,
+      "scale": 1.1,
+      "runner_up": "斩业星熊",
+      "margin": 0.13951,
+      "verdict": "未知"
+     }
+    },
+    {
+     "frame": "cd14",
+     "index": 3,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      52,
+      80,
+      176,
+      209
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "乌尔比安",
+       "score": 0.793922,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.666539,
+       "scale": 1.11
+      },
+      {
+       "name": "圣聆初雪",
+       "score": 0.597735,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "乌尔比安",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.09,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "乌尔比安",
+      "score": 0.966112,
+      "scale": 1.1,
+      "runner_up": "白面鸮",
+      "margin": 0.743263,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd14",
+     "index": 4,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      40,
+      84,
+      164,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "Mon3tr",
+       "score": 0.934245,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.796539,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.760733,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": null,
+     "landed_runner_up": "歌蕾蒂娅",
+     "landed_scale": 1.13,
+     "landed_blocked_by": "余量不够",
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.987397,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.329032,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd14",
+     "index": 5,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      48,
+      76,
+      172,
+      205
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "白面鸮",
+       "score": 0.529295,
+       "scale": 1.11
+      },
+      {
+       "name": "极境",
+       "score": 0.437446,
+       "scale": 1.05
+      },
+      {
+       "name": "黍",
+       "score": 0.412903,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "白面鸮",
+     "landed_runner_up": "极境",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "白面鸮",
+      "score": 0.97481,
+      "scale": 1.06,
+      "runner_up": "歌蕾蒂娅",
+      "margin": 0.625497,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd14",
+     "index": 8,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      44,
+      84,
+      168,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "新约能天使",
+       "score": 0.702937,
+       "scale": 1.11
+      },
+      {
+       "name": "Mon3tr",
+       "score": 0.57122,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.570458,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "新约能天使",
+     "landed_runner_up": "Mon3tr",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "新约能天使",
+      "score": 0.977536,
+      "scale": 1.1,
+      "runner_up": "Mon3tr",
+      "margin": 0.324092,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 2,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      84,
+      76,
+      208,
+      205
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "流明",
+       "score": 0.43285,
+       "scale": 1.11
+      },
+      {
+       "name": "新约能天使",
+       "score": 0.427889,
+       "scale": 1.11
+      },
+      {
+       "name": "黍",
+       "score": 0.415757,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "圣聆初雪",
+     "landed_runner_up": "流明",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "流明",
+      "score": 0.58577,
+      "scale": 1.1,
+      "runner_up": "斩业星熊",
+      "margin": 0.139527,
+      "verdict": "未知"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 3,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      52,
+      80,
+      176,
+      209
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "乌尔比安",
+       "score": 0.80643,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.678197,
+       "scale": 1.11
+      },
+      {
+       "name": "圣聆初雪",
+       "score": 0.599958,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "乌尔比安",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.09,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "乌尔比安",
+      "score": 0.966012,
+      "scale": 1.1,
+      "runner_up": "白面鸮",
+      "margin": 0.743377,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 4,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      40,
+      84,
+      164,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "Mon3tr",
+       "score": 0.939691,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.803717,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.771827,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": null,
+     "landed_runner_up": "歌蕾蒂娅",
+     "landed_scale": 1.13,
+     "landed_blocked_by": "余量不够",
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.987266,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.32886,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 5,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      48,
+      76,
+      172,
+      205
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "白面鸮",
+       "score": 0.530459,
+       "scale": 1.11
+      },
+      {
+       "name": "极境",
+       "score": 0.481685,
+       "scale": 1.05
+      },
+      {
+       "name": "黍",
+       "score": 0.416327,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "白面鸮",
+     "landed_runner_up": "极境",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "白面鸮",
+      "score": 0.974747,
+      "scale": 1.06,
+      "runner_up": "歌蕾蒂娅",
+      "margin": 0.625713,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 8,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      44,
+      84,
+      168,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "新约能天使",
+       "score": 0.703606,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.56958,
+       "scale": 1.11
+      },
+      {
+       "name": "Mon3tr",
+       "score": 0.565368,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "新约能天使",
+     "landed_runner_up": "Mon3tr",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "新约能天使",
+      "score": 0.977239,
+      "scale": 1.1,
+      "runner_up": "Mon3tr",
+      "margin": 0.324546,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd22",
+     "index": 3,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      48,
+      80,
+      172,
+      209
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "乌尔比安",
+       "score": 0.67983,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.54716,
+       "scale": 1.11
+      },
+      {
+       "name": "新约能天使",
+       "score": 0.537215,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "乌尔比安",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "乌尔比安",
+      "score": 0.965462,
+      "scale": 1.1,
+      "runner_up": "白面鸮",
+      "margin": 0.722936,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd22",
+     "index": 4,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      60,
+      84,
+      184,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "黍",
+       "score": 0.717587,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.414448,
+       "scale": 1.11
+      },
+      {
+       "name": "极境",
+       "score": 0.405608,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "黍",
+     "landed_runner_up": "圣聆初雪",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "黍",
+      "score": 0.97275,
+      "scale": 1.1,
+      "runner_up": "圣聆初雪",
+      "margin": 0.553894,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd22",
+     "index": 5,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      40,
+      84,
+      164,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "Mon3tr",
+       "score": 0.83476,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.722865,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.700544,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": null,
+     "landed_runner_up": "歌蕾蒂娅",
+     "landed_scale": 1.1,
+     "landed_blocked_by": "余量不够",
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.98818,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.330282,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd22",
+     "index": 6,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      44,
+      76,
+      168,
+      205
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "白面鸮",
+       "score": 0.555756,
+       "scale": 1.11
+      },
+      {
+       "name": "黍",
+       "score": 0.41928,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.418881,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "白面鸮",
+     "landed_runner_up": "极境",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "白面鸮",
+      "score": 0.926787,
+      "scale": 1.1,
+      "runner_up": "歌蕾蒂娅",
+      "margin": 0.577482,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd22",
+     "index": 9,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      44,
+      84,
+      168,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "新约能天使",
+       "score": 0.754284,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.589207,
+       "scale": 1.11
+      },
+      {
+       "name": "Mon3tr",
+       "score": 0.577945,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "新约能天使",
+     "landed_runner_up": "Mon3tr",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "新约能天使",
+      "score": 0.981559,
+      "scale": 1.1,
+      "runner_up": "Mon3tr",
+      "margin": 0.330184,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd23",
+     "index": 3,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      48,
+      80,
+      172,
+      209
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "乌尔比安",
+       "score": 0.687967,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.550471,
+       "scale": 1.11
+      },
+      {
+       "name": "极境",
+       "score": 0.545102,
+       "scale": 1.05
+      }
+     ],
+     "landed_name": "乌尔比安",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "乌尔比安",
+      "score": 0.965685,
+      "scale": 1.1,
+      "runner_up": "极境",
+      "margin": 0.662311,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd23",
+     "index": 4,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      60,
+      84,
+      184,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "黍",
+       "score": 0.719313,
+       "scale": 1.11
+      },
+      {
+       "name": "极境",
+       "score": 0.473454,
+       "scale": 1.05
+      },
+      {
+       "name": "流明",
+       "score": 0.405236,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "黍",
+     "landed_runner_up": "圣聆初雪",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "黍",
+      "score": 0.974133,
+      "scale": 1.1,
+      "runner_up": "圣聆初雪",
+      "margin": 0.554538,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd23",
+     "index": 5,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      40,
+      84,
+      164,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "Mon3tr",
+       "score": 0.841353,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.729991,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.702584,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": null,
+     "landed_runner_up": "歌蕾蒂娅",
+     "landed_scale": 1.1,
+     "landed_blocked_by": "余量不够",
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.988398,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.330219,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd23",
+     "index": 6,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      44,
+      76,
+      168,
+      205
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "白面鸮",
+       "score": 0.567827,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.429475,
+       "scale": 1.11
+      },
+      {
+       "name": "黍",
+       "score": 0.424125,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "白面鸮",
+     "landed_runner_up": "极境",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "白面鸮",
+      "score": 0.926333,
+      "scale": 1.1,
+      "runner_up": "歌蕾蒂娅",
+      "margin": 0.57719,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd27",
+     "index": 3,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      48,
+      80,
+      172,
+      209
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "乌尔比安",
+       "score": 0.688215,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.549251,
+       "scale": 1.11
+      },
+      {
+       "name": "新约能天使",
+       "score": 0.530649,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "乌尔比安",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.08,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "乌尔比安",
+      "score": 0.965871,
+      "scale": 1.1,
+      "runner_up": "白面鸮",
+      "margin": 0.72405,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd27",
+     "index": 4,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      60,
+      84,
+      184,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "黍",
+       "score": 0.731572,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.425073,
+       "scale": 1.05
+      },
+      {
+       "name": "极境",
+       "score": 0.404259,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "黍",
+     "landed_runner_up": "圣聆初雪",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "黍",
+      "score": 0.974677,
+      "scale": 1.1,
+      "runner_up": "圣聆初雪",
+      "margin": 0.55552,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd27",
+     "index": 5,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      40,
+      84,
+      164,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "Mon3tr",
+       "score": 0.840188,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.726638,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.699106,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": null,
+     "landed_runner_up": "歌蕾蒂娅",
+     "landed_scale": 1.1,
+     "landed_blocked_by": "余量不够",
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.98833,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.329905,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd27",
+     "index": 6,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      48,
+      76,
+      172,
+      205
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "白面鸮",
+       "score": 0.572023,
+       "scale": 1.11
+      },
+      {
+       "name": "黍",
+       "score": 0.440172,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.420995,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "白面鸮",
+     "landed_runner_up": "极境",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "白面鸮",
+      "score": 0.925935,
+      "scale": 1.1,
+      "runner_up": "斩业星熊",
+      "margin": 0.602705,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd28",
+     "index": 3,
+     "window": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      56,
+      80,
+      180,
+      209
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "乌尔比安",
+       "score": 0.696766,
+       "scale": 1.07
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.558708,
+       "scale": 1.05
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.547898,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "乌尔比安",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.08,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "乌尔比安",
+      "score": 0.976185,
+      "scale": 1.08,
+      "runner_up": "白面鸮",
+      "margin": 0.741987,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd28",
+     "index": 4,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      60,
+      84,
+      184,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "黍",
+       "score": 0.653919,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.379332,
+       "scale": 1.05
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.371989,
+       "scale": 1.05
+      }
+     ],
+     "landed_name": "黍",
+     "landed_runner_up": "圣聆初雪",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "黍",
+      "score": 0.974398,
+      "scale": 1.1,
+      "runner_up": "圣聆初雪",
+      "margin": 0.553198,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd28",
+     "index": 5,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      40,
+      84,
+      164,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "Mon3tr",
+       "score": 0.84168,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.730621,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.70161,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": null,
+     "landed_runner_up": "歌蕾蒂娅",
+     "landed_scale": 1.1,
+     "landed_blocked_by": "余量不够",
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.988229,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.330008,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd37",
+     "index": 4,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      60,
+      84,
+      184,
+      213
+     ],
+     "library_scored": 11,
+     "coarse_top": [
+      {
+       "name": "黍",
+       "score": 0.55075,
+       "scale": 1.11
+      },
+      {
+       "name": "Mon3tr",
+       "score": 0.447585,
+       "scale": 1.05
+      },
+      {
+       "name": "流明",
+       "score": 0.403467,
+       "scale": 1.05
+      }
+     ],
+     "landed_name": "黍",
+     "landed_runner_up": "圣聆初雪",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "黍",
+      "score": 0.97374,
+      "scale": 1.1,
+      "runner_up": "圣聆初雪",
+      "margin": 0.554391,
+      "verdict": "精确"
+     }
+    }
+   ]
+  },
+  "top-3 只 3 条": {
+   "before": {
+    "exact": 22,
+    "unknown": 6
+   },
+   "after": {
+    "exact": 26,
+    "unknown": 2
+   },
+   "gained_n": 6,
+   "lost_n": 2,
+   "gained": [
+    {
+     "frame": "cd14",
+     "index": 4,
+     "landed": {
+      "blocked_by": "余量不够",
+      "name": null,
+      "runner_up": "歌蕾蒂娅"
+     },
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.987397,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.357196,
+      "verdict": "精确"
+     },
+     "runner_up_in_topk": true
+    },
+    {
+     "frame": "cd15",
+     "index": 4,
+     "landed": {
+      "blocked_by": "余量不够",
+      "name": null,
+      "runner_up": "歌蕾蒂娅"
+     },
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.987266,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.356893,
+      "verdict": "精确"
+     },
+     "runner_up_in_topk": true
+    },
+    {
+     "frame": "cd22",
+     "index": 5,
+     "landed": {
+      "blocked_by": "余量不够",
+      "name": null,
+      "runner_up": "歌蕾蒂娅"
+     },
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.98818,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.355122,
+      "verdict": "精确"
+     },
+     "runner_up_in_topk": true
+    },
+    {
+     "frame": "cd23",
+     "index": 5,
+     "landed": {
+      "blocked_by": "余量不够",
+      "name": null,
+      "runner_up": "歌蕾蒂娅"
+     },
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.988398,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.355167,
+      "verdict": "精确"
+     },
+     "runner_up_in_topk": true
+    },
+    {
+     "frame": "cd27",
+     "index": 5,
+     "landed": {
+      "blocked_by": "余量不够",
+      "name": null,
+      "runner_up": "歌蕾蒂娅"
+     },
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.98833,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.354893,
+      "verdict": "精确"
+     },
+     "runner_up_in_topk": true
+    },
+    {
+     "frame": "cd28",
+     "index": 5,
+     "landed": {
+      "blocked_by": "余量不够",
+      "name": null,
+      "runner_up": "歌蕾蒂娅"
+     },
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.988229,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.35516,
+      "verdict": "精确"
+     },
+     "runner_up_in_topk": true
+    }
+   ],
+   "lost": [
+    {
+     "frame": "cd14",
+     "index": 2,
+     "landed": {
+      "blocked_by": null
+     },
+     "layered": {
+      "name": "流明",
+      "score": 0.585718,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.274497,
+      "verdict": "未知"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 2,
+     "landed": {
+      "blocked_by": null
+     },
+     "layered": {
+      "name": "流明",
+      "score": 0.58577,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.275245,
+      "verdict": "未知"
+     }
+    }
+   ],
+   "wrong_after_n": 0,
+   "wrong_rows": [],
+   "coarse_has_landed": 20,
+   "coarse_has_runner_up": 20,
+   "landed_scale_in_window": 17,
+   "rounds_s": [
+    5.381,
+    5.2833,
+    5.7707
+   ],
+   "median_s": 5.381,
+   "speedup_vs_landed_today": 28.613,
+   "speedup_vs_calibration": 2.981,
+   "calls_one_pass": 4494,
+   "rows": [
+    {
+     "frame": "cd14",
+     "index": 1,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      56,
+      84,
+      180,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "维什戴尔",
+       "score": 0.675697,
+       "scale": 1.11
+      },
+      {
+       "name": "极境",
+       "score": 0.583109,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.574473,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "维什戴尔",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.13,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "维什戴尔",
+      "score": 0.972619,
+      "scale": 1.12,
+      "runner_up": "极境",
+      "margin": 0.432276,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd14",
+     "index": 2,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      84,
+      76,
+      208,
+      205
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "流明",
+       "score": 0.430878,
+       "scale": 1.11
+      },
+      {
+       "name": "新约能天使",
+       "score": 0.428648,
+       "scale": 1.11
+      },
+      {
+       "name": "黍",
+       "score": 0.414155,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "圣聆初雪",
+     "landed_runner_up": "流明",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "流明",
+      "score": 0.585718,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.274497,
+      "verdict": "未知"
+     }
+    },
+    {
+     "frame": "cd14",
+     "index": 3,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      52,
+      80,
+      176,
+      209
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "乌尔比安",
+       "score": 0.793922,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.666539,
+       "scale": 1.11
+      },
+      {
+       "name": "圣聆初雪",
+       "score": 0.597735,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "乌尔比安",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.09,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "乌尔比安",
+      "score": 0.966112,
+      "scale": 1.1,
+      "runner_up": "白面鸮",
+      "margin": 0.743263,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd14",
+     "index": 4,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      40,
+      84,
+      164,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "Mon3tr",
+       "score": 0.934245,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.796539,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.760733,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": null,
+     "landed_runner_up": "歌蕾蒂娅",
+     "landed_scale": 1.13,
+     "landed_blocked_by": "余量不够",
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.987397,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.357196,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd14",
+     "index": 5,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      48,
+      76,
+      172,
+      205
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "白面鸮",
+       "score": 0.529295,
+       "scale": 1.11
+      },
+      {
+       "name": "极境",
+       "score": 0.437446,
+       "scale": 1.05
+      },
+      {
+       "name": "黍",
+       "score": 0.412903,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "白面鸮",
+     "landed_runner_up": "极境",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "白面鸮",
+      "score": 0.97481,
+      "scale": 1.06,
+      "runner_up": "黍",
+      "margin": 0.703195,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd14",
+     "index": 8,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      44,
+      84,
+      168,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "新约能天使",
+       "score": 0.702937,
+       "scale": 1.11
+      },
+      {
+       "name": "Mon3tr",
+       "score": 0.57122,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.570458,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "新约能天使",
+     "landed_runner_up": "Mon3tr",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "新约能天使",
+      "score": 0.977536,
+      "scale": 1.1,
+      "runner_up": "Mon3tr",
+      "margin": 0.324092,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 2,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      84,
+      76,
+      208,
+      205
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "流明",
+       "score": 0.43285,
+       "scale": 1.11
+      },
+      {
+       "name": "新约能天使",
+       "score": 0.427889,
+       "scale": 1.11
+      },
+      {
+       "name": "黍",
+       "score": 0.415757,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "圣聆初雪",
+     "landed_runner_up": "流明",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "流明",
+      "score": 0.58577,
+      "scale": 1.1,
+      "runner_up": "新约能天使",
+      "margin": 0.275245,
+      "verdict": "未知"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 3,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      52,
+      80,
+      176,
+      209
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "乌尔比安",
+       "score": 0.80643,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.678197,
+       "scale": 1.11
+      },
+      {
+       "name": "圣聆初雪",
+       "score": 0.599958,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "乌尔比安",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.09,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "乌尔比安",
+      "score": 0.966012,
+      "scale": 1.1,
+      "runner_up": "白面鸮",
+      "margin": 0.743377,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 4,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      40,
+      84,
+      164,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "Mon3tr",
+       "score": 0.939691,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.803717,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.771827,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": null,
+     "landed_runner_up": "歌蕾蒂娅",
+     "landed_scale": 1.13,
+     "landed_blocked_by": "余量不够",
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.987266,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.356893,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 5,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      48,
+      76,
+      172,
+      205
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "白面鸮",
+       "score": 0.530459,
+       "scale": 1.11
+      },
+      {
+       "name": "极境",
+       "score": 0.481685,
+       "scale": 1.05
+      },
+      {
+       "name": "黍",
+       "score": 0.416327,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "白面鸮",
+     "landed_runner_up": "极境",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "白面鸮",
+      "score": 0.974747,
+      "scale": 1.06,
+      "runner_up": "黍",
+      "margin": 0.702655,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 8,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      44,
+      84,
+      168,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "新约能天使",
+       "score": 0.703606,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.56958,
+       "scale": 1.11
+      },
+      {
+       "name": "Mon3tr",
+       "score": 0.565368,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "新约能天使",
+     "landed_runner_up": "Mon3tr",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "新约能天使",
+      "score": 0.977239,
+      "scale": 1.1,
+      "runner_up": "Mon3tr",
+      "margin": 0.324546,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd22",
+     "index": 3,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      48,
+      80,
+      172,
+      209
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "乌尔比安",
+       "score": 0.67983,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.54716,
+       "scale": 1.11
+      },
+      {
+       "name": "新约能天使",
+       "score": 0.537215,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "乌尔比安",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "乌尔比安",
+      "score": 0.965462,
+      "scale": 1.1,
+      "runner_up": "白面鸮",
+      "margin": 0.722936,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd22",
+     "index": 4,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      60,
+      84,
+      184,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "黍",
+       "score": 0.717587,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.414448,
+       "scale": 1.11
+      },
+      {
+       "name": "极境",
+       "score": 0.405608,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "黍",
+     "landed_runner_up": "圣聆初雪",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "黍",
+      "score": 0.97275,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.624383,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd22",
+     "index": 5,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      40,
+      84,
+      164,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "Mon3tr",
+       "score": 0.83476,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.722865,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.700544,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": null,
+     "landed_runner_up": "歌蕾蒂娅",
+     "landed_scale": 1.1,
+     "landed_blocked_by": "余量不够",
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.98818,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.355122,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd22",
+     "index": 6,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      44,
+      76,
+      168,
+      205
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "白面鸮",
+       "score": 0.555756,
+       "scale": 1.11
+      },
+      {
+       "name": "黍",
+       "score": 0.41928,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.418881,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "白面鸮",
+     "landed_runner_up": "极境",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "白面鸮",
+      "score": 0.926787,
+      "scale": 1.1,
+      "runner_up": "歌蕾蒂娅",
+      "margin": 0.577482,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd22",
+     "index": 9,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      44,
+      84,
+      168,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "新约能天使",
+       "score": 0.754284,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.589207,
+       "scale": 1.11
+      },
+      {
+       "name": "Mon3tr",
+       "score": 0.577945,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "新约能天使",
+     "landed_runner_up": "Mon3tr",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "新约能天使",
+      "score": 0.981559,
+      "scale": 1.1,
+      "runner_up": "Mon3tr",
+      "margin": 0.330184,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd23",
+     "index": 3,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      48,
+      80,
+      172,
+      209
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "乌尔比安",
+       "score": 0.687967,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.550471,
+       "scale": 1.11
+      },
+      {
+       "name": "极境",
+       "score": 0.545102,
+       "scale": 1.05
+      }
+     ],
+     "landed_name": "乌尔比安",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "乌尔比安",
+      "score": 0.965685,
+      "scale": 1.1,
+      "runner_up": "极境",
+      "margin": 0.662311,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd23",
+     "index": 4,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      60,
+      84,
+      184,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "黍",
+       "score": 0.719313,
+       "scale": 1.11
+      },
+      {
+       "name": "极境",
+       "score": 0.473454,
+       "scale": 1.05
+      },
+      {
+       "name": "流明",
+       "score": 0.405236,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "黍",
+     "landed_runner_up": "圣聆初雪",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "黍",
+      "score": 0.974133,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.614274,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd23",
+     "index": 5,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      40,
+      84,
+      164,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "Mon3tr",
+       "score": 0.841353,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.729991,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.702584,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": null,
+     "landed_runner_up": "歌蕾蒂娅",
+     "landed_scale": 1.1,
+     "landed_blocked_by": "余量不够",
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.988398,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.355167,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd23",
+     "index": 6,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      44,
+      76,
+      168,
+      205
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "白面鸮",
+       "score": 0.567827,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.429475,
+       "scale": 1.11
+      },
+      {
+       "name": "黍",
+       "score": 0.424125,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "白面鸮",
+     "landed_runner_up": "极境",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "白面鸮",
+      "score": 0.926333,
+      "scale": 1.1,
+      "runner_up": "歌蕾蒂娅",
+      "margin": 0.57719,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd27",
+     "index": 3,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      48,
+      80,
+      172,
+      209
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "乌尔比安",
+       "score": 0.688215,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.549251,
+       "scale": 1.11
+      },
+      {
+       "name": "新约能天使",
+       "score": 0.530649,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "乌尔比安",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.08,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "乌尔比安",
+      "score": 0.965871,
+      "scale": 1.1,
+      "runner_up": "白面鸮",
+      "margin": 0.72405,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd27",
+     "index": 4,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      60,
+      84,
+      184,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "黍",
+       "score": 0.731572,
+       "scale": 1.11
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.425073,
+       "scale": 1.05
+      },
+      {
+       "name": "极境",
+       "score": 0.404259,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "黍",
+     "landed_runner_up": "圣聆初雪",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "黍",
+      "score": 0.974677,
+      "scale": 1.1,
+      "runner_up": "极境",
+      "margin": 0.630512,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd27",
+     "index": 5,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      40,
+      84,
+      164,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "Mon3tr",
+       "score": 0.840188,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.726638,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.699106,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": null,
+     "landed_runner_up": "歌蕾蒂娅",
+     "landed_scale": 1.1,
+     "landed_blocked_by": "余量不够",
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.98833,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.354893,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd27",
+     "index": 6,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      48,
+      76,
+      172,
+      205
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "白面鸮",
+       "score": 0.572023,
+       "scale": 1.11
+      },
+      {
+       "name": "黍",
+       "score": 0.440172,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.420995,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "白面鸮",
+     "landed_runner_up": "极境",
+     "landed_scale": 1.06,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": false,
+     "layered": {
+      "name": "白面鸮",
+      "score": 0.925935,
+      "scale": 1.1,
+      "runner_up": "歌蕾蒂娅",
+      "margin": 0.604013,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd28",
+     "index": 3,
+     "window": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      56,
+      80,
+      180,
+      209
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "乌尔比安",
+       "score": 0.696766,
+       "scale": 1.07
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.558708,
+       "scale": 1.05
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.547898,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": "乌尔比安",
+     "landed_runner_up": "白面鸮",
+     "landed_scale": 1.08,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "乌尔比安",
+      "score": 0.976185,
+      "scale": 1.08,
+      "runner_up": "白面鸮",
+      "margin": 0.741987,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd28",
+     "index": 4,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      60,
+      84,
+      184,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "黍",
+       "score": 0.653919,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.379332,
+       "scale": 1.05
+      },
+      {
+       "name": "白面鸮",
+       "score": 0.371989,
+       "scale": 1.05
+      }
+     ],
+     "landed_name": "黍",
+     "landed_runner_up": "圣聆初雪",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "黍",
+      "score": 0.974398,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.616397,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd28",
+     "index": 5,
+     "window": [
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      40,
+      84,
+      164,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "Mon3tr",
+       "score": 0.84168,
+       "scale": 1.11
+      },
+      {
+       "name": "歌蕾蒂娅",
+       "score": 0.730621,
+       "scale": 1.11
+      },
+      {
+       "name": "流明",
+       "score": 0.70161,
+       "scale": 1.11
+      }
+     ],
+     "landed_name": null,
+     "landed_runner_up": "歌蕾蒂娅",
+     "landed_scale": 1.1,
+     "landed_blocked_by": "余量不够",
+     "coarse_has_landed": false,
+     "coarse_has_runner_up": true,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "Mon3tr",
+      "score": 0.988229,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.35516,
+      "verdict": "精确"
+     }
+    },
+    {
+     "frame": "cd37",
+     "index": 4,
+     "window": [
+      1.05,
+      1.06,
+      1.1,
+      1.11,
+      1.12
+     ],
+     "crop": [
+      60,
+      84,
+      184,
+      213
+     ],
+     "library_scored": 3,
+     "coarse_top": [
+      {
+       "name": "黍",
+       "score": 0.55075,
+       "scale": 1.11
+      },
+      {
+       "name": "Mon3tr",
+       "score": 0.447585,
+       "scale": 1.05
+      },
+      {
+       "name": "流明",
+       "score": 0.403467,
+       "scale": 1.05
+      }
+     ],
+     "landed_name": "黍",
+     "landed_runner_up": "圣聆初雪",
+     "landed_scale": 1.1,
+     "landed_blocked_by": null,
+     "coarse_has_landed": true,
+     "coarse_has_runner_up": false,
+     "landed_scale_in_window": true,
+     "layered": {
+      "name": "黍",
+      "score": 0.97374,
+      "scale": 1.1,
+      "runner_up": "流明",
+      "margin": 0.614914,
+      "verdict": "精确"
+     }
+    }
+   ]
+  }
+ },
+ "seconds": 53.699
+}

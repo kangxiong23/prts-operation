@@ -1,0 +1,1524 @@
+{
+  "note": "A2c 那一单的配对表。每一对是同一张卡的同一块画面，一次罩着、一次干净；判据沿用 tests/unit/test_vision_redcap.py 的 pair_ok（卡数相同 · 恰一个卡位翻罩 · 其余卡位只差一次亮度 · 这个卡位自己差一次仿射 rms<=12），本单没有另立判据。模型仍然只用红罩那批的两个标定对拟合。",
+  "library": "tests/帧样本/点名/编队页.json",
+  "source_batch": "data/precheck/cd（gitignored，60 帧 cd01..cd60）",
+  "criterion": {
+    "name": "_pair_ok（tests/unit/test_vision_redcap.py）",
+    "row_rms": 3.0,
+    "card_rms": 12.0
+  },
+  "reads": {
+    "cd01#4": {
+      "name": "白面鸮",
+      "score": 0.985462,
+      "runner_up": 0.400663,
+      "margin": 0.584799
+    },
+    "cd02#4": {
+      "name": "白面鸮",
+      "score": 0.985462,
+      "runner_up": 0.400663,
+      "margin": 0.584799
+    },
+    "cd04#4": {
+      "name": "极境",
+      "score": 0.349064,
+      "runner_up": 0.334623,
+      "margin": 0.014441
+    },
+    "cd04#8": {
+      "name": "极境",
+      "score": 0.309101,
+      "runner_up": 0.29574,
+      "margin": 0.013361
+    },
+    "cd05#4": {
+      "name": "极境",
+      "score": 0.330599,
+      "runner_up": 0.318031,
+      "margin": 0.012568
+    },
+    "cd05#8": {
+      "name": "极境",
+      "score": 0.31225,
+      "runner_up": 0.291408,
+      "margin": 0.020842
+    },
+    "cd06#4": {
+      "name": "极境",
+      "score": 0.309369,
+      "runner_up": 0.301623,
+      "margin": 0.007746
+    },
+    "cd06#8": {
+      "name": "极境",
+      "score": 0.326487,
+      "runner_up": 0.306198,
+      "margin": 0.020289
+    },
+    "cd07#8": {
+      "name": "极境",
+      "score": 0.978138,
+      "runner_up": 0.393024,
+      "margin": 0.585114
+    },
+    "cd09#0": {
+      "name": "极境",
+      "score": 0.336174,
+      "runner_up": 0.292226,
+      "margin": 0.043948
+    },
+    "cd10#0": {
+      "name": "极境",
+      "score": 0.329888,
+      "runner_up": 0.30291,
+      "margin": 0.026977
+    },
+    "cd11#0": {
+      "name": "极境",
+      "score": 0.335494,
+      "runner_up": 0.286658,
+      "margin": 0.048836
+    },
+    "cd12#0": {
+      "name": "极境",
+      "score": 0.328464,
+      "runner_up": 0.295224,
+      "margin": 0.03324
+    },
+    "cd13#0": {
+      "name": "斩业星熊",
+      "score": 0.967544,
+      "runner_up": 0.45331,
+      "margin": 0.514234
+    },
+    "cd13#6": {
+      "name": "极境",
+      "score": 0.314159,
+      "runner_up": 0.273985,
+      "margin": 0.040175
+    },
+    "cd14#1": {
+      "name": "极境",
+      "score": 0.342393,
+      "runner_up": 0.282777,
+      "margin": 0.059616
+    },
+    "cd14#6": {
+      "name": "歌蕾蒂娅",
+      "score": 0.976221,
+      "runner_up": 0.559715,
+      "margin": 0.416505
+    },
+    "cd15#1": {
+      "name": "维什戴尔",
+      "score": 0.984765,
+      "runner_up": 0.512818,
+      "margin": 0.471947
+    },
+    "cd16#1": {
+      "name": "维什戴尔",
+      "score": 0.984765,
+      "runner_up": 0.512818,
+      "margin": 0.471947
+    },
+    "cd22#9": {
+      "name": "极境",
+      "score": 0.338813,
+      "runner_up": 0.310745,
+      "margin": 0.028069
+    },
+    "cd23#6": {
+      "name": "极境",
+      "score": 0.285837,
+      "runner_up": 0.26908,
+      "margin": 0.016757
+    },
+    "cd23#9": {
+      "name": "新约能天使",
+      "score": 0.986875,
+      "runner_up": 0.484149,
+      "margin": 0.502726
+    },
+    "cd27#6": {
+      "name": "极境",
+      "score": 0.304686,
+      "runner_up": 0.272441,
+      "margin": 0.032245
+    },
+    "cd27#9": {
+      "name": "新约能天使",
+      "score": 0.986875,
+      "runner_up": 0.484149,
+      "margin": 0.502726
+    },
+    "cd28#6": {
+      "name": "白面鸮",
+      "score": 0.992094,
+      "runner_up": 0.398943,
+      "margin": 0.593151
+    },
+    "cd29#6": {
+      "name": "白面鸮",
+      "score": 0.992094,
+      "runner_up": 0.398943,
+      "margin": 0.593151
+    },
+    "cd31#6": {
+      "name": "白面鸮",
+      "score": 0.992094,
+      "runner_up": 0.398943,
+      "margin": 0.593151
+    },
+    "cd37#4": {
+      "name": "极境",
+      "score": 0.292849,
+      "runner_up": 0.273773,
+      "margin": 0.019076
+    },
+    "cd38#4": {
+      "name": "极境",
+      "score": 0.27791,
+      "runner_up": 0.274609,
+      "margin": 0.003302
+    },
+    "cd39#4": {
+      "name": "极境",
+      "score": 0.279112,
+      "runner_up": 0.258976,
+      "margin": 0.020135
+    },
+    "cd42#4": {
+      "name": "极境",
+      "score": 0.333273,
+      "runner_up": 0.291526,
+      "margin": 0.041747
+    },
+    "cd44#4": {
+      "name": "黍",
+      "score": 0.977358,
+      "runner_up": 0.365588,
+      "margin": 0.61177
+    },
+    "cd47#4": {
+      "name": "黍",
+      "score": 0.977358,
+      "runner_up": 0.365588,
+      "margin": 0.61177
+    },
+    "cd50#4": {
+      "name": "黍",
+      "score": 0.977358,
+      "runner_up": 0.365588,
+      "margin": 0.61177
+    },
+    "cd54#4": {
+      "name": "黍",
+      "score": 0.977358,
+      "runner_up": 0.365588,
+      "margin": 0.61177
+    },
+    "cd56#4": {
+      "name": "黍",
+      "score": 0.977358,
+      "runner_up": 0.365588,
+      "margin": 0.61177
+    },
+    "cd57#4": {
+      "name": "黍",
+      "score": 0.977358,
+      "runner_up": 0.365588,
+      "margin": 0.61177
+    },
+    "cd59#4": {
+      "name": "黍",
+      "score": 0.977358,
+      "runner_up": 0.365588,
+      "margin": 0.61177
+    },
+    "cd60#4": {
+      "name": "黍",
+      "score": 0.977358,
+      "runner_up": 0.365588,
+      "margin": 0.61177
+    }
+  },
+  "pairs": [
+    {
+      "set": "validation",
+      "slot": 0,
+      "capped": {
+        "file": "cd09_0.png",
+        "frame": "cd09",
+        "index": 0,
+        "key": "cd09#0"
+      },
+      "clean": {
+        "file": "cd13_0.png",
+        "frame": "cd13",
+        "index": 0,
+        "key": "cd13#0"
+      },
+      "under_the_cap": "斩业星熊",
+      "truth_from": "干净那一端（cd13#0）自己的身份区喂线上那条链 roster_scores：最高分 0.967544、次高 0.453310、余量 0.514234",
+      "clean_score": 0.967544,
+      "clean_runner_up": 0.45331,
+      "clean_margin": 0.514234,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.336174,
+        "runner_up": 0.292226,
+        "margin": 0.043948
+      },
+      "own_affine_rms": 10.237,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 0,
+      "capped": {
+        "file": "cd10_0.png",
+        "frame": "cd10",
+        "index": 0,
+        "key": "cd10#0"
+      },
+      "clean": {
+        "file": "cd13_0.png",
+        "frame": "cd13",
+        "index": 0,
+        "key": "cd13#0"
+      },
+      "under_the_cap": "斩业星熊",
+      "truth_from": "干净那一端（cd13#0）自己的身份区喂线上那条链 roster_scores：最高分 0.967544、次高 0.453310、余量 0.514234",
+      "clean_score": 0.967544,
+      "clean_runner_up": 0.45331,
+      "clean_margin": 0.514234,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.329888,
+        "runner_up": 0.30291,
+        "margin": 0.026977
+      },
+      "own_affine_rms": 10.327,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 0,
+      "capped": {
+        "file": "cd11_0.png",
+        "frame": "cd11",
+        "index": 0,
+        "key": "cd11#0"
+      },
+      "clean": {
+        "file": "cd13_0.png",
+        "frame": "cd13",
+        "index": 0,
+        "key": "cd13#0"
+      },
+      "under_the_cap": "斩业星熊",
+      "truth_from": "干净那一端（cd13#0）自己的身份区喂线上那条链 roster_scores：最高分 0.967544、次高 0.453310、余量 0.514234",
+      "clean_score": 0.967544,
+      "clean_runner_up": 0.45331,
+      "clean_margin": 0.514234,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.335494,
+        "runner_up": 0.286658,
+        "margin": 0.048836
+      },
+      "own_affine_rms": 10.228,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 0,
+      "capped": {
+        "file": "cd12_0.png",
+        "frame": "cd12",
+        "index": 0,
+        "key": "cd12#0"
+      },
+      "clean": {
+        "file": "cd13_0.png",
+        "frame": "cd13",
+        "index": 0,
+        "key": "cd13#0"
+      },
+      "under_the_cap": "斩业星熊",
+      "truth_from": "干净那一端（cd13#0）自己的身份区喂线上那条链 roster_scores：最高分 0.967544、次高 0.453310、余量 0.514234",
+      "clean_score": 0.967544,
+      "clean_runner_up": 0.45331,
+      "clean_margin": 0.514234,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.328464,
+        "runner_up": 0.295224,
+        "margin": 0.03324
+      },
+      "own_affine_rms": 10.217,
+      "truth_confident": true
+    },
+    {
+      "set": "calibration",
+      "slot": 1,
+      "capped": {
+        "file": "cd14_1.png",
+        "frame": "cd14",
+        "index": 1,
+        "key": "cd14#1"
+      },
+      "clean": {
+        "file": "cd15_1.png",
+        "frame": "cd15",
+        "index": 1,
+        "key": "cd15#1"
+      },
+      "under_the_cap": "维什戴尔",
+      "truth_from": "干净那一端（cd15#1）自己的身份区喂线上那条链 roster_scores：最高分 0.984765、次高 0.512818、余量 0.471947",
+      "clean_score": 0.984765,
+      "clean_runner_up": 0.512818,
+      "clean_margin": 0.471947,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.342393,
+        "runner_up": 0.282777,
+        "margin": 0.059616
+      },
+      "own_affine_rms": 10.082,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 1,
+      "capped": {
+        "file": "cd14_1.png",
+        "frame": "cd14",
+        "index": 1,
+        "key": "cd14#1"
+      },
+      "clean": {
+        "file": "cd16_1.png",
+        "frame": "cd16",
+        "index": 1,
+        "key": "cd16#1"
+      },
+      "under_the_cap": "维什戴尔",
+      "truth_from": "干净那一端（cd16#1）自己的身份区喂线上那条链 roster_scores：最高分 0.984765、次高 0.512818、余量 0.471947",
+      "clean_score": 0.984765,
+      "clean_runner_up": 0.512818,
+      "clean_margin": 0.471947,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.342393,
+        "runner_up": 0.282777,
+        "margin": 0.059616
+      },
+      "own_affine_rms": 10.086,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd04_4.png",
+        "frame": "cd04",
+        "index": 4,
+        "key": "cd04#4"
+      },
+      "clean": {
+        "file": "cd01_4.png",
+        "frame": "cd01",
+        "index": 4,
+        "key": "cd01#4"
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "干净那一端（cd01#4）自己的身份区喂线上那条链 roster_scores：最高分 0.985462、次高 0.400663、余量 0.584799",
+      "clean_score": 0.985462,
+      "clean_runner_up": 0.400663,
+      "clean_margin": 0.584799,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.349064,
+        "runner_up": 0.334623,
+        "margin": 0.014441
+      },
+      "own_affine_rms": 9.365,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd04_4.png",
+        "frame": "cd04",
+        "index": 4,
+        "key": "cd04#4"
+      },
+      "clean": {
+        "file": "cd02_4.png",
+        "frame": "cd02",
+        "index": 4,
+        "key": "cd02#4"
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "干净那一端（cd02#4）自己的身份区喂线上那条链 roster_scores：最高分 0.985462、次高 0.400663、余量 0.584799",
+      "clean_score": 0.985462,
+      "clean_runner_up": 0.400663,
+      "clean_margin": 0.584799,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.349064,
+        "runner_up": 0.334623,
+        "margin": 0.014441
+      },
+      "own_affine_rms": 9.472,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd05_4.png",
+        "frame": "cd05",
+        "index": 4,
+        "key": "cd05#4"
+      },
+      "clean": {
+        "file": "cd01_4.png",
+        "frame": "cd01",
+        "index": 4,
+        "key": "cd01#4"
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "干净那一端（cd01#4）自己的身份区喂线上那条链 roster_scores：最高分 0.985462、次高 0.400663、余量 0.584799",
+      "clean_score": 0.985462,
+      "clean_runner_up": 0.400663,
+      "clean_margin": 0.584799,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.330599,
+        "runner_up": 0.318031,
+        "margin": 0.012568
+      },
+      "own_affine_rms": 9.251,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd05_4.png",
+        "frame": "cd05",
+        "index": 4,
+        "key": "cd05#4"
+      },
+      "clean": {
+        "file": "cd02_4.png",
+        "frame": "cd02",
+        "index": 4,
+        "key": "cd02#4"
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "干净那一端（cd02#4）自己的身份区喂线上那条链 roster_scores：最高分 0.985462、次高 0.400663、余量 0.584799",
+      "clean_score": 0.985462,
+      "clean_runner_up": 0.400663,
+      "clean_margin": 0.584799,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.330599,
+        "runner_up": 0.318031,
+        "margin": 0.012568
+      },
+      "own_affine_rms": 9.353,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd06_4.png",
+        "frame": "cd06",
+        "index": 4,
+        "key": "cd06#4"
+      },
+      "clean": {
+        "file": "cd01_4.png",
+        "frame": "cd01",
+        "index": 4,
+        "key": "cd01#4"
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "干净那一端（cd01#4）自己的身份区喂线上那条链 roster_scores：最高分 0.985462、次高 0.400663、余量 0.584799",
+      "clean_score": 0.985462,
+      "clean_runner_up": 0.400663,
+      "clean_margin": 0.584799,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.309369,
+        "runner_up": 0.301623,
+        "margin": 0.007746
+      },
+      "own_affine_rms": 9.399,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd06_4.png",
+        "frame": "cd06",
+        "index": 4,
+        "key": "cd06#4"
+      },
+      "clean": {
+        "file": "cd02_4.png",
+        "frame": "cd02",
+        "index": 4,
+        "key": "cd02#4"
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "干净那一端（cd02#4）自己的身份区喂线上那条链 roster_scores：最高分 0.985462、次高 0.400663、余量 0.584799",
+      "clean_score": 0.985462,
+      "clean_runner_up": 0.400663,
+      "clean_margin": 0.584799,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.309369,
+        "runner_up": 0.301623,
+        "margin": 0.007746
+      },
+      "own_affine_rms": 9.508,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd37_4.png",
+        "frame": "cd37",
+        "index": 4,
+        "key": "cd37#4"
+      },
+      "clean": {
+        "file": "cd44_4.png",
+        "frame": "cd44",
+        "index": 4,
+        "key": "cd44#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd44#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.292849,
+        "runner_up": 0.273773,
+        "margin": 0.019076
+      },
+      "own_affine_rms": 9.513,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd37_4.png",
+        "frame": "cd37",
+        "index": 4,
+        "key": "cd37#4"
+      },
+      "clean": {
+        "file": "cd47_4.png",
+        "frame": "cd47",
+        "index": 4,
+        "key": "cd47#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd47#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.292849,
+        "runner_up": 0.273773,
+        "margin": 0.019076
+      },
+      "own_affine_rms": 9.569,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd37_4.png",
+        "frame": "cd37",
+        "index": 4,
+        "key": "cd37#4"
+      },
+      "clean": {
+        "file": "cd50_4.png",
+        "frame": "cd50",
+        "index": 4,
+        "key": "cd50#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd50#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.292849,
+        "runner_up": 0.273773,
+        "margin": 0.019076
+      },
+      "own_affine_rms": 9.569,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd37_4.png",
+        "frame": "cd37",
+        "index": 4,
+        "key": "cd37#4"
+      },
+      "clean": {
+        "file": "cd56_4.png",
+        "frame": "cd56",
+        "index": 4,
+        "key": "cd56#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd56#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.292849,
+        "runner_up": 0.273773,
+        "margin": 0.019076
+      },
+      "own_affine_rms": 9.569,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd37_4.png",
+        "frame": "cd37",
+        "index": 4,
+        "key": "cd37#4"
+      },
+      "clean": {
+        "file": "cd59_4.png",
+        "frame": "cd59",
+        "index": 4,
+        "key": "cd59#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd59#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.292849,
+        "runner_up": 0.273773,
+        "margin": 0.019076
+      },
+      "own_affine_rms": 9.569,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd37_4.png",
+        "frame": "cd37",
+        "index": 4,
+        "key": "cd37#4"
+      },
+      "clean": {
+        "file": "cd60_4.png",
+        "frame": "cd60",
+        "index": 4,
+        "key": "cd60#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd60#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.292849,
+        "runner_up": 0.273773,
+        "margin": 0.019076
+      },
+      "own_affine_rms": 9.569,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd38_4.png",
+        "frame": "cd38",
+        "index": 4,
+        "key": "cd38#4"
+      },
+      "clean": {
+        "file": "cd44_4.png",
+        "frame": "cd44",
+        "index": 4,
+        "key": "cd44#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd44#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.27791,
+        "runner_up": 0.274609,
+        "margin": 0.003302
+      },
+      "own_affine_rms": 9.517,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd38_4.png",
+        "frame": "cd38",
+        "index": 4,
+        "key": "cd38#4"
+      },
+      "clean": {
+        "file": "cd47_4.png",
+        "frame": "cd47",
+        "index": 4,
+        "key": "cd47#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd47#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.27791,
+        "runner_up": 0.274609,
+        "margin": 0.003302
+      },
+      "own_affine_rms": 9.574,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd38_4.png",
+        "frame": "cd38",
+        "index": 4,
+        "key": "cd38#4"
+      },
+      "clean": {
+        "file": "cd50_4.png",
+        "frame": "cd50",
+        "index": 4,
+        "key": "cd50#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd50#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.27791,
+        "runner_up": 0.274609,
+        "margin": 0.003302
+      },
+      "own_affine_rms": 9.574,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd38_4.png",
+        "frame": "cd38",
+        "index": 4,
+        "key": "cd38#4"
+      },
+      "clean": {
+        "file": "cd56_4.png",
+        "frame": "cd56",
+        "index": 4,
+        "key": "cd56#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd56#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.27791,
+        "runner_up": 0.274609,
+        "margin": 0.003302
+      },
+      "own_affine_rms": 9.574,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd38_4.png",
+        "frame": "cd38",
+        "index": 4,
+        "key": "cd38#4"
+      },
+      "clean": {
+        "file": "cd59_4.png",
+        "frame": "cd59",
+        "index": 4,
+        "key": "cd59#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd59#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.27791,
+        "runner_up": 0.274609,
+        "margin": 0.003302
+      },
+      "own_affine_rms": 9.574,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd38_4.png",
+        "frame": "cd38",
+        "index": 4,
+        "key": "cd38#4"
+      },
+      "clean": {
+        "file": "cd60_4.png",
+        "frame": "cd60",
+        "index": 4,
+        "key": "cd60#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd60#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.27791,
+        "runner_up": 0.274609,
+        "margin": 0.003302
+      },
+      "own_affine_rms": 9.574,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd39_4.png",
+        "frame": "cd39",
+        "index": 4,
+        "key": "cd39#4"
+      },
+      "clean": {
+        "file": "cd44_4.png",
+        "frame": "cd44",
+        "index": 4,
+        "key": "cd44#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd44#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.279112,
+        "runner_up": 0.258976,
+        "margin": 0.020135
+      },
+      "own_affine_rms": 9.516,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd39_4.png",
+        "frame": "cd39",
+        "index": 4,
+        "key": "cd39#4"
+      },
+      "clean": {
+        "file": "cd47_4.png",
+        "frame": "cd47",
+        "index": 4,
+        "key": "cd47#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd47#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.279112,
+        "runner_up": 0.258976,
+        "margin": 0.020135
+      },
+      "own_affine_rms": 9.572,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd39_4.png",
+        "frame": "cd39",
+        "index": 4,
+        "key": "cd39#4"
+      },
+      "clean": {
+        "file": "cd50_4.png",
+        "frame": "cd50",
+        "index": 4,
+        "key": "cd50#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd50#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.279112,
+        "runner_up": 0.258976,
+        "margin": 0.020135
+      },
+      "own_affine_rms": 9.572,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd39_4.png",
+        "frame": "cd39",
+        "index": 4,
+        "key": "cd39#4"
+      },
+      "clean": {
+        "file": "cd54_4.png",
+        "frame": "cd54",
+        "index": 4,
+        "key": "cd54#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd54#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.279112,
+        "runner_up": 0.258976,
+        "margin": 0.020135
+      },
+      "own_affine_rms": 9.572,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd39_4.png",
+        "frame": "cd39",
+        "index": 4,
+        "key": "cd39#4"
+      },
+      "clean": {
+        "file": "cd56_4.png",
+        "frame": "cd56",
+        "index": 4,
+        "key": "cd56#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd56#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.279112,
+        "runner_up": 0.258976,
+        "margin": 0.020135
+      },
+      "own_affine_rms": 9.572,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd39_4.png",
+        "frame": "cd39",
+        "index": 4,
+        "key": "cd39#4"
+      },
+      "clean": {
+        "file": "cd59_4.png",
+        "frame": "cd59",
+        "index": 4,
+        "key": "cd59#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd59#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.279112,
+        "runner_up": 0.258976,
+        "margin": 0.020135
+      },
+      "own_affine_rms": 9.572,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd39_4.png",
+        "frame": "cd39",
+        "index": 4,
+        "key": "cd39#4"
+      },
+      "clean": {
+        "file": "cd60_4.png",
+        "frame": "cd60",
+        "index": 4,
+        "key": "cd60#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd60#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.279112,
+        "runner_up": 0.258976,
+        "margin": 0.020135
+      },
+      "own_affine_rms": 9.572,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 4,
+      "capped": {
+        "file": "cd42_4.png",
+        "frame": "cd42",
+        "index": 4,
+        "key": "cd42#4"
+      },
+      "clean": {
+        "file": "cd57_4.png",
+        "frame": "cd57",
+        "index": 4,
+        "key": "cd57#4"
+      },
+      "under_the_cap": "黍",
+      "truth_from": "干净那一端（cd57#4）自己的身份区喂线上那条链 roster_scores：最高分 0.977358、次高 0.365588、余量 0.611770",
+      "clean_score": 0.977358,
+      "clean_runner_up": 0.365588,
+      "clean_margin": 0.61177,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.333273,
+        "runner_up": 0.291526,
+        "margin": 0.041747
+      },
+      "own_affine_rms": 9.571,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 6,
+      "capped": {
+        "file": "cd13_6.png",
+        "frame": "cd13",
+        "index": 6,
+        "key": "cd13#6"
+      },
+      "clean": {
+        "file": "cd14_6.png",
+        "frame": "cd14",
+        "index": 6,
+        "key": "cd14#6"
+      },
+      "under_the_cap": "歌蕾蒂娅",
+      "truth_from": "干净那一端（cd14#6）自己的身份区喂线上那条链 roster_scores：最高分 0.976221、次高 0.559715、余量 0.416505",
+      "clean_score": 0.976221,
+      "clean_runner_up": 0.559715,
+      "clean_margin": 0.416505,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.314159,
+        "runner_up": 0.273985,
+        "margin": 0.040175
+      },
+      "own_affine_rms": 11.622,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 6,
+      "capped": {
+        "file": "cd23_6.png",
+        "frame": "cd23",
+        "index": 6,
+        "key": "cd23#6"
+      },
+      "clean": {
+        "file": "cd28_6.png",
+        "frame": "cd28",
+        "index": 6,
+        "key": "cd28#6"
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "干净那一端（cd28#6）自己的身份区喂线上那条链 roster_scores：最高分 0.992094、次高 0.398943、余量 0.593151",
+      "clean_score": 0.992094,
+      "clean_runner_up": 0.398943,
+      "clean_margin": 0.593151,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.285837,
+        "runner_up": 0.26908,
+        "margin": 0.016757
+      },
+      "own_affine_rms": 9.619,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 6,
+      "capped": {
+        "file": "cd23_6.png",
+        "frame": "cd23",
+        "index": 6,
+        "key": "cd23#6"
+      },
+      "clean": {
+        "file": "cd29_6.png",
+        "frame": "cd29",
+        "index": 6,
+        "key": "cd29#6"
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "干净那一端（cd29#6）自己的身份区喂线上那条链 roster_scores：最高分 0.992094、次高 0.398943、余量 0.593151",
+      "clean_score": 0.992094,
+      "clean_runner_up": 0.398943,
+      "clean_margin": 0.593151,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.285837,
+        "runner_up": 0.26908,
+        "margin": 0.016757
+      },
+      "own_affine_rms": 9.644,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 6,
+      "capped": {
+        "file": "cd23_6.png",
+        "frame": "cd23",
+        "index": 6,
+        "key": "cd23#6"
+      },
+      "clean": {
+        "file": "cd31_6.png",
+        "frame": "cd31",
+        "index": 6,
+        "key": "cd31#6"
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "干净那一端（cd31#6）自己的身份区喂线上那条链 roster_scores：最高分 0.992094、次高 0.398943、余量 0.593151",
+      "clean_score": 0.992094,
+      "clean_runner_up": 0.398943,
+      "clean_margin": 0.593151,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.285837,
+        "runner_up": 0.26908,
+        "margin": 0.016757
+      },
+      "own_affine_rms": 9.644,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 6,
+      "capped": {
+        "file": "cd27_6.png",
+        "frame": "cd27",
+        "index": 6,
+        "key": "cd27#6"
+      },
+      "clean": {
+        "file": "cd28_6.png",
+        "frame": "cd28",
+        "index": 6,
+        "key": "cd28#6"
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "干净那一端（cd28#6）自己的身份区喂线上那条链 roster_scores：最高分 0.992094、次高 0.398943、余量 0.593151",
+      "clean_score": 0.992094,
+      "clean_runner_up": 0.398943,
+      "clean_margin": 0.593151,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.304686,
+        "runner_up": 0.272441,
+        "margin": 0.032245
+      },
+      "own_affine_rms": 9.815,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 6,
+      "capped": {
+        "file": "cd27_6.png",
+        "frame": "cd27",
+        "index": 6,
+        "key": "cd27#6"
+      },
+      "clean": {
+        "file": "cd29_6.png",
+        "frame": "cd29",
+        "index": 6,
+        "key": "cd29#6"
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "干净那一端（cd29#6）自己的身份区喂线上那条链 roster_scores：最高分 0.992094、次高 0.398943、余量 0.593151",
+      "clean_score": 0.992094,
+      "clean_runner_up": 0.398943,
+      "clean_margin": 0.593151,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.304686,
+        "runner_up": 0.272441,
+        "margin": 0.032245
+      },
+      "own_affine_rms": 9.841,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 6,
+      "capped": {
+        "file": "cd27_6.png",
+        "frame": "cd27",
+        "index": 6,
+        "key": "cd27#6"
+      },
+      "clean": {
+        "file": "cd31_6.png",
+        "frame": "cd31",
+        "index": 6,
+        "key": "cd31#6"
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "干净那一端（cd31#6）自己的身份区喂线上那条链 roster_scores：最高分 0.992094、次高 0.398943、余量 0.593151",
+      "clean_score": 0.992094,
+      "clean_runner_up": 0.398943,
+      "clean_margin": 0.593151,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.304686,
+        "runner_up": 0.272441,
+        "margin": 0.032245
+      },
+      "own_affine_rms": 9.841,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 8,
+      "capped": {
+        "file": "cd04_8.png",
+        "frame": "cd04",
+        "index": 8,
+        "key": "cd04#8"
+      },
+      "clean": {
+        "file": "cd07_8.png",
+        "frame": "cd07",
+        "index": 8,
+        "key": "cd07#8"
+      },
+      "under_the_cap": "极境",
+      "truth_from": "干净那一端（cd07#8）自己的身份区喂线上那条链 roster_scores：最高分 0.978138、次高 0.393024、余量 0.585114",
+      "clean_score": 0.978138,
+      "clean_runner_up": 0.393024,
+      "clean_margin": 0.585114,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.309101,
+        "runner_up": 0.29574,
+        "margin": 0.013361
+      },
+      "own_affine_rms": 11.572,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 8,
+      "capped": {
+        "file": "cd05_8.png",
+        "frame": "cd05",
+        "index": 8,
+        "key": "cd05#8"
+      },
+      "clean": {
+        "file": "cd07_8.png",
+        "frame": "cd07",
+        "index": 8,
+        "key": "cd07#8"
+      },
+      "under_the_cap": "极境",
+      "truth_from": "干净那一端（cd07#8）自己的身份区喂线上那条链 roster_scores：最高分 0.978138、次高 0.393024、余量 0.585114",
+      "clean_score": 0.978138,
+      "clean_runner_up": 0.393024,
+      "clean_margin": 0.585114,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.31225,
+        "runner_up": 0.291408,
+        "margin": 0.020842
+      },
+      "own_affine_rms": 11.575,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 8,
+      "capped": {
+        "file": "cd06_8.png",
+        "frame": "cd06",
+        "index": 8,
+        "key": "cd06#8"
+      },
+      "clean": {
+        "file": "cd07_8.png",
+        "frame": "cd07",
+        "index": 8,
+        "key": "cd07#8"
+      },
+      "under_the_cap": "极境",
+      "truth_from": "干净那一端（cd07#8）自己的身份区喂线上那条链 roster_scores：最高分 0.978138、次高 0.393024、余量 0.585114",
+      "clean_score": 0.978138,
+      "clean_runner_up": 0.393024,
+      "clean_margin": 0.585114,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.326487,
+        "runner_up": 0.306198,
+        "margin": 0.020289
+      },
+      "own_affine_rms": 11.575,
+      "truth_confident": true
+    },
+    {
+      "set": "calibration",
+      "slot": 9,
+      "capped": {
+        "file": "cd22_9.png",
+        "frame": "cd22",
+        "index": 9,
+        "key": "cd22#9"
+      },
+      "clean": {
+        "file": "cd23_9.png",
+        "frame": "cd23",
+        "index": 9,
+        "key": "cd23#9"
+      },
+      "under_the_cap": "新约能天使",
+      "truth_from": "干净那一端（cd23#9）自己的身份区喂线上那条链 roster_scores：最高分 0.986875、次高 0.484149、余量 0.502726",
+      "clean_score": 0.986875,
+      "clean_runner_up": 0.484149,
+      "clean_margin": 0.502726,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.338813,
+        "runner_up": 0.310745,
+        "margin": 0.028069
+      },
+      "own_affine_rms": 10.005,
+      "truth_confident": true
+    },
+    {
+      "set": "validation",
+      "slot": 9,
+      "capped": {
+        "file": "cd22_9.png",
+        "frame": "cd22",
+        "index": 9,
+        "key": "cd22#9"
+      },
+      "clean": {
+        "file": "cd27_9.png",
+        "frame": "cd27",
+        "index": 9,
+        "key": "cd27#9"
+      },
+      "under_the_cap": "新约能天使",
+      "truth_from": "干净那一端（cd27#9）自己的身份区喂线上那条链 roster_scores：最高分 0.986875、次高 0.484149、余量 0.502726",
+      "clean_score": 0.986875,
+      "clean_runner_up": 0.484149,
+      "clean_margin": 0.502726,
+      "capped_read": {
+        "name": "极境",
+        "score": 0.338813,
+        "runner_up": 0.310745,
+        "margin": 0.028069
+      },
+      "own_affine_rms": 10.044,
+      "truth_confident": true
+    }
+  ]
+}

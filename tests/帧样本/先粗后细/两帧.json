@@ -1,0 +1,218 @@
+{
+ "note": "两帧真跑（无红罩 / 带红罩）：三次全列 + 中位 + 对旧口径 20.692 s 的倍数 + 分路耗时。",
+ "old_frame_s": 20.692,
+ "old_frame_source": "tests/帧样本/先粗后细/一帧.json 的真跑中位（已裁定口径）",
+ "pitch": 207.5,
+ "rounds": 3,
+ "frames": {
+  "备战席/shot01": {
+   "batch": "备战席",
+   "frame": "shot01",
+   "cards": 12,
+   "library": 11,
+   "rounds_s": [
+    2.0792,
+    4.0602,
+    4.329
+   ],
+   "median_s": 4.0602,
+   "spread_max_over_min": 2.082,
+   "calls": 6006,
+   "calls_by_path": {
+    "clean": [
+     6006,
+     6006,
+     6006
+    ],
+    "disc": [
+     0,
+     0,
+     0
+    ]
+   },
+   "ratio_vs_old_frame": 5.096,
+   "split_s": {
+    "clean": 4.0323,
+    "disc": 0.0,
+    "build": 0.0,
+    "redeploy": 0.0214
+   },
+   "split_share": {
+    "clean": 0.9931,
+    "disc": 0.0,
+    "build": 0.0,
+    "redeploy": 0.0053
+   },
+   "split_n": {
+    "clean": 12,
+    "disc": 0,
+    "build": 0
+   },
+   "redcap_slots": 0,
+   "other_s": 0.0065,
+   "calls_per_slot": 500.5,
+   "slots": [
+    {
+     "index": 0,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 1,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 2,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 3,
+     "payload": "Unknown",
+     "name": null
+    },
+    {
+     "index": 4,
+     "payload": "Unknown",
+     "name": null
+    },
+    {
+     "index": 5,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 6,
+     "payload": "Unknown",
+     "name": null
+    },
+    {
+     "index": 7,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 8,
+     "payload": "Unknown",
+     "name": null
+    },
+    {
+     "index": 9,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 10,
+     "payload": "Unknown",
+     "name": null
+    },
+    {
+     "index": 11,
+     "payload": "Unknown",
+     "name": null
+    }
+   ]
+  },
+  "红罩/cd14": {
+   "batch": "红罩",
+   "frame": "cd14",
+   "cards": 10,
+   "library": 11,
+   "rounds_s": [
+    20.8404,
+    20.8918,
+    21.3958
+   ],
+   "median_s": 20.8918,
+   "spread_max_over_min": 1.027,
+   "calls": 4191,
+   "calls_by_path": {
+    "clean": [
+     1815,
+     1815,
+     1815
+    ],
+    "disc": [
+     1188,
+     1188,
+     1188
+    ]
+   },
+   "ratio_vs_old_frame": 0.99,
+   "split_s": {
+    "clean": 1.2897,
+    "disc": 16.3638,
+    "build": 3.1363,
+    "redeploy": 0.0231
+   },
+   "split_share": {
+    "clean": 0.0617,
+    "disc": 0.7833,
+    "build": 0.1501,
+    "redeploy": 0.0011
+   },
+   "split_n": {
+    "clean": 4,
+    "disc": 6,
+    "build": 1
+   },
+   "redcap_slots": 6,
+   "other_s": 0.0789,
+   "calls_per_slot": 419.1,
+   "slots": [
+    {
+     "index": 0,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 1,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 2,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 3,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 4,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 5,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 6,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 7,
+     "payload": "Unknown",
+     "name": null
+    },
+    {
+     "index": 8,
+     "payload": "Exact",
+     "name": null
+    },
+    {
+     "index": 9,
+     "payload": "Exact",
+     "name": null
+    }
+   ]
+  }
+ },
+ "seconds": 74.316
+}

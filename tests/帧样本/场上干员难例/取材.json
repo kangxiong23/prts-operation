@@ -1,0 +1,1239 @@
+{
+  "note": "被测对象 = `bench_field._bar_candidates()` 在整帧上的**全部输出**，一个不筛。所以 `bar` 是**候选坐标**而不是真值坐标；同一根条可能被记成两个候选（被背景切成两段），两条裁剪各是一块合法的窗。`candidate_lit` 是查找器给的连段长度，**不许当填充读数**（条宽 146，而相邻两条左缘只差 138 —— 邻条会盖掉本条的轨道尾巴）。",
+  "window_size": [
+    240,
+    360
+  ],
+  "bars_in_window": [
+    40,
+    320
+  ],
+  "crop_size": [
+    300,
+    420
+  ],
+  "crop_left_margin": 80,
+  "pick_rule": "每帧跑 bench_field._bar_candidates(source)（执行者写的候选查找器），它给出几根就裁几块；12 帧共 52 块",
+  "frame_count": 12,
+  "diamonds": {
+    "hard_多个技能条紧挨着.png": [
+      {
+        "score": 0.6883,
+        "at": [
+          1090,
+          365
+        ],
+        "size": [
+          64,
+          64
+        ]
+      }
+    ],
+    "hard_多个技能条错位挨着.png": [
+      {
+        "score": 0.4901,
+        "at": [
+          1234,
+          391
+        ],
+        "size": [
+          64,
+          64
+        ]
+      }
+    ],
+    "shot_20261007-202939-929.png": [
+      {
+        "score": 0.6115,
+        "at": [
+          1082,
+          520
+        ],
+        "size": [
+          64,
+          64
+        ]
+      }
+    ],
+    "shot_20261007-202959-919.png": [],
+    "shot_20261007-203019-925.png": [
+      {
+        "score": 0.8243,
+        "at": [
+          817,
+          395
+        ],
+        "size": [
+          64,
+          64
+        ]
+      }
+    ],
+    "shot_20261007-203049-920.png": [
+      {
+        "score": 0.5956,
+        "at": [
+          945,
+          383
+        ],
+        "size": [
+          64,
+          64
+        ]
+      },
+      {
+        "score": 0.5307,
+        "at": [
+          1083,
+          520
+        ],
+        "size": [
+          64,
+          64
+        ]
+      }
+    ],
+    "shot_20261007-203958-894.png": [],
+    "shot_20261007-204615-988.png": [
+      {
+        "score": 0.6938,
+        "at": [
+          1356,
+          498
+        ],
+        "size": [
+          64,
+          64
+        ]
+      }
+    ],
+    "shot_20261007-205107-116.png": [
+      {
+        "score": 0.5851,
+        "at": [
+          1234,
+          391
+        ],
+        "size": [
+          64,
+          64
+        ]
+      },
+      {
+        "score": 0.5327,
+        "at": [
+          1113,
+          402
+        ],
+        "size": [
+          64,
+          64
+        ]
+      }
+    ],
+    "special_带弹药机制的有竖线间隔的橙色技能条.png": [
+      {
+        "score": 0.6932,
+        "at": [
+          1356,
+          498
+        ],
+        "size": [
+          64,
+          64
+        ]
+      }
+    ],
+    "special_护盾机制.png": [
+      {
+        "score": 0.579,
+        "at": [
+          1229,
+          503
+        ],
+        "size": [
+          64,
+          64
+        ]
+      }
+    ],
+    "special_黄色菱形挡住了技能条，很难判准，应报未采样.png": [
+      {
+        "score": 0.7889,
+        "at": [
+          1357,
+          492
+        ],
+        "size": [
+          64,
+          64
+        ]
+      },
+      {
+        "score": 0.6579,
+        "at": [
+          1487,
+          581
+        ],
+        "size": [
+          64,
+          64
+        ]
+      },
+      {
+        "score": 0.5918,
+        "at": [
+          1229,
+          503
+        ],
+        "size": [
+          64,
+          64
+        ]
+      }
+    ]
+  },
+  "diamonds_note": "整帧搜到的黄菱形候选位置（模板 = assets/features/ready_diamond，搜索带 = (800, 350, 2000, 850)，下限 0.45）。**建批侧的取证**，不参与读数；用来判「用户标的『菱形挡住技能条』到底压在哪一根上」。",
+  "crops": [
+    {
+      "file": "r01_01_01.png",
+      "frame": "hard_多个技能条紧挨着.png",
+      "label": "多个技能条紧挨着",
+      "bar": [
+        1327,
+        485
+      ],
+      "candidate_lit": 106,
+      "independent_fill": 106,
+      "distance_to_centre": 141.0,
+      "window": [
+        1287,
+        165,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1327, 485) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/hard_多个技能条紧挨着.png"
+    },
+    {
+      "file": "r01_01_02.png",
+      "frame": "hard_多个技能条紧挨着.png",
+      "label": "多个技能条紧挨着",
+      "bar": [
+        1050,
+        630
+      ],
+      "candidate_lit": 20,
+      "independent_fill": 17,
+      "distance_to_centre": 277.0,
+      "window": [
+        1010,
+        310,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1050, 630) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/hard_多个技能条紧挨着.png"
+    },
+    {
+      "file": "r01_01_03.png",
+      "frame": "hard_多个技能条紧挨着.png",
+      "label": "多个技能条紧挨着",
+      "bar": [
+        1189,
+        630
+      ],
+      "candidate_lit": 137,
+      "independent_fill": 136,
+      "distance_to_centre": 138.1,
+      "window": [
+        1149,
+        310,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1189, 630) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/hard_多个技能条紧挨着.png"
+    },
+    {
+      "file": "r01_01_04.png",
+      "frame": "hard_多个技能条紧挨着.png",
+      "label": "多个技能条紧挨着",
+      "bar": [
+        1327,
+        630
+      ],
+      "candidate_lit": 276,
+      "independent_fill": 137,
+      "distance_to_centre": 4.0,
+      "window": [
+        1287,
+        310,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1327, 630) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/hard_多个技能条紧挨着.png"
+    },
+    {
+      "file": "r01_01_05.png",
+      "frame": "hard_多个技能条紧挨着.png",
+      "label": "多个技能条紧挨着",
+      "bar": [
+        1604,
+        630
+      ],
+      "candidate_lit": 59,
+      "independent_fill": 55,
+      "distance_to_centre": 277.0,
+      "window": [
+        1564,
+        310,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1604, 630) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/hard_多个技能条紧挨着.png"
+    },
+    {
+      "file": "r01_01_06.png",
+      "frame": "hard_多个技能条紧挨着.png",
+      "label": "多个技能条紧挨着",
+      "bar": [
+        1465,
+        631
+      ],
+      "candidate_lit": 138,
+      "independent_fill": 137,
+      "distance_to_centre": 138.1,
+      "window": [
+        1425,
+        311,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1465, 631) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/hard_多个技能条紧挨着.png"
+    },
+    {
+      "file": "r01_02_01.png",
+      "frame": "hard_多个技能条错位挨着.png",
+      "label": "多个技能条错位挨着",
+      "bar": [
+        1434,
+        499
+      ],
+      "candidate_lit": 90,
+      "independent_fill": 90,
+      "distance_to_centre": 166.1,
+      "window": [
+        1394,
+        179,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1434, 499) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/hard_多个技能条错位挨着.png"
+    },
+    {
+      "file": "r01_02_02.png",
+      "frame": "hard_多个技能条错位挨着.png",
+      "label": "多个技能条错位挨着",
+      "bar": [
+        1567,
+        564
+      ],
+      "candidate_lit": 94,
+      "independent_fill": 94,
+      "distance_to_centre": 247.9,
+      "window": [
+        1527,
+        244,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1567, 564) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/hard_多个技能条错位挨着.png"
+    },
+    {
+      "file": "r01_02_03.png",
+      "frame": "hard_多个技能条错位挨着.png",
+      "label": "多个技能条错位挨着",
+      "bar": [
+        1444,
+        633
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "distance_to_centre": 117.2,
+      "window": [
+        1404,
+        313,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1444, 633) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/hard_多个技能条错位挨着.png"
+    },
+    {
+      "file": "r01_02_04.png",
+      "frame": "hard_多个技能条错位挨着.png",
+      "label": "多个技能条错位挨着",
+      "bar": [
+        1318,
+        645
+      ],
+      "candidate_lit": 128,
+      "independent_fill": 125,
+      "distance_to_centre": 21.0,
+      "window": [
+        1278,
+        325,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1318, 645) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/hard_多个技能条错位挨着.png"
+    },
+    {
+      "file": "r01_02_05.png",
+      "frame": "hard_多个技能条错位挨着.png",
+      "label": "多个技能条错位挨着",
+      "bar": [
+        1194,
+        656
+      ],
+      "candidate_lit": 28,
+      "independent_fill": 25,
+      "distance_to_centre": 136.3,
+      "window": [
+        1154,
+        336,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1194, 656) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/hard_多个技能条错位挨着.png"
+    },
+    {
+      "file": "r01_03_01.png",
+      "frame": "shot_20261007-202939-929.png",
+      "label": "",
+      "bar": [
+        1447,
+        597
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "distance_to_centre": 123.5,
+      "window": [
+        1407,
+        277,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1447, 597) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-202939-929.png"
+    },
+    {
+      "file": "r01_03_02.png",
+      "frame": "shot_20261007-202939-929.png",
+      "label": "",
+      "bar": [
+        905,
+        648
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "distance_to_centre": 422.6,
+      "window": [
+        865,
+        328,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (905, 648) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-202939-929.png"
+    },
+    {
+      "file": "r01_03_03.png",
+      "frame": "shot_20261007-202939-929.png",
+      "label": "",
+      "bar": [
+        1043,
+        785
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "distance_to_centre": 325.5,
+      "window": [
+        1003,
+        465,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1043, 785) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-202939-929.png"
+    },
+    {
+      "file": "r01_04_01.png",
+      "frame": "shot_20261007-202959-919.png",
+      "label": "",
+      "bar": [
+        2045,
+        540
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "distance_to_centre": 723.1,
+      "window": [
+        2005,
+        220,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (2045, 540) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-202959-919.png"
+    },
+    {
+      "file": "r01_04_02.png",
+      "frame": "shot_20261007-202959-919.png",
+      "label": "",
+      "bar": [
+        1738,
+        569
+      ],
+      "candidate_lit": 89,
+      "independent_fill": 86,
+      "distance_to_centre": 414.9,
+      "window": [
+        1698,
+        249,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1738, 569) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-202959-919.png"
+    },
+    {
+      "file": "r01_04_03.png",
+      "frame": "shot_20261007-202959-919.png",
+      "label": "",
+      "bar": [
+        1447,
+        597
+      ],
+      "candidate_lit": 144,
+      "independent_fill": 144,
+      "distance_to_centre": 123.5,
+      "window": [
+        1407,
+        277,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1447, 597) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-202959-919.png"
+    },
+    {
+      "file": "r01_04_04.png",
+      "frame": "shot_20261007-202959-919.png",
+      "label": "",
+      "bar": [
+        1593,
+        616
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 105,
+      "distance_to_centre": 266.2,
+      "window": [
+        1553,
+        296,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1593, 616) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-202959-919.png"
+    },
+    {
+      "file": "r01_04_05.png",
+      "frame": "shot_20261007-202959-919.png",
+      "label": "",
+      "bar": [
+        1604,
+        740
+      ],
+      "candidate_lit": 41,
+      "independent_fill": 41,
+      "distance_to_centre": 299.5,
+      "window": [
+        1564,
+        420,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1604, 740) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-202959-919.png"
+    },
+    {
+      "file": "r01_05_01.png",
+      "frame": "shot_20261007-203019-925.png",
+      "label": "",
+      "bar": [
+        547,
+        427
+      ],
+      "candidate_lit": 23,
+      "independent_fill": 17,
+      "distance_to_centre": 805.0,
+      "window": [
+        507,
+        107,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (547, 427) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203019-925.png"
+    },
+    {
+      "file": "r01_05_02.png",
+      "frame": "shot_20261007-203019-925.png",
+      "label": "",
+      "bar": [
+        1447,
+        597
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "distance_to_centre": 123.5,
+      "window": [
+        1407,
+        277,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1447, 597) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203019-925.png"
+    },
+    {
+      "file": "r01_05_03.png",
+      "frame": "shot_20261007-203019-925.png",
+      "label": "",
+      "bar": [
+        1306,
+        610
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 140,
+      "distance_to_centre": 26.4,
+      "window": [
+        1266,
+        290,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1306, 610) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203019-925.png"
+    },
+    {
+      "file": "r01_05_04.png",
+      "frame": "shot_20261007-203019-925.png",
+      "label": "",
+      "bar": [
+        1036,
+        636
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 142,
+      "distance_to_centre": 291.2,
+      "window": [
+        996,
+        316,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1036, 636) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203019-925.png"
+    },
+    {
+      "file": "r01_05_05.png",
+      "frame": "shot_20261007-203019-925.png",
+      "label": "",
+      "bar": [
+        927,
+        677
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "distance_to_centre": 403.2,
+      "window": [
+        887,
+        357,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (927, 677) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203019-925.png"
+    },
+    {
+      "file": "r01_05_06.png",
+      "frame": "shot_20261007-203019-925.png",
+      "label": "",
+      "bar": [
+        911,
+        796
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "distance_to_centre": 449.4,
+      "window": [
+        871,
+        476,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (911, 796) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203019-925.png"
+    },
+    {
+      "file": "r01_06_01.png",
+      "frame": "shot_20261007-203049-920.png",
+      "label": "",
+      "bar": [
+        1590,
+        583
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "distance_to_centre": 266.5,
+      "window": [
+        1550,
+        263,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1590, 583) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203049-920.png"
+    },
+    {
+      "file": "r01_06_02.png",
+      "frame": "shot_20261007-203049-920.png",
+      "label": "",
+      "bar": [
+        1447,
+        597
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 143,
+      "distance_to_centre": 123.5,
+      "window": [
+        1407,
+        277,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1447, 597) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203049-920.png"
+    },
+    {
+      "file": "r01_06_03.png",
+      "frame": "shot_20261007-203049-920.png",
+      "label": "",
+      "bar": [
+        905,
+        648
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "distance_to_centre": 422.6,
+      "window": [
+        865,
+        328,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (905, 648) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203049-920.png"
+    },
+    {
+      "file": "r01_06_04.png",
+      "frame": "shot_20261007-203049-920.png",
+      "label": "",
+      "bar": [
+        1054,
+        666
+      ],
+      "candidate_lit": 141,
+      "independent_fill": 140,
+      "distance_to_centre": 275.9,
+      "window": [
+        1014,
+        346,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1054, 666) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203049-920.png"
+    },
+    {
+      "file": "r01_06_05.png",
+      "frame": "shot_20261007-203049-920.png",
+      "label": "",
+      "bar": [
+        1043,
+        785
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "distance_to_centre": 325.5,
+      "window": [
+        1003,
+        465,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1043, 785) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203049-920.png"
+    },
+    {
+      "file": "r01_07_01.png",
+      "frame": "shot_20261007-203958-894.png",
+      "label": "",
+      "bar": [
+        1721,
+        452
+      ],
+      "candidate_lit": 47,
+      "independent_fill": 43,
+      "distance_to_centre": 430.7,
+      "window": [
+        1681,
+        132,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1721, 452) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203958-894.png"
+    },
+    {
+      "file": "r01_07_02.png",
+      "frame": "shot_20261007-203958-894.png",
+      "label": "",
+      "bar": [
+        1580,
+        467
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 143,
+      "distance_to_centre": 298.8,
+      "window": [
+        1540,
+        147,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1580, 467) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203958-894.png"
+    },
+    {
+      "file": "r01_07_03.png",
+      "frame": "shot_20261007-203958-894.png",
+      "label": "",
+      "bar": [
+        1047,
+        523
+      ],
+      "candidate_lit": 140,
+      "independent_fill": 135,
+      "distance_to_centre": 298.3,
+      "window": [
+        1007,
+        203,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1047, 523) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203958-894.png"
+    },
+    {
+      "file": "r01_07_04.png",
+      "frame": "shot_20261007-203958-894.png",
+      "label": "",
+      "bar": [
+        1453,
+        629
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "distance_to_centre": 126.0,
+      "window": [
+        1413,
+        309,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1453, 629) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-203958-894.png"
+    },
+    {
+      "file": "r01_08_01.png",
+      "frame": "shot_20261007-204615-988.png",
+      "label": "",
+      "bar": [
+        1738,
+        569
+      ],
+      "candidate_lit": 45,
+      "independent_fill": 45,
+      "distance_to_centre": 414.9,
+      "window": [
+        1698,
+        249,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1738, 569) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-204615-988.png"
+    },
+    {
+      "file": "r01_08_02.png",
+      "frame": "shot_20261007-204615-988.png",
+      "label": "",
+      "bar": [
+        1447,
+        597
+      ],
+      "candidate_lit": 144,
+      "independent_fill": 144,
+      "distance_to_centre": 123.5,
+      "window": [
+        1407,
+        277,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1447, 597) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-204615-988.png"
+    },
+    {
+      "file": "r01_09_01.png",
+      "frame": "shot_20261007-205107-116.png",
+      "label": "",
+      "bar": [
+        1309,
+        512
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "distance_to_centre": 115.4,
+      "window": [
+        1269,
+        192,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1309, 512) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-205107-116.png"
+    },
+    {
+      "file": "r01_09_02.png",
+      "frame": "shot_20261007-205107-116.png",
+      "label": "",
+      "bar": [
+        1432,
+        577
+      ],
+      "candidate_lit": 144,
+      "independent_fill": 144,
+      "distance_to_centre": 115.9,
+      "window": [
+        1392,
+        257,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1432, 577) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-205107-116.png"
+    },
+    {
+      "file": "r01_09_03.png",
+      "frame": "shot_20261007-205107-116.png",
+      "label": "",
+      "bar": [
+        1318,
+        645
+      ],
+      "candidate_lit": 146,
+      "independent_fill": 146,
+      "distance_to_centre": 21.0,
+      "window": [
+        1278,
+        325,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1318, 645) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-205107-116.png"
+    },
+    {
+      "file": "r01_09_04.png",
+      "frame": "shot_20261007-205107-116.png",
+      "label": "",
+      "bar": [
+        1194,
+        656
+      ],
+      "candidate_lit": 28,
+      "independent_fill": 25,
+      "distance_to_centre": 136.3,
+      "window": [
+        1154,
+        336,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1194, 656) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-205107-116.png"
+    },
+    {
+      "file": "r01_09_05.png",
+      "frame": "shot_20261007-205107-116.png",
+      "label": "",
+      "bar": [
+        1074,
+        667
+      ],
+      "candidate_lit": 120,
+      "independent_fill": 119,
+      "distance_to_centre": 256.3,
+      "window": [
+        1034,
+        347,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1074, 667) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/shot_20261007-205107-116.png"
+    },
+    {
+      "file": "r01_10_01.png",
+      "frame": "special_带弹药机制的有竖线间隔的橙色技能条.png",
+      "label": "带弹药机制的有竖线间隔的橙色技能条",
+      "bar": [
+        1738,
+        569
+      ],
+      "candidate_lit": 89,
+      "independent_fill": 86,
+      "distance_to_centre": 414.9,
+      "window": [
+        1698,
+        249,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1738, 569) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/special_带弹药机制的有竖线间隔的橙色技能条.png"
+    },
+    {
+      "file": "r01_10_02.png",
+      "frame": "special_带弹药机制的有竖线间隔的橙色技能条.png",
+      "label": "带弹药机制的有竖线间隔的橙色技能条",
+      "bar": [
+        1447,
+        597
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "distance_to_centre": 123.5,
+      "window": [
+        1407,
+        277,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1447, 597) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/special_带弹药机制的有竖线间隔的橙色技能条.png"
+    },
+    {
+      "file": "r01_11_01.png",
+      "frame": "special_护盾机制.png",
+      "label": "护盾机制",
+      "bar": [
+        1438,
+        606
+      ],
+      "candidate_lit": 48,
+      "independent_fill": 48,
+      "distance_to_centre": 112.8,
+      "window": [
+        1398,
+        286,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1438, 606) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/special_护盾机制.png"
+    },
+    {
+      "file": "r01_11_02.png",
+      "frame": "special_护盾机制.png",
+      "label": "护盾机制",
+      "bar": [
+        1577,
+        682
+      ],
+      "candidate_lit": 44,
+      "independent_fill": 44,
+      "distance_to_centre": 256.2,
+      "window": [
+        1537,
+        362,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1577, 682) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/special_护盾机制.png"
+    },
+    {
+      "file": "r01_11_03.png",
+      "frame": "special_护盾机制.png",
+      "label": "护盾机制",
+      "bar": [
+        1318,
+        757
+      ],
+      "candidate_lit": 22,
+      "independent_fill": 17,
+      "distance_to_centre": 131.3,
+      "window": [
+        1278,
+        437,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1318, 757) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/special_护盾机制.png"
+    },
+    {
+      "file": "r01_11_04.png",
+      "frame": "special_护盾机制.png",
+      "label": "护盾机制",
+      "bar": [
+        1189,
+        768
+      ],
+      "candidate_lit": 128,
+      "independent_fill": 127,
+      "distance_to_centre": 198.0,
+      "window": [
+        1149,
+        448,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1189, 768) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/special_护盾机制.png"
+    },
+    {
+      "file": "r01_12_01.png",
+      "frame": "special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "label": "黄色菱形挡住了技能条，很难判准，应报未采样",
+      "bar": [
+        1438,
+        606
+      ],
+      "candidate_lit": 39,
+      "independent_fill": 36,
+      "distance_to_centre": 112.8,
+      "window": [
+        1398,
+        286,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1438, 606) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/special_黄色菱形挡住了技能条，很难判准，应报未采样.png"
+    },
+    {
+      "file": "r01_12_02.png",
+      "frame": "special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "label": "黄色菱形挡住了技能条，很难判准，应报未采样",
+      "bar": [
+        1583,
+        736
+      ],
+      "candidate_lit": 42,
+      "independent_fill": 42,
+      "distance_to_centre": 278.6,
+      "window": [
+        1543,
+        416,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1583, 736) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/special_黄色菱形挡住了技能条，很难判准，应报未采样.png"
+    },
+    {
+      "file": "r01_12_03.png",
+      "frame": "special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "label": "黄色菱形挡住了技能条，很难判准，应报未采样",
+      "bar": [
+        1449,
+        751
+      ],
+      "candidate_lit": 145,
+      "independent_fill": 145,
+      "distance_to_centre": 174.7,
+      "window": [
+        1409,
+        431,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1449, 751) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/special_黄色菱形挡住了技能条，很难判准，应报未采样.png"
+    },
+    {
+      "file": "r01_12_04.png",
+      "frame": "special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "label": "黄色菱形挡住了技能条，很难判准，应报未采样",
+      "bar": [
+        1318,
+        757
+      ],
+      "candidate_lit": 22,
+      "independent_fill": 17,
+      "distance_to_centre": 131.3,
+      "window": [
+        1278,
+        437,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1318, 757) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/special_黄色菱形挡住了技能条，很难判准，应报未采样.png"
+    },
+    {
+      "file": "r01_12_05.png",
+      "frame": "special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "label": "黄色菱形挡住了技能条，很难判准，应报未采样",
+      "bar": [
+        1189,
+        768
+      ],
+      "candidate_lit": 128,
+      "independent_fill": 127,
+      "distance_to_centre": 198.0,
+      "window": [
+        1149,
+        448,
+        240,
+        360
+      ],
+      "window_from": "候选条左上角 (1189, 768) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "screenshots/run-01/special_黄色菱形挡住了技能条，很难判准，应报未采样.png"
+    }
+  ]
+}

@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "note": "场上我方干员那条读数链的**面板真值批**：每一帧上详情面板是开着的，所以一帧里同时有面板那一行的 生命 当前/上限 与 被读的那根条。每一条是原生帧上 300×420 的一块，比取区（240×360）大一圈。它**不是**第一批，第一批已经拿它调过参。",
+  "crops": [
+    {
+      "file": "p00.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/panel_run/p00.png",
+      "source_sha256": "7d832d45db7ab8f15263da5de9bfcc4f00f930e029570c42eb4eba653b6e5184"
+    },
+    {
+      "file": "p01.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/panel_run/p01.png",
+      "source_sha256": "df77c5cc099f2be664efdd502ccf3e4f9c653a8070078ed4e1036d3d164e12b6"
+    },
+    {
+      "file": "p02.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/panel_run/p02.png",
+      "source_sha256": "ba308321dc09ed0b53fff5fbef5d14aced9411b4afbb4bd0c45bedb4df82cfed"
+    },
+    {
+      "file": "p03.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/panel_run/p03.png",
+      "source_sha256": "63f670e331fdca2b838b05c794f49b8a678c21a7a13fcde13323706b6c726aad"
+    },
+    {
+      "file": "p04.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/panel_run/p04.png",
+      "source_sha256": "0abb005cedd7880907c5e4b224cd54f248d366687bd6c48aae7806af23d600c1"
+    },
+    {
+      "file": "p05.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/panel_run/p05.png",
+      "source_sha256": "a34efa7cd1a2e110e9a32bc9cbe06f07e4af9891f9d0d2942617560d40ac9b6a"
+    },
+    {
+      "file": "p06.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/panel_run/p06.png",
+      "source_sha256": "697a7a8ca486ad2e5c86efb890f2a3df93af45c13720fc78d96a5ca787659f44"
+    },
+    {
+      "file": "p07.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/panel_run/p07.png",
+      "source_sha256": "8a93f4c09462e820273066aebb190bfb415ca4240d79b3bab8ebae6492432a59"
+    },
+    {
+      "file": "p08.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/panel_run/p08.png",
+      "source_sha256": "54815fde0c2d13a78c7dfbbfd4ad136fa02b68eb9847a31de153d031926d5e65"
+    },
+    {
+      "file": "p09.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/panel_run/p09.png",
+      "source_sha256": "c274f37328da10f087655b34be36fee4deb648a2c745119376113346570add5a"
+    },
+    {
+      "file": "p10.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/panel_run/p10.png",
+      "source_sha256": "6c8e40821bd3d58fdf1b171a0464f298f8378fd4c1319ca229d2bf3f651194d6"
+    },
+    {
+      "file": "p11.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/panel_run/p11.png",
+      "source_sha256": "c28bfbd6d14951ef73a90352d01fe67d0babb4746b9a91ca998f9a8c14cbf124"
+    },
+    {
+      "file": "sp_now.png",
+      "origin": [
+        1407,
+        369
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/probe/sp_now.png",
+      "source_sha256": "b5b1313bc4348e081749e62563c10745023ca5c216bec240dece34ab9068caa6"
+    }
+  ]
+}

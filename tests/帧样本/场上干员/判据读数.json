@@ -1,0 +1,5415 @@
+{
+  "note": "场上我方干员那三条读数链的判据读数。它**不判断够不够** —— 那是规划者的事；这里只放两簇的分布、空档、逐帧读数与覆盖说明。",
+  "batch": "tests/帧样本/场上干员",
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "ruler": {
+    "health": "逐列中位颜色离 HP_BLUE (110,190,228) 的逐通道最大差 ≤ HP_COLOUR_TOL=24；填着的那一截 = 自左缘起的连续亮列（容 GAP_TOLERANCE=4 列）",
+    "skill": "逐列中位颜色离**这一条自己的填充色**（自左缘起跳过 2 列、取 8 列的中位颜色）的逐通道最大差 ≤ SKILL_FILL_TOL=48；填着的那一截 = 自左缘起的连续同色列（容 GAP_TOLERANCE=4 列）；被压住那一档另有缝宽容度 COVER_GAP_TOLERANCE=10（≤ 它 → 跨过去接着算；> 它 → 下界）；含义按填着那一截的逐列中位 (R−G)：≤ 0 绿 / ≥ 40 橙 / 正的那一段认不出",
+    "diamond": "cv2.matchTemplate(TM_CCOEFF_NORMED, RGB 三通道)，模板 64×64，在取区里 ±60 px 的邻域上滑"
+  },
+  "window": {
+    "size": [
+      240,
+      360
+    ],
+    "pixels": 86400,
+    "bars_in_window": [
+      40,
+      320
+    ],
+    "diamond_in_window": [
+      112,
+      87
+    ],
+    "bar_pixels": 1168
+  },
+  "window_from": "取区左上角 = 血条左上角 − BARS_IN_WINDOW；血条左上角由部署记录 + 投影给出（本层不产生它）",
+  "dedup": {
+    "key": "帧名（批内唯一）",
+    "why": "同一个源帧里两根不同的条各是一条（例如 cd01 出了三条），所以去重按「哪一根条」而不是「哪一帧」"
+  },
+  "chains": {
+    "health": {
+      "reads": [
+        {
+          "name": "cd01_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": 0.08627450980392157
+          },
+          "covers": "血条满 + 技力充能中（绿）"
+        },
+        {
+          "name": "cd01_b",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": 0.09019607843137255
+          },
+          "covers": "血条满 + 技力生效中（橙实心）"
+        },
+        {
+          "name": "cd01_c",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.8835616438356164
+            },
+            "confidence": 0.09019607843137255
+          },
+          "covers": "血条 0.884 + 技力弹药分格（满）"
+        },
+        {
+          "name": "cd12_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.7397260273972602
+            },
+            "confidence": 0.09019607843137255
+          },
+          "covers": "血条 0.740 + 弹药分格"
+        },
+        {
+          "name": "shot01_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": 0.08627450980392157
+          },
+          "covers": "血条满 + 充能中 + 菱形不在"
+        },
+        {
+          "name": "shot02_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.2876712328767123
+            },
+            "confidence": 0.08627450980392157
+          },
+          "covers": "血条 0.288（很低）+ 充能中 + 菱形在"
+        },
+        {
+          "name": "shot04_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "lower_bound",
+              "lo": 0.3013698630136986
+            },
+            "confidence": 0.03725490196078431
+          },
+          "covers": "血条 0.301 + 技力条被别的条压住（下界）+ 菱形在"
+        },
+        {
+          "name": "shot21_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": 0.08627450980392157
+          },
+          "covers": "血条满 + 技力 0.863（没满）"
+        },
+        {
+          "name": "shot26_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": 0.09019607843137255
+          },
+          "covers": "血条满 + 弹药分格**没填满 → 下界**"
+        },
+        {
+          "name": "shot31_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.9931506849315068
+            },
+            "confidence": 0.09019607843137255
+          },
+          "covers": "血条 0.993 + 技力 0.527（没满）"
+        },
+        {
+          "name": "shot30_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": 0.09019607843137255
+          },
+          "covers": "血条满 + 充能中 + 菱形在（低分那一侧）"
+        },
+        {
+          "name": "shot22_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": 0.09019607843137255
+          },
+          "covers": "血条满 + 充能中 + 菱形在（最低分那一侧）"
+        },
+        {
+          "name": "board_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": 0.09019607843137255
+          },
+          "covers": "血条满 + 菱形在（另一个场景）"
+        },
+        {
+          "name": "board_b",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.8287671232876712
+            },
+            "confidence": 0.08627450980392157
+          },
+          "covers": "血条 0.829 + 菱形在"
+        },
+        {
+          "name": "field_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": 0.09019607843137255
+          },
+          "covers": "血条满 + 菱形在"
+        },
+        {
+          "name": "field_b",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.7808219178082192
+            },
+            "confidence": 0.09019607843137255
+          },
+          "covers": "血条 0.781 + 菱形在"
+        }
+      ],
+      "distribution": {
+        "count": 16,
+        "min": 0.287671,
+        "max": 1.0,
+        "median": 1.0
+      },
+      "gap": {
+        "largest_gap": 0.438356,
+        "below": 0.30137,
+        "above": 0.739726
+      },
+      "unsampled": [],
+      "note": "血量那个字段的形态是 精确/区间/下界/未采样 —— 这一层不产 Unknown。"
+    },
+    "skill": {
+      "reads": [
+        {
+          "name": "cd01_a",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "充能中"
+            },
+            "confidence": 0.09019607843137255
+          },
+          "sp": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "covers": "血条满 + 技力充能中（绿）"
+        },
+        {
+          "name": "cd01_b",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "生效中"
+            },
+            "confidence": 0.12156862745098039
+          },
+          "sp": {
+            "state": "unsampled"
+          },
+          "covers": "血条满 + 技力生效中（橙实心）"
+        },
+        {
+          "name": "cd01_c",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "弹药分格"
+            },
+            "confidence": 0.09803921568627451
+          },
+          "sp": {
+            "state": "unsampled"
+          },
+          "covers": "血条 0.884 + 技力弹药分格（满）"
+        },
+        {
+          "name": "cd12_a",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "弹药分格"
+            },
+            "confidence": 0.09803921568627451
+          },
+          "sp": {
+            "state": "unsampled"
+          },
+          "covers": "血条 0.740 + 弹药分格"
+        },
+        {
+          "name": "shot01_a",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.8082191780821918
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "充能中"
+            },
+            "confidence": 0.09607843137254903
+          },
+          "sp": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.8082191780821918
+            },
+            "confidence": null
+          },
+          "covers": "血条满 + 充能中 + 菱形不在"
+        },
+        {
+          "name": "shot02_a",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "充能中"
+            },
+            "confidence": 0.08431372549019608
+          },
+          "sp": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "covers": "血条 0.288（很低）+ 充能中 + 菱形在"
+        },
+        {
+          "name": "shot04_a",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "充能中"
+            },
+            "confidence": 0.08823529411764706
+          },
+          "sp": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "covers": "血条 0.301 + 技力条被别的条压住（下界）+ 菱形在"
+        },
+        {
+          "name": "shot21_a",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.863013698630137
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "充能中"
+            },
+            "confidence": 0.08431372549019608
+          },
+          "sp": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.863013698630137
+            },
+            "confidence": null
+          },
+          "covers": "血条满 + 技力 0.863（没满）"
+        },
+        {
+          "name": "shot26_a",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "lower_bound",
+              "lo": 0.8082191780821918
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "弹药分格"
+            },
+            "confidence": 0.09803921568627451
+          },
+          "sp": {
+            "state": "unsampled"
+          },
+          "covers": "血条满 + 弹药分格**没填满 → 下界**"
+        },
+        {
+          "name": "shot31_a",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.5273972602739726
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "充能中"
+            },
+            "confidence": 0.06666666666666667
+          },
+          "sp": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.5273972602739726
+            },
+            "confidence": null
+          },
+          "covers": "血条 0.993 + 技力 0.527（没满）"
+        },
+        {
+          "name": "shot30_a",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "充能中"
+            },
+            "confidence": 0.07058823529411765
+          },
+          "sp": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "covers": "血条满 + 充能中 + 菱形在（低分那一侧）"
+        },
+        {
+          "name": "shot22_a",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "充能中"
+            },
+            "confidence": 0.08431372549019608
+          },
+          "sp": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "covers": "血条满 + 充能中 + 菱形在（最低分那一侧）"
+        },
+        {
+          "name": "board_a",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "充能中"
+            },
+            "confidence": 0.08235294117647059
+          },
+          "sp": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "covers": "血条满 + 菱形在（另一个场景）"
+        },
+        {
+          "name": "board_b",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "充能中"
+            },
+            "confidence": 0.08627450980392157
+          },
+          "sp": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "covers": "血条 0.829 + 菱形在"
+        },
+        {
+          "name": "field_a",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "充能中"
+            },
+            "confidence": 0.08235294117647059
+          },
+          "sp": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "covers": "血条满 + 菱形在"
+        },
+        {
+          "name": "field_b",
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "meaning": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": "充能中"
+            },
+            "confidence": 0.08627450980392157
+          },
+          "sp": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": null
+          },
+          "covers": "血条 0.781 + 菱形在"
+        }
+      ],
+      "distribution": {
+        "count": 16,
+        "min": 0.527397,
+        "max": 1.0,
+        "median": 1.0
+      },
+      "gap": {
+        "largest_gap": 0.280822,
+        "below": 0.527397,
+        "above": 0.808219
+      },
+      "meanings": {
+        "充能中": 12,
+        "生效中": 1,
+        "弹药分格": 3
+      },
+      "sp_forms": {
+        "1.0": 9,
+        "unsampled": 4,
+        "0.8082191780821918": 1,
+        "0.863013698630137": 1,
+        "0.5273972602739726": 1
+      },
+      "note": "技力生效期间（含义 = 生效中 / 弹药分格）技力那个字段落未采样 —— 见 sp 那一列。**读数本身是下界时**（弹药剩余那种），技力那个字段**加宽成区间**（「下沿 … 1.0」）—— 下界不是那个字段允许的形态，不许原样透出去。上游的 skill_fill 仍然照实报下界：那是**读数**，不是字段。"
+    },
+    "diamond": {
+      "reads": [
+        {
+          "name": "cd01_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": false
+            },
+            "confidence": 0.14587461948394775
+          },
+          "score": 0.145875,
+          "at": [
+            1117,
+            384
+          ],
+          "covers": "血条满 + 技力充能中（绿）"
+        },
+        {
+          "name": "cd01_b",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": false
+            },
+            "confidence": 0.1511182337999344
+          },
+          "score": 0.151118,
+          "at": [
+            1099,
+            539
+          ],
+          "covers": "血条满 + 技力生效中（橙实心）"
+        },
+        {
+          "name": "cd01_c",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": false
+            },
+            "confidence": 0.2794606685638428
+          },
+          "score": 0.279461,
+          "at": [
+            1666,
+            227
+          ],
+          "covers": "血条 0.884 + 技力弹药分格（满）"
+        },
+        {
+          "name": "cd12_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": false
+            },
+            "confidence": 0.2777652144432068
+          },
+          "score": 0.277765,
+          "at": [
+            1668,
+            254
+          ],
+          "covers": "血条 0.740 + 弹药分格"
+        },
+        {
+          "name": "shot01_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": false
+            },
+            "confidence": 0.1417447179555893
+          },
+          "score": 0.141745,
+          "at": [
+            1475,
+            233
+          ],
+          "covers": "血条满 + 充能中 + 菱形不在"
+        },
+        {
+          "name": "shot02_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": true
+            },
+            "confidence": 0.8725101947784424
+          },
+          "score": 0.87251,
+          "at": [
+            1477,
+            253
+          ],
+          "covers": "血条 0.288（很低）+ 充能中 + 菱形在"
+        },
+        {
+          "name": "shot04_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": true
+            },
+            "confidence": 0.8329774737358093
+          },
+          "score": 0.832977,
+          "at": [
+            1477,
+            253
+          ],
+          "covers": "血条 0.301 + 技力条被别的条压住（下界）+ 菱形在"
+        },
+        {
+          "name": "shot21_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": false
+            },
+            "confidence": 0.16220949590206146
+          },
+          "score": 0.162209,
+          "at": [
+            1512,
+            572
+          ],
+          "covers": "血条满 + 技力 0.863（没满）"
+        },
+        {
+          "name": "shot26_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": false
+            },
+            "confidence": 0.19204173982143402
+          },
+          "score": 0.192042,
+          "at": [
+            1275,
+            692
+          ],
+          "covers": "血条满 + 弹药分格**没填满 → 下界**"
+        },
+        {
+          "name": "shot31_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": false
+            },
+            "confidence": 0.12868469953536987
+          },
+          "score": 0.128685,
+          "at": [
+            1709,
+            379
+          ],
+          "covers": "血条 0.993 + 技力 0.527（没满）"
+        },
+        {
+          "name": "shot30_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": true
+            },
+            "confidence": 0.5701258182525635
+          },
+          "score": 0.570126,
+          "at": [
+            1501,
+            726
+          ],
+          "covers": "血条满 + 充能中 + 菱形在（低分那一侧）"
+        },
+        {
+          "name": "shot22_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": true
+            },
+            "confidence": 0.5432910323143005
+          },
+          "score": 0.543291,
+          "at": [
+            1501,
+            726
+          ],
+          "covers": "血条满 + 充能中 + 菱形在（最低分那一侧）"
+        },
+        {
+          "name": "board_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": true
+            },
+            "confidence": 0.8556251525878906
+          },
+          "score": 0.855625,
+          "at": [
+            1684,
+            396
+          ],
+          "covers": "血条满 + 菱形在（另一个场景）"
+        },
+        {
+          "name": "board_b",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": true
+            },
+            "confidence": 0.8947699666023254
+          },
+          "score": 0.89477,
+          "at": [
+            948,
+            243
+          ],
+          "covers": "血条 0.829 + 菱形在"
+        },
+        {
+          "name": "field_a",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": true
+            },
+            "confidence": 0.8460054397583008
+          },
+          "score": 0.846005,
+          "at": [
+            1684,
+            396
+          ],
+          "covers": "血条满 + 菱形在"
+        },
+        {
+          "name": "field_b",
+          "slot": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": true
+            },
+            "confidence": 0.8837078809738159
+          },
+          "score": 0.883708,
+          "at": [
+            948,
+            243
+          ],
+          "covers": "血条 0.781 + 菱形在"
+        }
+      ],
+      "distribution": {
+        "count": 16,
+        "min": 0.128685,
+        "max": 0.89477,
+        "median": 0.543291
+      },
+      "present": {
+        "count": 8,
+        "min": 0.543291,
+        "max": 0.89477,
+        "median": 0.855625
+      },
+      "absent": {
+        "count": 8,
+        "min": 0.128685,
+        "max": 0.279461,
+        "median": 0.162209
+      },
+      "gap": {
+        "absent_max": 0.279461,
+        "present_min": 0.543291
+      },
+      "lines": {
+        "solid": 0.45,
+        "absent": 0.34
+      },
+      "note": "两条线之间那一段落未采样（认不出），它绝不落 Exact(False) —— 那是漏检方向。"
+    }
+  },
+  "template": {
+    "path": "assets/features/ready_diamond/diamond.npz",
+    "source": "data/probe/rawcol_1.bin",
+    "box": [
+      1817,
+      211,
+      64,
+      64
+    ],
+    "size": [
+      64,
+      64
+    ]
+  },
+  "sensitivity": {
+    "what": "取区整体沿 x 或 y 挪 ±δ 像素，看三条读数的**结论**变不变。判据：三条链的形态 / 含义 / 菱形那个布尔一致，**且**血条那个比例挪动不超过 2/BAR_WIDTH（两步）—— 读数的行带压到条边上一行时，抗锯齿会让末位差一步",
+    "shifts": [
+      -24,
+      -16,
+      -12,
+      -4,
+      -1,
+      0,
+      1,
+      4,
+      12,
+      16,
+      24
+    ],
+    "crops": [
+      {
+        "name": "cd01_a.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=1.0), confidence=0.08627450980392157)",
+          "skill": "(Valued(payload=Exact(value=1.0), confidence=None), Valued(payload=Exact(value='充能中'), confidence=0.09019607843137255))",
+          "diamond": "Valued(payload=Exact(value=False), confidence=0.14587461948394775)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "充能中",
+          "diamond": "False"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": -0.027397,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": -0.082192,
+            "health_form": "Exact",
+            "skill_form": "Interval",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          }
+        ]
+      },
+      {
+        "name": "cd01_b.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=1.0), confidence=0.09019607843137255)",
+          "skill": "(Valued(payload=Exact(value=1.0), confidence=None), Valued(payload=Exact(value='生效中'), confidence=0.12156862745098039))",
+          "diamond": "Valued(payload=Exact(value=False), confidence=0.1511182337999344)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "生效中",
+          "diamond": "False"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": -1.0,
+            "health_form": "Exact",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": -1.0,
+            "health_form": "Exact",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": -0.027397,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": -0.082192,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "LowerBound",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": -0.972603,
+            "health_form": "LowerBound",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "生效中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          }
+        ]
+      },
+      {
+        "name": "cd01_c.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=0.8835616438356164), confidence=0.09019607843137255)",
+          "skill": "(Valued(payload=Exact(value=1.0), confidence=None), Valued(payload=Exact(value='弹药分格'), confidence=0.09803921568627451))",
+          "diamond": "Valued(payload=Exact(value=False), confidence=0.2794606685638428)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "弹药分格",
+          "diamond": "False"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": false,
+            "broken_at": [
+              12
+            ]
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          }
+        ]
+      },
+      {
+        "name": "cd12_a.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=0.7397260273972602), confidence=0.09019607843137255)",
+          "skill": "(Valued(payload=Exact(value=1.0), confidence=None), Valued(payload=Exact(value='弹药分格'), confidence=0.09803921568627451))",
+          "diamond": "Valued(payload=Exact(value=False), confidence=0.2777652144432068)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "弹药分格",
+          "diamond": "False"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": false,
+            "broken_at": [
+              12
+            ]
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          }
+        ]
+      },
+      {
+        "name": "shot01_a.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=1.0), confidence=0.08627450980392157)",
+          "skill": "(Valued(payload=Exact(value=0.8082191780821918), confidence=None), Valued(payload=Exact(value='充能中'), confidence=0.09607843137254903))",
+          "diamond": "Valued(payload=Exact(value=False), confidence=0.1417447179555893)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "充能中",
+          "diamond": "False"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": -0.027397,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": -0.082192,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          }
+        ]
+      },
+      {
+        "name": "shot02_a.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=0.2876712328767123), confidence=0.08627450980392157)",
+          "skill": "(Valued(payload=Exact(value=1.0), confidence=None), Valued(payload=Exact(value='充能中'), confidence=0.08431372549019608))",
+          "diamond": "Valued(payload=Exact(value=True), confidence=0.8725101947784424)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "充能中",
+          "diamond": "True"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": false,
+            "broken_at": [
+              12
+            ]
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": false,
+            "broken_at": [
+              4,
+              12
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": false,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": false,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          }
+        ]
+      },
+      {
+        "name": "shot04_a.png",
+        "baseline": {
+          "health": "Valued(payload=LowerBound(lo=0.3013698630136986), confidence=0.03725490196078431)",
+          "skill": "(Valued(payload=Exact(value=1.0), confidence=None), Valued(payload=Exact(value='充能中'), confidence=0.08823529411764706))",
+          "diamond": "Valued(payload=Exact(value=True), confidence=0.8329774737358093)"
+        },
+        "baseline_forms": {
+          "health": "LowerBound",
+          "skill": "Exact",
+          "meaning": "充能中",
+          "diamond": "True"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": false,
+            "broken_at": [
+              12
+            ]
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": false,
+            "broken_at": [
+              4,
+              12
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "LowerBound",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "LowerBound",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "LowerBound",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "LowerBound",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "LowerBound",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "LowerBound",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "LowerBound",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "LowerBound",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "LowerBound",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "LowerBound",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.006849,
+            "health_form": "LowerBound",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": false,
+            "health_delta": 0.006849,
+            "health_form": "LowerBound",
+            "skill_form": "LowerBound",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": false,
+            "health_delta": 0.006849,
+            "health_form": "LowerBound",
+            "skill_form": "LowerBound",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": -0.123288,
+            "health_form": "LowerBound",
+            "skill_form": "LowerBound",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          }
+        ]
+      },
+      {
+        "name": "shot21_a.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=1.0), confidence=0.08627450980392157)",
+          "skill": "(Valued(payload=Exact(value=0.863013698630137), confidence=None), Valued(payload=Exact(value='充能中'), confidence=0.08431372549019608))",
+          "diamond": "Valued(payload=Exact(value=False), confidence=0.16220949590206146)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "充能中",
+          "diamond": "False"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": -0.027397,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": -0.082192,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          }
+        ]
+      },
+      {
+        "name": "shot26_a.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=1.0), confidence=0.09019607843137255)",
+          "skill": "(Valued(payload=LowerBound(lo=0.8082191780821918), confidence=None), Valued(payload=Exact(value='弹药分格'), confidence=0.09803921568627451))",
+          "diamond": "Valued(payload=Exact(value=False), confidence=0.19204173982143402)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "LowerBound",
+          "meaning": "弹药分格",
+          "diamond": "False"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": false,
+            "broken_at": [
+              4,
+              12
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": -1.0,
+            "health_form": "Exact",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": -1.0,
+            "health_form": "Exact",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": -0.027397,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": -0.082192,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": -1.0,
+            "health_form": "Exact",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": false,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": false,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "弹药分格",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          }
+        ]
+      },
+      {
+        "name": "shot31_a.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=0.9931506849315068), confidence=0.09019607843137255)",
+          "skill": "(Valued(payload=Exact(value=0.5273972602739726), confidence=None), Valued(payload=Exact(value='充能中'), confidence=0.06666666666666667))",
+          "diamond": "Valued(payload=Exact(value=False), confidence=0.12868469953536987)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "充能中",
+          "diamond": "False"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": -0.027397,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": -0.993151,
+            "health_form": "Exact",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": -0.924658,
+            "health_form": "LowerBound",
+            "skill_form": "LowerBound",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": false
+          }
+        ]
+      },
+      {
+        "name": "shot30_a.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=1.0), confidence=0.09019607843137255)",
+          "skill": "(Valued(payload=Exact(value=1.0), confidence=None), Valued(payload=Exact(value='充能中'), confidence=0.07058823529411765))",
+          "diamond": "Valued(payload=Exact(value=True), confidence=0.5701258182525635)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "充能中",
+          "diamond": "True"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": -0.027397,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": -0.082192,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          }
+        ]
+      },
+      {
+        "name": "shot22_a.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=1.0), confidence=0.09019607843137255)",
+          "skill": "(Valued(payload=Exact(value=1.0), confidence=None), Valued(payload=Exact(value='充能中'), confidence=0.08431372549019608))",
+          "diamond": "Valued(payload=Exact(value=True), confidence=0.5432910323143005)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "充能中",
+          "diamond": "True"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "LowerBound",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": -0.027397,
+            "health_form": "Exact",
+            "skill_form": "LowerBound",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": -0.082192,
+            "health_form": "Exact",
+            "skill_form": "Interval",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          }
+        ]
+      },
+      {
+        "name": "board_a.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=1.0), confidence=0.09019607843137255)",
+          "skill": "(Valued(payload=Exact(value=1.0), confidence=None), Valued(payload=Exact(value='充能中'), confidence=0.08235294117647059))",
+          "diamond": "Valued(payload=Exact(value=True), confidence=0.8556251525878906)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "充能中",
+          "diamond": "True"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": -1.0,
+            "health_form": "Exact",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": -0.027397,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": -0.082192,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          }
+        ]
+      },
+      {
+        "name": "board_b.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=0.8287671232876712), confidence=0.08627450980392157)",
+          "skill": "(Valued(payload=Exact(value=1.0), confidence=None), Valued(payload=Exact(value='充能中'), confidence=0.08627450980392157))",
+          "diamond": "Valued(payload=Exact(value=True), confidence=0.8947699666023254)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "充能中",
+          "diamond": "True"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": false,
+            "broken_at": [
+              12
+            ]
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          }
+        ]
+      },
+      {
+        "name": "field_a.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=1.0), confidence=0.09019607843137255)",
+          "skill": "(Valued(payload=Exact(value=1.0), confidence=None), Valued(payload=Exact(value='充能中'), confidence=0.08235294117647059))",
+          "diamond": "Valued(payload=Exact(value=True), confidence=0.8460054397583008)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "充能中",
+          "diamond": "True"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": -0.027397,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": -0.082192,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          }
+        ]
+      },
+      {
+        "name": "field_b.png",
+        "baseline": {
+          "health": "Valued(payload=Exact(value=0.7808219178082192), confidence=0.09019607843137255)",
+          "skill": "(Valued(payload=Exact(value=1.0), confidence=None), Valued(payload=Exact(value='充能中'), confidence=0.08627450980392157))",
+          "diamond": "Valued(payload=Exact(value=True), confidence=0.8837078809738159)"
+        },
+        "baseline_forms": {
+          "health": "Exact",
+          "skill": "Exact",
+          "meaning": "充能中",
+          "diamond": "True"
+        },
+        "tolerance": [
+          {
+            "axis": "x",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": false,
+            "broken_at": [
+              12
+            ]
+          },
+          {
+            "axis": "y",
+            "tolerance": 12,
+            "deltas_within_tolerance": [
+              0,
+              1,
+              4,
+              12
+            ],
+            "all_same_within_tolerance": true,
+            "broken_at": []
+          }
+        ],
+        "rows": [
+          {
+            "axis": "x",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 12,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "x",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": -1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 0,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 1,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 4,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 12,
+            "same": true,
+            "health_delta": 0.0,
+            "health_form": "Exact",
+            "skill_form": "Exact",
+            "meaning": "充能中",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 16,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          },
+          {
+            "axis": "y",
+            "shift": 24,
+            "same": false,
+            "health_delta": null,
+            "health_form": "unsampled",
+            "skill_form": "unsampled",
+            "meaning": "unsampled",
+            "diamond": true
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "crops": 16,
+      "within_tolerance": {
+        "x": {
+          "tolerance": 12,
+          "ok": 10,
+          "total": 16
+        },
+        "y": {
+          "tolerance": 12,
+          "ok": 13,
+          "total": 16
+        }
+      },
+      "first_break_beyond_tolerance": {
+        "x": 16,
+        "y": 16
+      }
+    }
+  },
+  "coverage": {
+    "covered": [
+      "血条：满（多帧）、0.740、0.781、0.829、0.884、0.993、0.288、0.301 —— 八档不同的填充",
+      "血条降级：精确（15 条）· **下界**（shot04_a：填着的那一截被别的条压过）",
+      "技力条：充能中（绿）、生效中（橙实心）、弹药分格（橙带竖线）三档都有",
+      "技力条填充：满（12 条）· 0.863（shot21_a）· 0.808（shot01_a）· 0.527（shot31_a）· **下界 0.808**（shot26_a：弹药没填满）",
+      "技力含义：充能中 12 条 / 生效中 1 条 / 弹药分格 3 条",
+      "技力那个字段：生效中与弹药分格那 4 条**落未采样**",
+      "菱形：在 8 条（分数 0.543–0.895）、不在 8 条（分数 0.129–0.279）；空档 0.279–0.543",
+      "条被挡住的那一档：shot04_a（条上压着**别的条** → 缝 8 列以内，**跨过去接着算**，仍读满）、shot30/shot22（条右侧背景比条还亮）",
+      "**锚点摆动铺到整批**：16 条**每一条各自**沿 x / y 挪 ±1 / ±4 / ±12 px：结论一字不变的有 10/16（x）与 13/16（y）；再往外挪才翻面，x 轴上最早翻面的是 ±16、y 轴上是 ±16 px",
+      "**±12 以内不是一条都不翻**：12 条在某一轴上翻了 —— x: board_b.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:充能中→unsampled), cd01_c.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:弹药分格→unsampled), cd12_a.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:弹药分格→unsampled), field_b.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:充能中→unsampled), shot02_a.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:充能中→unsampled), shot04_a.png(+12 health:LowerBound→unsampled/skill:Exact→unsampled/meaning:充能中→unsampled)；y: shot02_a.png(-4 skill:Exact→LowerBound), shot02_a.png(-12 skill:Exact→LowerBound), shot04_a.png(+4 skill:Exact→LowerBound), shot04_a.png(+12 skill:Exact→LowerBound), shot26_a.png(-4 meaning:弹药分格→充能中), shot26_a.png(-12 meaning:弹药分格→充能中)。逐条明细见 sensitivity.swing_within_tolerance"
+    ],
+    "swing_within_tolerance": {
+      "count": 12,
+      "by_axis": {
+        "x": "board_b.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:充能中→unsampled), cd01_c.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:弹药分格→unsampled), cd12_a.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:弹药分格→unsampled), field_b.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:充能中→unsampled), shot02_a.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:充能中→unsampled), shot04_a.png(+12 health:LowerBound→unsampled/skill:Exact→unsampled/meaning:充能中→unsampled)",
+        "y": "shot02_a.png(-4 skill:Exact→LowerBound), shot02_a.png(-12 skill:Exact→LowerBound), shot04_a.png(+4 skill:Exact→LowerBound), shot04_a.png(+12 skill:Exact→LowerBound), shot26_a.png(-4 meaning:弹药分格→充能中), shot26_a.png(-12 meaning:弹药分格→充能中)"
+      },
+      "rows": [
+        {
+          "name": "board_b.png",
+          "axis": "x",
+          "shift": 12,
+          "changed": [
+            "health:Exact→unsampled",
+            "skill:Exact→unsampled",
+            "meaning:充能中→unsampled"
+          ]
+        },
+        {
+          "name": "cd01_c.png",
+          "axis": "x",
+          "shift": 12,
+          "changed": [
+            "health:Exact→unsampled",
+            "skill:Exact→unsampled",
+            "meaning:弹药分格→unsampled"
+          ]
+        },
+        {
+          "name": "cd12_a.png",
+          "axis": "x",
+          "shift": 12,
+          "changed": [
+            "health:Exact→unsampled",
+            "skill:Exact→unsampled",
+            "meaning:弹药分格→unsampled"
+          ]
+        },
+        {
+          "name": "field_b.png",
+          "axis": "x",
+          "shift": 12,
+          "changed": [
+            "health:Exact→unsampled",
+            "skill:Exact→unsampled",
+            "meaning:充能中→unsampled"
+          ]
+        },
+        {
+          "name": "shot02_a.png",
+          "axis": "x",
+          "shift": 12,
+          "changed": [
+            "health:Exact→unsampled",
+            "skill:Exact→unsampled",
+            "meaning:充能中→unsampled"
+          ]
+        },
+        {
+          "name": "shot02_a.png",
+          "axis": "y",
+          "shift": -4,
+          "changed": [
+            "skill:Exact→LowerBound"
+          ]
+        },
+        {
+          "name": "shot02_a.png",
+          "axis": "y",
+          "shift": -12,
+          "changed": [
+            "skill:Exact→LowerBound"
+          ]
+        },
+        {
+          "name": "shot04_a.png",
+          "axis": "x",
+          "shift": 12,
+          "changed": [
+            "health:LowerBound→unsampled",
+            "skill:Exact→unsampled",
+            "meaning:充能中→unsampled"
+          ]
+        },
+        {
+          "name": "shot04_a.png",
+          "axis": "y",
+          "shift": 4,
+          "changed": [
+            "skill:Exact→LowerBound"
+          ]
+        },
+        {
+          "name": "shot04_a.png",
+          "axis": "y",
+          "shift": 12,
+          "changed": [
+            "skill:Exact→LowerBound"
+          ]
+        },
+        {
+          "name": "shot26_a.png",
+          "axis": "y",
+          "shift": -4,
+          "changed": [
+            "meaning:弹药分格→充能中"
+          ]
+        },
+        {
+          "name": "shot26_a.png",
+          "axis": "y",
+          "shift": -12,
+          "changed": [
+            "meaning:弹药分格→充能中"
+          ]
+        }
+      ],
+      "why": "翻面**不等于判据坏了**：窄窗里每一条各自撞到的东西不一样（旁边那个干员的条、条右边那截亮背景、**压在条上的别的条与黄色菱形**）。逐条列出来，是为了让「宽容窗口到底有多宽」这句话有读数支撑 —— 不是拿一条帧上的一句总结代替整批。"
+    },
+    "not_covered": [
+      "**极低填充**：低于约 3% 的血条一帧都没有 —— MIN_FILL_COLUMNS 那一档只有合成用例",
+      "**边界渐变 -> 区间**：血条两侧都没有「填着的那一截右边半亮」的真帧，两支区间只有合成用例",
+      "**技力含义的「认不出」那一档**：**这三批**（16 + 13 + 5 = 34 帧）里一帧都没有 —— 真帧在**难例批**，落法与逐块读数见 `tests/帧样本/场上干员难例/判据读数.json` 的 `coverage`（**覆盖文本的正文只在那一处**）；不许拿「取区里不止一根条」那种帧去凑",
+      "**sp_of 的「下界 → 加宽成区间」那一支**：真帧上**一帧都不触发** —— 唯一的**下界**读数（shot26_a）含义是**弹药分格**，按字段规则直接落**未采样**，轮不到加宽；这一支同样只剩合成用例",
+      "**技力条填充的区间那一支**：真帧上一帧都没有 —— 「半填」那条带子只有 SKILL_FILL_TOL（48）到 _SKILL_HALF_LIT_CEILING（56）那么窄，而实测的边界是**一步跳过去**的（填着那一侧最多 40，紧接着那一列就跳到 68 / 87 / 88 / 93 / 94 / 106 / 149）；这一支靠合成用例钉（取舍记在 field.py 那条常量里）",
+      "**取区里不止一根条**（格里有好几根条、或者条只截了一部分）：这一批里**一帧都没有** —— 这一档的取区本来就该由调用方给对；给错了会读出一个**没有意义**的比例，按用户对「很难判准」那一档的要求应当报**未采样**",
+      "**空轨道单独可见**（血条接近空、能看清暗轨道）：**这三批**里一帧都没有 ——真帧在**难例批**；**「条在、只是空了」与「条不在」是分得开的**（空的条留下一条条形变暗区 → 条内比条外暗，判据 `field._looks_like_an_empty_track`）—— 逐块落法见难例批 `判据读数.json` 的 `coverage`（那里是正文）。极低填充仍然落未采样，但那是**另一条线**（填充连段短于 `MIN_FILL_COLUMNS`），不是「分不开」",
+      "**技力条掉到零**（一条全暗的技力条）：一帧都没有 —— 难例批那一块是「空轨道被背景染了色」，不是「一条全暗的条」（见难例批 `判据读数.json` 的 `coverage`，那里是正文）",
+      "**暂停态下的菱形**：这一批全是常速帧，菱形在暂停态下自己在动这件事没测",
+      "**永续技能**：读得出「生效中」，而「没有还剩多久」这件事由数据库那一侧决定，这一批没有永续技能的帧"
+    ],
+    "stuck": "「极低填充」与「血条被切断」两档在现有原生帧里一帧都找不到 —— 按任务单的【卡住】那一条报出来，**没有拿别的东西凑**；裁定下来了：**不必再去找**，这两档**认合成用例**（tests/unit/test_vision_field.py 里那两支合成用例）。"
+  }
+}

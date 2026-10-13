@@ -1,0 +1,84 @@
+{
+  "note": "红罩反解那一单的配对表。每一对是「同一张卡的同一块画面，一次没罩、一次罩着」。标定集与验收集不相交（按对分）；验收那几对没有参与定任何参数。「罩下是谁」不是目视的，是拿**同一张卡后来干净了那一帧**喂同一条链（roster_scores）读出来的 —— 每对都记了那次读数过没过线、余量多少。",
+  "library": "tests/帧样本/点名/编队页.json",
+  "battle_batch": "tests/帧样本/红罩",
+  "criterion": {
+    "name": "_pair_ok（tests/unit/test_vision_redcap.py）",
+    "what": "同一帧对里：卡数相同 · 恰有一个卡位的罩状态不同 · 其余每个卡位在两帧间只差一次亮度（逐通道仿射，斜率 0.9–1.1、残差 rms ≤ 3）· 那个卡位自己差一次仿射（残差 rms ≤ 12）",
+    "rejects": "卡数不同 · 一行里有第二个卡位换过人 · 那个卡位自己的仿射残差超过 12"
+  },
+  "pairs": [
+    {
+      "set": "calibration",
+      "capped": {
+        "file": "cd14.png",
+        "index": 1
+      },
+      "clean": {
+        "file": "cd15.png",
+        "index": 1
+      },
+      "under_the_cap": "维什戴尔",
+      "truth_from": "cd15.png 位 1 的干净读数（roster_scores 最高分 0.9848 · 次高 0.5129 · 余量 0.4719）—— 过线，余量远大于 ROSTER_AMBIGUITY_MARGIN",
+      "clean_score": 0.9848,
+      "clean_runner_up": 0.5129,
+      "clean_margin": 0.4719,
+      "capped_score": 0.3424,
+      "capped_name": "极境"
+    },
+    {
+      "set": "calibration",
+      "capped": {
+        "file": "cd22.png",
+        "index": 9
+      },
+      "clean": {
+        "file": "cd23.png",
+        "index": 9
+      },
+      "under_the_cap": "新约能天使",
+      "truth_from": "cd23.png 位 9 的干净读数（最高分 0.9869 · 次高 0.4842 · 余量 0.5027）—— 过线",
+      "clean_score": 0.9869,
+      "clean_runner_up": 0.4842,
+      "clean_margin": 0.5027,
+      "capped_score": 0.3388,
+      "capped_name": "极境"
+    },
+    {
+      "set": "validation",
+      "capped": {
+        "file": "cd27.png",
+        "index": 6
+      },
+      "clean": {
+        "file": "cd28.png",
+        "index": 6
+      },
+      "under_the_cap": "白面鸮",
+      "truth_from": "cd28.png 位 6 的干净读数（最高分 0.9921 · 次高 0.3989 · 余量 0.5932）—— 过线",
+      "clean_score": 0.9921,
+      "clean_runner_up": 0.3989,
+      "clean_margin": 0.5932,
+      "capped_score": 0.3047,
+      "capped_name": "极境"
+    },
+    {
+      "set": "validation",
+      "capped": {
+        "file": "cd37.png",
+        "index": 4
+      },
+      "clean": {
+        "file": "cd59.png",
+        "index": 4
+      },
+      "under_the_cap": "黍",
+      "truth_from": "cd59.png 位 4 的干净读数（最高分 0.9774 · 次高 0.3656 · 余量 0.6118）—— 过线",
+      "clean_score": 0.9774,
+      "clean_runner_up": 0.3656,
+      "clean_margin": 0.6118,
+      "capped_score": 0.2928,
+      "capped_name": "极境"
+    }
+  ]
+}

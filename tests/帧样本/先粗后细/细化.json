@@ -1,0 +1,2893 @@
+{
+ "note": "多层细化：层表 + 选档一致率 + 判定账 + 速度。报出的分只来自最后一层（全分辨率）。只量不改。",
+ "truth": {
+  "file": "tests/帧样本/先粗后细/曲线.json",
+  "pairs": 4030,
+  "cards": 350
+ },
+ "reuse_today": {
+  "source_file": "tests/帧样本/先粗后细/读数.json（本单**复用**，没有重跑）",
+  "source_key": "cost_measured 的 甲的今天：全分辨率全档",
+  "config_calls": 1936,
+  "config_median_s": 28.1671,
+  "config_note": "那一趟把同一件事做了两遍（粗那一层的 pixels=100 就是精那一层），所以次数与墙钟都要折半才是今天那条链",
+  "chain_calls": 968,
+  "chain_median_s": 14.0836,
+  "chain_calls_per_pair": 11,
+  "per_call_s": 0.014549
+ },
+ "designs": {
+  "保真 · 50→100 · 全 11 档 · 位±12": {
+   "label": "保真 · 50→100 · 全 11 档 · 位±12",
+   "layers": [
+    {
+     "pixels": 50,
+     "scale_half": null,
+     "pos_half": null,
+     "factor": 0.5,
+     "covers_all_scales": true
+    },
+    {
+     "pixels": 100,
+     "scale_half": null,
+     "pos_half": 12,
+     "factor": 1.0,
+     "covers_all_scales": true
+    }
+   ],
+   "pairs": 4030,
+   "calls_total": 88660,
+   "calls_per_pair": 22.0,
+   "scale_exact": 3985,
+   "scale_within_1": 4007,
+   "scale_within_2": 4013,
+   "l0_exact": 2154,
+   "l0_within_1": 3450,
+   "winner_pairs": 350,
+   "winner_scale_exact": 350,
+   "winner_scale_within_1": 350,
+   "winner_scale_within_2": 350,
+   "cards": 350,
+   "before": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "after": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "gained": [],
+   "gained_n": 0,
+   "lost": [],
+   "lost_n": 0,
+   "wrong_new": [],
+   "wrong_new_n": 0,
+   "wrong_before_n": 0,
+   "wrong_after_n": 0,
+   "name_moved_n": 0,
+   "scale_moved_n": 0,
+   "scale_steps_histogram": {
+    "0": 3985,
+    "10": 10,
+    "1": 22,
+    "2": 6,
+    "7": 1,
+    "3": 2,
+    "6": 2,
+    "9": 1,
+    "8": 1
+   },
+   "lost_rows": [],
+   "seconds": 167.661
+  },
+  "保真 · 25→100 · 全 11 档 · 位±16": {
+   "label": "保真 · 25→100 · 全 11 档 · 位±16",
+   "layers": [
+    {
+     "pixels": 25,
+     "scale_half": null,
+     "pos_half": null,
+     "factor": 0.25,
+     "covers_all_scales": true
+    },
+    {
+     "pixels": 100,
+     "scale_half": null,
+     "pos_half": 16,
+     "factor": 1.0,
+     "covers_all_scales": true
+    }
+   ],
+   "pairs": 4030,
+   "calls_total": 88660,
+   "calls_per_pair": 22.0,
+   "scale_exact": 3731,
+   "scale_within_1": 3774,
+   "scale_within_2": 3855,
+   "l0_exact": 2518,
+   "l0_within_1": 2877,
+   "winner_pairs": 350,
+   "winner_scale_exact": 345,
+   "winner_scale_within_1": 348,
+   "winner_scale_within_2": 349,
+   "cards": 350,
+   "before": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "after": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "gained": [],
+   "gained_n": 0,
+   "lost": [],
+   "lost_n": 0,
+   "wrong_new": [],
+   "wrong_new_n": 0,
+   "wrong_before_n": 0,
+   "wrong_after_n": 0,
+   "name_moved_n": 4,
+   "scale_moved_n": 5,
+   "scale_steps_histogram": {
+    "0": 3731,
+    "2": 81,
+    "8": 34,
+    "10": 47,
+    "5": 34,
+    "1": 43,
+    "7": 12,
+    "9": 7,
+    "3": 12,
+    "6": 25,
+    "4": 4
+   },
+   "lost_rows": [],
+   "seconds": 106.476
+  },
+  "两层 · 15→100 · 档±1 · 位±16": {
+   "label": "两层 · 15→100 · 档±1 · 位±16",
+   "layers": [
+    {
+     "pixels": 15,
+     "scale_half": null,
+     "pos_half": null,
+     "factor": 0.15,
+     "covers_all_scales": true
+    },
+    {
+     "pixels": 100,
+     "scale_half": 1,
+     "pos_half": 16,
+     "factor": 1.0,
+     "covers_all_scales": false
+    }
+   ],
+   "pairs": 4030,
+   "calls_total": 53803,
+   "calls_per_pair": 13.351,
+   "scale_exact": 2168,
+   "scale_within_1": 2398,
+   "scale_within_2": 2653,
+   "l0_exact": 1899,
+   "l0_within_1": 2259,
+   "winner_pairs": 350,
+   "winner_scale_exact": 109,
+   "winner_scale_within_1": 146,
+   "winner_scale_within_2": 183,
+   "cards": 350,
+   "before": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "after": {
+    "exact": 201,
+    "unknown": 149
+   },
+   "gained": [],
+   "gained_n": 0,
+   "lost": [
+    {
+     "batch": "备战席",
+     "frame": "shot01",
+     "index": 0,
+     "redeploying": false,
+     "truth": "维什戴尔",
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.983458,
+      "scale": 1.13,
+      "margin": 0.47609,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839022,
+      "scale": 1.06,
+      "margin": 0.331653,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "shot02",
+     "index": 0,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.983458,
+      "scale": 1.13,
+      "margin": 0.47609,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839022,
+      "scale": 1.06,
+      "margin": 0.331653,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "shot05",
+     "index": 3,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.98343,
+      "scale": 1.13,
+      "margin": 0.476001,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839007,
+      "scale": 1.06,
+      "margin": 0.331579,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "shot07",
+     "index": 3,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.98343,
+      "scale": 1.13,
+      "margin": 0.476001,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839007,
+      "scale": 1.06,
+      "margin": 0.331579,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "shot21",
+     "index": 0,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.983458,
+      "scale": 1.13,
+      "margin": 0.476085,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839022,
+      "scale": 1.06,
+      "margin": 0.33165,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "立绘两组",
+     "frame": "组1_备战席",
+     "index": 2,
+     "redeploying": false,
+     "truth": null,
+     "group": "1",
+     "before": {
+      "name": "组1·荒芜拉普兰德",
+      "score": 0.976083,
+      "scale": 1.09,
+      "margin": 0.410673,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "组1·荒芜拉普兰德",
+      "score": 0.839095,
+      "scale": 1.06,
+      "margin": 0.274339,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "立绘两组",
+     "frame": "组2_备战席",
+     "index": 2,
+     "redeploying": false,
+     "truth": null,
+     "group": "2",
+     "before": {
+      "name": "组2·荒芜拉普兰德",
+      "score": 0.983103,
+      "scale": 1.11,
+      "margin": 0.47826,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "组2·荒芜拉普兰德",
+      "score": 0.784317,
+      "scale": 1.06,
+      "margin": 0.29483,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "立绘两组",
+     "frame": "组2_备战席",
+     "index": 7,
+     "redeploying": false,
+     "truth": null,
+     "group": "2",
+     "before": {
+      "name": "组2·歌蕾蒂娅",
+      "score": 0.990646,
+      "scale": 1.15,
+      "margin": 0.417043,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "组2·歌蕾蒂娅",
+      "score": 0.780662,
+      "scale": 1.06,
+      "margin": 0.207059,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够 + 余量不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    }
+   ],
+   "lost_n": 8,
+   "wrong_new": [],
+   "wrong_new_n": 0,
+   "wrong_before_n": 0,
+   "wrong_after_n": 0,
+   "name_moved_n": 41,
+   "scale_moved_n": 241,
+   "scale_steps_histogram": {
+    "0": 2168,
+    "3": 785,
+    "7": 64,
+    "5": 130,
+    "2": 255,
+    "4": 143,
+    "9": 62,
+    "1": 230,
+    "8": 31,
+    "10": 114,
+    "6": 48
+   },
+   "lost_rows": [
+    {
+     "frame": "shot01",
+     "index": 0,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.983458,
+      "scale": 1.13,
+      "margin": 0.47609,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839022,
+      "scale": 1.06,
+      "margin": 0.331653,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "shot02",
+     "index": 0,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.983458,
+      "scale": 1.13,
+      "margin": 0.47609,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839022,
+      "scale": 1.06,
+      "margin": 0.331653,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "shot05",
+     "index": 3,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.98343,
+      "scale": 1.13,
+      "margin": 0.476001,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839007,
+      "scale": 1.06,
+      "margin": 0.331579,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "shot07",
+     "index": 3,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.98343,
+      "scale": 1.13,
+      "margin": 0.476001,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839007,
+      "scale": 1.06,
+      "margin": 0.331579,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "shot21",
+     "index": 0,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.983458,
+      "scale": 1.13,
+      "margin": 0.476085,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839022,
+      "scale": 1.06,
+      "margin": 0.33165,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "组1_备战席",
+     "index": 2,
+     "before": {
+      "name": "组1·荒芜拉普兰德",
+      "score": 0.976083,
+      "scale": 1.09,
+      "margin": 0.410673,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "组1·荒芜拉普兰德",
+      "score": 0.839095,
+      "scale": 1.06,
+      "margin": 0.274339,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     }
+    }
+   ],
+   "seconds": 29.194
+  },
+  "两层 · 12→100 · 档±1 · 位±12": {
+   "label": "两层 · 12→100 · 档±1 · 位±12",
+   "layers": [
+    {
+     "pixels": 12,
+     "scale_half": null,
+     "pos_half": null,
+     "factor": 0.12,
+     "covers_all_scales": true
+    },
+    {
+     "pixels": 100,
+     "scale_half": 1,
+     "pos_half": 12,
+     "factor": 1.0,
+     "covers_all_scales": false
+    }
+   ],
+   "pairs": 4030,
+   "calls_total": 53791,
+   "calls_per_pair": 13.348,
+   "scale_exact": 1976,
+   "scale_within_1": 2866,
+   "scale_within_2": 3106,
+   "l0_exact": 1794,
+   "l0_within_1": 2108,
+   "winner_pairs": 350,
+   "winner_scale_exact": 106,
+   "winner_scale_within_1": 194,
+   "winner_scale_within_2": 236,
+   "cards": 350,
+   "before": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "after": {
+    "exact": 141,
+    "unknown": 209
+   },
+   "gained": [],
+   "gained_n": 0,
+   "lost": [
+    {
+     "batch": "备战席",
+     "frame": "shot01",
+     "index": 0,
+     "redeploying": false,
+     "truth": "维什戴尔",
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.983458,
+      "scale": 1.13,
+      "margin": 0.47609,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839021,
+      "scale": 1.06,
+      "margin": 0.331652,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "shot02",
+     "index": 0,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.983458,
+      "scale": 1.13,
+      "margin": 0.47609,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839021,
+      "scale": 1.06,
+      "margin": 0.331652,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "shot05",
+     "index": 3,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.98343,
+      "scale": 1.13,
+      "margin": 0.476001,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839007,
+      "scale": 1.06,
+      "margin": 0.331579,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "shot07",
+     "index": 3,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.98343,
+      "scale": 1.13,
+      "margin": 0.476001,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839007,
+      "scale": 1.06,
+      "margin": 0.331579,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "shot21",
+     "index": 0,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.983458,
+      "scale": 1.13,
+      "margin": 0.476085,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839021,
+      "scale": 1.06,
+      "margin": 0.331649,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "cd01",
+     "index": 3,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "Mon3tr",
+      "score": 0.988828,
+      "scale": 1.12,
+      "margin": 0.464051,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "Mon3tr",
+      "score": 0.818714,
+      "scale": 1.06,
+      "margin": 0.293937,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "cd08",
+     "index": 8,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.978138,
+      "scale": 1.13,
+      "margin": 0.585119,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.76606,
+      "scale": 1.06,
+      "margin": 0.373041,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "cd20",
+     "index": 1,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.984765,
+      "scale": 1.13,
+      "margin": 0.471947,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.846041,
+      "scale": 1.06,
+      "margin": 0.333223,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "cd20",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.97404,
+      "scale": 1.12,
+      "margin": 0.578637,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.763937,
+      "scale": 1.06,
+      "margin": 0.368535,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "cd60",
+     "index": 1,
+     "redeploying": false,
+     "truth": "维什戴尔",
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.984765,
+      "scale": 1.13,
+      "margin": 0.471947,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.846041,
+      "scale": 1.06,
+      "margin": 0.333223,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "cd60",
+     "index": 5,
+     "redeploying": false,
+     "truth": "Mon3tr",
+     "group": null,
+     "before": {
+      "name": "Mon3tr",
+      "score": 0.981369,
+      "scale": 1.13,
+      "margin": 0.458366,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "Mon3tr",
+      "score": 0.81754,
+      "scale": 1.06,
+      "margin": 0.294536,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "cd60",
+     "index": 10,
+     "redeploying": false,
+     "truth": "极境",
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974039,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.763936,
+      "scale": 1.06,
+      "margin": 0.368533,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd14",
+     "index": 9,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.982093,
+      "scale": 1.13,
+      "margin": 0.587958,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.766652,
+      "scale": 1.06,
+      "margin": 0.372518,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd15",
+     "index": 1,
+     "redeploying": false,
+     "truth": "维什戴尔",
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.984765,
+      "scale": 1.13,
+      "margin": 0.471947,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.846041,
+      "scale": 1.06,
+      "margin": 0.333223,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd15",
+     "index": 9,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.982093,
+      "scale": 1.13,
+      "margin": 0.587958,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.766647,
+      "scale": 1.06,
+      "margin": 0.372511,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd22",
+     "index": 1,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.984765,
+      "scale": 1.13,
+      "margin": 0.471947,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.846041,
+      "scale": 1.06,
+      "margin": 0.333223,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd22",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974038,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.763935,
+      "scale": 1.06,
+      "margin": 0.368532,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd23",
+     "index": 1,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.984765,
+      "scale": 1.13,
+      "margin": 0.471947,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.846041,
+      "scale": 1.06,
+      "margin": 0.333223,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd23",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974038,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.763935,
+      "scale": 1.06,
+      "margin": 0.368532,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd27",
+     "index": 1,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.984765,
+      "scale": 1.13,
+      "margin": 0.471947,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.846041,
+      "scale": 1.06,
+      "margin": 0.333223,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    }
+   ],
+   "lost_n": 68,
+   "wrong_new": [],
+   "wrong_new_n": 0,
+   "wrong_before_n": 0,
+   "wrong_after_n": 0,
+   "name_moved_n": 23,
+   "scale_moved_n": 242,
+   "scale_steps_histogram": {
+    "0": 1976,
+    "1": 890,
+    "3": 199,
+    "7": 194,
+    "10": 93,
+    "5": 36,
+    "9": 172,
+    "2": 240,
+    "4": 100,
+    "8": 82,
+    "6": 48
+   },
+   "lost_rows": [
+    {
+     "frame": "shot01",
+     "index": 0,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.983458,
+      "scale": 1.13,
+      "margin": 0.47609,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839021,
+      "scale": 1.06,
+      "margin": 0.331652,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "shot02",
+     "index": 0,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.983458,
+      "scale": 1.13,
+      "margin": 0.47609,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839021,
+      "scale": 1.06,
+      "margin": 0.331652,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "shot05",
+     "index": 3,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.98343,
+      "scale": 1.13,
+      "margin": 0.476001,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839007,
+      "scale": 1.06,
+      "margin": 0.331579,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "shot07",
+     "index": 3,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.98343,
+      "scale": 1.13,
+      "margin": 0.476001,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839007,
+      "scale": 1.06,
+      "margin": 0.331579,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "shot21",
+     "index": 0,
+     "before": {
+      "name": "维什戴尔",
+      "score": 0.983458,
+      "scale": 1.13,
+      "margin": 0.476085,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "维什戴尔",
+      "score": 0.839021,
+      "scale": 1.06,
+      "margin": 0.331649,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "cd01",
+     "index": 3,
+     "before": {
+      "name": "Mon3tr",
+      "score": 0.988828,
+      "scale": 1.12,
+      "margin": 0.464051,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "Mon3tr",
+      "score": 0.818714,
+      "scale": 1.06,
+      "margin": 0.293937,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    }
+   ],
+   "seconds": 26.143
+  },
+  "两层 · 15→100 · 档±2 · 位±24": {
+   "label": "两层 · 15→100 · 档±2 · 位±24",
+   "layers": [
+    {
+     "pixels": 15,
+     "scale_half": null,
+     "pos_half": null,
+     "factor": 0.15,
+     "covers_all_scales": true
+    },
+    {
+     "pixels": 100,
+     "scale_half": 2,
+     "pos_half": 24,
+     "factor": 1.0,
+     "covers_all_scales": false
+    }
+   ],
+   "pairs": 4030,
+   "calls_total": 59246,
+   "calls_per_pair": 14.701,
+   "scale_exact": 2362,
+   "scale_within_1": 2593,
+   "scale_within_2": 3404,
+   "l0_exact": 1899,
+   "l0_within_1": 2259,
+   "winner_pairs": 350,
+   "winner_scale_exact": 162,
+   "winner_scale_within_1": 182,
+   "winner_scale_within_2": 283,
+   "cards": 350,
+   "before": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "after": {
+    "exact": 207,
+    "unknown": 143
+   },
+   "gained": [],
+   "gained_n": 0,
+   "lost": [
+    {
+     "batch": "立绘两组",
+     "frame": "组2_备战席",
+     "index": 2,
+     "redeploying": false,
+     "truth": null,
+     "group": "2",
+     "before": {
+      "name": "组2·荒芜拉普兰德",
+      "score": 0.983103,
+      "scale": 1.11,
+      "margin": 0.47826,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "组2·荒芜拉普兰德",
+      "score": 0.829801,
+      "scale": 1.07,
+      "margin": 0.333534,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "立绘两组",
+     "frame": "组2_备战席",
+     "index": 7,
+     "redeploying": false,
+     "truth": null,
+     "group": "2",
+     "before": {
+      "name": "组2·歌蕾蒂娅",
+      "score": 0.990646,
+      "scale": 1.15,
+      "margin": 0.417043,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "组2·歌蕾蒂娅",
+      "score": 0.801261,
+      "scale": 1.07,
+      "margin": 0.227658,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够 + 余量不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    }
+   ],
+   "lost_n": 2,
+   "wrong_new": [],
+   "wrong_new_n": 0,
+   "wrong_before_n": 0,
+   "wrong_after_n": 0,
+   "name_moved_n": 19,
+   "scale_moved_n": 189,
+   "scale_steps_histogram": {
+    "0": 2362,
+    "2": 811,
+    "6": 53,
+    "3": 115,
+    "4": 147,
+    "9": 23,
+    "1": 231,
+    "8": 92,
+    "7": 29,
+    "10": 111,
+    "5": 56
+   },
+   "lost_rows": [
+    {
+     "frame": "组2_备战席",
+     "index": 2,
+     "before": {
+      "name": "组2·荒芜拉普兰德",
+      "score": 0.983103,
+      "scale": 1.11,
+      "margin": 0.47826,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "组2·荒芜拉普兰德",
+      "score": 0.829801,
+      "scale": 1.07,
+      "margin": 0.333534,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "组2_备战席",
+     "index": 7,
+     "before": {
+      "name": "组2·歌蕾蒂娅",
+      "score": 0.990646,
+      "scale": 1.15,
+      "margin": 0.417043,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "组2·歌蕾蒂娅",
+      "score": 0.801261,
+      "scale": 1.07,
+      "margin": 0.227658,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够 + 余量不够"
+     }
+    }
+   ],
+   "seconds": 43.621
+  },
+  "三层 · 12→50→100 · 档±3/±1 · 位±12/±6": {
+   "label": "三层 · 12→50→100 · 档±3/±1 · 位±12/±6",
+   "layers": [
+    {
+     "pixels": 12,
+     "scale_half": null,
+     "pos_half": null,
+     "factor": 0.12,
+     "covers_all_scales": true
+    },
+    {
+     "pixels": 50,
+     "scale_half": 3,
+     "pos_half": 12,
+     "factor": 0.5,
+     "covers_all_scales": false
+    },
+    {
+     "pixels": 100,
+     "scale_half": 1,
+     "pos_half": 6,
+     "factor": 1.0,
+     "covers_all_scales": false
+    }
+   ],
+   "pairs": 4030,
+   "calls_total": 73486,
+   "calls_per_pair": 18.235,
+   "scale_exact": 2807,
+   "scale_within_1": 3054,
+   "scale_within_2": 3250,
+   "l0_exact": 1794,
+   "l0_within_1": 2108,
+   "winner_pairs": 350,
+   "winner_scale_exact": 214,
+   "winner_scale_within_1": 255,
+   "winner_scale_within_2": 263,
+   "cards": 350,
+   "before": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "after": {
+    "exact": 182,
+    "unknown": 168
+   },
+   "gained": [],
+   "gained_n": 0,
+   "lost": [
+    {
+     "batch": "备战席",
+     "frame": "cd08",
+     "index": 8,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.978138,
+      "scale": 1.13,
+      "margin": 0.585119,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.84509,
+      "scale": 1.08,
+      "margin": 0.452071,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "cd20",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.97404,
+      "scale": 1.12,
+      "margin": 0.578637,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843354,
+      "scale": 1.08,
+      "margin": 0.447951,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "备战席",
+     "frame": "cd60",
+     "index": 10,
+     "redeploying": false,
+     "truth": "极境",
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974039,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843353,
+      "scale": 1.08,
+      "margin": 0.447949,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd14",
+     "index": 9,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.982093,
+      "scale": 1.13,
+      "margin": 0.587958,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.84533,
+      "scale": 1.08,
+      "margin": 0.451196,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd15",
+     "index": 9,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.982093,
+      "scale": 1.13,
+      "margin": 0.587958,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.845329,
+      "scale": 1.08,
+      "margin": 0.451193,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd22",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974038,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843353,
+      "scale": 1.08,
+      "margin": 0.447949,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd23",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974038,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843353,
+      "scale": 1.08,
+      "margin": 0.447949,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd27",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974038,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843353,
+      "scale": 1.08,
+      "margin": 0.447949,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd28",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974038,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843353,
+      "scale": 1.08,
+      "margin": 0.447949,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd37",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974038,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843353,
+      "scale": 1.08,
+      "margin": 0.447949,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "红罩",
+     "frame": "cd59",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974038,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843353,
+      "scale": 1.08,
+      "margin": 0.447949,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "余量",
+     "frame": "cd07",
+     "index": 8,
+     "redeploying": false,
+     "truth": "极境",
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.978138,
+      "scale": 1.13,
+      "margin": 0.585114,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.845079,
+      "scale": 1.08,
+      "margin": 0.452055,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "余量",
+     "frame": "cd13",
+     "index": 9,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.982093,
+      "scale": 1.13,
+      "margin": 0.587958,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.845329,
+      "scale": 1.08,
+      "margin": 0.451193,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "余量",
+     "frame": "cd17",
+     "index": 9,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.982093,
+      "scale": 1.13,
+      "margin": 0.587958,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.845329,
+      "scale": 1.08,
+      "margin": 0.451193,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "余量",
+     "frame": "cd21",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.97404,
+      "scale": 1.12,
+      "margin": 0.578639,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.84336,
+      "scale": 1.08,
+      "margin": 0.447958,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "余量",
+     "frame": "cd25",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974038,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843353,
+      "scale": 1.08,
+      "margin": 0.447949,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "余量",
+     "frame": "cd29",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974039,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843353,
+      "scale": 1.08,
+      "margin": 0.447949,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "余量",
+     "frame": "cd32",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.97404,
+      "scale": 1.12,
+      "margin": 0.578638,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.84336,
+      "scale": 1.08,
+      "margin": 0.447958,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "余量",
+     "frame": "cd38",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.974038,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843353,
+      "scale": 1.08,
+      "margin": 0.447949,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    },
+    {
+     "batch": "余量",
+     "frame": "cd43",
+     "index": 10,
+     "redeploying": false,
+     "truth": null,
+     "group": null,
+     "before": {
+      "name": "极境",
+      "score": 0.97404,
+      "scale": 1.12,
+      "margin": 0.578638,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843357,
+      "scale": 1.08,
+      "margin": 0.447954,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     },
+     "scale_moved": true,
+     "name_moved": false,
+     "changed": true
+    }
+   ],
+   "lost_n": 27,
+   "wrong_new": [],
+   "wrong_new_n": 0,
+   "wrong_before_n": 0,
+   "wrong_after_n": 0,
+   "name_moved_n": 18,
+   "scale_moved_n": 137,
+   "scale_steps_histogram": {
+    "0": 2807,
+    "1": 247,
+    "5": 105,
+    "7": 102,
+    "3": 132,
+    "10": 137,
+    "9": 48,
+    "4": 143,
+    "2": 196,
+    "6": 63,
+    "8": 50
+   },
+   "lost_rows": [
+    {
+     "frame": "cd08",
+     "index": 8,
+     "before": {
+      "name": "极境",
+      "score": 0.978138,
+      "scale": 1.13,
+      "margin": 0.585119,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.84509,
+      "scale": 1.08,
+      "margin": 0.452071,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "cd20",
+     "index": 10,
+     "before": {
+      "name": "极境",
+      "score": 0.97404,
+      "scale": 1.12,
+      "margin": 0.578637,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843354,
+      "scale": 1.08,
+      "margin": 0.447951,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "cd60",
+     "index": 10,
+     "before": {
+      "name": "极境",
+      "score": 0.974039,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": false,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843353,
+      "scale": 1.08,
+      "margin": 0.447949,
+      "verdict": "未知",
+      "wrong": false,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "cd14",
+     "index": 9,
+     "before": {
+      "name": "极境",
+      "score": 0.982093,
+      "scale": 1.13,
+      "margin": 0.587958,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.84533,
+      "scale": 1.08,
+      "margin": 0.451196,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "cd15",
+     "index": 9,
+     "before": {
+      "name": "极境",
+      "score": 0.982093,
+      "scale": 1.13,
+      "margin": 0.587958,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.845329,
+      "scale": 1.08,
+      "margin": 0.451193,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    },
+    {
+     "frame": "cd22",
+     "index": 10,
+     "before": {
+      "name": "极境",
+      "score": 0.974038,
+      "scale": 1.12,
+      "margin": 0.578635,
+      "verdict": "精确",
+      "wrong": null,
+      "blocked_by": null
+     },
+     "after": {
+      "name": "极境",
+      "score": 0.843353,
+      "scale": 1.08,
+      "margin": 0.447949,
+      "verdict": "未知",
+      "wrong": null,
+      "blocked_by": "分数不够"
+     }
+    }
+   ],
+   "seconds": 34.535
+  },
+  "三层 · 12→40→100 · 档±4/±1 · 位±10/±6": {
+   "label": "三层 · 12→40→100 · 档±4/±1 · 位±10/±6",
+   "layers": [
+    {
+     "pixels": 12,
+     "scale_half": null,
+     "pos_half": null,
+     "factor": 0.12,
+     "covers_all_scales": true
+    },
+    {
+     "pixels": 40,
+     "scale_half": 4,
+     "pos_half": 10,
+     "factor": 0.4,
+     "covers_all_scales": false
+    },
+    {
+     "pixels": 100,
+     "scale_half": 1,
+     "pos_half": 6,
+     "factor": 1.0,
+     "covers_all_scales": false
+    }
+   ],
+   "pairs": 4030,
+   "calls_total": 77364,
+   "calls_per_pair": 19.197,
+   "scale_exact": 2774,
+   "scale_within_1": 3059,
+   "scale_within_2": 3252,
+   "l0_exact": 1794,
+   "l0_within_1": 2108,
+   "winner_pairs": 350,
+   "winner_scale_exact": 234,
+   "winner_scale_within_1": 242,
+   "winner_scale_within_2": 288,
+   "cards": 350,
+   "before": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "after": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "gained": [],
+   "gained_n": 0,
+   "lost": [],
+   "lost_n": 0,
+   "wrong_new": [],
+   "wrong_new_n": 0,
+   "wrong_before_n": 0,
+   "wrong_after_n": 0,
+   "name_moved_n": 18,
+   "scale_moved_n": 119,
+   "scale_steps_histogram": {
+    "0": 2774,
+    "3": 266,
+    "5": 101,
+    "10": 131,
+    "1": 285,
+    "2": 193,
+    "9": 47,
+    "4": 85,
+    "8": 42,
+    "7": 80,
+    "6": 26
+   },
+   "lost_rows": [],
+   "seconds": 38.523
+  },
+  "三层 · 15→50→100 · 档±4/±2 · 位±16/±8": {
+   "label": "三层 · 15→50→100 · 档±4/±2 · 位±16/±8",
+   "layers": [
+    {
+     "pixels": 15,
+     "scale_half": null,
+     "pos_half": null,
+     "factor": 0.15,
+     "covers_all_scales": true
+    },
+    {
+     "pixels": 50,
+     "scale_half": 4,
+     "pos_half": 16,
+     "factor": 0.5,
+     "covers_all_scales": false
+    },
+    {
+     "pixels": 100,
+     "scale_half": 2,
+     "pos_half": 8,
+     "factor": 1.0,
+     "covers_all_scales": false
+    }
+   ],
+   "pairs": 4030,
+   "calls_total": 85196,
+   "calls_per_pair": 21.14,
+   "scale_exact": 3343,
+   "scale_within_1": 3492,
+   "scale_within_2": 3602,
+   "l0_exact": 1899,
+   "l0_within_1": 2259,
+   "winner_pairs": 350,
+   "winner_scale_exact": 308,
+   "winner_scale_within_1": 332,
+   "winner_scale_within_2": 340,
+   "cards": 350,
+   "before": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "after": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "gained": [],
+   "gained_n": 0,
+   "lost": [],
+   "lost_n": 0,
+   "wrong_new": [],
+   "wrong_new_n": 0,
+   "wrong_before_n": 0,
+   "wrong_after_n": 0,
+   "name_moved_n": 10,
+   "scale_moved_n": 43,
+   "scale_steps_histogram": {
+    "0": 3343,
+    "2": 110,
+    "3": 50,
+    "9": 29,
+    "1": 149,
+    "4": 58,
+    "8": 43,
+    "10": 133,
+    "7": 35,
+    "5": 31,
+    "6": 49
+   },
+   "lost_rows": [],
+   "seconds": 57.977
+  },
+  "三层 · 25→50→100 · 档±3/±1 · 位±12/±6": {
+   "label": "三层 · 25→50→100 · 档±3/±1 · 位±12/±6",
+   "layers": [
+    {
+     "pixels": 25,
+     "scale_half": null,
+     "pos_half": null,
+     "factor": 0.25,
+     "covers_all_scales": true
+    },
+    {
+     "pixels": 50,
+     "scale_half": 3,
+     "pos_half": 12,
+     "factor": 0.5,
+     "covers_all_scales": false
+    },
+    {
+     "pixels": 100,
+     "scale_half": 1,
+     "pos_half": 6,
+     "factor": 1.0,
+     "covers_all_scales": false
+    }
+   ],
+   "pairs": 4030,
+   "calls_total": 72740,
+   "calls_per_pair": 18.05,
+   "scale_exact": 3055,
+   "scale_within_1": 3283,
+   "scale_within_2": 3541,
+   "l0_exact": 2518,
+   "l0_within_1": 2877,
+   "winner_pairs": 350,
+   "winner_scale_exact": 201,
+   "winner_scale_within_1": 270,
+   "winner_scale_within_2": 309,
+   "cards": 350,
+   "before": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "after": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "gained": [],
+   "gained_n": 0,
+   "lost": [],
+   "lost_n": 0,
+   "wrong_new": [],
+   "wrong_new_n": 0,
+   "wrong_before_n": 0,
+   "wrong_after_n": 0,
+   "name_moved_n": 9,
+   "scale_moved_n": 149,
+   "scale_steps_histogram": {
+    "0": 3055,
+    "1": 228,
+    "3": 129,
+    "10": 103,
+    "6": 42,
+    "2": 258,
+    "8": 41,
+    "7": 86,
+    "4": 27,
+    "9": 29,
+    "5": 32
+   },
+   "lost_rows": [],
+   "seconds": 63.64
+  },
+  "四层 · 12→25→50→100 · 档±3/±2/±1 · 位±12/±8/±6": {
+   "label": "四层 · 12→25→50→100 · 档±3/±2/±1 · 位±12/±8/±6",
+   "layers": [
+    {
+     "pixels": 12,
+     "scale_half": null,
+     "pos_half": null,
+     "factor": 0.12,
+     "covers_all_scales": true
+    },
+    {
+     "pixels": 25,
+     "scale_half": 3,
+     "pos_half": 12,
+     "factor": 0.25,
+     "covers_all_scales": false
+    },
+    {
+     "pixels": 50,
+     "scale_half": 2,
+     "pos_half": 8,
+     "factor": 0.5,
+     "covers_all_scales": false
+    },
+    {
+     "pixels": 100,
+     "scale_half": 1,
+     "pos_half": 6,
+     "factor": 1.0,
+     "covers_all_scales": false
+    }
+   ],
+   "pairs": 4030,
+   "calls_total": 87504,
+   "calls_per_pair": 21.713,
+   "scale_exact": 2783,
+   "scale_within_1": 3038,
+   "scale_within_2": 3272,
+   "l0_exact": 1794,
+   "l0_within_1": 2108,
+   "winner_pairs": 350,
+   "winner_scale_exact": 213,
+   "winner_scale_within_1": 235,
+   "winner_scale_within_2": 282,
+   "cards": 350,
+   "before": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "after": {
+    "exact": 209,
+    "unknown": 141
+   },
+   "gained": [],
+   "gained_n": 0,
+   "lost": [],
+   "lost_n": 0,
+   "wrong_new": [],
+   "wrong_new_n": 0,
+   "wrong_before_n": 0,
+   "wrong_after_n": 0,
+   "name_moved_n": 20,
+   "scale_moved_n": 139,
+   "scale_steps_histogram": {
+    "0": 2783,
+    "1": 255,
+    "3": 220,
+    "7": 63,
+    "10": 149,
+    "2": 234,
+    "5": 99,
+    "9": 67,
+    "4": 58,
+    "8": 85,
+    "6": 17
+   },
+   "lost_rows": [],
+   "seconds": 42.188
+  }
+ },
+ "measure": {
+  "保真 · 50→100 · 全 11 档 · 位±12": {
+   "cards": 8,
+   "entries": 88,
+   "match_template_calls": 1936,
+   "median_s": 4.3024,
+   "rounds_s": [
+    1.7355,
+    4.3024,
+    4.62
+   ]
+  },
+  "保真 · 25→100 · 全 11 档 · 位±16": {
+   "cards": 8,
+   "entries": 88,
+   "match_template_calls": 1936,
+   "median_s": 2.8123,
+   "rounds_s": [
+    2.8357,
+    2.3583,
+    2.8123
+   ]
+  },
+  "两层 · 15→100 · 档±1 · 位±16": {
+   "cards": 8,
+   "entries": 88,
+   "match_template_calls": 1176,
+   "median_s": 0.8991,
+   "rounds_s": [
+    0.8991,
+    0.8992,
+    0.7446
+   ]
+  },
+  "两层 · 12→100 · 档±1 · 位±12": {
+   "cards": 8,
+   "entries": 88,
+   "match_template_calls": 1165,
+   "median_s": 0.6591,
+   "rounds_s": [
+    0.7006,
+    0.6591,
+    0.6524
+   ]
+  },
+  "两层 · 15→100 · 档±2 · 位±24": {
+   "cards": 8,
+   "entries": 88,
+   "match_template_calls": 1296,
+   "median_s": 1.1322,
+   "rounds_s": [
+    1.1322,
+    1.1238,
+    1.3189
+   ]
+  },
+  "三层 · 12→50→100 · 档±3/±1 · 位±12/±6": {
+   "cards": 8,
+   "entries": 88,
+   "match_template_calls": 1579,
+   "median_s": 0.9705,
+   "rounds_s": [
+    0.9079,
+    1.006,
+    0.9705
+   ]
+  },
+  "三层 · 12→40→100 · 档±4/±1 · 位±10/±6": {
+   "cards": 8,
+   "entries": 88,
+   "match_template_calls": 1664,
+   "median_s": 0.95,
+   "rounds_s": [
+    0.8999,
+    0.95,
+    1.0091
+   ]
+  },
+  "三层 · 15→50→100 · 档±4/±2 · 位±16/±8": {
+   "cards": 8,
+   "entries": 88,
+   "match_template_calls": 1867,
+   "median_s": 1.3715,
+   "rounds_s": [
+    1.346,
+    1.3715,
+    1.4886
+   ]
+  },
+  "三层 · 25→50→100 · 档±3/±1 · 位±12/±6": {
+   "cards": 8,
+   "entries": 88,
+   "match_template_calls": 1573,
+   "median_s": 1.2771,
+   "rounds_s": [
+    1.2425,
+    1.2771,
+    1.4969
+   ]
+  },
+  "四层 · 12→25→50→100 · 档±3/±2/±1 · 位±12/±8/±6": {
+   "cards": 8,
+   "entries": 88,
+   "match_template_calls": 1873,
+   "median_s": 0.9786,
+   "rounds_s": [
+    1.0756,
+    0.895,
+    0.9786
+   ]
+  }
+ },
+ "measure_frame": {
+  "保真 · 50→100 · 全 11 档 · 位±12": {
+   "batch": "备战席",
+   "frame": "shot01",
+   "cards": 12,
+   "entries": 132,
+   "match_template_calls": [
+    2904
+   ],
+   "median_s": 7.0658,
+   "rounds_s": [
+    6.847,
+    7.0658,
+    7.2465
+   ],
+   "today_calls": 1452,
+   "today_s": 21.1253
+  },
+  "保真 · 25→100 · 全 11 档 · 位±16": {
+   "batch": "备战席",
+   "frame": "shot01",
+   "cards": 12,
+   "entries": 132,
+   "match_template_calls": [
+    2904
+   ],
+   "median_s": 4.2242,
+   "rounds_s": [
+    4.2242,
+    4.5422,
+    3.827
+   ],
+   "today_calls": 1452,
+   "today_s": 21.1253
+  },
+  "两层 · 15→100 · 档±1 · 位±16": {
+   "batch": "备战席",
+   "frame": "shot01",
+   "cards": 12,
+   "entries": 132,
+   "match_template_calls": [
+    1750
+   ],
+   "median_s": 1.1567,
+   "rounds_s": [
+    1.0173,
+    1.1567,
+    1.2942
+   ],
+   "today_calls": 1452,
+   "today_s": 21.1253
+  },
+  "两层 · 12→100 · 档±1 · 位±12": {
+   "batch": "备战席",
+   "frame": "shot01",
+   "cards": 12,
+   "entries": 132,
+   "match_template_calls": [
+    1753
+   ],
+   "median_s": 0.9671,
+   "rounds_s": [
+    1.1539,
+    0.9671,
+    0.925
+   ],
+   "today_calls": 1452,
+   "today_s": 21.1253
+  },
+  "两层 · 15→100 · 档±2 · 位±24": {
+   "batch": "备战席",
+   "frame": "shot01",
+   "cards": 12,
+   "entries": 132,
+   "match_template_calls": [
+    1916
+   ],
+   "median_s": 1.5324,
+   "rounds_s": [
+    1.5188,
+    1.6372,
+    1.5324
+   ],
+   "today_calls": 1452,
+   "today_s": 21.1253
+  },
+  "三层 · 12→50→100 · 档±3/±1 · 位±12/±6": {
+   "batch": "备战席",
+   "frame": "shot01",
+   "cards": 12,
+   "entries": 132,
+   "match_template_calls": [
+    2383
+   ],
+   "median_s": 1.1777,
+   "rounds_s": [
+    1.1777,
+    1.1705,
+    1.2507
+   ],
+   "today_calls": 1452,
+   "today_s": 21.1253
+  },
+  "三层 · 12→40→100 · 档±4/±1 · 位±10/±6": {
+   "batch": "备战席",
+   "frame": "shot01",
+   "cards": 12,
+   "entries": 132,
+   "match_template_calls": [
+    2511
+   ],
+   "median_s": 1.4208,
+   "rounds_s": [
+    1.3287,
+    1.4745,
+    1.4208
+   ],
+   "today_calls": 1452,
+   "today_s": 21.1253
+  },
+  "三层 · 15→50→100 · 档±4/±2 · 位±16/±8": {
+   "batch": "备战席",
+   "frame": "shot01",
+   "cards": 12,
+   "entries": 132,
+   "match_template_calls": [
+    2733
+   ],
+   "median_s": 1.8924,
+   "rounds_s": [
+    1.8207,
+    1.9179,
+    1.8924
+   ],
+   "today_calls": 1452,
+   "today_s": 21.1253
+  },
+  "三层 · 25→50→100 · 档±3/±1 · 位±12/±6": {
+   "batch": "备战席",
+   "frame": "shot01",
+   "cards": 12,
+   "entries": 132,
+   "match_template_calls": [
+    2383
+   ],
+   "median_s": 1.7974,
+   "rounds_s": [
+    1.9856,
+    1.5013,
+    1.7974
+   ],
+   "today_calls": 1452,
+   "today_s": 21.1253
+  },
+  "四层 · 12→25→50→100 · 档±3/±2/±1 · 位±12/±8/±6": {
+   "batch": "备战席",
+   "frame": "shot01",
+   "cards": 12,
+   "entries": 132,
+   "match_template_calls": [
+    2835
+   ],
+   "median_s": 1.36,
+   "rounds_s": [
+    1.3071,
+    1.36,
+    1.4149
+   ],
+   "today_calls": 1452,
+   "today_s": 21.1253
+  }
+ }
+}

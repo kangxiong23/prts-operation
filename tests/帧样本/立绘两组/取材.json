@@ -1,0 +1,54 @@
+{
+  "note": "run-03 四张 = 两组，每组「一张编队页 + 一张进战斗后的备战席横带」。**哪张当库、哪张当卡**在这里写；**这一批没有 facts**。名单由规划者目视读出（游戏在编队页卡上印的是汉字，已定不上通用 OCR）。",
+  "facts": null,
+  "device": "vivo V2338A",
+  "groups": [
+    {
+      "name": "组1",
+      "library": "库1.json",
+      "formation_page": "组1_编队页.png",
+      "battle_band": "组1_备战席.png",
+      "source_formation": "screenshots/run-03/卡片余量强化测试1-0.png",
+      "source_battle": "screenshots/run-03/卡片余量强化测试1-1.png",
+      "names_in_cut_order": [
+        "圣聆初雪",
+        "凛御银灰",
+        "歌蕾蒂娅",
+        "荒芜拉普兰德",
+        "凯尔希·思衡托",
+        "白面鸮",
+        "塞雷娅",
+        "温蒂",
+        "维什戴尔",
+        "极境"
+      ]
+    },
+    {
+      "name": "组2",
+      "library": "库2.json",
+      "formation_page": "组2_编队页.png",
+      "battle_band": "组2_备战席.png",
+      "source_formation": "screenshots/run-03/卡片余量强化测试2-0.png",
+      "source_battle": "screenshots/run-03/卡片余量强化测试2-1.png",
+      "names_in_cut_order": [
+        "圣聆初雪",
+        "凛御银灰",
+        "歌蕾蒂娅",
+        "荒芜拉普兰德",
+        "凯尔希·思衡托",
+        "白面鸮",
+        "塞雷娅",
+        "温蒂",
+        "维什戴尔",
+        "极境"
+      ]
+    }
+  ],
+  "relationship": "两组的**人员与位置完全相同，只有立绘不同**（用户给的数据就是这样挑的）。所以 20 条库里**每一对同名的两条是双胞胎**：同一个干员的另一套立绘。口径是**立绘就是身份** —— 读出另一套立绘算失败。",
+  "cards_are_clean": true,
+  "truth": {
+    "status": "已由规划者确认，落点在 `tests/spec/`（执行者不填）",
+    "what": "备战席**卡位**（0 = 最右那张）↔ 名单第几位 的对应，以及每一组各是哪一套立绘。",
+    "who": "由规划者给（执行者不填真值、不许目视填）。"
+  }
+}

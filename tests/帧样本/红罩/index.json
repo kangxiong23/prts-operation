@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "box": [
+    300,
+    1040,
+    2799,
+    1259
+  ],
+  "crops": [
+    {
+      "file": "cd14.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd14.png",
+      "source_sha256": "4aadb8fddebcc90980add5772fdef2a8cb4d63b357078ab570b6cb41c04def2c"
+    },
+    {
+      "file": "cd15.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd15.png",
+      "source_sha256": "1a62261ede10a105f94191fc752b771b8cf8c93e6a49b51d9d04bd2ee9ce3ea1"
+    },
+    {
+      "file": "cd22.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd22.png",
+      "source_sha256": "6a3545ed4433583c144afe7d2360a723fd530bcea2b8a1cfd98da4aaa34ed35c"
+    },
+    {
+      "file": "cd23.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd23.png",
+      "source_sha256": "738645b00bfd7bb415547753444ddcd368de9718759a570ee765e00c5cb8cb18"
+    },
+    {
+      "file": "cd27.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd27.png",
+      "source_sha256": "76b3b3c7acbe212afbec143d8424829838b99d241edda6b2e5cc467158653b85"
+    },
+    {
+      "file": "cd28.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd28.png",
+      "source_sha256": "bf6d6bd0b6678745206c8aadf4d695728ca072494cde614782bdc6b33dc30f17"
+    },
+    {
+      "file": "cd37.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd37.png",
+      "source_sha256": "52ffaa9bd8bfd31f8c941de6508332bb82e13b0db796a46c53d7271bd82e2dc5"
+    },
+    {
+      "file": "cd59.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "data/precheck/cd/cd59.png",
+      "source_sha256": "55c66d4f40a8020c8b63ad178d88a5aa5212ab0460cc0c54af16f163a75c142d"
+    }
+  ]
+}

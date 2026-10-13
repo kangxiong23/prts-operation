@@ -1,0 +1,2141 @@
+{
+ "note": "塞雷娅那一对为什么只有 0.83：乙，只找原因。线 · 取区形状 · 那条链 · 尺度区间 · 库 · 模型一个字节没动。",
+ "batch": "tests/帧样本/立绘两组",
+ "library": [
+  "tests/帧样本/立绘两组/库1.json",
+  "tests/帧样本/立绘两组/库2.json"
+ ],
+ "entry": "ark.engine.vision.roster.roster_scores（只调用；曲线是它内层那一步逐档重跑，最大值与它逐位核对）",
+ "region": {
+  "who": "roster.identity_region",
+  "box_in_card": [
+   52,
+   76,
+   100,
+   100
+  ]
+ },
+ "criterion": {
+  "score": 0.85,
+  "margin": 0.25
+ },
+ "pairs": {
+  "1": {
+   "library_entry": "组1·塞雷娅",
+   "slot": 4,
+   "slot_top_score": 0.987521,
+   "online_score": 0.987521,
+   "online_scale": 1.05,
+   "curve_best_scale": 1.05,
+   "curve_max": 0.987521,
+   "best_loc": [
+    58,
+    107
+   ],
+   "expected_loc": [
+    54.6,
+    79.8
+   ],
+   "residual_px": [
+    3.4,
+    27.2
+   ],
+   "residual_norm": 27.41,
+   "widest_peak_scale": 1.05,
+   "widest_peak_score": 0.987521,
+   "peak_on_grid_edge": false,
+   "interval_edge_scores": {
+    "1.05": 0.987521,
+    "1.15": 0.729778
+   },
+   "above_interval_peak": 0.95968,
+   "box_luma_mean": 155.936,
+   "box_luma_std": 57.325,
+   "box_rgb_mean": [
+    168.73,
+    153.94,
+    145.13
+   ],
+   "ranking_top": [
+    {
+     "entry": "组1·塞雷娅",
+     "score": 0.987521
+    },
+    {
+     "entry": "组2·塞雷娅",
+     "score": 0.593936
+    },
+    {
+     "entry": "组2·温蒂",
+     "score": 0.519964
+    },
+    {
+     "entry": "组2·凯尔希·思衡托",
+     "score": 0.501583
+    }
+   ],
+   "curve_11": {
+    "1.05": {
+     "score": 0.987521,
+     "loc": [
+      58,
+      107
+     ]
+    },
+    "1.06": {
+     "score": 0.962541,
+     "loc": [
+      58,
+      107
+     ]
+    },
+    "1.07": {
+     "score": 0.946934,
+     "loc": [
+      57,
+      106
+     ]
+    },
+    "1.08": {
+     "score": 0.906601,
+     "loc": [
+      57,
+      105
+     ]
+    },
+    "1.09": {
+     "score": 0.864351,
+     "loc": [
+      57,
+      105
+     ]
+    },
+    "1.10": {
+     "score": 0.833892,
+     "loc": [
+      57,
+      104
+     ]
+    },
+    "1.11": {
+     "score": 0.80521,
+     "loc": [
+      57,
+      103
+     ]
+    },
+    "1.12": {
+     "score": 0.78633,
+     "loc": [
+      57,
+      103
+     ]
+    },
+    "1.13": {
+     "score": 0.764125,
+     "loc": [
+      57,
+      103
+     ]
+    },
+    "1.14": {
+     "score": 0.747755,
+     "loc": [
+      56,
+      102
+     ]
+    },
+    "1.15": {
+     "score": 0.729778,
+     "loc": [
+      56,
+      101
+     ]
+    }
+   },
+   "curve_wide": {
+    "0.80": {
+     "score": 0.477005,
+     "loc": [
+      78,
+      122
+     ]
+    },
+    "0.81": {
+     "score": 0.489695,
+     "loc": [
+      77,
+      121
+     ]
+    },
+    "0.82": {
+     "score": 0.500564,
+     "loc": [
+      77,
+      121
+     ]
+    },
+    "0.83": {
+     "score": 0.513058,
+     "loc": [
+      77,
+      121
+     ]
+    },
+    "0.84": {
+     "score": 0.524917,
+     "loc": [
+      76,
+      120
+     ]
+    },
+    "0.85": {
+     "score": 0.538715,
+     "loc": [
+      76,
+      119
+     ]
+    },
+    "0.86": {
+     "score": 0.543955,
+     "loc": [
+      75,
+      119
+     ]
+    },
+    "0.87": {
+     "score": 0.558483,
+     "loc": [
+      67,
+      117
+     ]
+    },
+    "0.88": {
+     "score": 0.578179,
+     "loc": [
+      66,
+      117
+     ]
+    },
+    "0.89": {
+     "score": 0.594887,
+     "loc": [
+      66,
+      116
+     ]
+    },
+    "0.90": {
+     "score": 0.61249,
+     "loc": [
+      65,
+      116
+     ]
+    },
+    "0.91": {
+     "score": 0.628925,
+     "loc": [
+      64,
+      115
+     ]
+    },
+    "0.92": {
+     "score": 0.645884,
+     "loc": [
+      63,
+      115
+     ]
+    },
+    "0.93": {
+     "score": 0.6663,
+     "loc": [
+      62,
+      114
+     ]
+    },
+    "0.94": {
+     "score": 0.683899,
+     "loc": [
+      61,
+      114
+     ]
+    },
+    "0.95": {
+     "score": 0.705268,
+     "loc": [
+      60,
+      113
+     ]
+    },
+    "0.96": {
+     "score": 0.724837,
+     "loc": [
+      60,
+      113
+     ]
+    },
+    "0.97": {
+     "score": 0.746257,
+     "loc": [
+      59,
+      112
+     ]
+    },
+    "0.98": {
+     "score": 0.768474,
+     "loc": [
+      59,
+      111
+     ]
+    },
+    "0.99": {
+     "score": 0.795314,
+     "loc": [
+      59,
+      111
+     ]
+    },
+    "1.00": {
+     "score": 0.804689,
+     "loc": [
+      59,
+      110
+     ]
+    },
+    "1.01": {
+     "score": 0.855641,
+     "loc": [
+      59,
+      110
+     ]
+    },
+    "1.02": {
+     "score": 0.897934,
+     "loc": [
+      59,
+      109
+     ]
+    },
+    "1.03": {
+     "score": 0.935363,
+     "loc": [
+      59,
+      109
+     ]
+    },
+    "1.04": {
+     "score": 0.95968,
+     "loc": [
+      58,
+      108
+     ]
+    },
+    "1.05": {
+     "score": 0.987521,
+     "loc": [
+      58,
+      107
+     ]
+    },
+    "1.06": {
+     "score": 0.962541,
+     "loc": [
+      58,
+      107
+     ]
+    },
+    "1.07": {
+     "score": 0.946934,
+     "loc": [
+      57,
+      106
+     ]
+    },
+    "1.08": {
+     "score": 0.906601,
+     "loc": [
+      57,
+      105
+     ]
+    },
+    "1.09": {
+     "score": 0.864351,
+     "loc": [
+      57,
+      105
+     ]
+    },
+    "1.10": {
+     "score": 0.833892,
+     "loc": [
+      57,
+      104
+     ]
+    },
+    "1.11": {
+     "score": 0.80521,
+     "loc": [
+      57,
+      103
+     ]
+    },
+    "1.12": {
+     "score": 0.78633,
+     "loc": [
+      57,
+      103
+     ]
+    },
+    "1.13": {
+     "score": 0.764125,
+     "loc": [
+      57,
+      103
+     ]
+    },
+    "1.14": {
+     "score": 0.747755,
+     "loc": [
+      56,
+      102
+     ]
+    },
+    "1.15": {
+     "score": 0.729778,
+     "loc": [
+      56,
+      101
+     ]
+    },
+    "1.16": {
+     "score": 0.710658,
+     "loc": [
+      56,
+      101
+     ]
+    },
+    "1.17": {
+     "score": 0.692126,
+     "loc": [
+      55,
+      100
+     ]
+    },
+    "1.18": {
+     "score": 0.674192,
+     "loc": [
+      54,
+      100
+     ]
+    },
+    "1.19": {
+     "score": 0.660894,
+     "loc": [
+      53,
+      99
+     ]
+    },
+    "1.20": {
+     "score": 0.647521,
+     "loc": [
+      52,
+      98
+     ]
+    },
+    "1.21": {
+     "score": 0.633732,
+     "loc": [
+      51,
+      98
+     ]
+    },
+    "1.22": {
+     "score": 0.622418,
+     "loc": [
+      51,
+      97
+     ]
+    },
+    "1.23": {
+     "score": 0.610024,
+     "loc": [
+      50,
+      97
+     ]
+    },
+    "1.24": {
+     "score": 0.59499,
+     "loc": [
+      50,
+      96
+     ]
+    },
+    "1.25": {
+     "score": 0.579232,
+     "loc": [
+      49,
+      96
+     ]
+    },
+    "1.26": {
+     "score": 0.560486,
+     "loc": [
+      49,
+      95
+     ]
+    },
+    "1.27": {
+     "score": 0.544345,
+     "loc": [
+      56,
+      94
+     ]
+    },
+    "1.28": {
+     "score": 0.534999,
+     "loc": [
+      56,
+      93
+     ]
+    },
+    "1.29": {
+     "score": 0.523923,
+     "loc": [
+      51,
+      93
+     ]
+    },
+    "1.30": {
+     "score": 0.512761,
+     "loc": [
+      56,
+      92
+     ]
+    },
+    "1.31": {
+     "score": 0.502448,
+     "loc": [
+      56,
+      91
+     ]
+    },
+    "1.32": {
+     "score": 0.491861,
+     "loc": [
+      55,
+      90
+     ]
+    },
+    "1.33": {
+     "score": 0.483667,
+     "loc": [
+      55,
+      89
+     ]
+    },
+    "1.34": {
+     "score": 0.476313,
+     "loc": [
+      56,
+      89
+     ]
+    },
+    "1.35": {
+     "score": 0.469463,
+     "loc": [
+      55,
+      88
+     ]
+    },
+    "1.36": {
+     "score": 0.464109,
+     "loc": [
+      55,
+      88
+     ]
+    },
+    "1.37": {
+     "score": 0.456875,
+     "loc": [
+      55,
+      87
+     ]
+    },
+    "1.38": {
+     "score": 0.451194,
+     "loc": [
+      55,
+      87
+     ]
+    },
+    "1.39": {
+     "score": 0.445211,
+     "loc": [
+      54,
+      86
+     ]
+    },
+    "1.40": {
+     "score": 0.438544,
+     "loc": [
+      54,
+      86
+     ]
+    }
+   }
+  },
+  "2": {
+   "library_entry": "组2·塞雷娅",
+   "slot": 4,
+   "slot_top_score": 0.8309,
+   "online_score": 0.8309,
+   "online_scale": 1.05,
+   "curve_best_scale": 1.05,
+   "curve_max": 0.8309,
+   "best_loc": [
+    63,
+    102
+   ],
+   "expected_loc": [
+    54.6,
+    79.8
+   ],
+   "residual_px": [
+    8.4,
+    22.2
+   ],
+   "residual_norm": 23.74,
+   "widest_peak_scale": 1.01,
+   "widest_peak_score": 0.97575,
+   "peak_on_grid_edge": false,
+   "interval_edge_scores": {
+    "1.05": 0.8309,
+    "1.15": 0.58712
+   },
+   "above_interval_peak": 0.97575,
+   "box_luma_mean": 169.967,
+   "box_luma_std": 57.288,
+   "box_rgb_mean": [
+    183.86,
+    167.68,
+    158.37
+   ],
+   "ranking_top": [
+    {
+     "entry": "组2·塞雷娅",
+     "score": 0.8309
+    },
+    {
+     "entry": "组1·塞雷娅",
+     "score": 0.584884
+    },
+    {
+     "entry": "组2·凯尔希·思衡托",
+     "score": 0.550734
+    },
+    {
+     "entry": "组2·温蒂",
+     "score": 0.527144
+    }
+   ],
+   "curve_11": {
+    "1.05": {
+     "score": 0.8309,
+     "loc": [
+      63,
+      102
+     ]
+    },
+    "1.06": {
+     "score": 0.786583,
+     "loc": [
+      63,
+      102
+     ]
+    },
+    "1.07": {
+     "score": 0.749292,
+     "loc": [
+      63,
+      101
+     ]
+    },
+    "1.08": {
+     "score": 0.723869,
+     "loc": [
+      63,
+      101
+     ]
+    },
+    "1.09": {
+     "score": 0.703277,
+     "loc": [
+      63,
+      100
+     ]
+    },
+    "1.10": {
+     "score": 0.67921,
+     "loc": [
+      63,
+      100
+     ]
+    },
+    "1.11": {
+     "score": 0.660021,
+     "loc": [
+      63,
+      99
+     ]
+    },
+    "1.12": {
+     "score": 0.637163,
+     "loc": [
+      63,
+      98
+     ]
+    },
+    "1.13": {
+     "score": 0.617711,
+     "loc": [
+      63,
+      97
+     ]
+    },
+    "1.14": {
+     "score": 0.600845,
+     "loc": [
+      63,
+      97
+     ]
+    },
+    "1.15": {
+     "score": 0.58712,
+     "loc": [
+      63,
+      96
+     ]
+    }
+   },
+   "curve_wide": {
+    "0.80": {
+     "score": 0.39336,
+     "loc": [
+      67,
+      116
+     ]
+    },
+    "0.81": {
+     "score": 0.41277,
+     "loc": [
+      67,
+      116
+     ]
+    },
+    "0.82": {
+     "score": 0.430782,
+     "loc": [
+      67,
+      115
+     ]
+    },
+    "0.83": {
+     "score": 0.448322,
+     "loc": [
+      67,
+      115
+     ]
+    },
+    "0.84": {
+     "score": 0.468131,
+     "loc": [
+      67,
+      114
+     ]
+    },
+    "0.85": {
+     "score": 0.487066,
+     "loc": [
+      67,
+      114
+     ]
+    },
+    "0.86": {
+     "score": 0.507979,
+     "loc": [
+      67,
+      113
+     ]
+    },
+    "0.87": {
+     "score": 0.528081,
+     "loc": [
+      67,
+      112
+     ]
+    },
+    "0.88": {
+     "score": 0.550373,
+     "loc": [
+      66,
+      112
+     ]
+    },
+    "0.89": {
+     "score": 0.575124,
+     "loc": [
+      66,
+      111
+     ]
+    },
+    "0.90": {
+     "score": 0.593475,
+     "loc": [
+      66,
+      110
+     ]
+    },
+    "0.91": {
+     "score": 0.620635,
+     "loc": [
+      66,
+      110
+     ]
+    },
+    "0.92": {
+     "score": 0.650789,
+     "loc": [
+      66,
+      109
+     ]
+    },
+    "0.93": {
+     "score": 0.680211,
+     "loc": [
+      66,
+      109
+     ]
+    },
+    "0.94": {
+     "score": 0.715996,
+     "loc": [
+      66,
+      108
+     ]
+    },
+    "0.95": {
+     "score": 0.736076,
+     "loc": [
+      66,
+      107
+     ]
+    },
+    "0.96": {
+     "score": 0.78195,
+     "loc": [
+      66,
+      107
+     ]
+    },
+    "0.97": {
+     "score": 0.820034,
+     "loc": [
+      66,
+      106
+     ]
+    },
+    "0.98": {
+     "score": 0.882292,
+     "loc": [
+      66,
+      106
+     ]
+    },
+    "0.99": {
+     "score": 0.917348,
+     "loc": [
+      66,
+      105
+     ]
+    },
+    "1.00": {
+     "score": 0.962991,
+     "loc": [
+      65,
+      105
+     ]
+    },
+    "1.01": {
+     "score": 0.97575,
+     "loc": [
+      65,
+      104
+     ]
+    },
+    "1.02": {
+     "score": 0.963843,
+     "loc": [
+      64,
+      104
+     ]
+    },
+    "1.03": {
+     "score": 0.929317,
+     "loc": [
+      64,
+      103
+     ]
+    },
+    "1.04": {
+     "score": 0.877051,
+     "loc": [
+      63,
+      103
+     ]
+    },
+    "1.05": {
+     "score": 0.8309,
+     "loc": [
+      63,
+      102
+     ]
+    },
+    "1.06": {
+     "score": 0.786583,
+     "loc": [
+      63,
+      102
+     ]
+    },
+    "1.07": {
+     "score": 0.749292,
+     "loc": [
+      63,
+      101
+     ]
+    },
+    "1.08": {
+     "score": 0.723869,
+     "loc": [
+      63,
+      101
+     ]
+    },
+    "1.09": {
+     "score": 0.703277,
+     "loc": [
+      63,
+      100
+     ]
+    },
+    "1.10": {
+     "score": 0.67921,
+     "loc": [
+      63,
+      100
+     ]
+    },
+    "1.11": {
+     "score": 0.660021,
+     "loc": [
+      63,
+      99
+     ]
+    },
+    "1.12": {
+     "score": 0.637163,
+     "loc": [
+      63,
+      98
+     ]
+    },
+    "1.13": {
+     "score": 0.617711,
+     "loc": [
+      63,
+      97
+     ]
+    },
+    "1.14": {
+     "score": 0.600845,
+     "loc": [
+      63,
+      97
+     ]
+    },
+    "1.15": {
+     "score": 0.58712,
+     "loc": [
+      63,
+      96
+     ]
+    },
+    "1.16": {
+     "score": 0.568801,
+     "loc": [
+      63,
+      95
+     ]
+    },
+    "1.17": {
+     "score": 0.547764,
+     "loc": [
+      62,
+      94
+     ]
+    },
+    "1.18": {
+     "score": 0.528149,
+     "loc": [
+      62,
+      93
+     ]
+    },
+    "1.19": {
+     "score": 0.507669,
+     "loc": [
+      62,
+      92
+     ]
+    },
+    "1.20": {
+     "score": 0.488093,
+     "loc": [
+      62,
+      91
+     ]
+    },
+    "1.21": {
+     "score": 0.470514,
+     "loc": [
+      62,
+      90
+     ]
+    },
+    "1.22": {
+     "score": 0.45447,
+     "loc": [
+      61,
+      89
+     ]
+    },
+    "1.23": {
+     "score": 0.439705,
+     "loc": [
+      61,
+      88
+     ]
+    },
+    "1.24": {
+     "score": 0.422611,
+     "loc": [
+      61,
+      87
+     ]
+    },
+    "1.25": {
+     "score": 0.404522,
+     "loc": [
+      61,
+      87
+     ]
+    },
+    "1.26": {
+     "score": 0.388505,
+     "loc": [
+      61,
+      86
+     ]
+    },
+    "1.27": {
+     "score": 0.374937,
+     "loc": [
+      61,
+      86
+     ]
+    },
+    "1.28": {
+     "score": 0.363434,
+     "loc": [
+      61,
+      85
+     ]
+    },
+    "1.29": {
+     "score": 0.349335,
+     "loc": [
+      61,
+      84
+     ]
+    },
+    "1.30": {
+     "score": 0.337138,
+     "loc": [
+      54,
+      78
+     ]
+    },
+    "1.31": {
+     "score": 0.33189,
+     "loc": [
+      54,
+      77
+     ]
+    },
+    "1.32": {
+     "score": 0.323526,
+     "loc": [
+      53,
+      76
+     ]
+    },
+    "1.33": {
+     "score": 0.314245,
+     "loc": [
+      40,
+      77
+     ]
+    },
+    "1.34": {
+     "score": 0.314067,
+     "loc": [
+      38,
+      77
+     ]
+    },
+    "1.35": {
+     "score": 0.313619,
+     "loc": [
+      37,
+      76
+     ]
+    },
+    "1.36": {
+     "score": 0.313528,
+     "loc": [
+      37,
+      75
+     ]
+    },
+    "1.37": {
+     "score": 0.313512,
+     "loc": [
+      36,
+      74
+     ]
+    },
+    "1.38": {
+     "score": 0.312681,
+     "loc": [
+      36,
+      73
+     ]
+    },
+    "1.39": {
+     "score": 0.312703,
+     "loc": [
+      35,
+      72
+     ]
+    },
+    "1.40": {
+     "score": 0.312722,
+     "loc": [
+      35,
+      71
+     ]
+    }
+   }
+  }
+ },
+ "every_operator": {
+  "1": {
+   "圣聆初雪": {
+    "library_entry": "组1·圣聆初雪",
+    "slot": 1,
+    "online_score": 0.979013,
+    "online_scale": 1.06,
+    "widest_peak_scale": 1.06,
+    "widest_peak_score": 0.979013,
+    "residual_norm": 26.44,
+    "above_interval_peak": 0.958212,
+    "interval_edge_scores": {
+     "1.05": 0.97845,
+     "1.15": 0.691012
+    },
+    "box_luma_mean": 180.34,
+    "box_luma_std": 52.325
+   },
+   "凛御银灰": {
+    "library_entry": "组1·凛御银灰",
+    "slot": 8,
+    "online_score": 0.983724,
+    "online_scale": 1.07,
+    "widest_peak_scale": 1.07,
+    "widest_peak_score": 0.983724,
+    "residual_norm": 29.05,
+    "above_interval_peak": 0.880151,
+    "interval_edge_scores": {
+     "1.05": 0.919568,
+     "1.15": 0.787877
+    },
+    "box_luma_mean": 158.203,
+    "box_luma_std": 51.909
+   },
+   "歌蕾蒂娅": {
+    "library_entry": "组1·歌蕾蒂娅",
+    "slot": 7,
+    "online_score": 0.973216,
+    "online_scale": 1.15,
+    "widest_peak_scale": 1.16,
+    "widest_peak_score": 0.990592,
+    "residual_norm": 15.75,
+    "above_interval_peak": 0.990592,
+    "interval_edge_scores": {
+     "1.05": 0.757825,
+     "1.15": 0.973216
+    },
+    "box_luma_mean": 152.454,
+    "box_luma_std": 77.994
+   },
+   "荒芜拉普兰德": {
+    "library_entry": "组1·荒芜拉普兰德",
+    "slot": 2,
+    "online_score": 0.976083,
+    "online_scale": 1.09,
+    "widest_peak_scale": 1.09,
+    "widest_peak_score": 0.976083,
+    "residual_norm": 22.16,
+    "above_interval_peak": 0.728031,
+    "interval_edge_scores": {
+     "1.05": 0.775498,
+     "1.15": 0.772002
+    },
+    "box_luma_mean": 208.515,
+    "box_luma_std": 46.72
+   },
+   "凯尔希·思衡托": {
+    "library_entry": "组1·凯尔希·思衡托",
+    "slot": 5,
+    "online_score": 0.985137,
+    "online_scale": 1.06,
+    "widest_peak_scale": 1.06,
+    "widest_peak_score": 0.985137,
+    "residual_norm": 26.44,
+    "above_interval_peak": 0.92332,
+    "interval_edge_scores": {
+     "1.05": 0.952919,
+     "1.15": 0.743134
+    },
+    "box_luma_mean": 201.134,
+    "box_luma_std": 48.24
+   },
+   "白面鸮": {
+    "library_entry": "组1·白面鸮",
+    "slot": 6,
+    "online_score": 0.986174,
+    "online_scale": 1.06,
+    "widest_peak_scale": 1.06,
+    "widest_peak_score": 0.986174,
+    "residual_norm": 16.48,
+    "above_interval_peak": 0.966101,
+    "interval_edge_scores": {
+     "1.05": 0.981399,
+     "1.15": 0.754764
+    },
+    "box_luma_mean": 203.081,
+    "box_luma_std": 44.925
+   },
+   "塞雷娅": {
+    "library_entry": "组1·塞雷娅",
+    "slot": 4,
+    "online_score": 0.987521,
+    "online_scale": 1.05,
+    "widest_peak_scale": 1.05,
+    "widest_peak_score": 0.987521,
+    "residual_norm": 27.41,
+    "above_interval_peak": 0.95968,
+    "interval_edge_scores": {
+     "1.05": 0.987521,
+     "1.15": 0.729778
+    },
+    "box_luma_mean": 155.936,
+    "box_luma_std": 57.325
+   },
+   "温蒂": {
+    "library_entry": "组1·温蒂",
+    "slot": 3,
+    "online_score": 0.977354,
+    "online_scale": 1.13,
+    "widest_peak_scale": 1.13,
+    "widest_peak_score": 0.977354,
+    "residual_norm": 19.16,
+    "above_interval_peak": 0.848556,
+    "interval_edge_scores": {
+     "1.05": 0.709005,
+     "1.15": 0.899094
+    },
+    "box_luma_mean": 186.151,
+    "box_luma_std": 61.757
+   },
+   "维什戴尔": {
+    "library_entry": "组1·维什戴尔",
+    "slot": 0,
+    "online_score": 0.981707,
+    "online_scale": 1.13,
+    "widest_peak_scale": 1.13,
+    "widest_peak_score": 0.981707,
+    "residual_norm": 16.27,
+    "above_interval_peak": 0.912507,
+    "interval_edge_scores": {
+     "1.05": 0.831332,
+     "1.15": 0.940177
+    },
+    "box_luma_mean": 162.202,
+    "box_luma_std": 51.672
+   },
+   "极境": {
+    "library_entry": "组1·极境",
+    "slot": 9,
+    "online_score": 0.980115,
+    "online_scale": 1.13,
+    "widest_peak_scale": 1.13,
+    "widest_peak_score": 0.980115,
+    "residual_norm": 14.33,
+    "above_interval_peak": 0.871725,
+    "interval_edge_scores": {
+     "1.05": 0.738686,
+     "1.15": 0.916809
+    },
+    "box_luma_mean": 170.172,
+    "box_luma_std": 60.492
+   }
+  },
+  "2": {
+   "圣聆初雪": {
+    "library_entry": "组2·圣聆初雪",
+    "slot": 1,
+    "online_score": 0.87709,
+    "online_scale": 1.05,
+    "widest_peak_scale": 1.02,
+    "widest_peak_score": 0.983677,
+    "residual_norm": 26.26,
+    "above_interval_peak": 0.983677,
+    "interval_edge_scores": {
+     "1.05": 0.87709,
+     "1.15": 0.501351
+    },
+    "box_luma_mean": 193.83,
+    "box_luma_std": 49.822
+   },
+   "凛御银灰": {
+    "library_entry": "组2·凛御银灰",
+    "slot": 8,
+    "online_score": 0.985731,
+    "online_scale": 1.11,
+    "widest_peak_scale": 1.11,
+    "widest_peak_score": 0.985731,
+    "residual_norm": 18.84,
+    "above_interval_peak": 0.863445,
+    "interval_edge_scores": {
+     "1.05": 0.814512,
+     "1.15": 0.896389
+    },
+    "box_luma_mean": 170.824,
+    "box_luma_std": 53.067
+   },
+   "歌蕾蒂娅": {
+    "library_entry": "组2·歌蕾蒂娅",
+    "slot": 7,
+    "online_score": 0.990646,
+    "online_scale": 1.15,
+    "widest_peak_scale": 1.15,
+    "widest_peak_score": 0.990646,
+    "residual_norm": 18.16,
+    "above_interval_peak": 0.970025,
+    "interval_edge_scores": {
+     "1.05": 0.763838,
+     "1.15": 0.990646
+    },
+    "box_luma_mean": 169.648,
+    "box_luma_std": 70.57
+   },
+   "荒芜拉普兰德": {
+    "library_entry": "组2·荒芜拉普兰德",
+    "slot": 2,
+    "online_score": 0.983103,
+    "online_scale": 1.11,
+    "widest_peak_scale": 1.11,
+    "widest_peak_score": 0.983103,
+    "residual_norm": 17.69,
+    "above_interval_peak": 0.804883,
+    "interval_edge_scores": {
+     "1.05": 0.733265,
+     "1.15": 0.848079
+    },
+    "box_luma_mean": 202.901,
+    "box_luma_std": 44.514
+   },
+   "凯尔希·思衡托": {
+    "library_entry": "组2·凯尔希·思衡托",
+    "slot": 5,
+    "online_score": 0.981858,
+    "online_scale": 1.06,
+    "widest_peak_scale": 1.06,
+    "widest_peak_score": 0.981858,
+    "residual_norm": 25.46,
+    "above_interval_peak": 0.96126,
+    "interval_edge_scores": {
+     "1.05": 0.98014,
+     "1.15": 0.781305
+    },
+    "box_luma_mean": 203.369,
+    "box_luma_std": 46.284
+   },
+   "白面鸮": {
+    "library_entry": "组2·白面鸮",
+    "slot": 6,
+    "online_score": 0.910849,
+    "online_scale": 1.05,
+    "widest_peak_scale": 1.02,
+    "widest_peak_score": 0.982616,
+    "residual_norm": 25.77,
+    "above_interval_peak": 0.982616,
+    "interval_edge_scores": {
+     "1.05": 0.910849,
+     "1.15": 0.610449
+    },
+    "box_luma_mean": 198.623,
+    "box_luma_std": 57.44
+   },
+   "塞雷娅": {
+    "library_entry": "组2·塞雷娅",
+    "slot": 4,
+    "online_score": 0.8309,
+    "online_scale": 1.05,
+    "widest_peak_scale": 1.01,
+    "widest_peak_score": 0.97575,
+    "residual_norm": 23.74,
+    "above_interval_peak": 0.97575,
+    "interval_edge_scores": {
+     "1.05": 0.8309,
+     "1.15": 0.58712
+    },
+    "box_luma_mean": 169.967,
+    "box_luma_std": 57.288
+   },
+   "温蒂": {
+    "library_entry": "组2·温蒂",
+    "slot": 3,
+    "online_score": 0.987181,
+    "online_scale": 1.09,
+    "widest_peak_scale": 1.09,
+    "widest_peak_score": 0.987181,
+    "residual_norm": 19.03,
+    "above_interval_peak": 0.816553,
+    "interval_edge_scores": {
+     "1.05": 0.85941,
+     "1.15": 0.815518
+    },
+    "box_luma_mean": 180.149,
+    "box_luma_std": 59.178
+   },
+   "维什戴尔": {
+    "library_entry": "组2·维什戴尔",
+    "slot": 0,
+    "online_score": 0.985461,
+    "online_scale": 1.1,
+    "widest_peak_scale": 1.1,
+    "widest_peak_score": 0.985461,
+    "residual_norm": 19.44,
+    "above_interval_peak": 0.736433,
+    "interval_edge_scores": {
+     "1.05": 0.754456,
+     "1.15": 0.781842
+    },
+    "box_luma_mean": 175.23,
+    "box_luma_std": 48.126
+   },
+   "极境": {
+    "library_entry": "组2·极境",
+    "slot": 9,
+    "online_score": 0.972989,
+    "online_scale": 1.13,
+    "widest_peak_scale": 1.13,
+    "widest_peak_score": 0.972989,
+    "residual_norm": 14.9,
+    "above_interval_peak": 0.920541,
+    "interval_edge_scores": {
+     "1.05": 0.784677,
+     "1.15": 0.954512
+    },
+    "box_luma_mean": 128.333,
+    "box_luma_std": 71.884
+   }
+  }
+ },
+ "crosscheck": {
+  "note": "曲线是那条链内层那一步逐档重跑；它在 IDENTITY_SCALES 上的最大值 必须与 roster_scores 给的分逐位相等 —— 不相等就说明这不是同一条链。",
+  "all_equal": true,
+  "rows": {
+   "组1·圣聆初雪": {
+    "roster_scores": 0.979013,
+    "curve_max": 0.979013,
+    "equal": true
+   },
+   "组1·凛御银灰": {
+    "roster_scores": 0.983724,
+    "curve_max": 0.983724,
+    "equal": true
+   },
+   "组1·歌蕾蒂娅": {
+    "roster_scores": 0.973216,
+    "curve_max": 0.973216,
+    "equal": true
+   },
+   "组1·荒芜拉普兰德": {
+    "roster_scores": 0.976083,
+    "curve_max": 0.976083,
+    "equal": true
+   },
+   "组1·凯尔希·思衡托": {
+    "roster_scores": 0.985137,
+    "curve_max": 0.985137,
+    "equal": true
+   },
+   "组1·白面鸮": {
+    "roster_scores": 0.986174,
+    "curve_max": 0.986174,
+    "equal": true
+   },
+   "组1·塞雷娅": {
+    "roster_scores": 0.987521,
+    "curve_max": 0.987521,
+    "equal": true
+   },
+   "组1·温蒂": {
+    "roster_scores": 0.977354,
+    "curve_max": 0.977354,
+    "equal": true
+   },
+   "组1·维什戴尔": {
+    "roster_scores": 0.981707,
+    "curve_max": 0.981707,
+    "equal": true
+   },
+   "组1·极境": {
+    "roster_scores": 0.980115,
+    "curve_max": 0.980115,
+    "equal": true
+   },
+   "组2·圣聆初雪": {
+    "roster_scores": 0.87709,
+    "curve_max": 0.87709,
+    "equal": true
+   },
+   "组2·凛御银灰": {
+    "roster_scores": 0.985731,
+    "curve_max": 0.985731,
+    "equal": true
+   },
+   "组2·歌蕾蒂娅": {
+    "roster_scores": 0.990646,
+    "curve_max": 0.990646,
+    "equal": true
+   },
+   "组2·荒芜拉普兰德": {
+    "roster_scores": 0.983103,
+    "curve_max": 0.983103,
+    "equal": true
+   },
+   "组2·凯尔希·思衡托": {
+    "roster_scores": 0.981858,
+    "curve_max": 0.981858,
+    "equal": true
+   },
+   "组2·白面鸮": {
+    "roster_scores": 0.910849,
+    "curve_max": 0.910849,
+    "equal": true
+   },
+   "组2·塞雷娅": {
+    "roster_scores": 0.8309,
+    "curve_max": 0.8309,
+    "equal": true
+   },
+   "组2·温蒂": {
+    "roster_scores": 0.987181,
+    "curve_max": 0.987181,
+    "equal": true
+   },
+   "组2·维什戴尔": {
+    "roster_scores": 0.985461,
+    "curve_max": 0.985461,
+    "equal": true
+   },
+   "组2·极境": {
+    "roster_scores": 0.972989,
+    "curve_max": 0.972989,
+    "equal": true
+   }
+  },
+  "find_squad_card": {
+   "组1·圣聆初雪": 1,
+   "组1·凛御银灰": 8,
+   "组1·歌蕾蒂娅": 7,
+   "组1·荒芜拉普兰德": 2,
+   "组1·凯尔希·思衡托": 5,
+   "组1·白面鸮": 6,
+   "组1·塞雷娅": 4,
+   "组1·温蒂": 3,
+   "组1·维什戴尔": 0,
+   "组1·极境": 9,
+   "组2·圣聆初雪": 1,
+   "组2·凛御银灰": 8,
+   "组2·歌蕾蒂娅": 7,
+   "组2·荒芜拉普兰德": 2,
+   "组2·凯尔希·思衡托": 5,
+   "组2·白面鸮": 6,
+   "组2·塞雷娅": null,
+   "组2·温蒂": 3,
+   "组2·维什戴尔": 0,
+   "组2·极境": 9
+  },
+  "find_squad_card_note": "单条那条路的卡位（恰有一张卡过分数线才给下标，否则 None）—— 它只吃分数，与余量线无关。"
+ },
+ "cross_batch": {
+  "note": "红罩那一批（库 = 点名/编队页.json，与这一批**不同源**）里，名字相同的那些卡的干净卡取区读数 —— 用来分开「这个人在这套立绘上不好认」与「这个人在这条链上就是低」。",
+  "overlap_operators": [
+   "圣聆初雪",
+   "极境",
+   "歌蕾蒂娅",
+   "白面鸮",
+   "维什戴尔"
+  ],
+  "redcap_batch": {
+   "Mon3tr": [
+    {
+     "frame": "cd37",
+     "index": 5,
+     "score": 0.981369,
+     "margin": 0.458366,
+     "redeploying": false
+    },
+    {
+     "frame": "cd59",
+     "index": 5,
+     "score": 0.981369,
+     "margin": 0.458366,
+     "redeploying": false
+    }
+   ],
+   "乌尔比安": [
+    {
+     "frame": "cd14",
+     "index": 3,
+     "score": 0.970116,
+     "margin": 0.290089,
+     "redeploying": true
+    },
+    {
+     "frame": "cd15",
+     "index": 3,
+     "score": 0.967626,
+     "margin": 0.287663,
+     "redeploying": true
+    },
+    {
+     "frame": "cd22",
+     "index": 3,
+     "score": 0.965461,
+     "margin": 0.28546,
+     "redeploying": true
+    },
+    {
+     "frame": "cd23",
+     "index": 3,
+     "score": 0.965685,
+     "margin": 0.28567,
+     "redeploying": true
+    },
+    {
+     "frame": "cd27",
+     "index": 3,
+     "score": 0.966823,
+     "margin": 0.286724,
+     "redeploying": true
+    },
+    {
+     "frame": "cd28",
+     "index": 3,
+     "score": 0.976185,
+     "margin": 0.295919,
+     "redeploying": true
+    },
+    {
+     "frame": "cd37",
+     "index": 3,
+     "score": 0.982144,
+     "margin": 0.475036,
+     "redeploying": false
+    },
+    {
+     "frame": "cd59",
+     "index": 3,
+     "score": 0.982144,
+     "margin": 0.475036,
+     "redeploying": false
+    }
+   ],
+   "圣聆初雪": [
+    {
+     "frame": "cd14",
+     "index": 2,
+     "score": 0.970915,
+     "margin": 0.373319,
+     "redeploying": true
+    },
+    {
+     "frame": "cd15",
+     "index": 2,
+     "score": 0.971017,
+     "margin": 0.373621,
+     "redeploying": true
+    },
+    {
+     "frame": "cd22",
+     "index": 2,
+     "score": 0.979359,
+     "margin": 0.591634,
+     "redeploying": false
+    },
+    {
+     "frame": "cd23",
+     "index": 2,
+     "score": 0.979359,
+     "margin": 0.591634,
+     "redeploying": false
+    },
+    {
+     "frame": "cd27",
+     "index": 2,
+     "score": 0.979359,
+     "margin": 0.591634,
+     "redeploying": false
+    },
+    {
+     "frame": "cd28",
+     "index": 2,
+     "score": 0.979359,
+     "margin": 0.591634,
+     "redeploying": false
+    },
+    {
+     "frame": "cd37",
+     "index": 2,
+     "score": 0.979359,
+     "margin": 0.591634,
+     "redeploying": false
+    },
+    {
+     "frame": "cd59",
+     "index": 2,
+     "score": 0.979359,
+     "margin": 0.591634,
+     "redeploying": false
+    }
+   ],
+   "斩业星熊": [
+    {
+     "frame": "cd14",
+     "index": 0,
+     "score": 0.967544,
+     "margin": 0.514234,
+     "redeploying": false
+    },
+    {
+     "frame": "cd15",
+     "index": 0,
+     "score": 0.967611,
+     "margin": 0.514305,
+     "redeploying": false
+    },
+    {
+     "frame": "cd22",
+     "index": 0,
+     "score": 0.967633,
+     "margin": 0.514354,
+     "redeploying": false
+    },
+    {
+     "frame": "cd23",
+     "index": 0,
+     "score": 0.967636,
+     "margin": 0.514365,
+     "redeploying": false
+    },
+    {
+     "frame": "cd27",
+     "index": 0,
+     "score": 0.967684,
+     "margin": 0.514532,
+     "redeploying": false
+    },
+    {
+     "frame": "cd28",
+     "index": 0,
+     "score": 0.967544,
+     "margin": 0.514234,
+     "redeploying": false
+    },
+    {
+     "frame": "cd37",
+     "index": 0,
+     "score": 0.967547,
+     "margin": 0.514241,
+     "redeploying": false
+    },
+    {
+     "frame": "cd59",
+     "index": 0,
+     "score": 0.967544,
+     "margin": 0.514234,
+     "redeploying": false
+    }
+   ],
+   "新约能天使": [
+    {
+     "frame": "cd14",
+     "index": 8,
+     "score": 0.977536,
+     "margin": 0.317141,
+     "redeploying": true
+    },
+    {
+     "frame": "cd15",
+     "index": 8,
+     "score": 0.977239,
+     "margin": 0.317931,
+     "redeploying": true
+    },
+    {
+     "frame": "cd22",
+     "index": 9,
+     "score": 0.981559,
+     "margin": 0.325128,
+     "redeploying": true
+    },
+    {
+     "frame": "cd23",
+     "index": 9,
+     "score": 0.986875,
+     "margin": 0.502726,
+     "redeploying": false
+    },
+    {
+     "frame": "cd27",
+     "index": 9,
+     "score": 0.986875,
+     "margin": 0.502726,
+     "redeploying": false
+    },
+    {
+     "frame": "cd28",
+     "index": 9,
+     "score": 0.986875,
+     "margin": 0.502726,
+     "redeploying": false
+    },
+    {
+     "frame": "cd37",
+     "index": 9,
+     "score": 0.986875,
+     "margin": 0.502726,
+     "redeploying": false
+    },
+    {
+     "frame": "cd59",
+     "index": 9,
+     "score": 0.986875,
+     "margin": 0.502726,
+     "redeploying": false
+    }
+   ],
+   "极境": [
+    {
+     "frame": "cd14",
+     "index": 9,
+     "score": 0.982093,
+     "margin": 0.587958,
+     "redeploying": false
+    },
+    {
+     "frame": "cd15",
+     "index": 9,
+     "score": 0.982093,
+     "margin": 0.587958,
+     "redeploying": false
+    },
+    {
+     "frame": "cd22",
+     "index": 10,
+     "score": 0.974038,
+     "margin": 0.578635,
+     "redeploying": false
+    },
+    {
+     "frame": "cd23",
+     "index": 10,
+     "score": 0.974038,
+     "margin": 0.578635,
+     "redeploying": false
+    },
+    {
+     "frame": "cd27",
+     "index": 10,
+     "score": 0.974038,
+     "margin": 0.578635,
+     "redeploying": false
+    },
+    {
+     "frame": "cd28",
+     "index": 10,
+     "score": 0.974038,
+     "margin": 0.578635,
+     "redeploying": false
+    },
+    {
+     "frame": "cd37",
+     "index": 10,
+     "score": 0.974038,
+     "margin": 0.578635,
+     "redeploying": false
+    },
+    {
+     "frame": "cd59",
+     "index": 10,
+     "score": 0.974038,
+     "margin": 0.578635,
+     "redeploying": false
+    }
+   ],
+   "歌蕾蒂娅": [
+    {
+     "frame": "cd14",
+     "index": 6,
+     "score": 0.976221,
+     "margin": 0.416505,
+     "redeploying": false
+    },
+    {
+     "frame": "cd15",
+     "index": 6,
+     "score": 0.976221,
+     "margin": 0.416505,
+     "redeploying": false
+    },
+    {
+     "frame": "cd22",
+     "index": 7,
+     "score": 0.984092,
+     "margin": 0.426061,
+     "redeploying": false
+    },
+    {
+     "frame": "cd23",
+     "index": 7,
+     "score": 0.984092,
+     "margin": 0.426061,
+     "redeploying": false
+    },
+    {
+     "frame": "cd27",
+     "index": 7,
+     "score": 0.984092,
+     "margin": 0.426061,
+     "redeploying": false
+    },
+    {
+     "frame": "cd28",
+     "index": 7,
+     "score": 0.984092,
+     "margin": 0.426061,
+     "redeploying": false
+    },
+    {
+     "frame": "cd37",
+     "index": 7,
+     "score": 0.984092,
+     "margin": 0.426061,
+     "redeploying": false
+    },
+    {
+     "frame": "cd59",
+     "index": 7,
+     "score": 0.984092,
+     "margin": 0.426061,
+     "redeploying": false
+    }
+   ],
+   "白面鸮": [
+    {
+     "frame": "cd14",
+     "index": 5,
+     "score": 0.974809,
+     "margin": 0.550692,
+     "redeploying": true
+    },
+    {
+     "frame": "cd15",
+     "index": 5,
+     "score": 0.974744,
+     "margin": 0.55047,
+     "redeploying": true
+    },
+    {
+     "frame": "cd22",
+     "index": 6,
+     "score": 0.971595,
+     "margin": 0.547686,
+     "redeploying": true
+    },
+    {
+     "frame": "cd23",
+     "index": 6,
+     "score": 0.971601,
+     "margin": 0.547546,
+     "redeploying": true
+    },
+    {
+     "frame": "cd27",
+     "index": 6,
+     "score": 0.972069,
+     "margin": 0.548104,
+     "redeploying": true
+    },
+    {
+     "frame": "cd28",
+     "index": 6,
+     "score": 0.992094,
+     "margin": 0.593151,
+     "redeploying": false
+    },
+    {
+     "frame": "cd37",
+     "index": 6,
+     "score": 0.992094,
+     "margin": 0.593151,
+     "redeploying": false
+    },
+    {
+     "frame": "cd59",
+     "index": 6,
+     "score": 0.992094,
+     "margin": 0.593151,
+     "redeploying": false
+    }
+   ],
+   "维什戴尔": [
+    {
+     "frame": "cd14",
+     "index": 1,
+     "score": 0.984065,
+     "margin": 0.317264,
+     "redeploying": true
+    },
+    {
+     "frame": "cd15",
+     "index": 1,
+     "score": 0.984765,
+     "margin": 0.471947,
+     "redeploying": false
+    },
+    {
+     "frame": "cd22",
+     "index": 1,
+     "score": 0.984765,
+     "margin": 0.471947,
+     "redeploying": false
+    },
+    {
+     "frame": "cd23",
+     "index": 1,
+     "score": 0.984765,
+     "margin": 0.471947,
+     "redeploying": false
+    },
+    {
+     "frame": "cd27",
+     "index": 1,
+     "score": 0.984765,
+     "margin": 0.471947,
+     "redeploying": false
+    },
+    {
+     "frame": "cd28",
+     "index": 1,
+     "score": 0.984765,
+     "margin": 0.471947,
+     "redeploying": false
+    },
+    {
+     "frame": "cd37",
+     "index": 1,
+     "score": 0.984765,
+     "margin": 0.471947,
+     "redeploying": false
+    },
+    {
+     "frame": "cd59",
+     "index": 1,
+     "score": 0.984765,
+     "margin": 0.471947,
+     "redeploying": false
+    }
+   ],
+   "黍": [
+    {
+     "frame": "cd22",
+     "index": 4,
+     "score": 0.972755,
+     "margin": 0.553901,
+     "redeploying": true
+    },
+    {
+     "frame": "cd23",
+     "index": 4,
+     "score": 0.974139,
+     "margin": 0.554546,
+     "redeploying": true
+    },
+    {
+     "frame": "cd27",
+     "index": 4,
+     "score": 0.974682,
+     "margin": 0.555524,
+     "redeploying": true
+    },
+    {
+     "frame": "cd28",
+     "index": 4,
+     "score": 0.974403,
+     "margin": 0.553203,
+     "redeploying": true
+    },
+    {
+     "frame": "cd37",
+     "index": 4,
+     "score": 0.973745,
+     "margin": 0.554398,
+     "redeploying": true
+    },
+    {
+     "frame": "cd59",
+     "index": 4,
+     "score": 0.977358,
+     "margin": 0.61177,
+     "redeploying": false
+    }
+   ]
+  }
+ }
+}

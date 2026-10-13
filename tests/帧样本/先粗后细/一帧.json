@@ -1,0 +1,94 @@
+{
+ "note": "丙：真跑一帧（点名那条链的线上入口 read_squad_identities）。只量不改。",
+ "batch": "备战席",
+ "frame": "shot01",
+ "cards": 12,
+ "library": 11,
+ "match_template_calls": 1452,
+ "rounds_s": [
+  14.5601,
+  20.6923,
+  22.5624
+ ],
+ "median_s": 20.6923,
+ "folded_estimate": {
+  "seconds": 21.1253,
+  "source": "tests/帧样本/先粗后细/读数.json 的 cost_measured（复用）",
+  "formula": "卡位 12 x 库 11 x 11 档 x 每次 0.014549 s"
+ },
+ "slots": [
+  {
+   "index": 0,
+   "shape": "Valued",
+   "payload": "Exact",
+   "name": null
+  },
+  {
+   "index": 1,
+   "shape": "Valued",
+   "payload": "Exact",
+   "name": null
+  },
+  {
+   "index": 2,
+   "shape": "Valued",
+   "payload": "Exact",
+   "name": null
+  },
+  {
+   "index": 3,
+   "shape": "Valued",
+   "payload": "Unknown",
+   "name": null
+  },
+  {
+   "index": 4,
+   "shape": "Valued",
+   "payload": "Unknown",
+   "name": null
+  },
+  {
+   "index": 5,
+   "shape": "Valued",
+   "payload": "Exact",
+   "name": null
+  },
+  {
+   "index": 6,
+   "shape": "Valued",
+   "payload": "Unknown",
+   "name": null
+  },
+  {
+   "index": 7,
+   "shape": "Valued",
+   "payload": "Exact",
+   "name": null
+  },
+  {
+   "index": 8,
+   "shape": "Valued",
+   "payload": "Unknown",
+   "name": null
+  },
+  {
+   "index": 9,
+   "shape": "Valued",
+   "payload": "Exact",
+   "name": null
+  },
+  {
+   "index": 10,
+   "shape": "Valued",
+   "payload": "Unknown",
+   "name": null
+  },
+  {
+   "index": 11,
+   "shape": "Valued",
+   "payload": "Unknown",
+   "name": null
+  }
+ ],
+ "seconds": 58.055
+}

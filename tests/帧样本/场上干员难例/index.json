@@ -1,0 +1,687 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "note": "场上我方干员那三条读数链的**补测批**：用户连拍里挑的 12 张难例（一格里有好几根条、挨得近、被黄菱形压住），按 `场上干员` 同一套尺寸裁成 300×420。它**不是**真值批（没有面板真值落进来），也**不是**基准集。",
+  "crops": [
+    {
+      "file": "r01_01_01.png",
+      "origin": [
+        1247,
+        145
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/hard_多个技能条紧挨着.png",
+      "source_sha256": "22fe531afa5ea750252f8172e36430bbc1a121a46226245a79669ed1c02a76ef"
+    },
+    {
+      "file": "r01_01_02.png",
+      "origin": [
+        970,
+        290
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/hard_多个技能条紧挨着.png",
+      "source_sha256": "22fe531afa5ea750252f8172e36430bbc1a121a46226245a79669ed1c02a76ef"
+    },
+    {
+      "file": "r01_01_03.png",
+      "origin": [
+        1109,
+        290
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/hard_多个技能条紧挨着.png",
+      "source_sha256": "22fe531afa5ea750252f8172e36430bbc1a121a46226245a79669ed1c02a76ef"
+    },
+    {
+      "file": "r01_01_04.png",
+      "origin": [
+        1247,
+        290
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/hard_多个技能条紧挨着.png",
+      "source_sha256": "22fe531afa5ea750252f8172e36430bbc1a121a46226245a79669ed1c02a76ef"
+    },
+    {
+      "file": "r01_01_05.png",
+      "origin": [
+        1524,
+        290
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/hard_多个技能条紧挨着.png",
+      "source_sha256": "22fe531afa5ea750252f8172e36430bbc1a121a46226245a79669ed1c02a76ef"
+    },
+    {
+      "file": "r01_01_06.png",
+      "origin": [
+        1385,
+        291
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/hard_多个技能条紧挨着.png",
+      "source_sha256": "22fe531afa5ea750252f8172e36430bbc1a121a46226245a79669ed1c02a76ef"
+    },
+    {
+      "file": "r01_02_01.png",
+      "origin": [
+        1354,
+        159
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/hard_多个技能条错位挨着.png",
+      "source_sha256": "51dc10762b4d85ecb7ec4608153dea6395720e503ff18d2777254e3c9f36b1b6"
+    },
+    {
+      "file": "r01_02_02.png",
+      "origin": [
+        1487,
+        224
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/hard_多个技能条错位挨着.png",
+      "source_sha256": "51dc10762b4d85ecb7ec4608153dea6395720e503ff18d2777254e3c9f36b1b6"
+    },
+    {
+      "file": "r01_02_03.png",
+      "origin": [
+        1364,
+        293
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/hard_多个技能条错位挨着.png",
+      "source_sha256": "51dc10762b4d85ecb7ec4608153dea6395720e503ff18d2777254e3c9f36b1b6"
+    },
+    {
+      "file": "r01_02_04.png",
+      "origin": [
+        1238,
+        305
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/hard_多个技能条错位挨着.png",
+      "source_sha256": "51dc10762b4d85ecb7ec4608153dea6395720e503ff18d2777254e3c9f36b1b6"
+    },
+    {
+      "file": "r01_02_05.png",
+      "origin": [
+        1114,
+        316
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/hard_多个技能条错位挨着.png",
+      "source_sha256": "51dc10762b4d85ecb7ec4608153dea6395720e503ff18d2777254e3c9f36b1b6"
+    },
+    {
+      "file": "r01_03_01.png",
+      "origin": [
+        1367,
+        257
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-202939-929.png",
+      "source_sha256": "eab8aba7921b001a2c636238027d6b5cf339c2b5bb3029a5b7ec3b22b9b88a30"
+    },
+    {
+      "file": "r01_03_02.png",
+      "origin": [
+        825,
+        308
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-202939-929.png",
+      "source_sha256": "eab8aba7921b001a2c636238027d6b5cf339c2b5bb3029a5b7ec3b22b9b88a30"
+    },
+    {
+      "file": "r01_03_03.png",
+      "origin": [
+        963,
+        445
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-202939-929.png",
+      "source_sha256": "eab8aba7921b001a2c636238027d6b5cf339c2b5bb3029a5b7ec3b22b9b88a30"
+    },
+    {
+      "file": "r01_04_01.png",
+      "origin": [
+        1965,
+        200
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-202959-919.png",
+      "source_sha256": "821a646f8e68c8520d32c91c75deed7cb18ef693bfc1553a59d3ff5792ddb962"
+    },
+    {
+      "file": "r01_04_02.png",
+      "origin": [
+        1658,
+        229
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-202959-919.png",
+      "source_sha256": "821a646f8e68c8520d32c91c75deed7cb18ef693bfc1553a59d3ff5792ddb962"
+    },
+    {
+      "file": "r01_04_03.png",
+      "origin": [
+        1367,
+        257
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-202959-919.png",
+      "source_sha256": "821a646f8e68c8520d32c91c75deed7cb18ef693bfc1553a59d3ff5792ddb962"
+    },
+    {
+      "file": "r01_04_04.png",
+      "origin": [
+        1513,
+        276
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-202959-919.png",
+      "source_sha256": "821a646f8e68c8520d32c91c75deed7cb18ef693bfc1553a59d3ff5792ddb962"
+    },
+    {
+      "file": "r01_04_05.png",
+      "origin": [
+        1524,
+        400
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-202959-919.png",
+      "source_sha256": "821a646f8e68c8520d32c91c75deed7cb18ef693bfc1553a59d3ff5792ddb962"
+    },
+    {
+      "file": "r01_05_01.png",
+      "origin": [
+        467,
+        87
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203019-925.png",
+      "source_sha256": "8be0ce67f860bfd1acd8bfc8d0ecc7934977b3fdbcdb647894b878b1ff28e6de"
+    },
+    {
+      "file": "r01_05_02.png",
+      "origin": [
+        1367,
+        257
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203019-925.png",
+      "source_sha256": "8be0ce67f860bfd1acd8bfc8d0ecc7934977b3fdbcdb647894b878b1ff28e6de"
+    },
+    {
+      "file": "r01_05_03.png",
+      "origin": [
+        1226,
+        270
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203019-925.png",
+      "source_sha256": "8be0ce67f860bfd1acd8bfc8d0ecc7934977b3fdbcdb647894b878b1ff28e6de"
+    },
+    {
+      "file": "r01_05_04.png",
+      "origin": [
+        956,
+        296
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203019-925.png",
+      "source_sha256": "8be0ce67f860bfd1acd8bfc8d0ecc7934977b3fdbcdb647894b878b1ff28e6de"
+    },
+    {
+      "file": "r01_05_05.png",
+      "origin": [
+        847,
+        337
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203019-925.png",
+      "source_sha256": "8be0ce67f860bfd1acd8bfc8d0ecc7934977b3fdbcdb647894b878b1ff28e6de"
+    },
+    {
+      "file": "r01_05_06.png",
+      "origin": [
+        831,
+        456
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203019-925.png",
+      "source_sha256": "8be0ce67f860bfd1acd8bfc8d0ecc7934977b3fdbcdb647894b878b1ff28e6de"
+    },
+    {
+      "file": "r01_06_01.png",
+      "origin": [
+        1510,
+        243
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203049-920.png",
+      "source_sha256": "7abe7623b80948f556c8b4a0ecc4a40a9fb826736bece1ff974690487e764088"
+    },
+    {
+      "file": "r01_06_02.png",
+      "origin": [
+        1367,
+        257
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203049-920.png",
+      "source_sha256": "7abe7623b80948f556c8b4a0ecc4a40a9fb826736bece1ff974690487e764088"
+    },
+    {
+      "file": "r01_06_03.png",
+      "origin": [
+        825,
+        308
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203049-920.png",
+      "source_sha256": "7abe7623b80948f556c8b4a0ecc4a40a9fb826736bece1ff974690487e764088"
+    },
+    {
+      "file": "r01_06_04.png",
+      "origin": [
+        974,
+        326
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203049-920.png",
+      "source_sha256": "7abe7623b80948f556c8b4a0ecc4a40a9fb826736bece1ff974690487e764088"
+    },
+    {
+      "file": "r01_06_05.png",
+      "origin": [
+        963,
+        445
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203049-920.png",
+      "source_sha256": "7abe7623b80948f556c8b4a0ecc4a40a9fb826736bece1ff974690487e764088"
+    },
+    {
+      "file": "r01_07_01.png",
+      "origin": [
+        1641,
+        112
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203958-894.png",
+      "source_sha256": "960a969bc57eee289af0c40bdc5926362a937c2d7d6c093ebea773d9bee4f7de"
+    },
+    {
+      "file": "r01_07_02.png",
+      "origin": [
+        1500,
+        127
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203958-894.png",
+      "source_sha256": "960a969bc57eee289af0c40bdc5926362a937c2d7d6c093ebea773d9bee4f7de"
+    },
+    {
+      "file": "r01_07_03.png",
+      "origin": [
+        967,
+        183
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203958-894.png",
+      "source_sha256": "960a969bc57eee289af0c40bdc5926362a937c2d7d6c093ebea773d9bee4f7de"
+    },
+    {
+      "file": "r01_07_04.png",
+      "origin": [
+        1373,
+        289
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-203958-894.png",
+      "source_sha256": "960a969bc57eee289af0c40bdc5926362a937c2d7d6c093ebea773d9bee4f7de"
+    },
+    {
+      "file": "r01_08_01.png",
+      "origin": [
+        1658,
+        229
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-204615-988.png",
+      "source_sha256": "a5016470ee354a2ff1f12c92e9dfc2a55285d82014c69e32e05ab0b5257ef542"
+    },
+    {
+      "file": "r01_08_02.png",
+      "origin": [
+        1367,
+        257
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-204615-988.png",
+      "source_sha256": "a5016470ee354a2ff1f12c92e9dfc2a55285d82014c69e32e05ab0b5257ef542"
+    },
+    {
+      "file": "r01_09_01.png",
+      "origin": [
+        1229,
+        172
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-205107-116.png",
+      "source_sha256": "61801ebeb0920cbc2250649a0240e4df0d971b1893beaf8eaf032f768b1cd829"
+    },
+    {
+      "file": "r01_09_02.png",
+      "origin": [
+        1352,
+        237
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-205107-116.png",
+      "source_sha256": "61801ebeb0920cbc2250649a0240e4df0d971b1893beaf8eaf032f768b1cd829"
+    },
+    {
+      "file": "r01_09_03.png",
+      "origin": [
+        1238,
+        305
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-205107-116.png",
+      "source_sha256": "61801ebeb0920cbc2250649a0240e4df0d971b1893beaf8eaf032f768b1cd829"
+    },
+    {
+      "file": "r01_09_04.png",
+      "origin": [
+        1114,
+        316
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-205107-116.png",
+      "source_sha256": "61801ebeb0920cbc2250649a0240e4df0d971b1893beaf8eaf032f768b1cd829"
+    },
+    {
+      "file": "r01_09_05.png",
+      "origin": [
+        994,
+        327
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/shot_20261007-205107-116.png",
+      "source_sha256": "61801ebeb0920cbc2250649a0240e4df0d971b1893beaf8eaf032f768b1cd829"
+    },
+    {
+      "file": "r01_10_01.png",
+      "origin": [
+        1658,
+        229
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/special_带弹药机制的有竖线间隔的橙色技能条.png",
+      "source_sha256": "29effb238ee41ac6adc7d6e6d1362944381581e0131aa388e7fb8c891040e154"
+    },
+    {
+      "file": "r01_10_02.png",
+      "origin": [
+        1367,
+        257
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/special_带弹药机制的有竖线间隔的橙色技能条.png",
+      "source_sha256": "29effb238ee41ac6adc7d6e6d1362944381581e0131aa388e7fb8c891040e154"
+    },
+    {
+      "file": "r01_11_01.png",
+      "origin": [
+        1358,
+        266
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/special_护盾机制.png",
+      "source_sha256": "3a357c3ed026a35817ef0af22d4a0c41bd69c528e9de448e82c323da4dc792a9"
+    },
+    {
+      "file": "r01_11_02.png",
+      "origin": [
+        1497,
+        342
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/special_护盾机制.png",
+      "source_sha256": "3a357c3ed026a35817ef0af22d4a0c41bd69c528e9de448e82c323da4dc792a9"
+    },
+    {
+      "file": "r01_11_03.png",
+      "origin": [
+        1238,
+        417
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/special_护盾机制.png",
+      "source_sha256": "3a357c3ed026a35817ef0af22d4a0c41bd69c528e9de448e82c323da4dc792a9"
+    },
+    {
+      "file": "r01_11_04.png",
+      "origin": [
+        1109,
+        428
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/special_护盾机制.png",
+      "source_sha256": "3a357c3ed026a35817ef0af22d4a0c41bd69c528e9de448e82c323da4dc792a9"
+    },
+    {
+      "file": "r01_12_01.png",
+      "origin": [
+        1358,
+        266
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "source_sha256": "65946843d4cee824a2e55760b710e7eaf02731907439de73ac499549a1fcbf90"
+    },
+    {
+      "file": "r01_12_02.png",
+      "origin": [
+        1503,
+        396
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "source_sha256": "65946843d4cee824a2e55760b710e7eaf02731907439de73ac499549a1fcbf90"
+    },
+    {
+      "file": "r01_12_03.png",
+      "origin": [
+        1369,
+        411
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "source_sha256": "65946843d4cee824a2e55760b710e7eaf02731907439de73ac499549a1fcbf90"
+    },
+    {
+      "file": "r01_12_04.png",
+      "origin": [
+        1238,
+        417
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "source_sha256": "65946843d4cee824a2e55760b710e7eaf02731907439de73ac499549a1fcbf90"
+    },
+    {
+      "file": "r01_12_05.png",
+      "origin": [
+        1109,
+        428
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "screenshots/run-01/special_黄色菱形挡住了技能条，很难判准，应报未采样.png",
+      "source_sha256": "65946843d4cee824a2e55760b710e7eaf02731907439de73ac499549a1fcbf90"
+    }
+  ]
+}

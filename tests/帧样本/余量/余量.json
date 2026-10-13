@@ -1,0 +1,3369 @@
+{
+  "note": "红罩那条路的「余量从哪来」。掩码版取区（不规则）与最大矩形取区（对照）并排；尺子是 margin.MaskedRuler（线上那条链的统计量、换一块取区），线上链条一个字节没动。",
+  "batch": "tests/帧样本/余量",
+  "capped_batch": "tests/帧样本/红罩",
+  "library": "tests/帧样本/点名/编队页.json",
+  "statistic": "逐通道减均值的零均值归一化相关（与 roster_scores 的 TM_CCOEFF_NORMED 同值，掩码全开时逐位相同）",
+  "lines": {
+    "score": 0.85,
+    "margin": 0.25
+  },
+  "mask": {
+    "boundary": "半径 60 的倒计时圆盘（bench.RING_OUTER）+ 顶上 47 px 那一条",
+    "bbox": [
+      0,
+      47,
+      186,
+      167
+    ],
+    "pixels": 19746,
+    "box_pixels": 31062,
+    "usable_scales": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+    ],
+    "wide": {
+      "bbox": [
+        0,
+        47,
+        204,
+        167
+      ],
+      "pixels": 22752,
+      "usable_scales": [
+        1.05
+      ]
+    }
+  },
+  "rect": {
+    "bbox": [
+      0,
+      177,
+      186,
+      37
+    ],
+    "pixels": 6882,
+    "usable_scales": [
+      1.05,
+      1.06,
+      1.07,
+      1.08,
+      1.09,
+      1.1,
+      1.11,
+      1.12,
+      1.13,
+      1.14,
+      1.15
+    ],
+    "variants": [
+      {
+        "bbox": [
+          164,
+          47,
+          40,
+          167
+        ],
+        "pixels": 6680,
+        "usable_scales": [
+          1.05,
+          1.06,
+          1.07,
+          1.08,
+          1.09,
+          1.1,
+          1.11,
+          1.12,
+          1.13,
+          1.14,
+          1.15
+        ],
+        "note": "上一单点名的 6680（右边条）"
+      },
+      {
+        "bbox": [
+          0,
+          47,
+          43,
+          167
+        ],
+        "pixels": 7181,
+        "usable_scales": [
+          1.05,
+          1.06,
+          1.07,
+          1.08,
+          1.09,
+          1.1,
+          1.11,
+          1.12,
+          1.13,
+          1.14,
+          1.15
+        ],
+        "note": "圆外最宽的左边条"
+      },
+      {
+        "bbox": [
+          0,
+          47,
+          204,
+          37
+        ],
+        "pixels": 7548,
+        "usable_scales": [
+          1.05
+        ],
+        "note": "圆外面积最大的矩形，但 204 宽 → 只剩一档尺度"
+      }
+    ]
+  },
+  "baseline": {
+    "box": [
+      52,
+      76,
+      100,
+      100
+    ],
+    "full": {
+      "pixels": 10000,
+      "note": "整块身份区（= 线上那条链的输入），掩码全开时 MaskedRuler 与 roster_scores 逐位相同"
+    },
+    "masked": {
+      "pixels": 748,
+      "note": "只留排掉倒计时图形之后的那一块"
+    }
+  },
+  "cards": [
+    {
+      "frame": "cd01",
+      "index": 3,
+      "name": "Mon3tr",
+      "truth": "线上那条链读自己干净的身份区：0.9888 / 次高 0.5248 / 余量 0.4641",
+      "mask": {
+        "score": 0.45042,
+        "name": "Mon3tr",
+        "runner_up": 0.346242,
+        "margin": 0.104178
+      },
+      "rect": {
+        "score": 0.485121,
+        "name": "乌尔比安",
+        "runner_up": 0.459906,
+        "margin": 0.025215
+      },
+      "rect_6680": {
+        "score": 0.8476,
+        "name": "Mon3tr",
+        "runner_up": 0.546774,
+        "margin": 0.300826
+      },
+      "identity_masked": {
+        "score": 0.985517,
+        "name": "Mon3tr",
+        "runner_up": 0.675627,
+        "margin": 0.309891
+      }
+    },
+    {
+      "frame": "cd01",
+      "index": 4,
+      "name": "白面鸮",
+      "truth": "线上那条链读自己干净的身份区：0.9855 / 次高 0.4007 / 余量 0.5848",
+      "mask": {
+        "score": 0.790132,
+        "name": "白面鸮",
+        "runner_up": 0.286625,
+        "margin": 0.503507
+      },
+      "rect": {
+        "score": 0.716016,
+        "name": "白面鸮",
+        "runner_up": 0.464148,
+        "margin": 0.251869
+      },
+      "rect_6680": {
+        "score": 0.77395,
+        "name": "白面鸮",
+        "runner_up": 0.523198,
+        "margin": 0.250753
+      },
+      "identity_masked": {
+        "score": 0.98163,
+        "name": "白面鸮",
+        "runner_up": 0.689437,
+        "margin": 0.292192
+      }
+    },
+    {
+      "frame": "cd07",
+      "index": 3,
+      "name": "Mon3tr",
+      "truth": "线上那条链读自己干净的身份区：0.9888 / 次高 0.5248 / 余量 0.4641",
+      "mask": {
+        "score": 0.442973,
+        "name": "Mon3tr",
+        "runner_up": 0.348398,
+        "margin": 0.094574
+      },
+      "rect": {
+        "score": 0.485074,
+        "name": "乌尔比安",
+        "runner_up": 0.459947,
+        "margin": 0.025127
+      },
+      "rect_6680": {
+        "score": 0.845923,
+        "name": "Mon3tr",
+        "runner_up": 0.544913,
+        "margin": 0.301011
+      },
+      "identity_masked": {
+        "score": 0.985517,
+        "name": "Mon3tr",
+        "runner_up": 0.675627,
+        "margin": 0.309891
+      }
+    },
+    {
+      "frame": "cd07",
+      "index": 8,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9781 / 次高 0.3930 / 余量 0.5851",
+      "mask": {
+        "score": 0.389088,
+        "name": "黍",
+        "runner_up": 0.359621,
+        "margin": 0.029467
+      },
+      "rect": {
+        "score": 0.570808,
+        "name": "极境",
+        "runner_up": 0.372285,
+        "margin": 0.198523
+      },
+      "rect_6680": {
+        "score": 0.57097,
+        "name": "乌尔比安",
+        "runner_up": 0.495141,
+        "margin": 0.075828
+      },
+      "identity_masked": {
+        "score": 0.97784,
+        "name": "极境",
+        "runner_up": 0.654524,
+        "margin": 0.323315
+      }
+    },
+    {
+      "frame": "cd13",
+      "index": 0,
+      "name": "斩业星熊",
+      "truth": "线上那条链读自己干净的身份区：0.9675 / 次高 0.4533 / 余量 0.5142",
+      "mask": {
+        "score": 0.647568,
+        "name": "斩业星熊",
+        "runner_up": 0.208486,
+        "margin": 0.439081
+      },
+      "rect": {
+        "score": 0.413921,
+        "name": "斩业星熊",
+        "runner_up": 0.358439,
+        "margin": 0.055482
+      },
+      "rect_6680": {
+        "score": 0.446239,
+        "name": "黍",
+        "runner_up": 0.397452,
+        "margin": 0.048787
+      },
+      "identity_masked": {
+        "score": 0.887316,
+        "name": "斩业星熊",
+        "runner_up": 0.692202,
+        "margin": 0.195113
+      }
+    },
+    {
+      "frame": "cd13",
+      "index": 9,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9821 / 次高 0.3941 / 余量 0.5880",
+      "mask": {
+        "score": 0.403677,
+        "name": "黍",
+        "runner_up": 0.34232,
+        "margin": 0.061357
+      },
+      "rect": {
+        "score": 0.5639,
+        "name": "极境",
+        "runner_up": 0.370932,
+        "margin": 0.192968
+      },
+      "rect_6680": {
+        "score": 0.561226,
+        "name": "乌尔比安",
+        "runner_up": 0.531951,
+        "margin": 0.029275
+      },
+      "identity_masked": {
+        "score": 0.976173,
+        "name": "极境",
+        "runner_up": 0.658802,
+        "margin": 0.317371
+      }
+    },
+    {
+      "frame": "cd17",
+      "index": 0,
+      "name": "斩业星熊",
+      "truth": "线上那条链读自己干净的身份区：0.9676 / 次高 0.4533 / 余量 0.5143",
+      "mask": {
+        "score": 0.64784,
+        "name": "斩业星熊",
+        "runner_up": 0.209237,
+        "margin": 0.438603
+      },
+      "rect": {
+        "score": 0.413935,
+        "name": "斩业星熊",
+        "runner_up": 0.358443,
+        "margin": 0.055492
+      },
+      "rect_6680": {
+        "score": 0.446246,
+        "name": "黍",
+        "runner_up": 0.397448,
+        "margin": 0.048798
+      },
+      "identity_masked": {
+        "score": 0.88752,
+        "name": "斩业星熊",
+        "runner_up": 0.692212,
+        "margin": 0.195308
+      }
+    },
+    {
+      "frame": "cd17",
+      "index": 1,
+      "name": "维什戴尔",
+      "truth": "线上那条链读自己干净的身份区：0.9848 / 次高 0.5128 / 余量 0.4719",
+      "mask": {
+        "score": 0.683245,
+        "name": "维什戴尔",
+        "runner_up": 0.20477,
+        "margin": 0.478475
+      },
+      "rect": {
+        "score": 0.507194,
+        "name": "维什戴尔",
+        "runner_up": 0.427041,
+        "margin": 0.080153
+      },
+      "rect_6680": {
+        "score": 0.408892,
+        "name": "Mon3tr",
+        "runner_up": 0.407017,
+        "margin": 0.001875
+      },
+      "identity_masked": {
+        "score": 0.965752,
+        "name": "维什戴尔",
+        "runner_up": 0.64195,
+        "margin": 0.323803
+      }
+    },
+    {
+      "frame": "cd17",
+      "index": 6,
+      "name": "歌蕾蒂娅",
+      "truth": "线上那条链读自己干净的身份区：0.9762 / 次高 0.5597 / 余量 0.4165",
+      "mask": {
+        "score": 0.623783,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.278157,
+        "margin": 0.345627
+      },
+      "rect": {
+        "score": 0.553489,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.358586,
+        "margin": 0.194902
+      },
+      "rect_6680": {
+        "score": 0.617021,
+        "name": "圣聆初雪",
+        "runner_up": 0.590561,
+        "margin": 0.02646
+      },
+      "identity_masked": {
+        "score": 0.954319,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.606452,
+        "margin": 0.347866
+      }
+    },
+    {
+      "frame": "cd17",
+      "index": 9,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9821 / 次高 0.3941 / 余量 0.5880",
+      "mask": {
+        "score": 0.404073,
+        "name": "黍",
+        "runner_up": 0.342218,
+        "margin": 0.061855
+      },
+      "rect": {
+        "score": 0.5639,
+        "name": "极境",
+        "runner_up": 0.370932,
+        "margin": 0.192968
+      },
+      "rect_6680": {
+        "score": 0.561226,
+        "name": "乌尔比安",
+        "runner_up": 0.531951,
+        "margin": 0.029275
+      },
+      "identity_masked": {
+        "score": 0.976173,
+        "name": "极境",
+        "runner_up": 0.658802,
+        "margin": 0.317371
+      }
+    },
+    {
+      "frame": "cd21",
+      "index": 0,
+      "name": "斩业星熊",
+      "truth": "线上那条链读自己干净的身份区：0.9675 / 次高 0.4533 / 余量 0.5142",
+      "mask": {
+        "score": 0.647568,
+        "name": "斩业星熊",
+        "runner_up": 0.208486,
+        "margin": 0.439081
+      },
+      "rect": {
+        "score": 0.413921,
+        "name": "斩业星熊",
+        "runner_up": 0.358439,
+        "margin": 0.055482
+      },
+      "rect_6680": {
+        "score": 0.446239,
+        "name": "黍",
+        "runner_up": 0.397452,
+        "margin": 0.048787
+      },
+      "identity_masked": {
+        "score": 0.887316,
+        "name": "斩业星熊",
+        "runner_up": 0.692202,
+        "margin": 0.195113
+      }
+    },
+    {
+      "frame": "cd21",
+      "index": 1,
+      "name": "维什戴尔",
+      "truth": "线上那条链读自己干净的身份区：0.9848 / 次高 0.5128 / 余量 0.4719",
+      "mask": {
+        "score": 0.674811,
+        "name": "维什戴尔",
+        "runner_up": 0.20387,
+        "margin": 0.470941
+      },
+      "rect": {
+        "score": 0.507189,
+        "name": "维什戴尔",
+        "runner_up": 0.427037,
+        "margin": 0.080152
+      },
+      "rect_6680": {
+        "score": 0.408889,
+        "name": "Mon3tr",
+        "runner_up": 0.407014,
+        "margin": 0.001875
+      },
+      "identity_masked": {
+        "score": 0.965752,
+        "name": "维什戴尔",
+        "runner_up": 0.64195,
+        "margin": 0.323803
+      }
+    },
+    {
+      "frame": "cd21",
+      "index": 2,
+      "name": "圣聆初雪",
+      "truth": "线上那条链读自己干净的身份区：0.9794 / 次高 0.3877 / 余量 0.5916",
+      "mask": {
+        "score": 0.49617,
+        "name": "圣聆初雪",
+        "runner_up": 0.369865,
+        "margin": 0.126305
+      },
+      "rect": {
+        "score": 0.46254,
+        "name": "圣聆初雪",
+        "runner_up": 0.390117,
+        "margin": 0.072423
+      },
+      "rect_6680": {
+        "score": 0.545231,
+        "name": "圣聆初雪",
+        "runner_up": 0.374801,
+        "margin": 0.17043
+      },
+      "identity_masked": {
+        "score": 0.976828,
+        "name": "圣聆初雪",
+        "runner_up": 0.70147,
+        "margin": 0.275359
+      }
+    },
+    {
+      "frame": "cd21",
+      "index": 7,
+      "name": "歌蕾蒂娅",
+      "truth": "线上那条链读自己干净的身份区：0.9841 / 次高 0.5580 / 余量 0.4261",
+      "mask": {
+        "score": 0.63092,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.277904,
+        "margin": 0.353015
+      },
+      "rect": {
+        "score": 0.555959,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.35676,
+        "margin": 0.199199
+      },
+      "rect_6680": {
+        "score": 0.615813,
+        "name": "圣聆初雪",
+        "runner_up": 0.591228,
+        "margin": 0.024585
+      },
+      "identity_masked": {
+        "score": 0.96308,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.603265,
+        "margin": 0.359814
+      }
+    },
+    {
+      "frame": "cd21",
+      "index": 10,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9740 / 次高 0.3954 / 余量 0.5786",
+      "mask": {
+        "score": 0.390104,
+        "name": "黍",
+        "runner_up": 0.349011,
+        "margin": 0.041093
+      },
+      "rect": {
+        "score": 0.557798,
+        "name": "极境",
+        "runner_up": 0.369178,
+        "margin": 0.188619
+      },
+      "rect_6680": {
+        "score": 0.555334,
+        "name": "乌尔比安",
+        "runner_up": 0.538093,
+        "margin": 0.017242
+      },
+      "identity_masked": {
+        "score": 0.985431,
+        "name": "极境",
+        "runner_up": 0.654504,
+        "margin": 0.330927
+      }
+    },
+    {
+      "frame": "cd25",
+      "index": 0,
+      "name": "斩业星熊",
+      "truth": "线上那条链读自己干净的身份区：0.9677 / 次高 0.4543 / 余量 0.5134",
+      "mask": {
+        "score": 0.639937,
+        "name": "斩业星熊",
+        "runner_up": 0.22631,
+        "margin": 0.413627
+      },
+      "rect": {
+        "score": 0.412763,
+        "name": "斩业星熊",
+        "runner_up": 0.359731,
+        "margin": 0.053032
+      },
+      "rect_6680": {
+        "score": 0.446268,
+        "name": "黍",
+        "runner_up": 0.397436,
+        "margin": 0.048832
+      },
+      "identity_masked": {
+        "score": 0.885956,
+        "name": "斩业星熊",
+        "runner_up": 0.686885,
+        "margin": 0.199071
+      }
+    },
+    {
+      "frame": "cd25",
+      "index": 1,
+      "name": "维什戴尔",
+      "truth": "线上那条链读自己干净的身份区：0.9848 / 次高 0.5128 / 余量 0.4719",
+      "mask": {
+        "score": 0.690944,
+        "name": "维什戴尔",
+        "runner_up": 0.205044,
+        "margin": 0.4859
+      },
+      "rect": {
+        "score": 0.507194,
+        "name": "维什戴尔",
+        "runner_up": 0.427057,
+        "margin": 0.080137
+      },
+      "rect_6680": {
+        "score": 0.408921,
+        "name": "Mon3tr",
+        "runner_up": 0.407033,
+        "margin": 0.001888
+      },
+      "identity_masked": {
+        "score": 0.965752,
+        "name": "维什戴尔",
+        "runner_up": 0.64195,
+        "margin": 0.323803
+      }
+    },
+    {
+      "frame": "cd25",
+      "index": 2,
+      "name": "圣聆初雪",
+      "truth": "线上那条链读自己干净的身份区：0.9794 / 次高 0.3877 / 余量 0.5916",
+      "mask": {
+        "score": 0.559864,
+        "name": "圣聆初雪",
+        "runner_up": 0.352035,
+        "margin": 0.20783
+      },
+      "rect": {
+        "score": 0.462296,
+        "name": "圣聆初雪",
+        "runner_up": 0.39015,
+        "margin": 0.072146
+      },
+      "rect_6680": {
+        "score": 0.542959,
+        "name": "圣聆初雪",
+        "runner_up": 0.374523,
+        "margin": 0.168435
+      },
+      "identity_masked": {
+        "score": 0.976828,
+        "name": "圣聆初雪",
+        "runner_up": 0.70147,
+        "margin": 0.275359
+      }
+    },
+    {
+      "frame": "cd25",
+      "index": 7,
+      "name": "歌蕾蒂娅",
+      "truth": "线上那条链读自己干净的身份区：0.9841 / 次高 0.5580 / 余量 0.4261",
+      "mask": {
+        "score": 0.591772,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.289207,
+        "margin": 0.302565
+      },
+      "rect": {
+        "score": 0.556137,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.356062,
+        "margin": 0.200074
+      },
+      "rect_6680": {
+        "score": 0.615415,
+        "name": "圣聆初雪",
+        "runner_up": 0.59083,
+        "margin": 0.024585
+      },
+      "identity_masked": {
+        "score": 0.96308,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.603265,
+        "margin": 0.359814
+      }
+    },
+    {
+      "frame": "cd25",
+      "index": 9,
+      "name": "新约能天使",
+      "truth": "线上那条链读自己干净的身份区：0.9869 / 次高 0.4841 / 余量 0.5027",
+      "mask": {
+        "score": 0.376888,
+        "name": "新约能天使",
+        "runner_up": 0.294623,
+        "margin": 0.082265
+      },
+      "rect": {
+        "score": 0.370585,
+        "name": "黍",
+        "runner_up": 0.311479,
+        "margin": 0.059106
+      },
+      "rect_6680": {
+        "score": 0.556873,
+        "name": "乌尔比安",
+        "runner_up": 0.448506,
+        "margin": 0.108367
+      },
+      "identity_masked": {
+        "score": 0.953665,
+        "name": "新约能天使",
+        "runner_up": 0.503077,
+        "margin": 0.450588
+      }
+    },
+    {
+      "frame": "cd25",
+      "index": 10,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9740 / 次高 0.3954 / 余量 0.5786",
+      "mask": {
+        "score": 0.403039,
+        "name": "黍",
+        "runner_up": 0.343256,
+        "margin": 0.059782
+      },
+      "rect": {
+        "score": 0.557881,
+        "name": "极境",
+        "runner_up": 0.369247,
+        "margin": 0.188634
+      },
+      "rect_6680": {
+        "score": 0.554234,
+        "name": "乌尔比安",
+        "runner_up": 0.542087,
+        "margin": 0.012146
+      },
+      "identity_masked": {
+        "score": 0.985431,
+        "name": "极境",
+        "runner_up": 0.654504,
+        "margin": 0.330927
+      }
+    },
+    {
+      "frame": "cd29",
+      "index": 0,
+      "name": "斩业星熊",
+      "truth": "线上那条链读自己干净的身份区：0.9676 / 次高 0.4533 / 余量 0.5144",
+      "mask": {
+        "score": 0.647454,
+        "name": "斩业星熊",
+        "runner_up": 0.208936,
+        "margin": 0.438518
+      },
+      "rect": {
+        "score": 0.413784,
+        "name": "斩业星熊",
+        "runner_up": 0.3586,
+        "margin": 0.055184
+      },
+      "rect_6680": {
+        "score": 0.446261,
+        "name": "黍",
+        "runner_up": 0.397443,
+        "margin": 0.048818
+      },
+      "identity_masked": {
+        "score": 0.887678,
+        "name": "斩业星熊",
+        "runner_up": 0.691899,
+        "margin": 0.195779
+      }
+    },
+    {
+      "frame": "cd29",
+      "index": 1,
+      "name": "维什戴尔",
+      "truth": "线上那条链读自己干净的身份区：0.9848 / 次高 0.5128 / 余量 0.4719",
+      "mask": {
+        "score": 0.681471,
+        "name": "维什戴尔",
+        "runner_up": 0.204217,
+        "margin": 0.477254
+      },
+      "rect": {
+        "score": 0.507194,
+        "name": "维什戴尔",
+        "runner_up": 0.427046,
+        "margin": 0.080148
+      },
+      "rect_6680": {
+        "score": 0.408899,
+        "name": "Mon3tr",
+        "runner_up": 0.407019,
+        "margin": 0.001879
+      },
+      "identity_masked": {
+        "score": 0.965752,
+        "name": "维什戴尔",
+        "runner_up": 0.64195,
+        "margin": 0.323803
+      }
+    },
+    {
+      "frame": "cd29",
+      "index": 2,
+      "name": "圣聆初雪",
+      "truth": "线上那条链读自己干净的身份区：0.9794 / 次高 0.3877 / 余量 0.5916",
+      "mask": {
+        "score": 0.502043,
+        "name": "圣聆初雪",
+        "runner_up": 0.366289,
+        "margin": 0.135754
+      },
+      "rect": {
+        "score": 0.462512,
+        "name": "圣聆初雪",
+        "runner_up": 0.39012,
+        "margin": 0.072392
+      },
+      "rect_6680": {
+        "score": 0.543825,
+        "name": "圣聆初雪",
+        "runner_up": 0.374581,
+        "margin": 0.169244
+      },
+      "identity_masked": {
+        "score": 0.976828,
+        "name": "圣聆初雪",
+        "runner_up": 0.70147,
+        "margin": 0.275359
+      }
+    },
+    {
+      "frame": "cd29",
+      "index": 6,
+      "name": "白面鸮",
+      "truth": "线上那条链读自己干净的身份区：0.9921 / 次高 0.3989 / 余量 0.5932",
+      "mask": {
+        "score": 0.787645,
+        "name": "白面鸮",
+        "runner_up": 0.286041,
+        "margin": 0.501604
+      },
+      "rect": {
+        "score": 0.719046,
+        "name": "白面鸮",
+        "runner_up": 0.464136,
+        "margin": 0.254909
+      },
+      "rect_6680": {
+        "score": 0.773995,
+        "name": "白面鸮",
+        "runner_up": 0.520476,
+        "margin": 0.253519
+      },
+      "identity_masked": {
+        "score": 0.989992,
+        "name": "白面鸮",
+        "runner_up": 0.674908,
+        "margin": 0.315084
+      }
+    },
+    {
+      "frame": "cd29",
+      "index": 7,
+      "name": "歌蕾蒂娅",
+      "truth": "线上那条链读自己干净的身份区：0.9841 / 次高 0.5580 / 余量 0.4261",
+      "mask": {
+        "score": 0.591772,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.289207,
+        "margin": 0.302565
+      },
+      "rect": {
+        "score": 0.556137,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.356062,
+        "margin": 0.200074
+      },
+      "rect_6680": {
+        "score": 0.615415,
+        "name": "圣聆初雪",
+        "runner_up": 0.59083,
+        "margin": 0.024585
+      },
+      "identity_masked": {
+        "score": 0.96308,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.603265,
+        "margin": 0.359814
+      }
+    },
+    {
+      "frame": "cd29",
+      "index": 9,
+      "name": "新约能天使",
+      "truth": "线上那条链读自己干净的身份区：0.9869 / 次高 0.4841 / 余量 0.5027",
+      "mask": {
+        "score": 0.376888,
+        "name": "新约能天使",
+        "runner_up": 0.294623,
+        "margin": 0.082265
+      },
+      "rect": {
+        "score": 0.370585,
+        "name": "黍",
+        "runner_up": 0.311479,
+        "margin": 0.059106
+      },
+      "rect_6680": {
+        "score": 0.556873,
+        "name": "乌尔比安",
+        "runner_up": 0.448506,
+        "margin": 0.108367
+      },
+      "identity_masked": {
+        "score": 0.953665,
+        "name": "新约能天使",
+        "runner_up": 0.503077,
+        "margin": 0.450588
+      }
+    },
+    {
+      "frame": "cd29",
+      "index": 10,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9740 / 次高 0.3954 / 余量 0.5786",
+      "mask": {
+        "score": 0.402117,
+        "name": "黍",
+        "runner_up": 0.342775,
+        "margin": 0.059341
+      },
+      "rect": {
+        "score": 0.557875,
+        "name": "极境",
+        "runner_up": 0.369245,
+        "margin": 0.18863
+      },
+      "rect_6680": {
+        "score": 0.554234,
+        "name": "乌尔比安",
+        "runner_up": 0.542087,
+        "margin": 0.012146
+      },
+      "identity_masked": {
+        "score": 0.985431,
+        "name": "极境",
+        "runner_up": 0.654504,
+        "margin": 0.330927
+      }
+    },
+    {
+      "frame": "cd32",
+      "index": 0,
+      "name": "斩业星熊",
+      "truth": "线上那条链读自己干净的身份区：0.9676 / 次高 0.4533 / 余量 0.5143",
+      "mask": {
+        "score": 0.646832,
+        "name": "斩业星熊",
+        "runner_up": 0.210657,
+        "margin": 0.436175
+      },
+      "rect": {
+        "score": 0.413855,
+        "name": "斩业星熊",
+        "runner_up": 0.358592,
+        "margin": 0.055263
+      },
+      "rect_6680": {
+        "score": 0.446261,
+        "name": "黍",
+        "runner_up": 0.397438,
+        "margin": 0.048824
+      },
+      "identity_masked": {
+        "score": 0.887704,
+        "name": "斩业星熊",
+        "runner_up": 0.691858,
+        "margin": 0.195845
+      }
+    },
+    {
+      "frame": "cd32",
+      "index": 1,
+      "name": "维什戴尔",
+      "truth": "线上那条链读自己干净的身份区：0.9848 / 次高 0.5128 / 余量 0.4719",
+      "mask": {
+        "score": 0.678173,
+        "name": "维什戴尔",
+        "runner_up": 0.204373,
+        "margin": 0.4738
+      },
+      "rect": {
+        "score": 0.507194,
+        "name": "维什戴尔",
+        "runner_up": 0.427046,
+        "margin": 0.080148
+      },
+      "rect_6680": {
+        "score": 0.408906,
+        "name": "Mon3tr",
+        "runner_up": 0.407025,
+        "margin": 0.001881
+      },
+      "identity_masked": {
+        "score": 0.965752,
+        "name": "维什戴尔",
+        "runner_up": 0.64195,
+        "margin": 0.323803
+      }
+    },
+    {
+      "frame": "cd32",
+      "index": 2,
+      "name": "圣聆初雪",
+      "truth": "线上那条链读自己干净的身份区：0.9794 / 次高 0.3877 / 余量 0.5916",
+      "mask": {
+        "score": 0.508856,
+        "name": "圣聆初雪",
+        "runner_up": 0.359701,
+        "margin": 0.149155
+      },
+      "rect": {
+        "score": 0.462483,
+        "name": "圣聆初雪",
+        "runner_up": 0.39012,
+        "margin": 0.072363
+      },
+      "rect_6680": {
+        "score": 0.543933,
+        "name": "圣聆初雪",
+        "runner_up": 0.374601,
+        "margin": 0.169331
+      },
+      "identity_masked": {
+        "score": 0.976828,
+        "name": "圣聆初雪",
+        "runner_up": 0.70147,
+        "margin": 0.275359
+      }
+    },
+    {
+      "frame": "cd32",
+      "index": 3,
+      "name": "乌尔比安",
+      "truth": "线上那条链读自己干净的身份区：0.9822 / 次高 0.5078 / 余量 0.4744",
+      "mask": {
+        "score": 0.360991,
+        "name": "乌尔比安",
+        "runner_up": 0.303423,
+        "margin": 0.057568
+      },
+      "rect": {
+        "score": 0.426341,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.354639,
+        "margin": 0.071702
+      },
+      "rect_6680": {
+        "score": 0.491439,
+        "name": "乌尔比安",
+        "runner_up": 0.456818,
+        "margin": 0.034621
+      },
+      "identity_masked": {
+        "score": 0.913107,
+        "name": "乌尔比安",
+        "runner_up": 0.720254,
+        "margin": 0.192854
+      }
+    },
+    {
+      "frame": "cd32",
+      "index": 5,
+      "name": "Mon3tr",
+      "truth": "线上那条链读自己干净的身份区：0.9814 / 次高 0.5230 / 余量 0.4584",
+      "mask": {
+        "score": 0.465127,
+        "name": "Mon3tr",
+        "runner_up": 0.344181,
+        "margin": 0.120946
+      },
+      "rect": {
+        "score": 0.485052,
+        "name": "乌尔比安",
+        "runner_up": 0.464565,
+        "margin": 0.020488
+      },
+      "rect_6680": {
+        "score": 0.828595,
+        "name": "Mon3tr",
+        "runner_up": 0.542709,
+        "margin": 0.285886
+      },
+      "identity_masked": {
+        "score": 0.967107,
+        "name": "Mon3tr",
+        "runner_up": 0.67856,
+        "margin": 0.288547
+      }
+    },
+    {
+      "frame": "cd32",
+      "index": 6,
+      "name": "白面鸮",
+      "truth": "线上那条链读自己干净的身份区：0.9921 / 次高 0.3989 / 余量 0.5932",
+      "mask": {
+        "score": 0.787645,
+        "name": "白面鸮",
+        "runner_up": 0.286041,
+        "margin": 0.501604
+      },
+      "rect": {
+        "score": 0.719046,
+        "name": "白面鸮",
+        "runner_up": 0.464136,
+        "margin": 0.254909
+      },
+      "rect_6680": {
+        "score": 0.773995,
+        "name": "白面鸮",
+        "runner_up": 0.520476,
+        "margin": 0.253519
+      },
+      "identity_masked": {
+        "score": 0.989992,
+        "name": "白面鸮",
+        "runner_up": 0.674908,
+        "margin": 0.315084
+      }
+    },
+    {
+      "frame": "cd32",
+      "index": 7,
+      "name": "歌蕾蒂娅",
+      "truth": "线上那条链读自己干净的身份区：0.9841 / 次高 0.5580 / 余量 0.4261",
+      "mask": {
+        "score": 0.591772,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.289207,
+        "margin": 0.302565
+      },
+      "rect": {
+        "score": 0.556137,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.356062,
+        "margin": 0.200074
+      },
+      "rect_6680": {
+        "score": 0.615415,
+        "name": "圣聆初雪",
+        "runner_up": 0.59083,
+        "margin": 0.024585
+      },
+      "identity_masked": {
+        "score": 0.96308,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.603265,
+        "margin": 0.359814
+      }
+    },
+    {
+      "frame": "cd32",
+      "index": 9,
+      "name": "新约能天使",
+      "truth": "线上那条链读自己干净的身份区：0.9869 / 次高 0.4841 / 余量 0.5027",
+      "mask": {
+        "score": 0.377583,
+        "name": "新约能天使",
+        "runner_up": 0.292392,
+        "margin": 0.085191
+      },
+      "rect": {
+        "score": 0.370566,
+        "name": "黍",
+        "runner_up": 0.311489,
+        "margin": 0.059078
+      },
+      "rect_6680": {
+        "score": 0.556873,
+        "name": "乌尔比安",
+        "runner_up": 0.448506,
+        "margin": 0.108367
+      },
+      "identity_masked": {
+        "score": 0.953665,
+        "name": "新约能天使",
+        "runner_up": 0.503077,
+        "margin": 0.450588
+      }
+    },
+    {
+      "frame": "cd32",
+      "index": 10,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9740 / 次高 0.3954 / 余量 0.5786",
+      "mask": {
+        "score": 0.387535,
+        "name": "黍",
+        "runner_up": 0.355231,
+        "margin": 0.032305
+      },
+      "rect": {
+        "score": 0.557802,
+        "name": "极境",
+        "runner_up": 0.369205,
+        "margin": 0.188597
+      },
+      "rect_6680": {
+        "score": 0.557878,
+        "name": "乌尔比安",
+        "runner_up": 0.527698,
+        "margin": 0.03018
+      },
+      "identity_masked": {
+        "score": 0.985431,
+        "name": "极境",
+        "runner_up": 0.654504,
+        "margin": 0.330927
+      }
+    },
+    {
+      "frame": "cd38",
+      "index": 0,
+      "name": "斩业星熊",
+      "truth": "线上那条链读自己干净的身份区：0.9678 / 次高 0.4530 / 余量 0.5147",
+      "mask": {
+        "score": 0.647665,
+        "name": "斩业星熊",
+        "runner_up": 0.210088,
+        "margin": 0.437577
+      },
+      "rect": {
+        "score": 0.414112,
+        "name": "斩业星熊",
+        "runner_up": 0.358447,
+        "margin": 0.055665
+      },
+      "rect_6680": {
+        "score": 0.446293,
+        "name": "黍",
+        "runner_up": 0.397423,
+        "margin": 0.048869
+      },
+      "identity_masked": {
+        "score": 0.88841,
+        "name": "斩业星熊",
+        "runner_up": 0.692612,
+        "margin": 0.195798
+      }
+    },
+    {
+      "frame": "cd38",
+      "index": 1,
+      "name": "维什戴尔",
+      "truth": "线上那条链读自己干净的身份区：0.9848 / 次高 0.5128 / 余量 0.4719",
+      "mask": {
+        "score": 0.676219,
+        "name": "维什戴尔",
+        "runner_up": 0.204645,
+        "margin": 0.471574
+      },
+      "rect": {
+        "score": 0.507194,
+        "name": "维什戴尔",
+        "runner_up": 0.427049,
+        "margin": 0.080145
+      },
+      "rect_6680": {
+        "score": 0.408891,
+        "name": "Mon3tr",
+        "runner_up": 0.407018,
+        "margin": 0.001874
+      },
+      "identity_masked": {
+        "score": 0.965752,
+        "name": "维什戴尔",
+        "runner_up": 0.64195,
+        "margin": 0.323803
+      }
+    },
+    {
+      "frame": "cd38",
+      "index": 2,
+      "name": "圣聆初雪",
+      "truth": "线上那条链读自己干净的身份区：0.9794 / 次高 0.3877 / 余量 0.5916",
+      "mask": {
+        "score": 0.496013,
+        "name": "圣聆初雪",
+        "runner_up": 0.369862,
+        "margin": 0.126151
+      },
+      "rect": {
+        "score": 0.462381,
+        "name": "圣聆初雪",
+        "runner_up": 0.390191,
+        "margin": 0.07219
+      },
+      "rect_6680": {
+        "score": 0.543148,
+        "name": "圣聆初雪",
+        "runner_up": 0.374564,
+        "margin": 0.168584
+      },
+      "identity_masked": {
+        "score": 0.976828,
+        "name": "圣聆初雪",
+        "runner_up": 0.70147,
+        "margin": 0.275359
+      }
+    },
+    {
+      "frame": "cd38",
+      "index": 3,
+      "name": "乌尔比安",
+      "truth": "线上那条链读自己干净的身份区：0.9821 / 次高 0.5071 / 余量 0.4750",
+      "mask": {
+        "score": 0.354479,
+        "name": "乌尔比安",
+        "runner_up": 0.300414,
+        "margin": 0.054065
+      },
+      "rect": {
+        "score": 0.426321,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.353702,
+        "margin": 0.072619
+      },
+      "rect_6680": {
+        "score": 0.479078,
+        "name": "乌尔比安",
+        "runner_up": 0.451262,
+        "margin": 0.027816
+      },
+      "identity_masked": {
+        "score": 0.91166,
+        "name": "乌尔比安",
+        "runner_up": 0.722819,
+        "margin": 0.188841
+      }
+    },
+    {
+      "frame": "cd38",
+      "index": 5,
+      "name": "Mon3tr",
+      "truth": "线上那条链读自己干净的身份区：0.9814 / 次高 0.5230 / 余量 0.4584",
+      "mask": {
+        "score": 0.469018,
+        "name": "Mon3tr",
+        "runner_up": 0.342438,
+        "margin": 0.12658
+      },
+      "rect": {
+        "score": 0.485052,
+        "name": "乌尔比安",
+        "runner_up": 0.464563,
+        "margin": 0.020489
+      },
+      "rect_6680": {
+        "score": 0.828459,
+        "name": "Mon3tr",
+        "runner_up": 0.542612,
+        "margin": 0.285847
+      },
+      "identity_masked": {
+        "score": 0.967104,
+        "name": "Mon3tr",
+        "runner_up": 0.678564,
+        "margin": 0.28854
+      }
+    },
+    {
+      "frame": "cd38",
+      "index": 6,
+      "name": "白面鸮",
+      "truth": "线上那条链读自己干净的身份区：0.9921 / 次高 0.3989 / 余量 0.5932",
+      "mask": {
+        "score": 0.78768,
+        "name": "白面鸮",
+        "runner_up": 0.285961,
+        "margin": 0.501719
+      },
+      "rect": {
+        "score": 0.719062,
+        "name": "白面鸮",
+        "runner_up": 0.464143,
+        "margin": 0.254919
+      },
+      "rect_6680": {
+        "score": 0.777102,
+        "name": "白面鸮",
+        "runner_up": 0.518181,
+        "margin": 0.258921
+      },
+      "identity_masked": {
+        "score": 0.989992,
+        "name": "白面鸮",
+        "runner_up": 0.674908,
+        "margin": 0.315084
+      }
+    },
+    {
+      "frame": "cd38",
+      "index": 7,
+      "name": "歌蕾蒂娅",
+      "truth": "线上那条链读自己干净的身份区：0.9841 / 次高 0.5580 / 余量 0.4261",
+      "mask": {
+        "score": 0.591771,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.289208,
+        "margin": 0.302563
+      },
+      "rect": {
+        "score": 0.556133,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.35606,
+        "margin": 0.200073
+      },
+      "rect_6680": {
+        "score": 0.615408,
+        "name": "圣聆初雪",
+        "runner_up": 0.590826,
+        "margin": 0.024583
+      },
+      "identity_masked": {
+        "score": 0.96308,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.603265,
+        "margin": 0.359814
+      }
+    },
+    {
+      "frame": "cd38",
+      "index": 9,
+      "name": "新约能天使",
+      "truth": "线上那条链读自己干净的身份区：0.9869 / 次高 0.4841 / 余量 0.5027",
+      "mask": {
+        "score": 0.376888,
+        "name": "新约能天使",
+        "runner_up": 0.294623,
+        "margin": 0.082265
+      },
+      "rect": {
+        "score": 0.370585,
+        "name": "黍",
+        "runner_up": 0.311479,
+        "margin": 0.059106
+      },
+      "rect_6680": {
+        "score": 0.556873,
+        "name": "乌尔比安",
+        "runner_up": 0.448506,
+        "margin": 0.108367
+      },
+      "identity_masked": {
+        "score": 0.953665,
+        "name": "新约能天使",
+        "runner_up": 0.503077,
+        "margin": 0.450588
+      }
+    },
+    {
+      "frame": "cd38",
+      "index": 10,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9740 / 次高 0.3954 / 余量 0.5786",
+      "mask": {
+        "score": 0.403039,
+        "name": "黍",
+        "runner_up": 0.343256,
+        "margin": 0.059782
+      },
+      "rect": {
+        "score": 0.557881,
+        "name": "极境",
+        "runner_up": 0.369247,
+        "margin": 0.188634
+      },
+      "rect_6680": {
+        "score": 0.554234,
+        "name": "乌尔比安",
+        "runner_up": 0.542087,
+        "margin": 0.012146
+      },
+      "identity_masked": {
+        "score": 0.985431,
+        "name": "极境",
+        "runner_up": 0.654504,
+        "margin": 0.330927
+      }
+    },
+    {
+      "frame": "cd43",
+      "index": 0,
+      "name": "斩业星熊",
+      "truth": "线上那条链读自己干净的身份区：0.9676 / 次高 0.4535 / 余量 0.5141",
+      "mask": {
+        "score": 0.647261,
+        "name": "斩业星熊",
+        "runner_up": 0.213084,
+        "margin": 0.434177
+      },
+      "rect": {
+        "score": 0.413644,
+        "name": "斩业星熊",
+        "runner_up": 0.358733,
+        "margin": 0.054911
+      },
+      "rect_6680": {
+        "score": 0.446241,
+        "name": "黍",
+        "runner_up": 0.397451,
+        "margin": 0.048789
+      },
+      "identity_masked": {
+        "score": 0.887337,
+        "name": "斩业星熊",
+        "runner_up": 0.691287,
+        "margin": 0.196051
+      }
+    },
+    {
+      "frame": "cd43",
+      "index": 1,
+      "name": "维什戴尔",
+      "truth": "线上那条链读自己干净的身份区：0.9848 / 次高 0.5128 / 余量 0.4719",
+      "mask": {
+        "score": 0.675451,
+        "name": "维什戴尔",
+        "runner_up": 0.20391,
+        "margin": 0.471541
+      },
+      "rect": {
+        "score": 0.507189,
+        "name": "维什戴尔",
+        "runner_up": 0.427037,
+        "margin": 0.080152
+      },
+      "rect_6680": {
+        "score": 0.408913,
+        "name": "Mon3tr",
+        "runner_up": 0.407029,
+        "margin": 0.001884
+      },
+      "identity_masked": {
+        "score": 0.965752,
+        "name": "维什戴尔",
+        "runner_up": 0.64195,
+        "margin": 0.323803
+      }
+    },
+    {
+      "frame": "cd43",
+      "index": 2,
+      "name": "圣聆初雪",
+      "truth": "线上那条链读自己干净的身份区：0.9794 / 次高 0.3877 / 余量 0.5916",
+      "mask": {
+        "score": 0.49617,
+        "name": "圣聆初雪",
+        "runner_up": 0.369865,
+        "margin": 0.126305
+      },
+      "rect": {
+        "score": 0.46254,
+        "name": "圣聆初雪",
+        "runner_up": 0.390117,
+        "margin": 0.072423
+      },
+      "rect_6680": {
+        "score": 0.545231,
+        "name": "圣聆初雪",
+        "runner_up": 0.374801,
+        "margin": 0.17043
+      },
+      "identity_masked": {
+        "score": 0.976828,
+        "name": "圣聆初雪",
+        "runner_up": 0.70147,
+        "margin": 0.275359
+      }
+    },
+    {
+      "frame": "cd43",
+      "index": 3,
+      "name": "乌尔比安",
+      "truth": "线上那条链读自己干净的身份区：0.9821 / 次高 0.5071 / 余量 0.4750",
+      "mask": {
+        "score": 0.354467,
+        "name": "乌尔比安",
+        "runner_up": 0.300417,
+        "margin": 0.05405
+      },
+      "rect": {
+        "score": 0.426286,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.353671,
+        "margin": 0.072616
+      },
+      "rect_6680": {
+        "score": 0.47942,
+        "name": "乌尔比安",
+        "runner_up": 0.451345,
+        "margin": 0.028075
+      },
+      "identity_masked": {
+        "score": 0.91166,
+        "name": "乌尔比安",
+        "runner_up": 0.722819,
+        "margin": 0.188841
+      }
+    },
+    {
+      "frame": "cd43",
+      "index": 4,
+      "name": "黍",
+      "truth": "线上那条链读自己干净的身份区：0.9774 / 次高 0.3656 / 余量 0.6118",
+      "mask": {
+        "score": 0.805768,
+        "name": "黍",
+        "runner_up": 0.367845,
+        "margin": 0.437923
+      },
+      "rect": {
+        "score": 0.566705,
+        "name": "黍",
+        "runner_up": 0.373626,
+        "margin": 0.193079
+      },
+      "rect_6680": {
+        "score": 0.392211,
+        "name": "黍",
+        "runner_up": 0.376675,
+        "margin": 0.015537
+      },
+      "identity_masked": {
+        "score": 0.971422,
+        "name": "黍",
+        "runner_up": 0.595303,
+        "margin": 0.376119
+      }
+    },
+    {
+      "frame": "cd43",
+      "index": 5,
+      "name": "Mon3tr",
+      "truth": "线上那条链读自己干净的身份区：0.9814 / 次高 0.5230 / 余量 0.4584",
+      "mask": {
+        "score": 0.465127,
+        "name": "Mon3tr",
+        "runner_up": 0.344181,
+        "margin": 0.120946
+      },
+      "rect": {
+        "score": 0.485052,
+        "name": "乌尔比安",
+        "runner_up": 0.464565,
+        "margin": 0.020488
+      },
+      "rect_6680": {
+        "score": 0.828595,
+        "name": "Mon3tr",
+        "runner_up": 0.542709,
+        "margin": 0.285886
+      },
+      "identity_masked": {
+        "score": 0.967107,
+        "name": "Mon3tr",
+        "runner_up": 0.67856,
+        "margin": 0.288547
+      }
+    },
+    {
+      "frame": "cd43",
+      "index": 6,
+      "name": "白面鸮",
+      "truth": "线上那条链读自己干净的身份区：0.9921 / 次高 0.3989 / 余量 0.5932",
+      "mask": {
+        "score": 0.788984,
+        "name": "白面鸮",
+        "runner_up": 0.287015,
+        "margin": 0.501968
+      },
+      "rect": {
+        "score": 0.719046,
+        "name": "白面鸮",
+        "runner_up": 0.464142,
+        "margin": 0.254905
+      },
+      "rect_6680": {
+        "score": 0.773995,
+        "name": "白面鸮",
+        "runner_up": 0.520476,
+        "margin": 0.253519
+      },
+      "identity_masked": {
+        "score": 0.989992,
+        "name": "白面鸮",
+        "runner_up": 0.674908,
+        "margin": 0.315084
+      }
+    },
+    {
+      "frame": "cd43",
+      "index": 7,
+      "name": "歌蕾蒂娅",
+      "truth": "线上那条链读自己干净的身份区：0.9841 / 次高 0.5580 / 余量 0.4261",
+      "mask": {
+        "score": 0.593794,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.288834,
+        "margin": 0.304961
+      },
+      "rect": {
+        "score": 0.556099,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.356237,
+        "margin": 0.199862
+      },
+      "rect_6680": {
+        "score": 0.615494,
+        "name": "圣聆初雪",
+        "runner_up": 0.590908,
+        "margin": 0.024586
+      },
+      "identity_masked": {
+        "score": 0.96308,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.603265,
+        "margin": 0.359814
+      }
+    },
+    {
+      "frame": "cd43",
+      "index": 9,
+      "name": "新约能天使",
+      "truth": "线上那条链读自己干净的身份区：0.9869 / 次高 0.4841 / 余量 0.5027",
+      "mask": {
+        "score": 0.378499,
+        "name": "新约能天使",
+        "runner_up": 0.290323,
+        "margin": 0.088176
+      },
+      "rect": {
+        "score": 0.370535,
+        "name": "黍",
+        "runner_up": 0.311351,
+        "margin": 0.059184
+      },
+      "rect_6680": {
+        "score": 0.556525,
+        "name": "乌尔比安",
+        "runner_up": 0.448037,
+        "margin": 0.108488
+      },
+      "identity_masked": {
+        "score": 0.953665,
+        "name": "新约能天使",
+        "runner_up": 0.503077,
+        "margin": 0.450588
+      }
+    },
+    {
+      "frame": "cd43",
+      "index": 10,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9740 / 次高 0.3954 / 余量 0.5786",
+      "mask": {
+        "score": 0.393664,
+        "name": "黍",
+        "runner_up": 0.34777,
+        "margin": 0.045894
+      },
+      "rect": {
+        "score": 0.557853,
+        "name": "极境",
+        "runner_up": 0.369255,
+        "margin": 0.188598
+      },
+      "rect_6680": {
+        "score": 0.559115,
+        "name": "乌尔比安",
+        "runner_up": 0.522006,
+        "margin": 0.037109
+      },
+      "identity_masked": {
+        "score": 0.985431,
+        "name": "极境",
+        "runner_up": 0.654504,
+        "margin": 0.330927
+      }
+    },
+    {
+      "frame": "cd48",
+      "index": 0,
+      "name": "斩业星熊",
+      "truth": "线上那条链读自己干净的身份区：0.9675 / 次高 0.4533 / 余量 0.5142",
+      "mask": {
+        "score": 0.647568,
+        "name": "斩业星熊",
+        "runner_up": 0.208486,
+        "margin": 0.439081
+      },
+      "rect": {
+        "score": 0.413921,
+        "name": "斩业星熊",
+        "runner_up": 0.358439,
+        "margin": 0.055482
+      },
+      "rect_6680": {
+        "score": 0.446239,
+        "name": "黍",
+        "runner_up": 0.397452,
+        "margin": 0.048787
+      },
+      "identity_masked": {
+        "score": 0.887316,
+        "name": "斩业星熊",
+        "runner_up": 0.692202,
+        "margin": 0.195113
+      }
+    },
+    {
+      "frame": "cd48",
+      "index": 1,
+      "name": "维什戴尔",
+      "truth": "线上那条链读自己干净的身份区：0.9848 / 次高 0.5128 / 余量 0.4719",
+      "mask": {
+        "score": 0.674811,
+        "name": "维什戴尔",
+        "runner_up": 0.20387,
+        "margin": 0.470941
+      },
+      "rect": {
+        "score": 0.507189,
+        "name": "维什戴尔",
+        "runner_up": 0.427037,
+        "margin": 0.080152
+      },
+      "rect_6680": {
+        "score": 0.408889,
+        "name": "Mon3tr",
+        "runner_up": 0.407014,
+        "margin": 0.001875
+      },
+      "identity_masked": {
+        "score": 0.965752,
+        "name": "维什戴尔",
+        "runner_up": 0.64195,
+        "margin": 0.323803
+      }
+    },
+    {
+      "frame": "cd48",
+      "index": 2,
+      "name": "圣聆初雪",
+      "truth": "线上那条链读自己干净的身份区：0.9794 / 次高 0.3877 / 余量 0.5916",
+      "mask": {
+        "score": 0.499747,
+        "name": "圣聆初雪",
+        "runner_up": 0.367473,
+        "margin": 0.132274
+      },
+      "rect": {
+        "score": 0.462526,
+        "name": "圣聆初雪",
+        "runner_up": 0.390116,
+        "margin": 0.07241
+      },
+      "rect_6680": {
+        "score": 0.545231,
+        "name": "圣聆初雪",
+        "runner_up": 0.374801,
+        "margin": 0.17043
+      },
+      "identity_masked": {
+        "score": 0.976828,
+        "name": "圣聆初雪",
+        "runner_up": 0.70147,
+        "margin": 0.275359
+      }
+    },
+    {
+      "frame": "cd48",
+      "index": 3,
+      "name": "乌尔比安",
+      "truth": "线上那条链读自己干净的身份区：0.9821 / 次高 0.5073 / 余量 0.4748",
+      "mask": {
+        "score": 0.35595,
+        "name": "乌尔比安",
+        "runner_up": 0.300819,
+        "margin": 0.055131
+      },
+      "rect": {
+        "score": 0.426439,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.354115,
+        "margin": 0.072324
+      },
+      "rect_6680": {
+        "score": 0.484082,
+        "name": "乌尔比安",
+        "runner_up": 0.453713,
+        "margin": 0.030369
+      },
+      "identity_masked": {
+        "score": 0.911892,
+        "name": "乌尔比安",
+        "runner_up": 0.722049,
+        "margin": 0.189842
+      }
+    },
+    {
+      "frame": "cd48",
+      "index": 4,
+      "name": "黍",
+      "truth": "线上那条链读自己干净的身份区：0.9774 / 次高 0.3656 / 余量 0.6118",
+      "mask": {
+        "score": 0.802209,
+        "name": "黍",
+        "runner_up": 0.365761,
+        "margin": 0.436448
+      },
+      "rect": {
+        "score": 0.566632,
+        "name": "黍",
+        "runner_up": 0.373793,
+        "margin": 0.19284
+      },
+      "rect_6680": {
+        "score": 0.392206,
+        "name": "黍",
+        "runner_up": 0.376668,
+        "margin": 0.015538
+      },
+      "identity_masked": {
+        "score": 0.971422,
+        "name": "黍",
+        "runner_up": 0.595303,
+        "margin": 0.376119
+      }
+    },
+    {
+      "frame": "cd48",
+      "index": 5,
+      "name": "Mon3tr",
+      "truth": "线上那条链读自己干净的身份区：0.9814 / 次高 0.5230 / 余量 0.4584",
+      "mask": {
+        "score": 0.473576,
+        "name": "Mon3tr",
+        "runner_up": 0.34098,
+        "margin": 0.132596
+      },
+      "rect": {
+        "score": 0.485105,
+        "name": "乌尔比安",
+        "runner_up": 0.464571,
+        "margin": 0.020534
+      },
+      "rect_6680": {
+        "score": 0.825911,
+        "name": "Mon3tr",
+        "runner_up": 0.54072,
+        "margin": 0.285191
+      },
+      "identity_masked": {
+        "score": 0.9671,
+        "name": "Mon3tr",
+        "runner_up": 0.678545,
+        "margin": 0.288554
+      }
+    },
+    {
+      "frame": "cd48",
+      "index": 6,
+      "name": "白面鸮",
+      "truth": "线上那条链读自己干净的身份区：0.9921 / 次高 0.3989 / 余量 0.5932",
+      "mask": {
+        "score": 0.799329,
+        "name": "白面鸮",
+        "runner_up": 0.295246,
+        "margin": 0.504083
+      },
+      "rect": {
+        "score": 0.719183,
+        "name": "白面鸮",
+        "runner_up": 0.464181,
+        "margin": 0.255002
+      },
+      "rect_6680": {
+        "score": 0.77985,
+        "name": "白面鸮",
+        "runner_up": 0.516141,
+        "margin": 0.26371
+      },
+      "identity_masked": {
+        "score": 0.989992,
+        "name": "白面鸮",
+        "runner_up": 0.674908,
+        "margin": 0.315084
+      }
+    },
+    {
+      "frame": "cd48",
+      "index": 7,
+      "name": "歌蕾蒂娅",
+      "truth": "线上那条链读自己干净的身份区：0.9841 / 次高 0.5580 / 余量 0.4261",
+      "mask": {
+        "score": 0.594199,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.289127,
+        "margin": 0.305072
+      },
+      "rect": {
+        "score": 0.555987,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.35701,
+        "margin": 0.198977
+      },
+      "rect_6680": {
+        "score": 0.616322,
+        "name": "圣聆初雪",
+        "runner_up": 0.591775,
+        "margin": 0.024548
+      },
+      "identity_masked": {
+        "score": 0.96308,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.603265,
+        "margin": 0.359814
+      }
+    },
+    {
+      "frame": "cd48",
+      "index": 9,
+      "name": "新约能天使",
+      "truth": "线上那条链读自己干净的身份区：0.9869 / 次高 0.4841 / 余量 0.5027",
+      "mask": {
+        "score": 0.377103,
+        "name": "新约能天使",
+        "runner_up": 0.29393,
+        "margin": 0.083173
+      },
+      "rect": {
+        "score": 0.370516,
+        "name": "黍",
+        "runner_up": 0.311507,
+        "margin": 0.059009
+      },
+      "rect_6680": {
+        "score": 0.556818,
+        "name": "乌尔比安",
+        "runner_up": 0.448464,
+        "margin": 0.108354
+      },
+      "identity_masked": {
+        "score": 0.953665,
+        "name": "新约能天使",
+        "runner_up": 0.503077,
+        "margin": 0.450588
+      }
+    },
+    {
+      "frame": "cd48",
+      "index": 10,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9740 / 次高 0.3954 / 余量 0.5786",
+      "mask": {
+        "score": 0.40385,
+        "name": "极境",
+        "runner_up": 0.354526,
+        "margin": 0.049324
+      },
+      "rect": {
+        "score": 0.557975,
+        "name": "极境",
+        "runner_up": 0.369575,
+        "margin": 0.1884
+      },
+      "rect_6680": {
+        "score": 0.556947,
+        "name": "乌尔比安",
+        "runner_up": 0.538623,
+        "margin": 0.018324
+      },
+      "identity_masked": {
+        "score": 0.985431,
+        "name": "极境",
+        "runner_up": 0.654504,
+        "margin": 0.330927
+      }
+    },
+    {
+      "frame": "cd52",
+      "index": 0,
+      "name": "斩业星熊",
+      "truth": "线上那条链读自己干净的身份区：0.9675 / 次高 0.4533 / 余量 0.5142",
+      "mask": {
+        "score": 0.647568,
+        "name": "斩业星熊",
+        "runner_up": 0.208486,
+        "margin": 0.439081
+      },
+      "rect": {
+        "score": 0.413921,
+        "name": "斩业星熊",
+        "runner_up": 0.358439,
+        "margin": 0.055482
+      },
+      "rect_6680": {
+        "score": 0.446239,
+        "name": "黍",
+        "runner_up": 0.397452,
+        "margin": 0.048787
+      },
+      "identity_masked": {
+        "score": 0.887316,
+        "name": "斩业星熊",
+        "runner_up": 0.692202,
+        "margin": 0.195113
+      }
+    },
+    {
+      "frame": "cd52",
+      "index": 1,
+      "name": "维什戴尔",
+      "truth": "线上那条链读自己干净的身份区：0.9848 / 次高 0.5128 / 余量 0.4719",
+      "mask": {
+        "score": 0.674811,
+        "name": "维什戴尔",
+        "runner_up": 0.20387,
+        "margin": 0.470941
+      },
+      "rect": {
+        "score": 0.507189,
+        "name": "维什戴尔",
+        "runner_up": 0.427037,
+        "margin": 0.080152
+      },
+      "rect_6680": {
+        "score": 0.408889,
+        "name": "Mon3tr",
+        "runner_up": 0.407014,
+        "margin": 0.001875
+      },
+      "identity_masked": {
+        "score": 0.965752,
+        "name": "维什戴尔",
+        "runner_up": 0.64195,
+        "margin": 0.323803
+      }
+    },
+    {
+      "frame": "cd52",
+      "index": 2,
+      "name": "圣聆初雪",
+      "truth": "线上那条链读自己干净的身份区：0.9794 / 次高 0.3877 / 余量 0.5916",
+      "mask": {
+        "score": 0.49617,
+        "name": "圣聆初雪",
+        "runner_up": 0.369865,
+        "margin": 0.126305
+      },
+      "rect": {
+        "score": 0.46254,
+        "name": "圣聆初雪",
+        "runner_up": 0.390117,
+        "margin": 0.072423
+      },
+      "rect_6680": {
+        "score": 0.545231,
+        "name": "圣聆初雪",
+        "runner_up": 0.374801,
+        "margin": 0.17043
+      },
+      "identity_masked": {
+        "score": 0.976828,
+        "name": "圣聆初雪",
+        "runner_up": 0.70147,
+        "margin": 0.275359
+      }
+    },
+    {
+      "frame": "cd52",
+      "index": 3,
+      "name": "乌尔比安",
+      "truth": "线上那条链读自己干净的身份区：0.9821 / 次高 0.5071 / 余量 0.4750",
+      "mask": {
+        "score": 0.354467,
+        "name": "乌尔比安",
+        "runner_up": 0.300417,
+        "margin": 0.05405
+      },
+      "rect": {
+        "score": 0.426286,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.353671,
+        "margin": 0.072616
+      },
+      "rect_6680": {
+        "score": 0.47942,
+        "name": "乌尔比安",
+        "runner_up": 0.451345,
+        "margin": 0.028075
+      },
+      "identity_masked": {
+        "score": 0.91166,
+        "name": "乌尔比安",
+        "runner_up": 0.722819,
+        "margin": 0.188841
+      }
+    },
+    {
+      "frame": "cd52",
+      "index": 4,
+      "name": "黍",
+      "truth": "线上那条链读自己干净的身份区：0.9774 / 次高 0.3656 / 余量 0.6118",
+      "mask": {
+        "score": 0.805768,
+        "name": "黍",
+        "runner_up": 0.367845,
+        "margin": 0.437923
+      },
+      "rect": {
+        "score": 0.566705,
+        "name": "黍",
+        "runner_up": 0.373626,
+        "margin": 0.193079
+      },
+      "rect_6680": {
+        "score": 0.392211,
+        "name": "黍",
+        "runner_up": 0.376675,
+        "margin": 0.015537
+      },
+      "identity_masked": {
+        "score": 0.971422,
+        "name": "黍",
+        "runner_up": 0.595303,
+        "margin": 0.376119
+      }
+    },
+    {
+      "frame": "cd52",
+      "index": 5,
+      "name": "Mon3tr",
+      "truth": "线上那条链读自己干净的身份区：0.9814 / 次高 0.5230 / 余量 0.4584",
+      "mask": {
+        "score": 0.465127,
+        "name": "Mon3tr",
+        "runner_up": 0.344181,
+        "margin": 0.120946
+      },
+      "rect": {
+        "score": 0.485052,
+        "name": "乌尔比安",
+        "runner_up": 0.464565,
+        "margin": 0.020488
+      },
+      "rect_6680": {
+        "score": 0.828595,
+        "name": "Mon3tr",
+        "runner_up": 0.542709,
+        "margin": 0.285886
+      },
+      "identity_masked": {
+        "score": 0.967107,
+        "name": "Mon3tr",
+        "runner_up": 0.67856,
+        "margin": 0.288547
+      }
+    },
+    {
+      "frame": "cd52",
+      "index": 6,
+      "name": "白面鸮",
+      "truth": "线上那条链读自己干净的身份区：0.9921 / 次高 0.3989 / 余量 0.5932",
+      "mask": {
+        "score": 0.787645,
+        "name": "白面鸮",
+        "runner_up": 0.286041,
+        "margin": 0.501604
+      },
+      "rect": {
+        "score": 0.719046,
+        "name": "白面鸮",
+        "runner_up": 0.464136,
+        "margin": 0.254909
+      },
+      "rect_6680": {
+        "score": 0.773995,
+        "name": "白面鸮",
+        "runner_up": 0.520476,
+        "margin": 0.253519
+      },
+      "identity_masked": {
+        "score": 0.989992,
+        "name": "白面鸮",
+        "runner_up": 0.674908,
+        "margin": 0.315084
+      }
+    },
+    {
+      "frame": "cd52",
+      "index": 7,
+      "name": "歌蕾蒂娅",
+      "truth": "线上那条链读自己干净的身份区：0.9841 / 次高 0.5580 / 余量 0.4261",
+      "mask": {
+        "score": 0.591772,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.289207,
+        "margin": 0.302565
+      },
+      "rect": {
+        "score": 0.556137,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.356062,
+        "margin": 0.200074
+      },
+      "rect_6680": {
+        "score": 0.615415,
+        "name": "圣聆初雪",
+        "runner_up": 0.59083,
+        "margin": 0.024585
+      },
+      "identity_masked": {
+        "score": 0.96308,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.603265,
+        "margin": 0.359814
+      }
+    },
+    {
+      "frame": "cd52",
+      "index": 9,
+      "name": "新约能天使",
+      "truth": "线上那条链读自己干净的身份区：0.9869 / 次高 0.4841 / 余量 0.5027",
+      "mask": {
+        "score": 0.377191,
+        "name": "新约能天使",
+        "runner_up": 0.294185,
+        "margin": 0.083007
+      },
+      "rect": {
+        "score": 0.370526,
+        "name": "黍",
+        "runner_up": 0.311507,
+        "margin": 0.059019
+      },
+      "rect_6680": {
+        "score": 0.556873,
+        "name": "乌尔比安",
+        "runner_up": 0.448506,
+        "margin": 0.108367
+      },
+      "identity_masked": {
+        "score": 0.953665,
+        "name": "新约能天使",
+        "runner_up": 0.503077,
+        "margin": 0.450588
+      }
+    },
+    {
+      "frame": "cd52",
+      "index": 10,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9740 / 次高 0.3954 / 余量 0.5786",
+      "mask": {
+        "score": 0.414927,
+        "name": "极境",
+        "runner_up": 0.344096,
+        "margin": 0.070831
+      },
+      "rect": {
+        "score": 0.557824,
+        "name": "极境",
+        "runner_up": 0.369279,
+        "margin": 0.188544
+      },
+      "rect_6680": {
+        "score": 0.556271,
+        "name": "乌尔比安",
+        "runner_up": 0.535589,
+        "margin": 0.020682
+      },
+      "identity_masked": {
+        "score": 0.985431,
+        "name": "极境",
+        "runner_up": 0.654504,
+        "margin": 0.330927
+      }
+    },
+    {
+      "frame": "cd56",
+      "index": 0,
+      "name": "斩业星熊",
+      "truth": "线上那条链读自己干净的身份区：0.9677 / 次高 0.4530 / 余量 0.5147",
+      "mask": {
+        "score": 0.645795,
+        "name": "斩业星熊",
+        "runner_up": 0.211866,
+        "margin": 0.433929
+      },
+      "rect": {
+        "score": 0.414096,
+        "name": "斩业星熊",
+        "runner_up": 0.358516,
+        "margin": 0.05558
+      },
+      "rect_6680": {
+        "score": 0.4463,
+        "name": "黍",
+        "runner_up": 0.397415,
+        "margin": 0.048886
+      },
+      "identity_masked": {
+        "score": 0.888284,
+        "name": "斩业星熊",
+        "runner_up": 0.692418,
+        "margin": 0.195866
+      }
+    },
+    {
+      "frame": "cd56",
+      "index": 1,
+      "name": "维什戴尔",
+      "truth": "线上那条链读自己干净的身份区：0.9848 / 次高 0.5128 / 余量 0.4719",
+      "mask": {
+        "score": 0.675028,
+        "name": "维什戴尔",
+        "runner_up": 0.20407,
+        "margin": 0.470958
+      },
+      "rect": {
+        "score": 0.507193,
+        "name": "维什戴尔",
+        "runner_up": 0.427179,
+        "margin": 0.080014
+      },
+      "rect_6680": {
+        "score": 0.408912,
+        "name": "Mon3tr",
+        "runner_up": 0.407031,
+        "margin": 0.001882
+      },
+      "identity_masked": {
+        "score": 0.965752,
+        "name": "维什戴尔",
+        "runner_up": 0.64195,
+        "margin": 0.323803
+      }
+    },
+    {
+      "frame": "cd56",
+      "index": 2,
+      "name": "圣聆初雪",
+      "truth": "线上那条链读自己干净的身份区：0.9794 / 次高 0.3877 / 余量 0.5916",
+      "mask": {
+        "score": 0.496152,
+        "name": "圣聆初雪",
+        "runner_up": 0.369876,
+        "margin": 0.126275
+      },
+      "rect": {
+        "score": 0.462485,
+        "name": "圣聆初雪",
+        "runner_up": 0.390126,
+        "margin": 0.072358
+      },
+      "rect_6680": {
+        "score": 0.544728,
+        "name": "圣聆初雪",
+        "runner_up": 0.374791,
+        "margin": 0.169937
+      },
+      "identity_masked": {
+        "score": 0.976828,
+        "name": "圣聆初雪",
+        "runner_up": 0.70147,
+        "margin": 0.275359
+      }
+    },
+    {
+      "frame": "cd56",
+      "index": 3,
+      "name": "乌尔比安",
+      "truth": "线上那条链读自己干净的身份区：0.9821 / 次高 0.5071 / 余量 0.4750",
+      "mask": {
+        "score": 0.354467,
+        "name": "乌尔比安",
+        "runner_up": 0.300417,
+        "margin": 0.05405
+      },
+      "rect": {
+        "score": 0.426286,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.353671,
+        "margin": 0.072616
+      },
+      "rect_6680": {
+        "score": 0.47942,
+        "name": "乌尔比安",
+        "runner_up": 0.451345,
+        "margin": 0.028075
+      },
+      "identity_masked": {
+        "score": 0.91166,
+        "name": "乌尔比安",
+        "runner_up": 0.722819,
+        "margin": 0.188841
+      }
+    },
+    {
+      "frame": "cd56",
+      "index": 4,
+      "name": "黍",
+      "truth": "线上那条链读自己干净的身份区：0.9774 / 次高 0.3656 / 余量 0.6118",
+      "mask": {
+        "score": 0.805768,
+        "name": "黍",
+        "runner_up": 0.367845,
+        "margin": 0.437923
+      },
+      "rect": {
+        "score": 0.566705,
+        "name": "黍",
+        "runner_up": 0.373626,
+        "margin": 0.193079
+      },
+      "rect_6680": {
+        "score": 0.392211,
+        "name": "黍",
+        "runner_up": 0.376675,
+        "margin": 0.015537
+      },
+      "identity_masked": {
+        "score": 0.971422,
+        "name": "黍",
+        "runner_up": 0.595303,
+        "margin": 0.376119
+      }
+    },
+    {
+      "frame": "cd56",
+      "index": 5,
+      "name": "Mon3tr",
+      "truth": "线上那条链读自己干净的身份区：0.9814 / 次高 0.5230 / 余量 0.4584",
+      "mask": {
+        "score": 0.465126,
+        "name": "Mon3tr",
+        "runner_up": 0.34418,
+        "margin": 0.120946
+      },
+      "rect": {
+        "score": 0.485051,
+        "name": "乌尔比安",
+        "runner_up": 0.464564,
+        "margin": 0.020487
+      },
+      "rect_6680": {
+        "score": 0.828595,
+        "name": "Mon3tr",
+        "runner_up": 0.542709,
+        "margin": 0.285886
+      },
+      "identity_masked": {
+        "score": 0.967107,
+        "name": "Mon3tr",
+        "runner_up": 0.67856,
+        "margin": 0.288547
+      }
+    },
+    {
+      "frame": "cd56",
+      "index": 6,
+      "name": "白面鸮",
+      "truth": "线上那条链读自己干净的身份区：0.9921 / 次高 0.3989 / 余量 0.5932",
+      "mask": {
+        "score": 0.790665,
+        "name": "白面鸮",
+        "runner_up": 0.287015,
+        "margin": 0.50365
+      },
+      "rect": {
+        "score": 0.719268,
+        "name": "白面鸮",
+        "runner_up": 0.464072,
+        "margin": 0.255195
+      },
+      "rect_6680": {
+        "score": 0.774351,
+        "name": "白面鸮",
+        "runner_up": 0.520448,
+        "margin": 0.253904
+      },
+      "identity_masked": {
+        "score": 0.989992,
+        "name": "白面鸮",
+        "runner_up": 0.674908,
+        "margin": 0.315084
+      }
+    },
+    {
+      "frame": "cd56",
+      "index": 7,
+      "name": "歌蕾蒂娅",
+      "truth": "线上那条链读自己干净的身份区：0.9841 / 次高 0.5580 / 余量 0.4261",
+      "mask": {
+        "score": 0.597459,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.28834,
+        "margin": 0.30912
+      },
+      "rect": {
+        "score": 0.555913,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.3568,
+        "margin": 0.199114
+      },
+      "rect_6680": {
+        "score": 0.615742,
+        "name": "圣聆初雪",
+        "runner_up": 0.591202,
+        "margin": 0.024539
+      },
+      "identity_masked": {
+        "score": 0.96308,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.603265,
+        "margin": 0.359814
+      }
+    },
+    {
+      "frame": "cd56",
+      "index": 9,
+      "name": "新约能天使",
+      "truth": "线上那条链读自己干净的身份区：0.9869 / 次高 0.4841 / 余量 0.5027",
+      "mask": {
+        "score": 0.376889,
+        "name": "新约能天使",
+        "runner_up": 0.294623,
+        "margin": 0.082266
+      },
+      "rect": {
+        "score": 0.370587,
+        "name": "黍",
+        "runner_up": 0.311479,
+        "margin": 0.059109
+      },
+      "rect_6680": {
+        "score": 0.556873,
+        "name": "乌尔比安",
+        "runner_up": 0.448506,
+        "margin": 0.108367
+      },
+      "identity_masked": {
+        "score": 0.953665,
+        "name": "新约能天使",
+        "runner_up": 0.503077,
+        "margin": 0.450588
+      }
+    },
+    {
+      "frame": "cd56",
+      "index": 10,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9740 / 次高 0.3954 / 余量 0.5786",
+      "mask": {
+        "score": 0.393507,
+        "name": "黍",
+        "runner_up": 0.346157,
+        "margin": 0.047349
+      },
+      "rect": {
+        "score": 0.55785,
+        "name": "极境",
+        "runner_up": 0.369197,
+        "margin": 0.188653
+      },
+      "rect_6680": {
+        "score": 0.554237,
+        "name": "乌尔比安",
+        "runner_up": 0.542087,
+        "margin": 0.012149
+      },
+      "identity_masked": {
+        "score": 0.985431,
+        "name": "极境",
+        "runner_up": 0.654504,
+        "margin": 0.330927
+      }
+    },
+    {
+      "frame": "cd60",
+      "index": 0,
+      "name": "斩业星熊",
+      "truth": "线上那条链读自己干净的身份区：0.9678 / 次高 0.4531 / 余量 0.5147",
+      "mask": {
+        "score": 0.646503,
+        "name": "斩业星熊",
+        "runner_up": 0.21661,
+        "margin": 0.429893
+      },
+      "rect": {
+        "score": 0.413921,
+        "name": "斩业星熊",
+        "runner_up": 0.358714,
+        "margin": 0.055208
+      },
+      "rect_6680": {
+        "score": 0.446304,
+        "name": "黍",
+        "runner_up": 0.397409,
+        "margin": 0.048895
+      },
+      "identity_masked": {
+        "score": 0.888471,
+        "name": "斩业星熊",
+        "runner_up": 0.691803,
+        "margin": 0.196668
+      }
+    },
+    {
+      "frame": "cd60",
+      "index": 1,
+      "name": "维什戴尔",
+      "truth": "线上那条链读自己干净的身份区：0.9848 / 次高 0.5128 / 余量 0.4719",
+      "mask": {
+        "score": 0.680112,
+        "name": "维什戴尔",
+        "runner_up": 0.205258,
+        "margin": 0.474853
+      },
+      "rect": {
+        "score": 0.507194,
+        "name": "维什戴尔",
+        "runner_up": 0.427046,
+        "margin": 0.080148
+      },
+      "rect_6680": {
+        "score": 0.408912,
+        "name": "Mon3tr",
+        "runner_up": 0.407034,
+        "margin": 0.001879
+      },
+      "identity_masked": {
+        "score": 0.965752,
+        "name": "维什戴尔",
+        "runner_up": 0.64195,
+        "margin": 0.323803
+      }
+    },
+    {
+      "frame": "cd60",
+      "index": 2,
+      "name": "圣聆初雪",
+      "truth": "线上那条链读自己干净的身份区：0.9794 / 次高 0.3877 / 余量 0.5916",
+      "mask": {
+        "score": 0.496138,
+        "name": "圣聆初雪",
+        "runner_up": 0.369843,
+        "margin": 0.126295
+      },
+      "rect": {
+        "score": 0.462522,
+        "name": "圣聆初雪",
+        "runner_up": 0.39012,
+        "margin": 0.072402
+      },
+      "rect_6680": {
+        "score": 0.541094,
+        "name": "圣聆初雪",
+        "runner_up": 0.373903,
+        "margin": 0.167191
+      },
+      "identity_masked": {
+        "score": 0.976828,
+        "name": "圣聆初雪",
+        "runner_up": 0.70147,
+        "margin": 0.275359
+      }
+    },
+    {
+      "frame": "cd60",
+      "index": 3,
+      "name": "乌尔比安",
+      "truth": "线上那条链读自己干净的身份区：0.9821 / 次高 0.5071 / 余量 0.4750",
+      "mask": {
+        "score": 0.354584,
+        "name": "乌尔比安",
+        "runner_up": 0.300487,
+        "margin": 0.054097
+      },
+      "rect": {
+        "score": 0.426286,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.353671,
+        "margin": 0.072616
+      },
+      "rect_6680": {
+        "score": 0.479355,
+        "name": "乌尔比安",
+        "runner_up": 0.450824,
+        "margin": 0.028531
+      },
+      "identity_masked": {
+        "score": 0.91166,
+        "name": "乌尔比安",
+        "runner_up": 0.722819,
+        "margin": 0.188841
+      }
+    },
+    {
+      "frame": "cd60",
+      "index": 4,
+      "name": "黍",
+      "truth": "线上那条链读自己干净的身份区：0.9774 / 次高 0.3656 / 余量 0.6118",
+      "mask": {
+        "score": 0.805768,
+        "name": "黍",
+        "runner_up": 0.367845,
+        "margin": 0.437923
+      },
+      "rect": {
+        "score": 0.566705,
+        "name": "黍",
+        "runner_up": 0.373626,
+        "margin": 0.193079
+      },
+      "rect_6680": {
+        "score": 0.392211,
+        "name": "黍",
+        "runner_up": 0.376675,
+        "margin": 0.015537
+      },
+      "identity_masked": {
+        "score": 0.971422,
+        "name": "黍",
+        "runner_up": 0.595303,
+        "margin": 0.376119
+      }
+    },
+    {
+      "frame": "cd60",
+      "index": 5,
+      "name": "Mon3tr",
+      "truth": "线上那条链读自己干净的身份区：0.9814 / 次高 0.5230 / 余量 0.4584",
+      "mask": {
+        "score": 0.465127,
+        "name": "Mon3tr",
+        "runner_up": 0.344181,
+        "margin": 0.120946
+      },
+      "rect": {
+        "score": 0.485052,
+        "name": "乌尔比安",
+        "runner_up": 0.464565,
+        "margin": 0.020488
+      },
+      "rect_6680": {
+        "score": 0.828595,
+        "name": "Mon3tr",
+        "runner_up": 0.542709,
+        "margin": 0.285886
+      },
+      "identity_masked": {
+        "score": 0.967107,
+        "name": "Mon3tr",
+        "runner_up": 0.67856,
+        "margin": 0.288547
+      }
+    },
+    {
+      "frame": "cd60",
+      "index": 6,
+      "name": "白面鸮",
+      "truth": "线上那条链读自己干净的身份区：0.9921 / 次高 0.3989 / 余量 0.5932",
+      "mask": {
+        "score": 0.787645,
+        "name": "白面鸮",
+        "runner_up": 0.286041,
+        "margin": 0.501604
+      },
+      "rect": {
+        "score": 0.719046,
+        "name": "白面鸮",
+        "runner_up": 0.464136,
+        "margin": 0.254909
+      },
+      "rect_6680": {
+        "score": 0.773995,
+        "name": "白面鸮",
+        "runner_up": 0.520476,
+        "margin": 0.253519
+      },
+      "identity_masked": {
+        "score": 0.989992,
+        "name": "白面鸮",
+        "runner_up": 0.674908,
+        "margin": 0.315084
+      }
+    },
+    {
+      "frame": "cd60",
+      "index": 7,
+      "name": "歌蕾蒂娅",
+      "truth": "线上那条链读自己干净的身份区：0.9841 / 次高 0.5580 / 余量 0.4261",
+      "mask": {
+        "score": 0.591772,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.289207,
+        "margin": 0.302565
+      },
+      "rect": {
+        "score": 0.556137,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.356062,
+        "margin": 0.200074
+      },
+      "rect_6680": {
+        "score": 0.615415,
+        "name": "圣聆初雪",
+        "runner_up": 0.59083,
+        "margin": 0.024585
+      },
+      "identity_masked": {
+        "score": 0.96308,
+        "name": "歌蕾蒂娅",
+        "runner_up": 0.603265,
+        "margin": 0.359814
+      }
+    },
+    {
+      "frame": "cd60",
+      "index": 9,
+      "name": "新约能天使",
+      "truth": "线上那条链读自己干净的身份区：0.9869 / 次高 0.4841 / 余量 0.5027",
+      "mask": {
+        "score": 0.377685,
+        "name": "新约能天使",
+        "runner_up": 0.292933,
+        "margin": 0.084752
+      },
+      "rect": {
+        "score": 0.370589,
+        "name": "黍",
+        "runner_up": 0.311476,
+        "margin": 0.059113
+      },
+      "rect_6680": {
+        "score": 0.556873,
+        "name": "乌尔比安",
+        "runner_up": 0.448506,
+        "margin": 0.108367
+      },
+      "identity_masked": {
+        "score": 0.953665,
+        "name": "新约能天使",
+        "runner_up": 0.503077,
+        "margin": 0.450588
+      }
+    },
+    {
+      "frame": "cd60",
+      "index": 10,
+      "name": "极境",
+      "truth": "线上那条链读自己干净的身份区：0.9740 / 次高 0.3954 / 余量 0.5786",
+      "mask": {
+        "score": 0.401948,
+        "name": "黍",
+        "runner_up": 0.342947,
+        "margin": 0.059001
+      },
+      "rect": {
+        "score": 0.557875,
+        "name": "极境",
+        "runner_up": 0.369245,
+        "margin": 0.18863
+      },
+      "rect_6680": {
+        "score": 0.555516,
+        "name": "乌尔比安",
+        "runner_up": 0.530892,
+        "margin": 0.024624
+      },
+      "identity_masked": {
+        "score": 0.985431,
+        "name": "极境",
+        "runner_up": 0.654504,
+        "margin": 0.330927
+      }
+    }
+  ],
+  "undo": [
+    {
+      "set": "calibration",
+      "capped": {
+        "frame": "cd14",
+        "index": 1
+      },
+      "clean": {
+        "frame": "cd15",
+        "index": 1
+      },
+      "under_the_cap": "维什戴尔",
+      "capped_identity": {
+        "score": 0.342393,
+        "name": "极境",
+        "runner_up": 0.282777,
+        "margin": 0.059616
+      },
+      "solved_identity_full": {
+        "score": 0.35116,
+        "name": "维什戴尔",
+        "runner_up": 0.309139,
+        "margin": 0.042021
+      },
+      "solved_identity_masked": {
+        "score": 0.947595,
+        "name": "维什戴尔",
+        "runner_up": 0.601986,
+        "margin": 0.345608
+      },
+      "solved_mask_region": {
+        "score": 0.452861,
+        "name": "维什戴尔",
+        "runner_up": 0.209153,
+        "margin": 0.243708
+      }
+    },
+    {
+      "set": "calibration",
+      "capped": {
+        "frame": "cd22",
+        "index": 9
+      },
+      "clean": {
+        "frame": "cd23",
+        "index": 9
+      },
+      "under_the_cap": "新约能天使",
+      "capped_identity": {
+        "score": 0.338813,
+        "name": "极境",
+        "runner_up": 0.310745,
+        "margin": 0.028069
+      },
+      "solved_identity_full": {
+        "score": 0.382445,
+        "name": "新约能天使",
+        "runner_up": 0.352681,
+        "margin": 0.029764
+      },
+      "solved_identity_masked": {
+        "score": 0.867746,
+        "name": "新约能天使",
+        "runner_up": 0.518121,
+        "margin": 0.349625
+      },
+      "solved_mask_region": {
+        "score": 0.340807,
+        "name": "黍",
+        "runner_up": 0.333657,
+        "margin": 0.00715
+      }
+    },
+    {
+      "set": "validation",
+      "capped": {
+        "frame": "cd27",
+        "index": 6
+      },
+      "clean": {
+        "frame": "cd28",
+        "index": 6
+      },
+      "under_the_cap": "白面鸮",
+      "capped_identity": {
+        "score": 0.304686,
+        "name": "极境",
+        "runner_up": 0.272441,
+        "margin": 0.032245
+      },
+      "solved_identity_full": {
+        "score": 0.438662,
+        "name": "白面鸮",
+        "runner_up": 0.265202,
+        "margin": 0.17346
+      },
+      "solved_identity_masked": {
+        "score": 0.959844,
+        "name": "白面鸮",
+        "runner_up": 0.67118,
+        "margin": 0.288665
+      },
+      "solved_mask_region": {
+        "score": 0.733972,
+        "name": "白面鸮",
+        "runner_up": 0.26268,
+        "margin": 0.471293
+      }
+    },
+    {
+      "set": "validation",
+      "capped": {
+        "frame": "cd37",
+        "index": 4
+      },
+      "clean": {
+        "frame": "cd59",
+        "index": 4
+      },
+      "under_the_cap": "黍",
+      "capped_identity": {
+        "score": 0.292849,
+        "name": "极境",
+        "runner_up": 0.273773,
+        "margin": 0.019076
+      },
+      "solved_identity_full": {
+        "score": 0.360853,
+        "name": "黍",
+        "runner_up": 0.249524,
+        "margin": 0.111329
+      },
+      "solved_identity_masked": {
+        "score": 0.951327,
+        "name": "黍",
+        "runner_up": 0.543514,
+        "margin": 0.407813
+      },
+      "solved_mask_region": {
+        "score": 0.629546,
+        "name": "黍",
+        "runner_up": 0.373032,
+        "margin": 0.256514
+      }
+    }
+  ],
+  "class_icon": {
+    "readable": true,
+    "evidence": [
+      {
+        "capped": "cd14#1",
+        "clean": "cd15#1",
+        "slope": [
+          0.449,
+          0.4754,
+          0.4753
+        ],
+        "rms": 14.527,
+        "correlation": 0.95154,
+        "clean_peak": 255,
+        "capped_peak": 115,
+        "top": {
+          "name": "维什戴尔",
+          "iou": 0.8097
+        },
+        "runner_up": {
+          "name": "新约能天使",
+          "iou": 0.5227
+        },
+        "distance": 0.287,
+        "shrunk_entries": [
+          "维什戴尔"
+        ],
+        "shrunk": {
+          "score": 0.452861,
+          "name": "维什戴尔",
+          "runner_up": 0.0,
+          "margin": 0.452861
+        },
+        "full": {
+          "score": 0.452861,
+          "name": "维什戴尔",
+          "runner_up": 0.209153,
+          "margin": 0.243708
+        }
+      },
+      {
+        "capped": "cd22#9",
+        "clean": "cd23#9",
+        "slope": [
+          0.43,
+          0.5084,
+          0.4749
+        ],
+        "rms": 17.007,
+        "correlation": 0.9363,
+        "clean_peak": 251,
+        "capped_peak": 123,
+        "top": {
+          "name": "新约能天使",
+          "iou": 0.9886
+        },
+        "runner_up": {
+          "name": "歌蕾蒂娅",
+          "iou": 0.7702
+        },
+        "distance": 0.2184,
+        "shrunk_entries": [
+          "新约能天使",
+          "歌蕾蒂娅"
+        ],
+        "shrunk": {
+          "score": 0.314858,
+          "name": "新约能天使",
+          "runner_up": 0.097682,
+          "margin": 0.217177
+        },
+        "full": {
+          "score": 0.340807,
+          "name": "黍",
+          "runner_up": 0.333657,
+          "margin": 0.00715
+        }
+      },
+      {
+        "capped": "cd27#6",
+        "clean": "cd28#6",
+        "slope": [
+          0.4731,
+          0.5065,
+          0.548
+        ],
+        "rms": 17.764,
+        "correlation": 0.95157,
+        "clean_peak": 255,
+        "capped_peak": 124,
+        "top": {
+          "name": "白面鸮",
+          "iou": 0.9849
+        },
+        "runner_up": {
+          "name": "Mon3tr",
+          "iou": 0.9151
+        },
+        "distance": 0.0699,
+        "shrunk_entries": [
+          "Mon3tr",
+          "白面鸮"
+        ],
+        "shrunk": {
+          "score": 0.733972,
+          "name": "白面鸮",
+          "runner_up": 0.18459,
+          "margin": 0.549382
+        },
+        "full": {
+          "score": 0.733972,
+          "name": "白面鸮",
+          "runner_up": 0.26268,
+          "margin": 0.471293
+        }
+      },
+      {
+        "capped": "cd37#4",
+        "clean": "cd59#4",
+        "slope": [
+          0.6142,
+          0.5701,
+          0.496
+        ],
+        "rms": 19.064,
+        "correlation": 0.92154,
+        "clean_peak": 247,
+        "capped_peak": 157,
+        "top": {
+          "name": "黍",
+          "iou": 0.9202
+        },
+        "runner_up": {
+          "name": "斩业星熊",
+          "iou": 0.853
+        },
+        "distance": 0.0672,
+        "shrunk_entries": [
+          "斩业星熊",
+          "黍"
+        ],
+        "shrunk": {
+          "score": 0.629546,
+          "name": "黍",
+          "runner_up": 0.094237,
+          "margin": 0.535309
+        },
+        "full": {
+          "score": 0.629546,
+          "name": "黍",
+          "runner_up": 0.373032,
+          "margin": 0.256514
+        }
+      }
+    ],
+    "iou_line": 0.75,
+    "groups": {
+      "Mon3tr": [
+        "Mon3tr",
+        "白面鸮"
+      ],
+      "乌尔比安": [
+        "乌尔比安"
+      ],
+      "圣聆初雪": [
+        "圣聆初雪"
+      ],
+      "斩业星熊": [
+        "斩业星熊",
+        "黍"
+      ],
+      "新约能天使": [
+        "新约能天使",
+        "歌蕾蒂娅"
+      ],
+      "极境": [
+        "极境"
+      ],
+      "歌蕾蒂娅": [
+        "新约能天使",
+        "歌蕾蒂娅"
+      ],
+      "白面鸮": [
+        "Mon3tr",
+        "白面鸮"
+      ],
+      "维什戴尔": [
+        "维什戴尔"
+      ],
+      "黍": [
+        "斩业星熊",
+        "黍"
+      ]
+    }
+  }
+}

@@ -1,0 +1,352 @@
+{
+ "note": "判据换成 (1-次高)/(1-最高) >= 2 + 0.09/(1-最高) 且 最高 >= 0.85 之后的判定账。只量不落。",
+ "criterion": {
+  "score_line": 0.85,
+  "old_margin": 0.25,
+  "factor": 2.0,
+  "pad": 0.09,
+  "closed_form": "次高 <= 2 x 最高 - 1.09",
+  "required_margin": "1.09 - 最高"
+ },
+ "sources": {
+  "主路": "tests/帧样本/先粗后细/读数.json 的 benefit_rows（350 张，今天那条链）",
+  "红罩路": "tests/帧样本/红罩/点名.json 的 frames[].slots（28 张红罩卡）"
+ },
+ "equivalence": {
+  "cards": 378,
+  "mismatches": 0,
+  "rows": []
+ },
+ "a_lost": {
+  "cards": 378,
+  "old_exact": 231,
+  "new_exact": 237,
+  "lost_n": 0,
+  "gained_n": 6,
+  "lost": []
+ },
+ "b_gained": [
+  {
+   "path": "红罩路",
+   "frame": "cd14",
+   "index": 4,
+   "name": null,
+   "score": 0.989704,
+   "runner_up": 0.78567,
+   "margin": 0.204034,
+   "runner_up_name": "歌蕾蒂娅",
+   "required_margin": 0.100296,
+   "room": 0.103738,
+   "truth": null,
+   "wrong": null
+  },
+  {
+   "path": "红罩路",
+   "frame": "cd15",
+   "index": 4,
+   "name": null,
+   "score": 0.989639,
+   "runner_up": 0.785865,
+   "margin": 0.203774,
+   "runner_up_name": "歌蕾蒂娅",
+   "required_margin": 0.100361,
+   "room": 0.103413,
+   "truth": null,
+   "wrong": null
+  },
+  {
+   "path": "红罩路",
+   "frame": "cd22",
+   "index": 5,
+   "name": null,
+   "score": 0.98818,
+   "runner_up": 0.789913,
+   "margin": 0.198267,
+   "runner_up_name": "歌蕾蒂娅",
+   "required_margin": 0.10182,
+   "room": 0.096447,
+   "truth": null,
+   "wrong": null
+  },
+  {
+   "path": "红罩路",
+   "frame": "cd23",
+   "index": 5,
+   "name": null,
+   "score": 0.988398,
+   "runner_up": 0.790166,
+   "margin": 0.198232,
+   "runner_up_name": "歌蕾蒂娅",
+   "required_margin": 0.101602,
+   "room": 0.09663,
+   "truth": null,
+   "wrong": null
+  },
+  {
+   "path": "红罩路",
+   "frame": "cd27",
+   "index": 5,
+   "name": null,
+   "score": 0.98833,
+   "runner_up": 0.790297,
+   "margin": 0.198033,
+   "runner_up_name": "歌蕾蒂娅",
+   "required_margin": 0.10167,
+   "room": 0.096363,
+   "truth": null,
+   "wrong": null
+  },
+  {
+   "path": "红罩路",
+   "frame": "cd28",
+   "index": 5,
+   "name": null,
+   "score": 0.988229,
+   "runner_up": 0.789624,
+   "margin": 0.198605,
+   "runner_up_name": "歌蕾蒂娅",
+   "required_margin": 0.101771,
+   "room": 0.096834,
+   "truth": null,
+   "wrong": null
+  }
+ ],
+ "c_boundary": {
+  "range": [
+   0.85,
+   0.95
+  ],
+  "n": 2,
+  "rows": [
+   {
+    "path": "主路",
+    "frame": "组2_备战席",
+    "index": 1,
+    "name": "组2·圣聆初雪",
+    "score": 0.87709,
+    "runner_up": 0.336747,
+    "margin": 0.540343,
+    "required_margin": 0.21291,
+    "room": 0.327433,
+    "old_verdict": "精确",
+    "new_verdict": "精确"
+   },
+   {
+    "path": "主路",
+    "frame": "组2_备战席",
+    "index": 6,
+    "name": "组2·白面鸮",
+    "score": 0.910849,
+    "runner_up": 0.428654,
+    "margin": 0.482195,
+    "required_margin": 0.179151,
+    "room": 0.303044,
+    "old_verdict": "精确",
+    "new_verdict": "精确"
+   }
+  ]
+ },
+ "d_insensitive": {
+  "factor_fixed_pad_scan": {
+   "factor": 2.0,
+   "pad_center": 0.09,
+   "same_ledger_pads": [
+    0.0,
+    0.185
+   ],
+   "n_tested": 121
+  },
+  "pad_fixed_factor_scan": {
+   "pad": 0.09,
+   "factor_center": 2.0,
+   "same_ledger_factors": [
+    2.0,
+    2.0
+   ],
+   "n_tested": 201
+  },
+  "note": "判定账**完全不动**的那一段（其他两项不变）。值由用户定，这一份只报区间、不改值。",
+  "knife_edge_rows": [
+   {
+    "path": "红罩路",
+    "frame": "cd27",
+    "index": 5,
+    "name": null,
+    "score": 0.98833,
+    "margin": 0.198033,
+    "required_margin": 0.10167,
+    "room": 0.096363
+   },
+   {
+    "path": "红罩路",
+    "frame": "cd22",
+    "index": 5,
+    "name": null,
+    "score": 0.98818,
+    "margin": 0.198267,
+    "required_margin": 0.10182,
+    "room": 0.096447
+   },
+   {
+    "path": "红罩路",
+    "frame": "cd23",
+    "index": 5,
+    "name": null,
+    "score": 0.988398,
+    "margin": 0.198232,
+    "required_margin": 0.101602,
+    "room": 0.09663
+   },
+   {
+    "path": "红罩路",
+    "frame": "cd28",
+    "index": 5,
+    "name": null,
+    "score": 0.988229,
+    "margin": 0.198605,
+    "required_margin": 0.101771,
+    "room": 0.096834
+   },
+   {
+    "path": "红罩路",
+    "frame": "cd15",
+    "index": 4,
+    "name": null,
+    "score": 0.989639,
+    "margin": 0.203774,
+    "required_margin": 0.100361,
+    "room": 0.103413
+   },
+   {
+    "path": "红罩路",
+    "frame": "cd14",
+    "index": 4,
+    "name": null,
+    "score": 0.989704,
+    "margin": 0.204034,
+    "required_margin": 0.100296,
+    "room": 0.103738
+   },
+   {
+    "path": "红罩路",
+    "frame": "cd22",
+    "index": 3,
+    "name": "乌尔比安",
+    "score": 0.965461,
+    "margin": 0.28546,
+    "required_margin": 0.124539,
+    "room": 0.160921
+   },
+   {
+    "path": "红罩路",
+    "frame": "cd23",
+    "index": 3,
+    "name": "乌尔比安",
+    "score": 0.965685,
+    "margin": 0.28567,
+    "required_margin": 0.124315,
+    "room": 0.161355
+   }
+  ],
+  "factor_neighbour_differs": {
+   "1.99": [],
+   "2.01": []
+  },
+  "pad_neighbour_differs": {
+   "0.0875": [],
+   "0.0925": []
+  }
+ },
+ "e_redcap_six": [
+  {
+   "path": "红罩路",
+   "frame": "cd14",
+   "index": 4,
+   "name": null,
+   "score": 0.989704,
+   "runner_up_name": "歌蕾蒂娅",
+   "runner_up": 0.78567,
+   "margin": 0.204034,
+   "required_margin": 0.100296,
+   "room": 0.103738,
+   "new_verdict": "精确"
+  },
+  {
+   "path": "红罩路",
+   "frame": "cd15",
+   "index": 4,
+   "name": null,
+   "score": 0.989639,
+   "runner_up_name": "歌蕾蒂娅",
+   "runner_up": 0.785865,
+   "margin": 0.203774,
+   "required_margin": 0.100361,
+   "room": 0.103413,
+   "new_verdict": "精确"
+  },
+  {
+   "path": "红罩路",
+   "frame": "cd22",
+   "index": 5,
+   "name": null,
+   "score": 0.98818,
+   "runner_up_name": "歌蕾蒂娅",
+   "runner_up": 0.789913,
+   "margin": 0.198267,
+   "required_margin": 0.10182,
+   "room": 0.096447,
+   "new_verdict": "精确"
+  },
+  {
+   "path": "红罩路",
+   "frame": "cd23",
+   "index": 5,
+   "name": null,
+   "score": 0.988398,
+   "runner_up_name": "歌蕾蒂娅",
+   "runner_up": 0.790166,
+   "margin": 0.198232,
+   "required_margin": 0.101602,
+   "room": 0.09663,
+   "new_verdict": "精确"
+  },
+  {
+   "path": "红罩路",
+   "frame": "cd27",
+   "index": 5,
+   "name": null,
+   "score": 0.98833,
+   "runner_up_name": "歌蕾蒂娅",
+   "runner_up": 0.790297,
+   "margin": 0.198033,
+   "required_margin": 0.10167,
+   "room": 0.096363,
+   "new_verdict": "精确"
+  },
+  {
+   "path": "红罩路",
+   "frame": "cd28",
+   "index": 5,
+   "name": null,
+   "score": 0.988229,
+   "runner_up_name": "歌蕾蒂娅",
+   "runner_up": 0.789624,
+   "margin": 0.198605,
+   "required_margin": 0.101771,
+   "room": 0.096834,
+   "new_verdict": "精确"
+  }
+ ],
+ "by_path": {
+  "主路": {
+   "cards": 350,
+   "old_exact": 209,
+   "new_exact": 209
+  },
+  "红罩路": {
+   "cards": 28,
+   "old_exact": 22,
+   "new_exact": 28
+  }
+ }
+}

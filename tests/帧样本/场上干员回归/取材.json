@@ -1,0 +1,98 @@
+{
+  "note": "**这一批没有真值**：只有取区、来源与「这一帧的底是什么」。读数钉在 tests/unit/test_vision_field.py 的回归那一段里。",
+  "window_size": [
+    240,
+    360
+  ],
+  "bars_in_window": [
+    40,
+    320
+  ],
+  "crop_size": [
+    300,
+    420
+  ],
+  "crop_left_margin": 80,
+  "crops": [
+    {
+      "file": "s00.png",
+      "source": "data/probe/sp_series/s00.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "note": "亮底：橙条纹地板"
+    },
+    {
+      "file": "s01.png",
+      "source": "data/probe/sp_series/s01.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "note": "亮底：花丛"
+    },
+    {
+      "file": "s02.png",
+      "source": "data/probe/sp_series/s02.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "note": "亮底：青地板"
+    },
+    {
+      "file": "s03.png",
+      "source": "data/probe/sp_series/s03.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "note": "亮底：青地板"
+    },
+    {
+      "file": "s04.png",
+      "source": "data/probe/sp_series/s04.png",
+      "bar": [
+        1487,
+        709
+      ],
+      "window": [
+        1447,
+        389,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1487, 709) − BARS_IN_WINDOW → operator_ui_window()",
+      "note": "亮底：橙条纹地板"
+    }
+  ]
+}
