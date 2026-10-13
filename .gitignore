@@ -19,3 +19,7 @@ assets/gamedata/
 
 # 引擎运行时的落盘输出
 *.log
+
+# AI agent 专属截图工作区（测试样例扩充用）：截图不入库，仅保留工作区说明
+screenshots/*
+!screenshots/README.md

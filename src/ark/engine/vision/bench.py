@@ -96,6 +96,7 @@ from ark.engine.vision.glyphs import (
 
 __all__ = [
     "read_squad_row",
+    "redeploying",
     "SquadCard",
     "squad_card_centres",
     "countdown_boxes",
@@ -668,6 +669,32 @@ def _ring_gain(profile: np.ndarray) -> int:
     return int(np.percentile(inside - outside, RING_GAIN_PERCENTILE))
 
 
+def redeploying(frame: Frame, centre_x: float, *, card_top: float) -> bool | None:
+    """这张卡**在不在再部署中** —— `True` / `False` / `None`（判不了）。
+
+    **判据只有这一处**（`read_squad_row` 与 `roster.read_squad_identities` 都调它）：
+    **环比它周围亮多少**（`_ring_gain`），不是白弧多长、也不是环带自己够不够亮 ——
+    白弧量的是**已过比例**（刚撤退的卡接近 0°），而环带自己的亮度会被**亮卡面**顶穿
+    （实测同一张卡面在批里出现两次：真环那一次环带最暗 **110**、假环那一次 **102**，
+    绝对亮度只差 8 而真值反着）。**红罩也不单独当判据**。
+
+    **它只读环、不读别的**：不要字形表、也不读倒计时那套粗体表 —— 备战席点名那一层
+    要判「这一格该走哪块取区」就走它，不必先把整行（费用 + 秒数）读一遍。
+
+    **它自己剖一次环**（`_ring_profile`，实测 **0.73 ms**／张）。`read_squad_row` 另有
+    一份剖面要算白弧，于是那一层每张卡多剖一次 —— 相对线上每张卡整条链（~1.4 s）是
+    0.05%，所以这里保持「一个入口自己把剖面算对」，不开口子让调用方传一份进来。
+    """
+    if not isinstance(frame, Frame):
+        raise TypeError(f"要读的是一帧，收到 {type(frame).__name__}")
+    gain = _ring_gain(_ring_profile(frame, centre_x, card_top))
+    if gain >= RING_GAIN_PRESENT_MIN:
+        return True
+    if gain <= RING_GAIN_ABSENT_MAX:
+        return False
+    return None
+
+
 def countdown_boxes(
     frame: Frame, centre_x: float, card_top: float
 ) -> tuple[
@@ -797,10 +824,8 @@ def read_squad_row(
     **卡数与中心走 `squad_card_centres`**（那里有完整口径）：有卡的那些格**一定是连着
     的一片**，中间缺一格说明那一格的跳变没读出来、中心落回网格。
 
-    **再部署中的判据是环比它周围亮多少**（`_ring_gain`），不是白弧多长、也不是环带
-    自己够不够亮 —— 白弧量的是**已过比例**（刚撤退的卡接近 0°），而环带自己的亮度会被
-    **亮卡面**顶穿（实测同一张卡面在批里出现两次：真环那一次环带最暗 **110**、假环那一次
-    **102**，绝对亮度只差 8 而真值反着）。**红罩也不单独当判据**。
+    **再部署中的判据不住这里**：它是 `redeploying`（环比环外亮多少）—— 这一层只调它，
+    判据只有一处，不在这儿再留一份。
 
     **不在再部署中的卡，秒数一律 `Unsampled()`**（那里没有倒计时可读）——
     与「有笔画但认不出 → 未知」是两支，不许混。**判不了那一档照读**：那里有没有倒计时
@@ -826,15 +851,9 @@ def read_squad_row(
             ),
         )
         profile = _ring_profile(frame, centre, top)
-        gain = _ring_gain(profile)
-        if gain >= RING_GAIN_PRESENT_MIN:
-            redeploying: bool | None = True
-        elif gain <= RING_GAIN_ABSENT_MAX:
-            redeploying = False
-        else:
-            redeploying = None
+        state = redeploying(frame, centre, card_top=top)
         ring_fraction = float(_ring_arc(profile)) / 360.0
-        if redeploying is False:
+        if state is False:
             seconds: SlotValue = Unsampled()
             ring_fraction = None
         else:
@@ -845,7 +864,7 @@ def read_squad_row(
                 center_x=centre,
                 center_from_jump=from_jump,
                 cost=cost,
-                redeploying=redeploying,
+                redeploying=state,
                 seconds=seconds,
                 ring_fraction=ring_fraction,
             )
