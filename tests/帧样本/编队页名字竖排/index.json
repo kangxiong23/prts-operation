@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "kind": "formation_name_ocr",
+  "phase": "编队页名字那一读（第十一单）：**竖排版面**的那一次真实调用 —— 拼图与响应都在仓里。",
+  "page": {
+    "image": "screenshots/run-04/编队界面.png",
+    "sha256": "428579209ffe05815bbd39d1ab255b9bbd1615aaf848d26598fcbf07eb28c6f9",
+    "canvas": [
+      2800,
+      1260
+    ]
+  },
+  "region": {
+    "note": "取区 = [卡左缘, 卡左缘 + 214)；名字以外一律压深；**四条边界都必须落在深色上**（用户裁定 D）。上行下缘是 607（608 那一行整行是亮背景）。",
+    "rows": [
+      [
+        577,
+        607
+      ],
+      [
+        1081,
+        1112
+      ]
+    ],
+    "right_inset": 208,
+    "name_box": [
+      9,
+      208
+    ],
+    "name_width": 200,
+    "art_width": 214,
+    "left0": 470,
+    "pitch": 271,
+    "counts": [
+      5,
+      5
+    ],
+    "left": "卡左缘（= 470 + 271k），不越过"
+  },
+  "grid": {
+    "note": "**十格竖排**（roster_names.VERTICAL）：一行一格、行间 25 px **深色**；格 214x44（名字行 + 上 6 行 + 下 6 行，都压深）；**不许白边**。",
+    "cell": [
+      214,
+      44
+    ],
+    "gap_x": 0,
+    "gap_y": 25,
+    "columns": 1,
+    "pad_above": 6,
+    "pad_below": 6
+  },
+  "crops": [
+    {
+      "file": "拼图_竖排.png",
+      "source": "由上面那张 page 拼出来的（不是原图的一部分）；一格一行、行间深色",
+      "source_sha256": "9e469eb0c802c9f7781c1ffe4ed3cdab499adf504defff5e8de10135226986a0",
+      "source_bytes": 44049,
+      "sheet_digest": "d9df3cb41184af1792cf330568024b49"
+    },
+    {
+      "file": "响应.json",
+      "source": "webapi.xfyun.cn/v1/service/v1/ocr/general 的**原始响应文本**（一字未改；单行、没有换行）",
+      "source_sha256": "b4813017f903d628f7ee085ce84f345bc307ff48abe6541456694b48ddc8ca80",
+      "source_bytes": 2112
+    }
+  ],
+  "products": [
+    {
+      "file": "d9df3cb41184af1792cf330568024b49.json",
+      "what": "**那一单的产物样本**：由 响应.json 在本地重放、经 roster_names.write_roster 写出来的一局名单（**0 次调用**）",
+      "why": "文件名就是 write_roster 自己给的（键 = 名字图的指纹），**一个字没改** —— 它与生产写出来的那份同形。",
+      "source_sha256": "ca1b37ef7ae045c8561d2d7fedce271b6ab42089433fec6c8d9d7c8699cd5971",
+      "source_bytes": 1598,
+      "note": "**不带那本账**（用户裁定 1）：产物是按**内容寻址**的 —— 同一套阵容必须产出同一份字节；掺进「这次网络怎么走的」之后，同一帧在通的那一窗与降级那一窗会写出两份不同产物。账住读数（RosterReading.attempt）与报告。"
+    }
+  ],
+  "response": {
+    "status": "第十一单那次真实调用，已落仓（响应.json）",
+    "code": "0",
+    "desc": "success",
+    "sid": "wcr00409699@gz36e91e29249e463000",
+    "words": 10,
+    "slots": 10,
+    "merge": "**没有合词**：十格一格一词（旧横排那种三格并成一个词的事没有复现）。",
+    "verdict": {
+      "精确": 9,
+      "改过": 1,
+      "未知": 0
+    },
+    "vs_truth": {
+      "对": 10,
+      "改过": 0,
+      "未知": 0,
+      "错": 0
+    },
+    "per_slot": [
+      {"slot": 0, "word": "圣聆初雪", "name": "圣聆初雪", "how": "精确", "truth": "圣聆初雪"},
+      {"slot": 1, "word": "凛御银灰", "name": "凛御银灰", "how": "精确", "truth": "凛御银灰"},
+      {"slot": 2, "word": "歌蕾蒂娅", "name": "歌蕾蒂娅", "how": "精确", "truth": "歌蕾蒂娅"},
+      {"slot": 3, "word": "荒芜拉普兰德", "name": "荒芜拉普兰德", "how": "精确", "truth": "荒芜拉普兰德"},
+      {"slot": 4, "word": "凯尔希·思衡托", "name": "凯尔希·思衡托", "how": "精确", "truth": "凯尔希·思衡托"},
+      {"slot": 5, "word": "白面号", "name": "白面鸮", "how": "改过", "truth": "白面鸮"},
+      {"slot": 6, "word": "塞雷娅", "name": "塞雷娅", "how": "精确", "truth": "塞雷娅"},
+      {"slot": 7, "word": "温蒂", "name": "温蒂", "how": "精确", "truth": "温蒂"},
+      {"slot": 8, "word": "维什戴尔", "name": "维什戴尔", "how": "精确", "truth": "维什戴尔"},
+      {"slot": 9, "word": "极境", "name": "极境", "how": "精确", "truth": "极境"}
+    ],
+    "note": "「精确 9 / 改过 1 / 未知 0」是**判决链**的账：格 5 的原文是 `白面号`，归一化之后在名单里编辑距离 1 的候选只有一个 ⇒ 采用 `白面鸮` 并标「改过」。「对 10 / 错 0」是**照真值**对的账。两把尺子都记下来。"
+  },
+  "attempts": [
+    {
+      "when": "第十一单（补记）",
+      "what": "按**默认安全级** POST https://webapi.xfyun.cn/v1/service/v1/ocr/general",
+      "result": "TLS 握手失败：SSL: WRONG_SIGNATURE_TYPE（wrong signature type）",
+      "billed": false,
+      "why_not_billed": "TLS 都没握上，HTTP 请求没发出去 —— 按逻辑不计费",
+      "note": "**异常原文没留下**：那一次的探针把异常收进一个变量，然后在打印之前自己越界崩了。如实记，别写成没发生过。"
+    },
+    {
+      "when": "第十一单（同一次调用，按裁定 Q1 的第二步）",
+      "what": "对**那一次连接**降级（set_ciphers(\"DEFAULT@SECLEVEL=0\")）重试**一次**",
+      "result": "HTTP 200 · code=0 · 词数 10 · 十格一格一词",
+      "billed": true,
+      "note": "第一次撞墙用了 11.19s，两次合计 11.72s。**这一次调用只产生一次计费。**"
+    }
+  ],
+  "truth_names": [
+    "圣聆初雪",
+    "凛御银灰",
+    "歌蕾蒂娅",
+    "荒芜拉普兰德",
+    "凯尔希·思衡托",
+    "白面鸮",
+    "塞雷娅",
+    "温蒂",
+    "维什戴尔",
+    "极境"
+  ],
+  "truth_note": "**规划者给的**（第十单裁定 7），按卡位次序（上行在前、每行左到右）；执行者不填真值。",
+  "truth_cross_check": "这两份（本文件与 tests/帧样本/编队页名字/index.json）的 truth_names 必须**逐字一致**；不一致就算红（用户裁定 8③）。",
+  "rebuild": {
+    "note": "由上面那张 page 与 region 按 roster_names.VERTICAL 拼出来的（确定性派生：同输入 ⇒ 同字节）。",
+    "how": "scripts/bench_roster_names.py 的「做7①」那一段就是这条复现：它拿 screenshots/run-04/编队界面.png 现拼一遍，RAW sha256 与 source_sha256 对上。",
+    "needs": "screenshots/run-04/编队界面.png（那目录不进版本库），所以这张拼图本身必须留仓 —— 它是唯一能离线重放的那块石头。"
+  }
+}

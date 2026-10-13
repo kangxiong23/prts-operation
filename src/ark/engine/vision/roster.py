@@ -109,8 +109,11 @@ import `contracts` 与 `vision` 自己）。
 `tests/unit/test_vision_roster.py` 里有一条拿手算的 Pearson 把它逐位对上。
 
 **匹配在 RGB 三通道上做**（三个通道当一个向量），不是灰度：卡面是彩色的，颜色
-本身就是辨识度的一部分。而 `TM_CCOEFF_NORMED` 减均值、除能量，所以**整体压暗**
-（费用不足那一档）不影响它 —— 那正是"压暗与它无关"那条实测在算法上的样子。
+本身就是辨识度的一部分。而 `TM_CCOEFF_NORMED` 减均值、除能量 —— **它比的是归一化
+之后的东西，所以对「整片乘一个标量」天生免疫**（用户裁定，第九单）：费用不足那一档
+的压暗不影响它的判定与名字。实测同一张卡跨帧的相关：灰罩 **0.9967** / 乘回去
+**0.9968** / 逐位相同 **1.0000**；两张横带与差图（「压暗 = ×0.502」那一段读数）留在
+`tests/帧样本/缺费/`。
 
 ## 落法：只有两种形态
 
@@ -137,17 +140,9 @@ import `contracts` 与 `vision` 自己）。
 **两块取区分开记、不互相顶替**（《备战席点名》§判据的形状），但那两条线**两块共用**
 —— 换的只是取区，不是判据。
 
-**缺费那一档换的既不是取区、也不是判据，是像素**（用户裁定，第八单）：判「这一格缺费吗」
-走 `gray.insufficient_cost`（判据只有那一处），裁决是 `True` 的那一格**先把那块取区乘
-回去**（`gray.restore`：灰罩是整片乘 0.5，实测五对逐像素 `G/C` 的中位 0.5021–0.5025），
-再走**干净卡原来那条路** —— 取区还是那个 100×100 的方框，判据还是
-`ROSTER_SOLID_MATCH_SCORE` 加余量公式，**一个数都没动**。三态（干净 / 再部署中 / 缺费）
-各有其判据、各住一处，而**取区只有两块**。
-
-**还原对这条链的判定与名字是"不该动"的**：`TM_CCOEFF_NORMED` 对**整片乘一个标量**天生
-透明（实测同一张卡跨帧的相关：灰罩 **0.9967** / 乘回去 **0.9968** / 逐位相同 **1.0000**）。
-还原改的是**像素本身**（与干净卡逐像素平均差 89.6 → 2.0），好让**别的读绝对像素的人**
-（取墨阈值、环增益、将来的读数）看到一张干净卡。**"同一条线"是字面意义上的**。
+**这一层不为「缺费」开分支**（用户裁定 1，第九单）：曾经接过一条「缺费就按每格裁决把
+取区乘回去」的路，**已撤**（那个分支、它的模块与它的 14 条单测一起退了）。有没有缺费是
+**状态层**的事，形状是**一次比较**（卡费 vs 当前费）；**视觉层不养分支**，取区仍然只有上面那两块。
 
 **它们凭什么算同一条统计量**：`MaskedRuler` 掩码全开时**逐位复现 `roster_scores`**
 （`tests/unit/test_vision_redcap_margin.py` 钉着）；两者的分子都是逐通道减均值之后的
@@ -223,7 +218,6 @@ from ark.contracts import (
     Valued,
     squad_card_rect,
 )
-from ark.engine.vision import gray
 from ark.engine.vision.bench import redeploying, squad_card_centres
 from ark.engine.vision.frame import Frame
 
@@ -729,30 +723,6 @@ def _guard_faces(faces: object) -> None:
                 f"收到 {art.dtype} 的 {art.shape}"
             )
 
-
-def _guard_insufficient(verdicts: object, count: int) -> None:
-    """`insufficient` 那一串的形状闸门：**一格一个裁决**，`True` / `False` / `None`。
-
-    **长度不许自由**：裁决是按卡位给出来的（`gray.insufficient_cost` 一格一个），少一个
-    多一个都说明调用方把别的帧的裁决递进来了 —— 那时"第 k 格还原不还原"就没有依据。
-    `None` 是**合法裁决**（判不了），不是"这一串没给"：没给是整条参数为 `None`。
-    """
-    if verdicts is None:
-        return
-    if isinstance(verdicts, (str, bytes)) or not isinstance(verdicts, Sequence):
-        raise TypeError(
-            f"缺费裁决要是每格一个的一串，收到 {type(verdicts).__name__}"
-        )
-    if len(verdicts) != count:
-        raise ValueError(
-            f"缺费裁决有 {len(verdicts)} 个，而这一帧数出 {count} 个卡位："
-            "裁决是按卡位给的，一格一个"
-        )
-    for position, verdict in enumerate(verdicts):
-        if verdict is not None and not isinstance(verdict, bool):
-            raise TypeError(
-                f"第 {position} 格的缺费裁决要是 True / False / None，收到 {verdict!r}"
-            )
 
 
 def _guard_region(region: object) -> None:
@@ -1650,7 +1620,6 @@ def read_squad_identities(
     pitch: float,
     assets: SquadGeometry | None = None,
     trace: list | None = None,
-    insufficient: Sequence[bool | None] | None = None,
 ) -> tuple[SlotValue, ...]:
     """读备战席那一栏：**一帧 → 每个卡位一个身份**（下标 0 = 最右那张）。
 
@@ -1681,12 +1650,6 @@ def read_squad_identities(
     （判据只有那一处），是 `True` 的才走 `redcap_region` + `margin.MaskedRuler`；
     **其余一律照旧**（含 `redeploying` 判不出来的那一档）。
 
-    **`insufficient` 是每格的缺费裁决**（`gray.insufficient_cost` 给的
-    `True` / `False` / `None`，一格一个）：是 `True` 的那一格**先把取区乘回去**
-    （`gray.restore`）再打分 —— 走的是**干净卡那条路**，判据一个数没动。
-    `None`（判不了）按"没缺费"处理，与 `redeploying` 判不出来那一档同一个方向：
-    **保守的那一侧是不动画面**。**红罩优先**：`redeploying` 是 `True` 的那一格不还原
-    （它走圆盘那块取区，红罩有自己的事）。不给（`None`）就是每格都按干净卡处理。
 
     **`assets` 是"一局里的可复用资产"**（用户裁定，见 `SquadGeometry`）：给了它，
     每个卡位**第一次**跑满之后就把**每一条库自己的对位**留成资产，之后每帧**只在那块几何上
@@ -1725,7 +1688,6 @@ def read_squad_identities(
     card_top = float(squad_card_rect(0, pitch).y)
     redcap_ruler = None
     centres = squad_card_centres(frame, pitch=pitch)
-    _guard_insufficient(insufficient, len(centres))
     for index, (centre, _) in enumerate(centres):
         red = redeploying(frame, centre, card_top=card_top) is True
         box = redcap_box if red else identity_box
@@ -1735,11 +1697,7 @@ def read_squad_identities(
             else identity_region(centre, pitch=pitch)
         )
         region = np.ascontiguousarray(frame.crop(rect))
-        gray_card = (
-            not red and insufficient is not None and insufficient[index] is True
-        )
-        if gray_card:
-            region = gray.restore(region)
+
         kind = "红罩" if red else "干净"
         digest = hashlib.blake2b(region.tobytes(), digest_size=10).hexdigest()
         if assets is not None:
@@ -1749,7 +1707,7 @@ def read_squad_identities(
                 assets.counts["跳过"] += 1
                 if trace is not None:
                     trace.append({"index": index, "red": bool(red), "how": "跳过",
-                                  "gray": bool(gray_card), "cost": {"跳过": 0.0},
+                                  "cost": {"跳过": 0.0},
                                   "reused": _exact_name(remembered),
                                   "verdict": ("精确" if _exact_name(remembered)
                                               is not None else "未知")})
@@ -1766,7 +1724,6 @@ def read_squad_identities(
         )
         if assets is not None:
             assets.remember(index, kind, digest, value)
-        slot_trace["gray"] = bool(gray_card)
         if trace is not None:
             trace.append(slot_trace)
         identities.append(value)
@@ -1806,7 +1763,6 @@ def squad_card_scores(
     *,
     pitch: float,
     assets: SquadGeometry | None = None,
-    insufficient: Sequence[bool | None] | None = None,
 ) -> tuple[tuple[float, int], ...]:
     """一位干员对**每个卡位**的分数 —— `((分数, 卡下标), ...)`，按分数降序。
 
@@ -1853,15 +1809,13 @@ def squad_card_scores(
     redcap_ruler: object | None = None
     scored: list[tuple[float, int]] = []
     centres = squad_card_centres(frame, pitch=pitch)
-    _guard_insufficient(insufficient, len(centres))
     for index, (centre, _) in enumerate(centres):
         red = redeploying(frame, centre, card_top=card_top) is True
         region = np.ascontiguousarray(frame.crop(
             redcap_region(centre, pitch=pitch) if red
             else identity_region(centre, pitch=pitch)
         ))
-        if not red and insufficient is not None and insufficient[index] is True:
-            region = gray.restore(region)
+
         geometry = assets.geometry_of(index, name) if assets is not None else None
         if geometry is not None and not _geometry_fits(region, entry[1], geometry.scale):
             geometry = None

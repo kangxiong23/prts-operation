@@ -76,3 +76,7 @@
 
 `scripts/bench_gray.py`（两张横带 + `差图.json` 都是它落的；`index.json` 与这份 README
 是手写的）。**它不跑那张 60 帧的整网**（用户裁定）。
+
+**这个脚本已经删了**（用户裁定：生成器那条路的**产物**留在仓里，生成它的脚本不必留 ——
+它 import 的 `src/ark/engine/vision/gray.py` 也一起撤了，留着它就是一份永远 import 不动的文件）。
+**它躺在 `6b76fc2` 里**：`git show 6b76fc2:scripts/bench_gray.py` 拿得回来。

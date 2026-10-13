@@ -37,6 +37,7 @@ import cv2
 import numpy as np
 
 from ark.engine.vision.frame import CANVAS_2800x1260, Frame
+from ark.offline.assets_gen.roster_names import load_roster_names
 
 __all__ = [
     "cut_formation_arts",
@@ -193,6 +194,8 @@ def load_formation_page(path: str | Path) -> Frame:
 
 def load_cardfaces(
     manifest: str | Path = FORMATION_MANIFEST,
+    *,
+    names_from: str | Path | None = None,
 ) -> tuple[tuple[str, np.ndarray], ...]:
     """清单 → **库**（`(名字, 立绘块)`，按 cut_order）。
 
@@ -203,6 +206,11 @@ def load_cardfaces(
 
     名字的个数必须与切出来的块数一样：少一个名字就是**一条没有身份的空位**，
     而它在库里看起来仍然"有一条"。
+
+    **`names_from` 是可选的那条路**（用户裁定 5）：给一个**一局名单产物**
+    （`assets/roster/<局指纹>.json`，由 `roster_names` 读出来的那一份），就用它的
+    `names`，清单里那份留着当兼容。**清单仍然要给**：`frame`、`geometry` 与张数都住它那儿，
+    而名字与块数必须一样多 —— 两处对不上就报错，不猜谁对。
     """
     manifest = Path(manifest)
     if not manifest.is_file():
@@ -219,6 +227,8 @@ def load_cardfaces(
     if not isinstance(frame_path, str) or not frame_path:
         raise TypeError(f"{manifest} 的 frame 要是相对仓库根的路径，收到 {frame_path!r}")
     names = record["names"]
+    if names_from is not None:
+        names = _names_from_roster(Path(names_from))
     if isinstance(names, (str, bytes)) or not isinstance(names, Sequence):
         raise TypeError(f"{manifest} 的 names 要是名字的序列，收到 {type(names).__name__}")
     for position, name in enumerate(names):
@@ -232,6 +242,21 @@ def load_cardfaces(
             "对不上就是有卡位没有身份，而它在库里看起来仍然有一条"
         )
     return tuple(zip(names, arts))
+
+def _names_from_roster(path: Path) -> tuple[str, ...]:
+    """一局名单产物 → 名字序列（用户裁定 5）。**只认那种形状**，别的形状报错。"""
+    record = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(record, Mapping) or "names" not in record:
+        raise ValueError(
+            str(path) + " 不是一份一局名单产物（没有 names 那一段）："
+            "它该是 assets/roster/<局指纹>.json"
+        )
+    if record.get("kind") != "game_roster":
+        raise ValueError(
+            str(path) + " 的 kind 是 " + repr(record.get("kind"))
+            + "，不是 game_roster —— 拿全量闭集当一局名单用会把库的键说错"
+        )
+    return load_roster_names(path)
 
 
 def _row_bands() -> tuple[tuple[int, int], ...]:
