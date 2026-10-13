@@ -796,17 +796,25 @@ def check_sample_port_has_exactly_one_method() -> str:
     return f"一个方法：{names[0]}"
 
 
-def check_asset_port_has_only_the_projection_method() -> str:
-    """§5：资产端口的**方法集由第一个用户层补**（补法规则：只加方法、不改端口
-    本身）。现在有第一个：`projection` —— 它的用户层是设备层（§1 说像素在那个
-    入口内部由投影算出），而投影值住在 `offline/`，`engine` 永远不 import 它。"""
+def check_the_asset_port_binds_no_other_layers_types() -> str:
+    """§5：资产端口的**方法集由第一个用户层补**（补法规则：只加方法、不改端口本身）
+    —— 所以「只有几个方法」**不能**当断言：每接一层它就多一个（第二个是视觉层要的
+    `squad_faces`）。
+
+    能当断言的是那条**规则**：**签名里只用内建与契约层自己的类型**。把 numpy 或
+    `offline/` 的类塞进端口，等于让端口替那些层发明类型，而 `engine` 又永远不 import
+    `offline` —— 库要经端口到视觉层，就走**字节**，不走对方的类。"""
+    import inspect
+
     port = _need("AssetPort")
     names = _public_names(port)
-    assert names == ["projection"], (
-        f"资产端口现在应当只有 projection 这一个方法，实际 {names} —— "
-        "再加方法要走补法规则"
-    )
-    return "一个方法：projection（补法规则的第一个）"
+    assert names, "资产端口一个方法都没有：补法规则是「用到时补」，不是「永远空着」"
+    banned = ("numpy", "assets_gen", "ark.")
+    for name in names:
+        text = str(inspect.signature(getattr(port, name)))
+        hit = [word for word in banned if word in text]
+        assert not hit, f"{name} 的签名里有别层的类型（{hit}）：{text}"
+    return f"{len(names)} 个方法（{', '.join(names)}）：签名只用内建与契约层自己的类型"
 
 
 def check_error_model_is_three_without_partial() -> str:
@@ -871,7 +879,9 @@ CHECKS: tuple[Check, ...] = (
     Check("P3", "契约层 §5 + 设备层 §1", "四个动词收格坐标，不收像素", check_device_verbs_take_grid_not_pixel),
     Check("P4", "契约层 §5 + §3", "时钟端口只给墙钟毫秒", check_clock_port_gives_wall_clock),
     Check("P5", "契约层 §5", "样本端口恰好一个方法", check_sample_port_has_exactly_one_method),
-    Check("P6", "契约层 §5（补法规则）", "资产端口只有 projection 这一个方法", check_asset_port_has_only_the_projection_method),
+    Check("P6", "契约层 §5（补法规则）",
+          "资产端口只加方法，而且签名里不许有别层的类型",
+          check_the_asset_port_binds_no_other_layers_types),
     Check("P7", "契约层 §5", "错误三种，没有「部分成功」", check_error_model_is_three_without_partial),
     Check("J1", "契约层「这一层唯一的验收判据」", "哪几个数是猜的，必须能从类型里看出来", check_the_one_acceptance_criterion),
     Check("J2", "契约层 §1", "未命中升格成「空」要有分数落点", check_promotion_needs_a_score),

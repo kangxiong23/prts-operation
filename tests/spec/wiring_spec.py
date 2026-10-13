@@ -206,17 +206,18 @@ def check_sample_port_empty_impl_does_nothing() -> str:
 
 
 def check_asset_port_empty_impl_does_not_invent_a_projection() -> str:
-    """资产端口的空实现**不许编出一个投影**（端口与错误 §5 的补法规则 + 零假事实）。
+    """资产端口那个实现**不许编出一个投影**（端口与错误 §5 的补法规则 + 零假事实）。
 
-    端口现在有第一个方法 `projection`（补法规则：每个方法由它的第一个用户层补），
-    而这一轮**没有真的投影值** —— 标定是首轮探索编辑器的第一块。空实现只有两条
-    诚实出路：**没有这个方法**（那就登记进 `PORT_GAPS`）、或者**调用就报错**。
+    端口现在有两个方法（`projection` 与 `squad_faces`，补法规则：每个方法由它的
+    第一个用户层补），离线那一侧的实现只接了后一个，而 `projection` **没有真的值**
+    —— 标定是首轮探索编辑器的第一块。所以它只有两条诚实出路：**没有这个方法**
+    （那就登记进 `PORT_GAPS`）、或者**调用就报错**。
 
     **返回一个编出来的 `Projection` 是最坏的一条**：设备层会照着它算像素、
     把手指放到一个没人验过的地方 —— 那是假事实，比"没接"坏得多。
     """
     port_module = _module("ark.offline.assets_gen.port")
-    impl = port_module.EmptyAssetPort()
+    impl = port_module.RosterAssetPort()
     method = getattr(impl, "projection", None)
     if method is None:
         return "空实现没有 projection：这一轮投影还没有来源，欠账要登记进 PORT_GAPS"
@@ -270,7 +271,10 @@ def check_missing_projection_never_becomes_a_click() -> str:
     return "四个动词在缺投影时一条命令都没发"
 
 
-_ABSOLUTE_PATH = re.compile(r"[A-Za-z]:[\\/]")
+# **判据要认得出"这是盘符路径，不是 URL"**：原来的 `[A-Za-z]:[\\/]` 把 `https://`
+# 里的 `s:/` 也当成盘符路径了 —— 线上通道那个端点一写进源码，这条网就误报。
+# 盘符字母前面不会紧跟另一个字母，URL 的 scheme 会，所以加一条后顾。
+_ABSOLUTE_PATH = re.compile(r"(?<![A-Za-z])[A-Za-z]:[\\/]")
 
 
 def check_no_local_paths_or_serials_in_sources() -> str:
@@ -444,7 +448,7 @@ CHECKS: tuple[Check, ...] = (
     Check("W4", "端口与错误 §5 + 采集与验收/README §1",
           "样本端口的空实现什么都不做", check_sample_port_empty_impl_does_nothing),
     Check("W5", "端口与错误 §5（资产：补法规则）+ 零假事实",
-          "资产端口的空实现不许编出一个投影",
+          "资产端口那个实现不许编出一个投影（它接的是别的路）",
           check_asset_port_empty_impl_does_not_invent_a_projection),
     Check("W6", "设备层 §6（前置）+ 代码结构 规则一",
           "引擎里不许出现本机的绝对路径与设备序列号",

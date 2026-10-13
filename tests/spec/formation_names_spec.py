@@ -28,9 +28,13 @@ from __future__ import annotations
 
 import hashlib
 import importlib
+import inspect
 import json
 import sys
 from collections.abc import Callable
+
+import numpy as np
+from PIL import Image
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -123,7 +127,7 @@ def check_everything_listed_in_the_index_matches_its_file() -> str:
     而且算出来的哈希与字节数与记的一致 —— 只写一个数、不盯着它，那个数会静默过期。
     """
     parts = []
-    for section in ("crops", "products"):
+    for section in ("crops", "products", "manifests"):
         for hit in _index().get(section, ()):
             path = BATCH / hit["file"]
             if not path.is_file():
@@ -236,9 +240,156 @@ def check_the_two_attempts_are_recorded_truthfully() -> str:
     )
 
 
+ORDER_BATCH = REPO / "tests" / "帧样本" / "编队页次序"
+FACE_DIR = REPO / "assets" / "roster"
+FACE_INDEX = FACE_DIR / "faces.json"
+
+
+def check_the_cross_layer_order_is_one_rule() -> str:
+    """合成帧那条**跨层**检查：第 i 个名字配的确实是第 i 张卡的立绘。
+
+    两半各自独立读：**立绘那侧读颜色**（`index.json` 的 `paint.per_slot`），
+    **名字那侧读响应里那个词**。两边都读出来之后，走**装载那条路**
+    （`load_cardfaces(..., names_from=…)`）把它们配起来 —— 那条路是 `zip`，
+    **静默**，所以必须有东西盯着它。
+    """
+    cardface = _mod("ark.offline.assets_gen.cardface")
+    RN = _mod("ark.offline.assets_gen.roster_names")
+    index = json.loads((ORDER_BATCH / "index.json").read_text(encoding="utf-8"))
+    names = list(index["names_by_slot"])
+    paint = [tuple(int(channel) for channel in item) for item in index["paint"]["per_slot"]]
+    counts = list(index["region"]["counts"])
+
+    record = json.loads((ORDER_BATCH / "合成响应.json").read_text(encoding="utf-8"))
+    per_slot = RN.assign_words(RN.parse_words(record), RN.VERTICAL, slots=len(names))
+    read_back = [items[0] if items else "" for items in per_slot]
+    if read_back != names:
+        raise AssertionError(f"名字那一侧读出来的次序不对：{read_back} ≠ {names}")
+
+    template = json.loads(
+        (REPO / "tests" / "帧样本" / "点名" / "编队页.json").read_text(encoding="utf-8")
+    )
+    geometry = json.loads(json.dumps(template["geometry"]))
+    for row, count in zip(geometry["rows"], counts):
+        row["count"] = count
+    manifest = {
+        "frame": "tests/帧样本/编队页次序/合成编队页.png",
+        "canvas": template["canvas"],
+        "geometry": geometry,
+        "names": names,
+        "same_run_as_battle_frames": False,
+    }
+    # 合成清单与合成产物落在 `data/`（**被 gitignore**）下的一小块里：沙箱里
+    # 建临时目录会被拒，而这两个文件本来就只是"喂进去就扔"的料。
+    scratch = REPO / "data" / "spec_tmp"
+    scratch.mkdir(parents=True, exist_ok=True)
+    manifest_path = scratch / "合成清单.json"
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False), encoding="utf-8")
+    product_path = scratch / "合成产物.json"
+    product_path.write_text(
+        json.dumps({"kind": "game_roster", "names": names}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    library = cardface.load_cardfaces(manifest_path, names_from=product_path)
+
+    if len(library) != len(names):
+        raise AssertionError(f"库切出 {len(library)} 条，名字有 {len(names)} 条")
+    for slot, ((name, block), want_name, want_colour) in enumerate(zip(library, names, paint)):
+        if name != want_name:
+            raise AssertionError(f"第 {slot} 条配的名字是 {name}，按次序该是 {want_name}")
+        seen = set(map(tuple, block.reshape(-1, 3).tolist()))
+        if seen != {want_colour}:
+            raise AssertionError(
+                f"第 {slot} 条的立绘不是一种颜色：{sorted(seen)[:3]}（期望 {want_colour}）"
+            )
+    return (
+        f"{len(library)} 条**逐条**按同一套次序配上（名字 {names[0]}→{names[-1]}，"
+        f"颜色 {paint[0]}→{paint[-1]}）"
+    )
+
+
+def check_the_face_library_is_content_addressed() -> str:
+    """库**自带卡面**，而且每一块的 `id` 就是**它像素的哈希**（内容寻址）。
+
+    内容寻址是这一版填「精英化那一维填不出来」那个洞的办法：同一套立绘第二次遇到
+    就是同一个 `id`（直接命中），同一个名字两套立绘就是两条 `id`。所以"id 等于像素
+    的哈希"这条**必须**有人盯着，否则内容寻址就只是个说法。
+    """
+    index = json.loads(FACE_INDEX.read_text(encoding="utf-8"))
+    entries = index["faces"]
+    if not entries:
+        raise AssertionError("库索引里一条都没有")
+    names = []
+    for item in entries:
+        path = FACE_DIR / item["file"]
+        if not path.is_file():
+            raise AssertionError(f"{item['file']} 不在仓里")
+        blob = path.read_bytes()
+        if len(blob) != item["bytes"]:
+            raise AssertionError(f"{item['file']} 的字节数是 {len(blob)}，索引说 {item['bytes']}")
+        if hashlib.sha256(blob).hexdigest() != item["sha256"]:
+            raise AssertionError(f"{item['file']} 的文件 sha256 与索引对不上")
+        pixels = np.asarray(Image.open(path).convert("RGB"))
+        if list(pixels.shape) != list(item["shape"]):
+            raise AssertionError(
+                f"{item['file']} 的形状是 {list(pixels.shape)}，索引说 {item['shape']}"
+            )
+        raw = pixels.tobytes()
+        if hashlib.sha256(raw).hexdigest() != item["pixels_sha256"]:
+            raise AssertionError(f"{item['file']} 的像素 sha256 与索引对不上")
+        digest = hashlib.blake2b(raw, digest_size=16).hexdigest()
+        if digest != item["id"]:
+            raise AssertionError(
+                f"{item['file']} 的 id 不是它像素的哈希：算出来 {digest} ≠ 索引里 {item['id']}"
+            )
+        names.append(item["name"])
+    return f"{len(entries)} 条，id 逐条等于像素的 blake2b ｜ 名字 {names[0]}…{names[-1]}"
+
+
+def check_the_battle_product_does_not_land_in_the_asset_tree() -> str:
+    """一局产物是**运行期凭据**，闭集才是资产 —— 两者的窝要分开（规格 §5）。"""
+    RN = _mod("ark.offline.assets_gen.roster_names")
+    default = inspect.signature(RN.write_roster).parameters["directory"].default
+    parts = Path(default).parts
+    if "assets" in parts:
+        raise AssertionError(f"一局产物默认往资产树里写：{default}")
+    names_file = Path(RN.NAMES_FILE)
+    if names_file.parent.name != "roster":
+        raise AssertionError(f"全量闭集该住 assets/roster/，实际 {names_file}")
+    return (
+        f"一局产物默认落 …{Path(*parts[-2:])}（不在 assets/ 下）｜ "
+        f"闭集仍在 {names_file.parent.name}/{names_file.name}"
+    )
+
+
+def check_every_file_in_the_fixture_is_listed_in_the_index() -> str:
+    """目录里有的，`index.json` 里也得有（只有 `index.json` 与 `README.md` 例外）。
+
+    这条与 F1 是一对：**F1 管"列了的都在"，这条管"在的都被列了"**。少了后一半，
+    往夹具里塞一个文件就能绕开索引 —— 而索引正是那份夹具"说得清自己"的地方。
+    """
+    listed: set[str] = set()
+    for section in ("crops", "products", "manifests"):
+        for hit in _index().get(section, ()):
+            listed.add(hit["file"])
+    present = {
+        path.name
+        for path in BATCH.iterdir()
+        if path.is_file() and path.name not in ("index.json", "README.md")
+    }
+    missing = sorted(present - listed)
+    if missing:
+        raise AssertionError(f"目录里有、index.json 里没列：{missing}")
+    stale = sorted(listed - present)
+    if stale:
+        raise AssertionError(f"index.json 里列了、目录里没有：{stale}")
+    return f"{len(listed)} 样：列了的都在 ｜ 在的都被列了"
+
+
 CHECKS: tuple[Check, ...] = (
     Check("F1", f"{SPEC} §4（index 里列着的都要在仓里、都对得上）",
-          "index.json 里列的每一样（两块石头 ＋ 一局产物）都在仓里，算出来的 sha256 与字节数与记的一致",
+          "index.json 里列的每一样（两块石头 ＋ 一局产物 ＋ 清单）都在仓里，"
+          "算出来的 sha256 与字节数与记的一致",
           check_everything_listed_in_the_index_matches_its_file),
     Check("F2", f"{SPEC} §1（名字墨迹行）+ §3（行序无歧义）",
           "接口给的十个词框 y 单调递增、相邻框不重叠 —— 行序没有歧义",
@@ -258,6 +409,18 @@ CHECKS: tuple[Check, ...] = (
     Check("F7", f"{SPEC} §6（记账：两次尝试只计费一次）",
           "两次尝试如实记着，且只计费一次",
           check_the_two_attempts_are_recorded_truthfully),
+    Check("F8", f"{SPEC} §5（库里的配对按位置来）",
+          "跨层：第 i 个名字配的确实是第 i 张卡的立绘（装载那条路真的走一遍）",
+          check_the_cross_layer_order_is_one_rule),
+    Check("F9", f"{SPEC} §5（库自带卡面）+ 卡面与指纹 §3（累积、不重采）",
+          "库索引里每一条：文件对、像素对、而且 id 就是它像素的 blake2b",
+          check_the_face_library_is_content_addressed),
+    Check("F10", f"{SPEC} §5（一局产物 ≠ 库）",
+          "一局产物默认不落进资产树，而全量闭集仍在 assets/roster/",
+          check_the_battle_product_does_not_land_in_the_asset_tree),
+    Check("F11", f"{SPEC} §4（两块石头都留仓，索引说得清自己）",
+          "夹具目录里有的，index.json 里也列了 —— 塞一个文件绕不过索引",
+          check_every_file_in_the_fixture_is_listed_in_the_index),
 )
 
 
