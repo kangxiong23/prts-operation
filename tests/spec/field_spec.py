@@ -26,7 +26,9 @@
 读数验证它的读数。
 
 - **F10 / F11**：跑在**执行者裁的真值批**上（帧与取区来自它的 `取材.json`，真值来自我这份表）；
-- **F12**：跑在**规划者自己新采的 5 帧**上（`data/probe/sp_series/`，**执行者从没见过**）。
+- **F12**：跑在**规划者自己新采的 5 帧**上（`data/probe/sp_series/`，**执行者从没见过**）；
+- **F16**：菱形那个布尔（在 / 不在）也由**我看图逐帧读**（`DIAMOND_PRESENT`，16 帧），
+  取证图 `data/probe/diamond_sheet.png` —— 夹具 `取材.json` 的 `covers` 只是**抄本**。
 
 **`look_now` 不进用例**：那一帧面板写满血，而"离屏幕中心最近的那根"读到 0.774，执行者列出的
 候选里另有 4 根是满的 —— **哪一根配那行数，我定不了**。真值配对定不了的帧不能当判据，
@@ -113,6 +115,33 @@ SP_SERIES_TRUTH: dict[str, tuple[tuple[int, int], tuple[int, int]]] = {
 `s02` / `s03` 曾经是存疑（面板 Mon3tr 满血、读数 13/15，而我在别处量到的那根条两样都对不上）。
 **取区定成 (1447, 389, 240, 360) 之后两边都对上了**：生命 1.0000 = 2153/2153 ✓、
 技力 0.86986 = 127/146 ≈ 13/15 ✓。所以它们进来了。"""
+
+DIAMOND_PRESENT: dict[str, bool] = {
+    "cd01_a": False,
+    "cd01_b": False,
+    "cd01_c": False,
+    "cd12_a": False,
+    "shot01_a": False,
+    "shot21_a": False,
+    "shot26_a": False,
+    "shot31_a": False,
+    "shot02_a": True,
+    "shot04_a": True,
+    "shot30_a": True,
+    "shot22_a": True,
+    "board_a": True,
+    "board_b": True,
+    "field_a": True,
+    "field_b": True,
+}
+"""**规划者看图逐帧读出来的**「那个黄菱形在不在」—— 16 帧 = 8 在 / 8 不在。
+
+「在」＝**黄色**菱形（中心一枚黑三叉）；「不在」＝画面里没有它。**最像它的两条邻居不是它**：
+`cd01_c` / `cd12_a` 上是**灰色**菱形，`cd01_a` 上是**黄色圆环 + 数字 `3`**（倒计时那个图形）。
+取证图 `data/probe/diamond_sheet.png`（16 格逐格裁出菱形邻域、×2 放大、画上链匹配到的落点）。
+
+**它不来自执行者的 `取材.json`**（那份是它自己看图的产物）—— 两者相符由 F16 自己核出来：
+我这张表是**主本**，夹具那份只是抄本。"""
 
 TOLERANCE = 0.025
 """**条是 146 列**，1 列 = 0.0068。取 0.025 ≈ 3.7 列 —— 规划者自己量同一根条时，
@@ -552,6 +581,62 @@ def _f9_window_out_of_canvas() -> None:
     raise AssertionError("取区越出画布却照样读成功了 —— 那会把三样元素挪到别处再报一个数")
 
 
+def _f16_diamond_verdicts_match_truth() -> None:
+    """菱形的**判决**与规划者逐帧读出来的真值相符，而且**两条线坐在量出来的空档里**。
+
+    **编号从 F16 起**：F14 / F15 已经随坏样本 `shot33_a` 一起退掉了（见 `field_verdict.md`
+    §删掉了什么），**那两个号不许再用** —— 复用一个退掉的号，看历史记录的人会以为
+    这是同一条检查。
+
+    两个方向分开数：**误报**（画面里没有它却报「在」—— 假事实，最重）与**漏检**
+    （画面里有它却报「不在」）。「认不出」**不算错**（它是安全方向），但也不许变成
+    一条"什么都不判"的链 —— 所以另有一条：**分数落在空档两侧、判决却是「认不出」**，
+    那就是把明明白白的读数丢掉了，要红。
+
+    余量那一条**只写规则、不写死数**：两条线必须**严格坐在空档内部**
+    （`max(不在) < ABSENT < SOLID < min(在)`）—— 线可以调，坐到空档外面不行。
+    **那两条线现在没有推导出处**（这一批只量出空档），这件事记在
+    `docs/10-规格/视觉层/场上我方干员.md` §3，不在这里重述。
+    """
+    field = _field()
+    template = field.load_ready_diamond()
+    frames = _frames()
+    scores: dict[str, float] = {}
+    unsampled: list[str] = []
+    missed: list[str] = []
+    false_positives: list[str] = []
+    for name, want in DIAMOND_PRESENT.items():
+        window = _window_of(name)
+        score, _, _ = field.diamond_score(frames[name], window, template)
+        scores[name] = score
+        slot = field.find_ready_diamond(frames[name], window, template)
+        payload = getattr(slot, "payload", None)
+        if type(payload).__name__ != "Exact":
+            unsampled.append(name)
+            continue
+        if bool(getattr(payload, "value", False)) == want:
+            continue
+        (missed if want else false_positives).append(name)
+
+    present = [s for n, s in scores.items() if DIAMOND_PRESENT[n]]
+    absent = [s for n, s in scores.items() if not DIAMOND_PRESENT[n]]
+    assert len(present) == 8 and len(absent) == 8, (len(present), len(absent))
+    assert not false_positives, (
+        f"误报（画面里没有那个黄菱形，却报「在」）：{false_positives} —— 这是假事实那个方向"
+    )
+    assert not missed, f"漏检（画面里有那个黄菱形，却报「不在」）：{missed}"
+    lost = [
+        f"{name}（分 {scores[name]:.6f}）"
+        for name in unsampled
+        if scores[name] <= max(absent) or scores[name] >= min(present)
+    ]
+    assert not lost, f"分数在空档之外、判决却落「认不出」—— 明明白白的读数被丢掉了：{lost}"
+    assert max(absent) < field.DIAMOND_ABSENT_SCORE < field.DIAMOND_SOLID_SCORE < min(present), (
+        f"两条线没坐在空档里：不在最高 {max(absent):.6f} · 在最低 {min(present):.6f} · "
+        f"线是 {field.DIAMOND_ABSENT_SCORE} / {field.DIAMOND_SOLID_SCORE}"
+    )
+
+
 CHECKS: tuple[Check, ...] = (
     Check("F1", "血条只出字段表允许的形态，且九档填充看得见", "状态层/我方干员 §字段表（血量那一行）", _f1_health_forms),
     Check("F2", "技力字段只出精确/区间/未采样，不许出下界", "状态层/我方干员 §字段表（技力那一行）", _f2_skill_forms),
@@ -566,4 +651,5 @@ CHECKS: tuple[Check, ...] = (
     Check("F11", "技力填充与独立真值相容", "field_ops_truth.md 的 `16/26` · 状态层/我方干员 §技力", _f11_skill_matches_truth),
     Check("F12", "执行者没见过的 3 帧也与真值相容", "field_ops_truth.md §第二批真值帧（sp_series）", _f12_new_frames_match_truth),
     Check("F13", "自己画的技力条（含亮轨道）也读得出亮区比例", "视觉层/场上我方干员 §2 · §1（绿条 = 充能中）", _f13_skill_fill_known),
+    Check("F16", "菱形的判决与规划者读的真值相符（16 帧），两条线坐在空档里", "视觉层/场上我方干员 §3 · 真值主本是本文件的 DIAMOND_PRESENT", _f16_diamond_verdicts_match_truth),
 )

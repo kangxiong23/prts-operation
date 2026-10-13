@@ -8,7 +8,8 @@
 
     python tests/spec/check_the_checks.py
 
-现在覆盖两批：`contracts_spec.py`（契约层）与 `topbar_spec.py`（顶部两个数）。
+现在覆盖三批：`contracts_spec.py`（契约层）· `topbar_spec.py`（顶部两个数）·
+`field_spec.py`（场上我方干员的菱形那个布尔）。
 **不是每条检查都有探针** —— 探针要有"把公开面换成坏的那一版"这个动作，有些检查
 （例如"35 帧都读对"）的反例要伪造一整批帧，代价大于收益。**这一批挑的是"断言的是
 形状、而不是某个值"的那些**：形状类断言最容易写成永远绿。
@@ -32,8 +33,10 @@ sys.path.insert(0, str(_HERE.parents[1] / "src"))
 sys.path.insert(0, str(_HERE))
 
 import ark.contracts as contracts  # noqa: E402
+import ark.engine.vision.field as field_mod  # noqa: E402
 import ark.engine.vision.topbar as topbar_mod  # noqa: E402
 import contracts_spec as spec  # noqa: E402
+import field_spec  # noqa: E402
 import topbar_spec  # noqa: E402
 
 _MODULES = (contracts, spec)
@@ -261,6 +264,73 @@ TOP_CASES: tuple[tuple[str, Callable[[], str], dict[str, object], str | None], .
 )
 
 
+# ---------------------------------------------------------------------------
+# 场上我方干员那批（F14）：菱形那个布尔
+#
+# F14 的断言是分层的：簇大小 → 两个方向 → "判决与线脱钩" → 两条线坐在空档里。
+# 所以每个探针要**指定是哪一层炸的**（`must_mention`），否则外层先炸，
+# 里层那几条断言就永远没人试过。
+# ---------------------------------------------------------------------------
+
+
+def _always_unsampled(*_args: object, **_kwargs: object) -> object:
+    """菱形判决：一律「认不出」—— 分数与线都还是好的，只是什么都不判。"""
+    return contracts.Unsampled()
+
+
+def _diamond_absent_ceiling() -> float:
+    """这一批「不在」那 8 条里**最高**的分 —— 量出来，不抄一个数。
+
+    抬到它上面（哪怕只多一点点）「不在」那一簇就开始落「认不出」，所以这一个值
+    是"这条线还有没有余量"的边界。
+    """
+    template = field_mod.load_ready_diamond()
+    frames = field_spec._frames()
+    return max(
+        field_mod.diamond_score(frames[name], field_spec._window_of(name), template)[0]
+        for name, present in field_spec.DIAMOND_PRESENT.items()
+        if not present
+    )
+
+
+_DIAMOND_CEILING = _diamond_absent_ceiling()
+"""模块加载时量一次（16 次模板匹配，代价可忽略）。"""
+
+FIELD_CASES: tuple[
+    tuple[str, object, Callable[[], str], dict[str, object], str | None], ...
+] = (
+    (
+        "F16 真值两处对翻（一处在→不在、一处不在→在）",
+        # `DIAMOND_PRESENT` 住在**规划者那份表**上，所以要盖 `field_spec`。
+        field_spec,
+        # 簇大小还是 8/8，所以只有**方向断言**能抓 —— 这正是要试的那一层。
+        field_spec._f16_diamond_verdicts_match_truth,
+        {
+            "DIAMOND_PRESENT": {
+                **field_spec.DIAMOND_PRESENT,
+                "shot02_a": False,
+                "cd01_a": True,
+            }
+        },
+        "误报",
+    ),
+    (
+        "F16 判决永远「认不出」（线与分数都还好）",
+        field_mod,
+        field_spec._f16_diamond_verdicts_match_truth,
+        {"find_ready_diamond": _always_unsampled},
+        "明明白白的读数被丢掉了",
+    ),
+    (
+        "F16 「不在」那条线抬到空档上缘",
+        field_mod,
+        field_spec._f16_diamond_verdicts_match_truth,
+        {"DIAMOND_ABSENT_SCORE": _DIAMOND_CEILING},
+        "两条线没坐在空档里",
+    ),
+)
+
+
 def main() -> int:
     print("把公开面换成坏的那一版，检查是否变红：")
     results = [_goes_red(name, check, patch) for name, check, patch in CASES]
@@ -269,6 +339,12 @@ def main() -> int:
     results += [
         _goes_red_in(topbar_mod, name, check, patch, must_mention=mention)
         for name, check, patch, mention in TOP_CASES
+    ]
+    print()
+    print("场上我方干员那批（盖在判决入口与真值表上）：")
+    results += [
+        _goes_red_in(module, name, check, patch, must_mention=mention)
+        for name, module, check, patch, mention in FIELD_CASES
     ]
     print()
     print(f"{sum(results)}/{len(results)} 条检查被证明会红")
