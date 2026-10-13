@@ -403,7 +403,7 @@ def test_device_facts_goes_through_one_dumpsys_and_needs_no_projection():
 class FakeAssets:
     """假的资产端口：给一套**线性**投影（格 → 像素 = 原点 + 格 × 100）。
 
-    `refuses` 那支模拟真正的空实现（`EmptyAssetPort` 调用就报错）。
+    `refuses` 那支模拟真正的空实现（**离线那一侧那个实现**调用就报错）。
     """
 
     ORIGIN = (1000.0, 500.0)
@@ -577,7 +577,7 @@ def test_the_four_verbs_send_nothing_when_the_projection_refuses():
 
 
 class AssetsWithoutProjection:
-    """假的资产端口：**根本没有 projection 这个方法**（`EmptyAssetPort` 就是这一支）。
+    """假的资产端口：**根本没有 projection 这个方法**（离线那一侧那个实现就是这一支）。
 
     「留空 = 方法不存在」（代码结构 §尚未落地），所以四个动词撞上的是
     `AttributeError` —— 那**不许**直接漏出去（读起来像 bug），要转成一句带话的报错。

@@ -7,7 +7,7 @@
 | 设备 | `AdbDevice` | `engine/device/adb.py` |
 | 时钟 | `SystemClock` | `engine/device/clock.py` |
 | 样本 | `EmptySamplePort` | `offline/hardcase/port.py` |
-| 资产 | `EmptyAssetPort` | `offline/assets_gen/port.py` |
+| 资产 | `RosterAssetPort` | `offline/assets_gen/port.py` |
 
 **只有这里许 import 别人**（导入规则里 `ark.runtime` 是唯一不设限的那条）。`engine`
 的六个子包互不 import，它们之间靠契约层的端口连 —— 接到一起是这里的事。
@@ -36,7 +36,7 @@ from dataclasses import dataclass
 from ark.contracts import AssetPort, ClockPort, DevicePort, SamplePort, View
 from ark.engine.device.adb import AdbDevice, AdbTransport
 from ark.engine.device.clock import SystemClock
-from ark.offline.assets_gen.port import EmptyAssetPort
+from ark.offline.assets_gen.port import RosterAssetPort
 from ark.offline.hardcase.port import EmptySamplePort
 
 __all__ = ["Wiring", "build_wiring", "PORT_GAPS"]
@@ -69,7 +69,7 @@ def build_wiring(transport: AdbTransport, *, view: View = View.NORMAL) -> Wiring
     **`view` 是「此刻的视图」**：同一个资产端口实例同时交给 `Wiring.assets` 与
     设备层，所以两边看到的投影是**同一套**。
     """
-    assets = EmptyAssetPort()
+    assets = RosterAssetPort()
     return Wiring(
         device=AdbDevice(transport, assets, view),
         clock=SystemClock(),
@@ -89,6 +89,9 @@ PORT_GAPS: tuple[str, ...] = (
 
 资产端口那一条是**「方法不存在」**（T5 裁定四的新口径），不是「方法在、一调就炸」：
 代码结构 §尚未落地 说「留空 = 方法不存在」，而 `port_completeness` 的判据是**方法级
-的** —— 一个在但一调就炸的方法会让「接上了」变成假的。所以 `EmptyAssetPort` 一个
-公开方法都没有，欠账写在这里。
+的** —— 一个在但一调就炸的方法会让「接上了」变成假的。所以 `projection` 在实现者
+身上**根本不存在**，欠账写在这里。
+
+**另一个方法不在欠账里**：备战席点名要的那份库这一轮**接上了**（这一单的做4），
+用户层是视觉层，实现是 `RosterAssetPort` 从 `assets/roster/` 读出来交给它。
 """

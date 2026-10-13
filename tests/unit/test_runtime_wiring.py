@@ -1,4 +1,4 @@
-"""组装点：四个端口一个不缺 · 欠账写下来了 · 空实现真的是空的。"""
+"""组装点：四个端口一个不缺 · 欠账写下来了 · 没接的那个方法真的不存在。"""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from ark.engine.device.adb import AdbTransport
-from ark.offline.assets_gen.port import EmptyAssetPort
+from ark.offline.assets_gen.port import RosterAssetPort
 from ark.offline.hardcase.port import EmptySamplePort
 from ark.runtime.wiring import PORT_GAPS, Wiring, build_wiring
 
@@ -82,13 +82,24 @@ def test_empty_sample_port_does_nothing():
     assert vars(port) == {}
 
 
-def test_empty_asset_port_has_no_projection_and_the_gap_is_registered():
-    """T5 裁定四（新口径）：**留空 = 方法不存在** —— 空实现一个公开方法都没有。
+def test_asset_port_implements_exactly_the_methods_the_contract_declares():
+    """T5 裁定四（新口径）：**留空 = 方法不存在**，接上的**恰好**是契约层声明的那几个。
 
-    欠账必须**写下来**（`PORT_GAPS`），不许摆一个「在但一调就炸」的方法：那会让
-    「接上了」这个判断变成**假的**（`port_completeness` 的判据是方法级的）。
+    资产端口现在声明两个：这一轮接上了 `squad_faces`（备战席点名要的那份库），
+    `projection` 仍然**不存在** —— 欠账必须**写下来**（`PORT_GAPS`），不许摆一个
+    「在但一调就炸」的方法：那会让「接上了」这个判断变成**假的**
+    （`port_completeness` 的判据是方法级的）。
     """
-    assert [name for name in dir(EmptyAssetPort) if not name.startswith("_")] == []
+    from ark.contracts import AssetPort
+
+    declared = {
+        name for name, value in vars(AssetPort).items()
+        if not name.startswith("_") and callable(value)
+    }
+    present = {name for name in dir(RosterAssetPort) if not name.startswith("_")}
+    assert present == {"squad_faces"}, "接上的恰好是契约层声明的那一个"
+    assert present <= declared, "实现者多出了端口方法集之外的东西（补法规则）"
+    assert not hasattr(RosterAssetPort, "projection")
     assert any(
         "AssetPort" in entry and "projection" in entry for entry in PORT_GAPS
     ), "资产端口那条欠账没有登记进 PORT_GAPS"

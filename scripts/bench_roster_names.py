@@ -17,7 +17,14 @@ if str(REPO / "src") not in sys.path:
     sys.path.insert(0, str(REPO / "src"))
 
 from ark.offline.assets_gen import roster_names as RN  # noqa: E402
-from ark.offline.assets_gen.cardface import load_formation_page  # noqa: E402
+from ark.engine.device.adb import SQUAD_CARD_PITCH  # noqa: E402
+from ark.engine.vision import roster as RS  # noqa: E402
+from ark.offline.assets_gen import face_library as FL  # noqa: E402
+from ark.offline.assets_gen.cardface import (  # noqa: E402
+    cut_formation_arts,
+    load_cardfaces,
+    load_formation_page,
+)
 
 BATCH = REPO / "tests" / "帧样本" / "编队页名字"
 SCRATCH = REPO / "data" / "probe"
@@ -196,7 +203,51 @@ def main() -> int:
     if list(vtruth) != list(truth) or seen["n"] != 1:
         print("   【红】两份夹具的 truth_names 逐字不一致，或者重放被叫了 %d 次" % seen["n"])
         return 1
-    return 0
+
+    print()
+    print("### A2 做3b：**真帧那一次** —— run-04 自己的清单（5 + 5）＋ 一局产物 ⇒ load_cardfaces")
+    manifest = vertical / "编队页.json"
+    manifest_record = json.loads(manifest.read_text(encoding="utf-8"))
+    product = vertical / vindex["products"][0]["file"]
+    cards = load_cardfaces(manifest, names_from=product)
+    run_page = load_formation_page(REPO / manifest_record["frame"])
+    direct = cut_formation_arts(
+        run_page, counts=tuple(row["count"] for row in manifest_record["geometry"]["rows"])
+    )
+    print("   load_cardfaces(names_from=一局产物) 跑通：%d 条 ｜ 直接切出来 %d 块"
+          % (len(cards), len(direct)))
+    wrong = 0
+    for slot, ((name, art), want) in enumerate(zip(cards, vtruth)):
+        same_name = name == want
+        same_pixels = art.tobytes() == direct[slot].tobytes()
+        wrong += 0 if (same_name and same_pixels) else 1
+        print("   格 %d  %-12s 真值 %-12s %s ｜ 立绘逐字节 == 第 %d 张卡的立绘：%s"
+              % (slot, name, want, "对" if same_name else "【错】", slot, same_pixels))
+    print("   逐条配对与真值一致：%s" % ("**是**" if wrong == 0 else "【否 %d 处】" % wrong))
+
+    print()
+    print("### A2 验收：**把编队页那一帧拿掉**，只用落下来的库，还认不认得出卡")
+    library = FL.load_face_library()
+    disk_faces = FL.load_face_images(library)
+    print("   库从盘上读（%s）：%d 条 ｜ 次序 %s"
+          % (FL.FACES_FILE.name, len(disk_faces), [item[0] for item in disk_faces]))
+    identical = all(
+        art.tobytes() == direct[slot].tobytes()
+        for slot, (name, art) in enumerate(disk_faces) if name == cards[slot][0]
+    )
+    print("   盘上那块与当初切下来的**逐字节相同**：%s" % identical)
+    battle = load_formation_page(REPO / "screenshots" / "run-04" / "干净卡对照.png")
+    values = RS.read_squad_identities(battle, disk_faces, pitch=SQUAD_CARD_PITCH)
+    exact = unknown = 0
+    for index, value in enumerate(values):
+        name = RS._exact_name(value)
+        exact += 1 if name else 0
+        unknown += 0 if name else 1
+        print("   卡位 %d -> %s" % (index, name if name else "未知"))
+    print("   备战席那一帧（run-04，与编队页**同源**）：精确 %d ｜ 未知 %d（合 %d）"
+          % (exact, unknown, len(values)))
+    print("   —— 这一趟**一个字节都没读编队页**：库来自 assets/roster/，帧来自备战席。")
+    return 0 if (wrong == 0 and exact > 0) else 1
 
 
 if __name__ == "__main__":

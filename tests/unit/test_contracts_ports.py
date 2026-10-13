@@ -102,12 +102,14 @@ def test_sample_port_has_exactly_one_method() -> None:
     assert _public_names(SamplePort) == ["submit"]
 
 
-def test_asset_port_has_one_method_and_carries_the_rule() -> None:
-    """§5：资产端口**方法集由第一个用户层补**，现在有第一个：`projection`。
+def test_asset_port_has_the_methods_its_users_added_and_carries_the_rule() -> None:
+    """§5：资产端口**方法集由第一个用户层补**，现在有两个：`projection` · `squad_faces`。
 
-    补法规则必须写在它的文档字符串里，否则下一个人会在这一层替别的层发明类型。
+    两个都是**被用户层用到时才补的**：投影是设备层要的（手势的像素从它算），
+    库是视觉层要的（备战席点名的 `faces`）。补法规则必须写在它的文档字符串里，
+    否则下一个人会在这一层替别的层发明类型。
     """
-    assert _public_names(AssetPort) == ["projection"]
+    assert _public_names(AssetPort) == ["projection", "squad_faces"]
     # 文档字符串会按行折行，所以把空白全抹掉再对句子 —— 折行不该让一条规则"查不到"
     doc = "".join((AssetPort.__doc__ or "").split())
     for phrase in ("第一个用户层", "只加方法", "不改端口本身"):

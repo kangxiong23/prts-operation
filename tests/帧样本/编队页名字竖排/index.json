@@ -74,6 +74,14 @@
       "note": "**不带那本账**（用户裁定 1）：产物是按**内容寻址**的 —— 同一套阵容必须产出同一份字节；掺进「这次网络怎么走的」之后，同一帧在通的那一窗与降级那一窗会写出两份不同产物。账住读数（RosterReading.attempt）与报告。"
     }
   ],
+  "manifests": [
+    {
+      "file": "编队页.json",
+      "source": "run-04 那一帧**自己的** 5+5 清单；装载那条路（load_cardfaces(names_from=…)）用它",
+      "source_sha256": "0f2d1f8eefe8a5a5ad98999cf07972c9b44363f45ac97d7d38b5b5031e072891",
+      "source_bytes": 1438
+    }
+  ],
   "response": {
     "status": "第十一单那次真实调用，已落仓（响应.json）",
     "code": "0",

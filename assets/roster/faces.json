@@ -1,0 +1,262 @@
+{
+  "version": 1,
+  "kind": "roster_faces",
+  "note": "库按干员累积（规格 卡面与指纹 §3）：同一个组合第二次遇到直接命中，不再落一份。",
+  "key": "干员 × 精英化 × 皮肤（规格 §0）",
+  "key_gap": "【洞】精英化这一维现在填不出来（那一读只给名字）⇒ id 按**卡面像素**算（内容寻址）：同一套立绘第二次遇到是同一个 id；同一个名字有两套立绘就是两条 id。等精英化能读了再把它加进键里。",
+  "block": "一块 = 编队页那张卡里的**立绘**（art_width × 卡高），不是整张卡、也不是脸上那一小块；比对的模板是备战席卡里那个 100×100 的窄框（规格 视觉层/备战席点名 §判据的形状）。",
+  "channel_order": "盘上是 PNG（编码器口径 BGR），内存里是 RGB；无损，逐位可比。",
+  "count": 10,
+  "faces": [
+    {
+      "id": "80cd90bf72fa143e6b70ce521f2b98cb",
+      "name": "圣聆初雪",
+      "elite": null,
+      "skin": null,
+      "file": "faces/80cd90bf72fa143e6b70ce521f2b98cb.png",
+      "sha256": "24c645a004b39a7128a908b6d267add23e5e512d25cb36261b96d82ce33e8a97",
+      "pixels_sha256": "547fac1101bd708501135fb0be7a1b8bf4ad19b6335d7923d50ac2237c11b9ff",
+      "bytes": 182166,
+      "shape": [
+        480,
+        214,
+        3
+      ],
+      "source": {
+        "page": "screenshots/run-04/编队界面.png",
+        "page_sha256": "428579209ffe05815bbd39d1ab255b9bbd1615aaf848d26598fcbf07eb28c6f9",
+        "counts": [
+          5,
+          5
+        ],
+        "same_run_as_battle_frames": true,
+        "product": "d9df3cb41184af1792cf330568024b49"
+      }
+    },
+    {
+      "id": "f0b05c84dcc5ae62c1fcd4258a2b544c",
+      "name": "凛御银灰",
+      "elite": null,
+      "skin": null,
+      "file": "faces/f0b05c84dcc5ae62c1fcd4258a2b544c.png",
+      "sha256": "872cf6f64acaffde0999c26b7bc64099dcd8af64d75e59b270f8c5524ca04411",
+      "pixels_sha256": "63d95b05f79deeda1b57359072fbbb70cfaab18c0ed84375b30d98b89db06837",
+      "bytes": 163157,
+      "shape": [
+        480,
+        214,
+        3
+      ],
+      "source": {
+        "page": "screenshots/run-04/编队界面.png",
+        "page_sha256": "428579209ffe05815bbd39d1ab255b9bbd1615aaf848d26598fcbf07eb28c6f9",
+        "counts": [
+          5,
+          5
+        ],
+        "same_run_as_battle_frames": true,
+        "product": "d9df3cb41184af1792cf330568024b49"
+      }
+    },
+    {
+      "id": "bb13995a2c2c396f529dcb04d51510b2",
+      "name": "歌蕾蒂娅",
+      "elite": null,
+      "skin": null,
+      "file": "faces/bb13995a2c2c396f529dcb04d51510b2.png",
+      "sha256": "6a83779e613c59594828d042c3c44ea05bf8dfb3f5c26a7ce3ae5c47fe8bb042",
+      "pixels_sha256": "87a8e64ccc4338d607d6a1a560ee721f53015b9f8a3e1eb2f01ab35f6a8d9f44",
+      "bytes": 167146,
+      "shape": [
+        480,
+        214,
+        3
+      ],
+      "source": {
+        "page": "screenshots/run-04/编队界面.png",
+        "page_sha256": "428579209ffe05815bbd39d1ab255b9bbd1615aaf848d26598fcbf07eb28c6f9",
+        "counts": [
+          5,
+          5
+        ],
+        "same_run_as_battle_frames": true,
+        "product": "d9df3cb41184af1792cf330568024b49"
+      }
+    },
+    {
+      "id": "7cf662e9edd2d6f9cf3dfbdbad28d3d5",
+      "name": "荒芜拉普兰德",
+      "elite": null,
+      "skin": null,
+      "file": "faces/7cf662e9edd2d6f9cf3dfbdbad28d3d5.png",
+      "sha256": "61ba14aa10c0c8483d72f9efb0a25f74842ec71ec1454e9defa74d5d53c692ed",
+      "pixels_sha256": "c9c2215b47e59fbf3bbcbd95bc33d9976227acb34f90d2747fb3990d50b34e45",
+      "bytes": 158189,
+      "shape": [
+        480,
+        214,
+        3
+      ],
+      "source": {
+        "page": "screenshots/run-04/编队界面.png",
+        "page_sha256": "428579209ffe05815bbd39d1ab255b9bbd1615aaf848d26598fcbf07eb28c6f9",
+        "counts": [
+          5,
+          5
+        ],
+        "same_run_as_battle_frames": true,
+        "product": "d9df3cb41184af1792cf330568024b49"
+      }
+    },
+    {
+      "id": "9352656056be81b943a62712524ebce7",
+      "name": "凯尔希·思衡托",
+      "elite": null,
+      "skin": null,
+      "file": "faces/9352656056be81b943a62712524ebce7.png",
+      "sha256": "86382a5f757299688c45fdf318404e8a2842c429b8b093e23fcde7b8d746bdc2",
+      "pixels_sha256": "1cda9a54e25dbba7c5b7794434f1c75baa71954b2f58162940bb8bdfc950e7d7",
+      "bytes": 164490,
+      "shape": [
+        480,
+        214,
+        3
+      ],
+      "source": {
+        "page": "screenshots/run-04/编队界面.png",
+        "page_sha256": "428579209ffe05815bbd39d1ab255b9bbd1615aaf848d26598fcbf07eb28c6f9",
+        "counts": [
+          5,
+          5
+        ],
+        "same_run_as_battle_frames": true,
+        "product": "d9df3cb41184af1792cf330568024b49"
+      }
+    },
+    {
+      "id": "6885d8b3a25eb34168d6f450eea84858",
+      "name": "白面鸮",
+      "elite": null,
+      "skin": null,
+      "file": "faces/6885d8b3a25eb34168d6f450eea84858.png",
+      "sha256": "3a3eaade64e083dde4bca1792d7bbdd84c22fd796c8ccd5cbcb08dfd53d15b78",
+      "pixels_sha256": "74dc458e2879982615d69cbcaf81ca64621e103cb6b8d1211ff3d1ed8aecee46",
+      "bytes": 147564,
+      "shape": [
+        480,
+        214,
+        3
+      ],
+      "source": {
+        "page": "screenshots/run-04/编队界面.png",
+        "page_sha256": "428579209ffe05815bbd39d1ab255b9bbd1615aaf848d26598fcbf07eb28c6f9",
+        "counts": [
+          5,
+          5
+        ],
+        "same_run_as_battle_frames": true,
+        "product": "d9df3cb41184af1792cf330568024b49"
+      }
+    },
+    {
+      "id": "2a63bdc299348d05ebb8e218efe9ef4e",
+      "name": "塞雷娅",
+      "elite": null,
+      "skin": null,
+      "file": "faces/2a63bdc299348d05ebb8e218efe9ef4e.png",
+      "sha256": "05bdcd4872322f86ed25247554b0754b8cba949fe3d0e0182520c93bb468bc7f",
+      "pixels_sha256": "c58c7bbd6bf2d00bc6389cd090774e1af86708ecfcf623def8248be8baff5879",
+      "bytes": 161984,
+      "shape": [
+        480,
+        214,
+        3
+      ],
+      "source": {
+        "page": "screenshots/run-04/编队界面.png",
+        "page_sha256": "428579209ffe05815bbd39d1ab255b9bbd1615aaf848d26598fcbf07eb28c6f9",
+        "counts": [
+          5,
+          5
+        ],
+        "same_run_as_battle_frames": true,
+        "product": "d9df3cb41184af1792cf330568024b49"
+      }
+    },
+    {
+      "id": "dd59dbc9def75c0e189b61a0dd4c874d",
+      "name": "温蒂",
+      "elite": null,
+      "skin": null,
+      "file": "faces/dd59dbc9def75c0e189b61a0dd4c874d.png",
+      "sha256": "a4b83799af13f43c1ad52dffa012ce1e3d0258f98826c2030eb963f30fb5536c",
+      "pixels_sha256": "e3f61795f2232f193ca8f07b92aad253bc55d9d4e3327a795b9ca4e53a5e66b7",
+      "bytes": 158514,
+      "shape": [
+        480,
+        214,
+        3
+      ],
+      "source": {
+        "page": "screenshots/run-04/编队界面.png",
+        "page_sha256": "428579209ffe05815bbd39d1ab255b9bbd1615aaf848d26598fcbf07eb28c6f9",
+        "counts": [
+          5,
+          5
+        ],
+        "same_run_as_battle_frames": true,
+        "product": "d9df3cb41184af1792cf330568024b49"
+      }
+    },
+    {
+      "id": "8d91ef71836c69f2012bda45ab24cf3a",
+      "name": "维什戴尔",
+      "elite": null,
+      "skin": null,
+      "file": "faces/8d91ef71836c69f2012bda45ab24cf3a.png",
+      "sha256": "7d6d376c212510dee3ed0765d785ff1275552660b27253ef08cda137c1f12fb5",
+      "pixels_sha256": "c668e313f5782dffd941fcdaab92a982fff0d72049b13196893408695dc77bbe",
+      "bytes": 168463,
+      "shape": [
+        480,
+        214,
+        3
+      ],
+      "source": {
+        "page": "screenshots/run-04/编队界面.png",
+        "page_sha256": "428579209ffe05815bbd39d1ab255b9bbd1615aaf848d26598fcbf07eb28c6f9",
+        "counts": [
+          5,
+          5
+        ],
+        "same_run_as_battle_frames": true,
+        "product": "d9df3cb41184af1792cf330568024b49"
+      }
+    },
+    {
+      "id": "c124757c266def318e7b789a0759d2c7",
+      "name": "极境",
+      "elite": null,
+      "skin": null,
+      "file": "faces/c124757c266def318e7b789a0759d2c7.png",
+      "sha256": "f90ccd6aafb61894e59d678a4282ff29daaf3fc6f3dee3a34d6ebd5af6ec7073",
+      "pixels_sha256": "56755370f4812055a5a3dc8732e9bd92ee64edbadb0a3520fe49b7a5d623bea0",
+      "bytes": 158920,
+      "shape": [
+        480,
+        214,
+        3
+      ],
+      "source": {
+        "page": "screenshots/run-04/编队界面.png",
+        "page_sha256": "428579209ffe05815bbd39d1ab255b9bbd1615aaf848d26598fcbf07eb28c6f9",
+        "counts": [
+          5,
+          5
+        ],
+        "same_run_as_battle_frames": true,
+        "product": "d9df3cb41184af1792cf330568024b49"
+      }
+    }
+  ]
+}

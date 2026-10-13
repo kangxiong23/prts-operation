@@ -129,6 +129,7 @@ __all__ = [
     "DEFAULT_ENDPOINT",
     "ROSTER_DIR",
     "NAMES_FILE",
+    "STATE_DIR",
     "RosterGrid",
     "NameDecision",
     "RosterReading",
@@ -163,6 +164,14 @@ ROSTER_DIR: Final[Path] = REPO / "assets" / "roster"
 
 NAMES_FILE: Final[Path] = ROSTER_DIR / "names.json"
 """全量**闭集**：判决里那句「精确命中全量名单」对的就是它。"""
+
+STATE_DIR: Final[Path] = REPO / "data" / "roster_state"
+"""**运行期状态**的家：**一局产物**落这儿（`data/` 是 gitignored 的运行时数据）。
+
+**一局产物不进版本库、也不进 `assets/roster/`**（用户裁定）：它是**建库那一步的凭据**，
+不是资产 —— 资产只有 `assets/roster/` 那一份（全量闭集 `names.json` + 库 `faces.json`）。
+逐局产物往资产树里堆不是个事：库里跨局累积的是**卡面**，不是"哪一局用了谁"。
+"""
 
 
 NAME_ROWS: Final[tuple[tuple[int, int], ...]] = ((577, 607), (1081, 1112))
@@ -863,12 +872,22 @@ def write_roster(
     *,
     page: str,
     page_sha256: str,
-    directory: str | Path = ROSTER_DIR,
+    directory: str | Path = STATE_DIR,
+    faces: Sequence[str | None] | None = None,
 ) -> Path:
-    """一局那份名单落盘：`<局指纹>.json`（用户裁定 5）。
+    """**一局产物**落盘：`<局指纹>.json`。
+
+    它**不是库**：库按干员累积、跨局（那一份住 `assets/roster/`，见 `face_library`）；
+    一局产物只记**这一局队伍那 10 个**（名字 + 卡面引用 + 编队页出处），是**建库那一步
+    的凭据** ⇒ 住运行期状态（`STATE_DIR`，`data/` 之下、**不进版本库**）。
 
     **见到「未知」就拒绝落盘**：一份带未知的名单当库的键用，就是把「没读出来」
     当成「查无此人」。
+
+    **`faces` 就是那份「卡面引用」**（可选）：一格一个库里那条卡面的 id
+    （`face_library.face_id`），那一局库里没有就给 `None`。给了就逐格多落一个 `face`、
+    并写下它从哪份库解析（`faces_from`）；**不给就一个字节都不多写** ——
+    夹具里那份样本是那么落的，它的哈希不许因为加了这一维而漂。
     """
     unknown = [item.slot for item in reading.slots if item.name is None]
     if unknown:
@@ -876,9 +895,20 @@ def write_roster(
             "这份名单里有 " + repr(len(unknown)) + " 格是未知（" + repr(unknown)
             + "）—— 拒绝落盘：库的名单不许带未知（用户裁定 3）"
         )
+    if faces is not None and len(faces) != len(reading.slots):
+        raise ValueError(
+            "卡面引用要给每一格一个（" + repr(len(reading.slots)) + " 个），收到 "
+            + repr(len(faces)) + " 个"
+        )
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
     path = directory / (reading.digest + ".json")
+    slots: list[dict] = []
+    for position, item in enumerate(reading.slots):
+        entry = {"slot": item.slot, "word": item.word, "name": item.name, "how": item.how}
+        if faces is not None:
+            entry["face"] = faces[position]
+        slots.append(entry)
     record = {
         "version": 1,
         "kind": "game_roster",
@@ -886,11 +916,10 @@ def write_roster(
         "page": {"image": page, "sha256": page_sha256},
         "calls": reading.calls,
         "names": [item.name for item in reading.slots],
-        "slots": [
-            {"slot": item.slot, "word": item.word, "name": item.name, "how": item.how}
-            for item in reading.slots
-        ],
+        "slots": slots,
     }
+    if faces is not None:
+        record["faces_from"] = "assets/roster/faces.json"
     path.write_text(
         json.dumps(record, ensure_ascii=False, indent=2) + chr(10),
         encoding="utf-8",
