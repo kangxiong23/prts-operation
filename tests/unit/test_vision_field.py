@@ -57,6 +57,7 @@ REPO = Path(__file__).resolve().parents[2]
 BATCH = REPO / "tests" / "帧样本" / "场上干员"
 HARVEST = BATCH / "取材.json"
 REPORT = BATCH / "判据读数.json"
+GRAY_BATCH = REPO / "tests" / "帧样本" / "灰菱形"
 
 
 @pytest.fixture(scope="module")
@@ -1139,7 +1140,7 @@ def test_diamond_verdicts_match_the_batch_truth(readings, harvest) -> None:
     离 `DIAMOND_ABSENT_SCORE = 0.34` 还有 **0.060539**；两簇之间的空档 **0.263830** 宽。
     最贴线的两条是 `shot22_a`（0.543291）与 `cd01_c`（0.279461）。
     """
-    truth = {item["file"][:-4]: "菱形在" in item["covers"] for item in harvest["crops"]}
+    truth = {item["file"][:-4]: "黄菱形在" in item["covers"] for item in harvest["crops"]}
     assert len(truth) == 16, sorted(truth)
     assert sum(truth.values()) == 8, "真值自己不对：`covers` 里数不出 8 条「菱形在」"
 
@@ -1223,6 +1224,171 @@ def test_diamond_does_not_use_a_frame_from_the_batch(batch) -> None:
         source = str(data["source"])
     assert source not in {c.source for c in batch.cases}
     assert not any(source == c.source for c in batch.cases)
+
+
+# ---------------------------------------------------------------------------
+# 灰菱形：第二条存在性读数（技能**可关闭**那一个）
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(scope="module")
+def gray_batch():
+    return load_batch(GRAY_BATCH)
+
+
+@pytest.fixture(scope="module")
+def gray_readings() -> dict[str, dict]:
+    """灰菱形那条链：**两条链**在**两批**上各读一遍。**只跑一次。**
+
+    两批：`tests/帧样本/灰菱形`（新批，10 条）与 `tests/帧样本/场上干员`（已有的那批
+    16 条 —— 它里面有**两块是灰菱形在**：`cd01_c` · `cd12_a`；另外 14 块灰的不在，
+    其中 8 块是**黄的在**）。真值只认夹具自己的 `covers`，不拿分数倒推。
+    """
+    gray_template = field.load_close_diamond()
+    yellow_template = field.load_ready_diamond()
+    out: dict[str, dict] = {}
+
+    def read(batch_dir, gray_truth_of) -> None:
+        taking = json.loads((batch_dir / "取材.json").read_text(encoding="utf-8"))
+        for case, raw in replay_frames(load_batch(batch_dir)):
+            entry = next(item for item in taking["crops"] if item["file"] == case.name + ".png")
+            window = PixelRect(*entry["window"])
+            frame = frame_from_raw(raw)
+            out[case.name] = {
+                "frame": frame,
+                "window": window,
+                "covers": entry["covers"],
+                "gray_truth": gray_truth_of(case.name, entry["covers"]),
+                "yellow_truth": "黄菱形在" in entry["covers"],
+                "close": field.find_close_diamond(frame, window, gray_template),
+                "ready": field.find_ready_diamond(frame, window, yellow_template),
+                "close_score": field.diamond_score(frame, window, gray_template)[0],
+                "ready_score": field.diamond_score(frame, window, yellow_template)[0],
+            }
+
+    read(GRAY_BATCH, lambda _name, covers: "灰菱形不在" not in covers)
+    read(BATCH, lambda name, _covers: name in ("cd01_c", "cd12_a"))
+    return out
+
+
+def _bool_of(slot: SlotValue) -> str:
+    """一个槽 → 「在」/「不在」/「认不出」—— 只看形态，不看分数。"""
+    if isinstance(slot, Valued) and isinstance(slot.payload, Exact):
+        return "在" if slot.payload.value else "不在"
+    return "认不出"
+
+
+def test_close_diamond_verdicts_match_the_batch_truth(gray_readings) -> None:
+    """**灰菱形：判决 == 真值** —— 真值来自夹具自己的 `covers`，不是链的分数。
+
+    真值集：**在 10 条 · 不在 16 条**。在 = `灰菱形` 那批 8 条 + `场上干员` 那批的
+    `cd01_c` / `cd12_a`；不在 = `灰菱形` 那批 2 条（`cd03` · `cd08` —— 那一格上是墙，
+    没有图标）+ `场上干员` 那批另外 14 条。
+
+    两个方向分开点数：漏检（该在却报不在 / 认不出）与**误报（不在却报在 —— 假事实，
+    最重）**。实测：命中 **10** · 漏检 **0** · 误报 **0** · 认不出 **0**。
+
+    **两条余量**（判据一改要重跑）：空档 **0.299424 … 0.761464（宽 0.462040）**，两条线是
+    空档三等分 ⇒ **0.4534** / **0.6075**，两侧余量各 **≈ 0.1540**。
+    最贴线的两条：`cd41`（0.761464）与 `board_b`（0.299424）。
+    """
+    truth = {name: row["gray_truth"] for name, row in gray_readings.items()}
+    assert len(truth) == 26, sorted(truth)
+    assert sum(truth.values()) == 10, "真值自己不对：灰菱形在的条数对不上"
+
+    counted = {"在": 0, "不在": 0, "认不出": 0}
+    missed: list[str] = []
+    false_positives: list[str] = []
+    for name, want in truth.items():
+        got = _bool_of(gray_readings[name]["close"])
+        counted[got] += 1
+        if got == "认不出":
+            continue
+        if got == ("在" if want else "不在"):
+            continue
+        (missed if want else false_positives).append(name)
+
+    assert counted["认不出"] == 0, f"这一批里出现了认不出（单独点数，不算错）：{counted}"
+    assert counted["在"] == 10 and counted["不在"] == 16, counted
+    assert missed == [], f"漏检（该在却没报在）：{missed}"
+    assert false_positives == [], f"误报（不在却报在 —— 假事实，最重）：{false_positives}"
+
+    present = [gray_readings[n]["close_score"] for n, want in truth.items() if want]
+    absent = [gray_readings[n]["close_score"] for n, want in truth.items() if not want]
+    assert max(absent) < field.CLOSE_DIAMOND_ABSENT_SCORE, "不在那一簇顶到 0.4534 线上了：这条线没有余量"
+    assert min(present) > field.CLOSE_DIAMOND_SOLID_SCORE, "在那一簇掉到 0.6075 线上了：这条线没有余量"
+
+
+def test_the_two_diamonds_do_not_mix(gray_readings) -> None:
+    """**黄 ↔ 灰 不混（四格）** —— 混了就是假事实：AI 会去关一个没开的技能，
+    或者以为技能已经开着。
+
+    四格（实测）：
+
+    | 这一格 | 那一条报「在」 |
+    | --- | --- |
+    | **黄的在**（`场上干员` 那 8 块） × 黄那条 | **8 / 8** |
+    | **黄的在** × **灰那条** | **0 / 8** ← 必须 0 |
+    | **灰的在**（10 块） × 灰那条 | **10 / 10** |
+    | **灰的在** × **黄那条** | **0 / 10** ← 必须 0 |
+
+    「认不出」那两格都是 **0**（它不算错，所以单独报数，不当成「不在」）。
+    """
+    yellow_frames = [n for n, r in gray_readings.items() if r["yellow_truth"]]
+    gray_frames = [n for n, r in gray_readings.items() if r["gray_truth"]]
+    assert len(yellow_frames) == 8, yellow_frames
+    assert len(gray_frames) == 10, gray_frames
+
+    assert [n for n in yellow_frames if _bool_of(gray_readings[n]["ready"]) == "在"] == yellow_frames
+    assert [n for n in gray_frames if _bool_of(gray_readings[n]["close"]) == "在"] == gray_frames
+
+    crossed = [n for n in yellow_frames if _bool_of(gray_readings[n]["close"]) == "在"]
+    assert crossed == [], f"黄的帧上灰那条报了在（不许混）：{crossed}"
+    crossed = [n for n in gray_frames if _bool_of(gray_readings[n]["ready"]) == "在"]
+    assert crossed == [], f"灰的帧上黄那条报了在（不许混）：{crossed}"
+
+    assert [n for n in yellow_frames if _bool_of(gray_readings[n]["close"]) == "认不出"] == []
+    assert [n for n in gray_frames if _bool_of(gray_readings[n]["ready"]) == "认不出"] == []
+
+    # 跨色那两侧各自离自己的线还有多远
+    assert max(gray_readings[n]["close_score"] for n in yellow_frames) < field.CLOSE_DIAMOND_ABSENT_SCORE
+    assert min(gray_readings[n]["ready_score"] for n in gray_frames) < field.DIAMOND_ABSENT_SCORE
+
+
+def test_close_diamond_ambiguous_band_falls_to_unsampled(gray_batch, monkeypatch) -> None:
+    """灰那条链**中间那一段落 `Unsampled`**，**绝不落 `Exact(False)`** —— 那是漏检方向。
+
+    真帧里没有「灰的分正好落在两条线之间」那一档，所以把判据本身换成一个固定分数：
+    它**就是** `diamond_score`，换它等于把"读数恰好落在空档里"直接摆进去。
+    """
+    case = gray_batch.cases[0]
+    frame = frame_from_raw(case.raw())
+    taking = json.loads((GRAY_BATCH / "取材.json").read_text(encoding="utf-8"))
+    window = PixelRect(*taking["crops"][0]["window"])
+    middle = (field.CLOSE_DIAMOND_ABSENT_SCORE + field.CLOSE_DIAMOND_SOLID_SCORE) / 2
+    monkeypatch.setattr(field, "diamond_score", lambda *a, **k: (middle, 0, 0))
+    slot = field.find_close_diamond(frame, window, field.load_close_diamond())
+    assert slot == Unsampled()
+    assert slot != Valued(Exact(False), middle)
+
+
+def test_close_diamond_is_its_own_asset_and_its_own_lines() -> None:
+    """灰那条链是**新的一条**：另一个模板、另一组线 —— 不是把黄的那条改成二选一。
+
+    用户裁定：**黄的那条不许被改造**。所以这一条同时钉着「两个资产是两份、两组线不是
+    同一对」，以及「灰的模板不是取自任何一批夹具的帧」。
+    """
+    assert field.CLOSE_DIAMOND_PATH != field.READY_DIAMOND_PATH
+    assert field.CLOSE_DIAMOND_PATH.is_file() and field.READY_DIAMOND_PATH.is_file()
+    assert (field.CLOSE_DIAMOND_ABSENT_SCORE, field.CLOSE_DIAMOND_SOLID_SCORE) != (
+        field.DIAMOND_ABSENT_SCORE, field.DIAMOND_SOLID_SCORE)
+    assert field.load_close_diamond().shape != field.load_ready_diamond().shape
+
+    with np.load(field.CLOSE_DIAMOND_PATH) as data:
+        source = str(data["source"])
+    assert source == "data/precheck/cd/cd24.png"
+    assert source not in {c.source for c in load_batch(BATCH).cases}
+    assert source not in {c.source for c in load_batch(GRAY_BATCH).cases}, "模板不许取自真值批"
 
 
 # ---------------------------------------------------------------------------

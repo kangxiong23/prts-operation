@@ -115,6 +115,12 @@ __all__ = [
     "DIAMOND_SEARCH_RADIUS",
     "DIAMOND_SOLID_SCORE",
     "DIAMOND_ABSENT_SCORE",
+    "find_close_diamond",
+    "load_close_diamond",
+    "save_close_diamond",
+    "CLOSE_DIAMOND_PATH",
+    "CLOSE_DIAMOND_SOLID_SCORE",
+    "CLOSE_DIAMOND_ABSENT_SCORE",
 ]
 
 
@@ -582,6 +588,39 @@ READY_DIAMOND_PATH: Final[Path] = _assets_path("ready_diamond")
 
 来源与裁法写在资产自己的 source / box 字段里（load_ready_diamond 会给回来）——
 **不许取自验收批的帧**（《识别方法》§已定 那条纪律）。
+"""
+
+CLOSE_DIAMOND_PATH: Final[Path] = _assets_path("close_diamond")
+"""**可关闭菱形**（灰的那个）的图标模板落点：assets/features/close_diamond/diamond.npz。
+
+用户给的语义：**黄 = 技能可释放 · 灰 = 技能可关闭**。两个图标**同位置、同外框、
+不同色**（里面的字形也不一样：黄的是黑爆形、灰的是一个浅灰方块）。
+它与黄的那条**是两条链、两个模板、两组线**，只共用「在干员上方那个邻域里滑着搜」
+这个做法。
+"""
+
+CLOSE_DIAMOND_ABSENT_SCORE: Final[float] = 0.4534
+CLOSE_DIAMOND_SOLID_SCORE: Final[float] = 0.6075
+"""灰菱形的两条线：≥ 0.6075 算**在**、≤ 0.4534 算**不在**、中间那一段落**未采样**。
+
+**这两条线是量出来的，而且写得出是怎么来的**（黄的那两条线在仓里没有推导出处，
+所以**不许照抄**它的 0.34 / 0.45）：
+
+| 簇 | 分数 | 条数 |
+| --- | --- | --- |
+| **在** | **0.761464 … 0.980065** | **10**（灰菱形那批 8 条 + 场上干员那批 2 条：cd01_c · cd12_a） |
+| **不在** | **0.150690 … 0.299424** | **16**（灰菱形那批 2 条 + 场上干员那批 14 条） |
+
+空档是 **0.299424 … 0.761464，宽 0.462040**。两条线取**空档三等分**：下 1/3 给「不在」的
+余量、中 1/3 是「认不出」、上 1/3 给「在」的余量 ——
+`0.299424 + 0.154013 = 0.453437` 取 **0.4534**、`0.761464 − 0.154013 = 0.607451` 取 **0.6075**，
+**两侧余量各 ≈ 0.1540**。
+
+**0.4534 与黄那条的 0.45 数值上挨得近，那是巧合**：两份空档不一样宽（灰 **0.462040**、
+黄 0.2638），两个数各自从自己那份空档算出来 —— **不是抄的，也不许被拿去对齐**。
+
+**中间那一段绝不落 `Exact(False)`**：可手动触发这个字段只有布尔 / 未采样两种形态，
+把「认不出」读成「不在」正是《识别方法》「存在性搜索」那一行标了 ⚠ 的**漏检方向**。
 """
 
 
@@ -1607,5 +1646,87 @@ def find_ready_diamond(
     if score >= DIAMOND_SOLID_SCORE:
         return Valued(Exact(True), score)
     if score <= DIAMOND_ABSENT_SCORE:
+        return Valued(Exact(False), score)
+    return Unsampled()
+
+
+def load_close_diamond(path: Path | str = CLOSE_DIAMOND_PATH) -> np.ndarray:
+    """读出厂的可关闭菱形（**灰的那个**）模板 → (高, 宽, 3) 的 uint8 RGB。
+
+    **与 `load_ready_diamond` 同一个格式、同一套闸门，但读的是另一个资产、喂的是
+    另一条链**。这里没有把两个合成一个函数、也没有给黄的那个加参数：用户裁定
+    **黄那条链这一单一个字节都不动** —— 所以宁可让读取器重复这一段，也不去改它。
+    """
+    path = Path(path)
+    if not path.is_file():
+        raise FileNotFoundError(
+            f"可关闭菱形（灰的）的模板不在 {path}：它是灰那条链的前提资产，缺了要响亮地"
+            "报出来，不许静默降级成一个「没有灰菱形」"
+        )
+    with np.load(path) as data:
+        if "template" not in data:
+            raise KeyError(f"{path} 里没有 template 这一项：找到 {list(data)}")
+        template = np.array(data["template"])
+    if template.dtype != np.uint8 or template.ndim != 3 or template.shape[2] != 3:
+        raise TypeError(
+            f"{path} 里的模板要是 (高, 宽, 3) 的 uint8 RGB，收到 "
+            f"{template.dtype} 的 {template.shape}"
+        )
+    return template
+
+
+def save_close_diamond(
+    template: np.ndarray,
+    path: Path | str = CLOSE_DIAMOND_PATH,
+    *,
+    source: str,
+    box: tuple[int, int, int, int],
+) -> Path:
+    """把灰菱形的模板写成一个资产：模板本身 + **它从哪来**（source / box）。
+
+    来源必须跟着资产走，否则「这个模板是不是取自验收批」就无从回答
+    （《识别方法》§已定 那条纪律）。这一份取自 `data/precheck/cd/cd24.png`，
+    那一帧**不在任何一批夹具里**（灰菱形另外那些帧里，cd01 / cd12 是「场上干员」
+    那批的来源帧，所以不行）。
+    """
+    if not isinstance(template, np.ndarray) or template.dtype != np.uint8:
+        raise TypeError("模板要是 uint8 的 ndarray")
+    if template.ndim != 3 or template.shape[2] != 3:
+        raise TypeError(f"模板要是 (高, 宽, 3) 的 RGB，收到 {template.shape}")
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(
+        path,
+        template=template,
+        source=np.asarray(source),
+        box=np.asarray(box, dtype=np.int64),
+    )
+    return path
+
+
+def find_close_diamond(
+    frame: Frame, window: PixelRect, template: np.ndarray
+) -> SlotValue:
+    """搜那个**灰**菱形**在不在**（技能可关闭的那一个图标）。
+
+    与 `find_ready_diamond`（黄的）**同款三出口、同一个搜索做法**，但**是另一条链**：
+
+    - 最高分 ≥ `CLOSE_DIAMOND_SOLID_SCORE` → `Valued(Exact(True), 最高分)`；
+    - ≤ `CLOSE_DIAMOND_ABSENT_SCORE` → `Valued(Exact(False), 最高分)`；
+    - 中间那一段 → `Unsampled()` —— 那是「认不出」。
+
+    **取区与搜索邻域与黄的那条共用**（`operator_ui_window` 折出来的取区，
+    `DIAMOND_IN_WINDOW` ± `DIAMOND_SEARCH_RADIUS`）：实测两个图标在同一格上只差
+    **3 px**（灰的中心在血条左上角 +(73, −236)、黄的 +(72, −233)），远在 ±60 里。
+
+    **它不复用黄那条的两条线**：灰的用自己量出来的空档（见
+    `CLOSE_DIAMOND_ABSENT_SCORE` 那一段）。用户裁定：两个布尔**各判各的** ——
+    灰的帧不许被判成「黄的在」、黄的帧不许被判成「灰的在」，混了就是**假事实**
+    （AI 会去关一个没开的技能，或者以为技能已经开着）。
+    """
+    score, _, _ = diamond_score(frame, window, template)
+    if score >= CLOSE_DIAMOND_SOLID_SCORE:
+        return Valued(Exact(True), score)
+    if score <= CLOSE_DIAMOND_ABSENT_SCORE:
         return Valued(Exact(False), score)
     return Unsampled()

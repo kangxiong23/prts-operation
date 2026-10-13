@@ -94,7 +94,7 @@
             },
             "confidence": 0.08627450980392157
           },
-          "covers": "血条满 + 充能中 + 菱形不在"
+          "covers": "血条满 + 充能中 + 黄菱形不在"
         },
         {
           "name": "shot02_a",
@@ -106,7 +106,7 @@
             },
             "confidence": 0.08627450980392157
           },
-          "covers": "血条 0.288（很低）+ 充能中 + 菱形在"
+          "covers": "血条 0.288（很低）+ 充能中 + 黄菱形在"
         },
         {
           "name": "shot04_a",
@@ -118,7 +118,7 @@
             },
             "confidence": 0.03725490196078431
           },
-          "covers": "血条 0.301 + 技力条被别的条压住（下界）+ 菱形在"
+          "covers": "血条 0.301 + 技力条被别的条压住（下界）+ 黄菱形在"
         },
         {
           "name": "shot21_a",
@@ -166,7 +166,7 @@
             },
             "confidence": 0.09019607843137255
           },
-          "covers": "血条满 + 充能中 + 菱形在（低分那一侧）"
+          "covers": "血条满 + 充能中 + 黄菱形在（低分那一侧）"
         },
         {
           "name": "shot22_a",
@@ -178,7 +178,7 @@
             },
             "confidence": 0.09019607843137255
           },
-          "covers": "血条满 + 充能中 + 菱形在（最低分那一侧）"
+          "covers": "血条满 + 充能中 + 黄菱形在（最低分那一侧）"
         },
         {
           "name": "board_a",
@@ -190,7 +190,7 @@
             },
             "confidence": 0.09019607843137255
           },
-          "covers": "血条满 + 菱形在（另一个场景）"
+          "covers": "血条满 + 黄菱形在（另一个场景）"
         },
         {
           "name": "board_b",
@@ -202,7 +202,7 @@
             },
             "confidence": 0.08627450980392157
           },
-          "covers": "血条 0.829 + 菱形在"
+          "covers": "血条 0.829 + 黄菱形在"
         },
         {
           "name": "field_a",
@@ -214,7 +214,7 @@
             },
             "confidence": 0.09019607843137255
           },
-          "covers": "血条满 + 菱形在"
+          "covers": "血条满 + 黄菱形在"
         },
         {
           "name": "field_b",
@@ -226,7 +226,7 @@
             },
             "confidence": 0.09019607843137255
           },
-          "covers": "血条 0.781 + 菱形在"
+          "covers": "血条 0.781 + 黄菱形在"
         }
       ],
       "distribution": {
@@ -368,7 +368,7 @@
             },
             "confidence": null
           },
-          "covers": "血条满 + 充能中 + 菱形不在"
+          "covers": "血条满 + 充能中 + 黄菱形不在"
         },
         {
           "name": "shot02_a",
@@ -396,7 +396,7 @@
             },
             "confidence": null
           },
-          "covers": "血条 0.288（很低）+ 充能中 + 菱形在"
+          "covers": "血条 0.288（很低）+ 充能中 + 黄菱形在"
         },
         {
           "name": "shot04_a",
@@ -424,7 +424,7 @@
             },
             "confidence": null
           },
-          "covers": "血条 0.301 + 技力条被别的条压住（下界）+ 菱形在"
+          "covers": "血条 0.301 + 技力条被别的条压住（下界）+ 黄菱形在"
         },
         {
           "name": "shot21_a",
@@ -531,7 +531,7 @@
             },
             "confidence": null
           },
-          "covers": "血条满 + 充能中 + 菱形在（低分那一侧）"
+          "covers": "血条满 + 充能中 + 黄菱形在（低分那一侧）"
         },
         {
           "name": "shot22_a",
@@ -559,7 +559,7 @@
             },
             "confidence": null
           },
-          "covers": "血条满 + 充能中 + 菱形在（最低分那一侧）"
+          "covers": "血条满 + 充能中 + 黄菱形在（最低分那一侧）"
         },
         {
           "name": "board_a",
@@ -587,7 +587,7 @@
             },
             "confidence": null
           },
-          "covers": "血条满 + 菱形在（另一个场景）"
+          "covers": "血条满 + 黄菱形在（另一个场景）"
         },
         {
           "name": "board_b",
@@ -615,7 +615,7 @@
             },
             "confidence": null
           },
-          "covers": "血条 0.829 + 菱形在"
+          "covers": "血条 0.829 + 黄菱形在"
         },
         {
           "name": "field_a",
@@ -643,7 +643,7 @@
             },
             "confidence": null
           },
-          "covers": "血条满 + 菱形在"
+          "covers": "血条满 + 黄菱形在"
         },
         {
           "name": "field_b",
@@ -671,7 +671,7 @@
             },
             "confidence": null
           },
-          "covers": "血条 0.781 + 菱形在"
+          "covers": "血条 0.781 + 黄菱形在"
         }
       ],
       "distribution": {
@@ -784,7 +784,7 @@
             1475,
             233
           ],
-          "covers": "血条满 + 充能中 + 菱形不在"
+          "covers": "血条满 + 充能中 + 黄菱形不在"
         },
         {
           "name": "shot02_a",
@@ -801,7 +801,7 @@
             1477,
             253
           ],
-          "covers": "血条 0.288（很低）+ 充能中 + 菱形在"
+          "covers": "血条 0.288（很低）+ 充能中 + 黄菱形在"
         },
         {
           "name": "shot04_a",
@@ -818,7 +818,7 @@
             1477,
             253
           ],
-          "covers": "血条 0.301 + 技力条被别的条压住（下界）+ 菱形在"
+          "covers": "血条 0.301 + 技力条被别的条压住（下界）+ 黄菱形在"
         },
         {
           "name": "shot21_a",
@@ -886,7 +886,7 @@
             1501,
             726
           ],
-          "covers": "血条满 + 充能中 + 菱形在（低分那一侧）"
+          "covers": "血条满 + 充能中 + 黄菱形在（低分那一侧）"
         },
         {
           "name": "shot22_a",
@@ -903,7 +903,7 @@
             1501,
             726
           ],
-          "covers": "血条满 + 充能中 + 菱形在（最低分那一侧）"
+          "covers": "血条满 + 充能中 + 黄菱形在（最低分那一侧）"
         },
         {
           "name": "board_a",
@@ -920,7 +920,7 @@
             1684,
             396
           ],
-          "covers": "血条满 + 菱形在（另一个场景）"
+          "covers": "血条满 + 黄菱形在（另一个场景）"
         },
         {
           "name": "board_b",
@@ -937,7 +937,7 @@
             948,
             243
           ],
-          "covers": "血条 0.829 + 菱形在"
+          "covers": "血条 0.829 + 黄菱形在"
         },
         {
           "name": "field_a",
@@ -954,7 +954,7 @@
             1684,
             396
           ],
-          "covers": "血条满 + 菱形在"
+          "covers": "血条满 + 黄菱形在"
         },
         {
           "name": "field_b",
@@ -971,7 +971,7 @@
             948,
             243
           ],
-          "covers": "血条 0.781 + 菱形在"
+          "covers": "血条 0.781 + 黄菱形在"
         }
       ],
       "distribution": {
@@ -5275,7 +5275,7 @@
       "技力条填充：满（12 条）· 0.863（shot21_a）· 0.808（shot01_a）· 0.527（shot31_a）· **下界 0.808**（shot26_a：弹药没填满）",
       "技力含义：充能中 12 条 / 生效中 1 条 / 弹药分格 3 条",
       "技力那个字段：生效中与弹药分格那 4 条**落未采样**",
-      "菱形：在 8 条（分数 0.543–0.895）、不在 8 条（分数 0.129–0.279）；空档 0.279–0.543",
+      "黄菱形：在 8 条（分数 0.543–0.895）、不在 8 条（分数 0.129–0.279）；空档 0.279–0.543",
       "条被挡住的那一档：shot04_a（条上压着**别的条** → 缝 8 列以内，**跨过去接着算**，仍读满）、shot30/shot22（条右侧背景比条还亮）",
       "**锚点摆动铺到整批**：16 条**每一条各自**沿 x / y 挪 ±1 / ±4 / ±12 px：结论一字不变的有 10/16（x）与 13/16（y）；再往外挪才翻面，x 轴上最早翻面的是 ±16、y 轴上是 ±16 px",
       "**±12 以内不是一条都不翻**：12 条在某一轴上翻了 —— x: board_b.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:充能中→unsampled), cd01_c.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:弹药分格→unsampled), cd12_a.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:弹药分格→unsampled), field_b.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:充能中→unsampled), shot02_a.png(+12 health:Exact→unsampled/skill:Exact→unsampled/meaning:充能中→unsampled), shot04_a.png(+12 health:LowerBound→unsampled/skill:Exact→unsampled/meaning:充能中→unsampled)；y: shot02_a.png(-4 skill:Exact→LowerBound), shot02_a.png(-12 skill:Exact→LowerBound), shot04_a.png(+4 skill:Exact→LowerBound), shot04_a.png(+12 skill:Exact→LowerBound), shot26_a.png(-4 meaning:弹药分格→充能中), shot26_a.png(-12 meaning:弹药分格→充能中)。逐条明细见 sensitivity.swing_within_tolerance"

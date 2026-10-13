@@ -124,18 +124,18 @@ PICKS: tuple[tuple[str, str, int, int, str], ...] = (
     ("cd01_b", "data/precheck/cd/cd01.png", 1025, 800, "血条满 + 技力生效中（橙实心）"),
     ("cd01_c", "data/precheck/cd/cd01.png", 1597, 476, "血条 0.884 + 技力弹药分格（满）"),
     ("cd12_a", "data/precheck/cd/cd12.png", 1597, 476, "血条 0.740 + 弹药分格"),
-    ("shot01_a", "data/precheck/live/shot01.png", 1406, 486, "血条满 + 充能中 + 菱形不在"),
-    ("shot02_a", "data/precheck/live/shot02.png", 1406, 486, "血条 0.288（很低）+ 充能中 + 菱形在"),
-    ("shot04_a", "data/precheck/live/shot04.png", 1406, 486, "血条 0.301 + 技力条被别的条压住（下界）+ 菱形在"),
+    ("shot01_a", "data/precheck/live/shot01.png", 1406, 486, "血条满 + 充能中 + 黄菱形不在"),
+    ("shot02_a", "data/precheck/live/shot02.png", 1406, 486, "血条 0.288（很低）+ 充能中 + 黄菱形在"),
+    ("shot04_a", "data/precheck/live/shot04.png", 1406, 486, "血条 0.301 + 技力条被别的条压住（下界）+ 黄菱形在"),
     ("shot21_a", "data/precheck/live/shot21.png", 1423, 777, "血条满 + 技力 0.863（没满）"),
     ("shot26_a", "data/precheck/live/shot26.png", 1222, 936, "血条满 + 弹药分格**没填满 → 下界**"),
     ("shot31_a", "data/precheck/live/shot31.png", 1609, 584, "血条 0.993 + 技力 0.527（没满）"),
-    ("shot30_a", "data/precheck/live/shot30.png", 1429, 959, "血条满 + 充能中 + 菱形在（低分那一侧）"),
-    ("shot22_a", "data/precheck/live/shot22.png", 1429, 959, "血条满 + 充能中 + 菱形在（最低分那一侧）"),
-    ("board_a", "data/probe/_t5_board/board.raw", 1612, 629, "血条满 + 菱形在（另一个场景）"),
-    ("board_b", "data/probe/_t5_board/board.raw", 877, 476, "血条 0.829 + 菱形在"),
-    ("field_a", "data/probe/_t5_field/field.raw", 1612, 629, "血条满 + 菱形在"),
-    ("field_b", "data/probe/_t5_field/field.raw", 877, 476, "血条 0.781 + 菱形在"),
+    ("shot30_a", "data/precheck/live/shot30.png", 1429, 959, "血条满 + 充能中 + 黄菱形在（低分那一侧）"),
+    ("shot22_a", "data/precheck/live/shot22.png", 1429, 959, "血条满 + 充能中 + 黄菱形在（最低分那一侧）"),
+    ("board_a", "data/probe/_t5_board/board.raw", 1612, 629, "血条满 + 黄菱形在（另一个场景）"),
+    ("board_b", "data/probe/_t5_board/board.raw", 877, 476, "血条 0.829 + 黄菱形在"),
+    ("field_a", "data/probe/_t5_field/field.raw", 1612, 629, "血条满 + 黄菱形在"),
+    ("field_b", "data/probe/_t5_field/field.raw", 877, 476, "血条 0.781 + 黄菱形在"),
 )
 
 # 面板真值批。元组是：帧名 / 源帧 / 期望的血条左上角 x / y / 生命当前 / 生命上限 /
@@ -640,7 +640,7 @@ def _coverage(sensitivity: dict[str, object]) -> dict[str, object]:
             "· **下界 0.808**（shot26_a：弹药没填满）",
             "技力含义：充能中 12 条 / 生效中 1 条 / 弹药分格 3 条",
             "技力那个字段：生效中与弹药分格那 4 条**落未采样**",
-            "菱形：在 8 条（分数 0.543–0.895）、不在 8 条（分数 0.129–0.279）；空档 0.279–0.543",
+            "黄菱形：在 8 条（分数 0.543–0.895）、不在 8 条（分数 0.129–0.279）；空档 0.279–0.543",
             "条被挡住的那一档：shot04_a（条上压着**别的条** → 缝 8 列以内，**跨过去接着算**，"
             "仍读满）、shot30/shot22（条右侧背景比条还亮）",
             "**锚点摆动铺到整批**："

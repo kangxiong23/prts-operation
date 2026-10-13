@@ -1,0 +1,139 @@
+{
+  "note": "灰菱形那个布尔的真值。**每一块都明写「灰菱形在」或「灰菱形不在」** —— 与场上干员那批不一样（那批「不在」是靠不写来暗示的，灰的这批两个方向都写出来）。真值里没有分数：分数由秤现算。",
+  "batch": "tests/帧样本/灰菱形",
+  "window_size": [
+    240,
+    360
+  ],
+  "bars_in_window": [
+    40,
+    320
+  ],
+  "crop_size": [
+    300,
+    420
+  ],
+  "crop_left_margin": 80,
+  "crops": [
+    {
+      "file": "cd26.png",
+      "covers": "灰菱形在（技能开着，可关闭）",
+      "window": [
+        1557,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1597, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd26.png"
+    },
+    {
+      "file": "cd18.png",
+      "covers": "灰菱形在（技能开着，可关闭）",
+      "window": [
+        1557,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1597, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd18.png"
+    },
+    {
+      "file": "cd35.png",
+      "covers": "灰菱形在（技能开着，可关闭）",
+      "window": [
+        1557,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1597, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd35.png"
+    },
+    {
+      "file": "cd49.png",
+      "covers": "灰菱形在（技能开着，可关闭）",
+      "window": [
+        1557,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1597, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd49.png"
+    },
+    {
+      "file": "cd33.png",
+      "covers": "灰菱形在（技能开着，可关闭）",
+      "window": [
+        1557,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1597, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd33.png"
+    },
+    {
+      "file": "cd46.png",
+      "covers": "灰菱形在（技能开着，可关闭）",
+      "window": [
+        1557,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1597, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd46.png"
+    },
+    {
+      "file": "cd41.png",
+      "covers": "灰菱形在（技能开着，可关闭）",
+      "window": [
+        1557,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1597, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd41.png"
+    },
+    {
+      "file": "cd02.png",
+      "covers": "灰菱形在（技能开着，可关闭）",
+      "window": [
+        1557,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1597, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd02.png"
+    },
+    {
+      "file": "cd03.png",
+      "covers": "灰菱形不在（那一格上没有灰菱形）",
+      "window": [
+        1557,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1597, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd03.png"
+    },
+    {
+      "file": "cd08.png",
+      "covers": "灰菱形不在（那一格上没有灰菱形）",
+      "window": [
+        1557,
+        156,
+        240,
+        360
+      ],
+      "window_from": "血条左上角 (1597, 476) − BARS_IN_WINDOW → operator_ui_window()",
+      "source": "data/precheck/cd/cd08.png"
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "note": "灰菱形（技能可关闭那一个）的真值批。每块是原生帧上 300x420 的一块，一个像素都不缩；取区由血条左上角折出来，见 取材.json。",
+  "crops": [
+    {
+      "file": "cd26.png",
+      "origin": [
+        1517,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd26.png",
+      "source_sha256": "4057e73ce68a4f4ac0f7ef009f6f75e11b379427786ab8d072f121ab67167cf1"
+    },
+    {
+      "file": "cd18.png",
+      "origin": [
+        1517,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd18.png",
+      "source_sha256": "959c37007eff468ecccb3858139f6863e0e2bf14d6da24e7b49b5db17367e12b"
+    },
+    {
+      "file": "cd35.png",
+      "origin": [
+        1517,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd35.png",
+      "source_sha256": "ea4fa65d3fba1c68c89e4af707ba3371d09eb83dcbcdb4a7f003cdb6588dd577"
+    },
+    {
+      "file": "cd49.png",
+      "origin": [
+        1517,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd49.png",
+      "source_sha256": "393305ae18af1a61f419ee60bb14576e66b3517f91cd96e8c44a86fb8d29a967"
+    },
+    {
+      "file": "cd33.png",
+      "origin": [
+        1517,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd33.png",
+      "source_sha256": "dea153e237a5eef88b309490960f5fac307b3cfaa80f98dca21c48a9d60f7390"
+    },
+    {
+      "file": "cd46.png",
+      "origin": [
+        1517,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd46.png",
+      "source_sha256": "351d56770b0619005fa1705316bfaf35854e75f273fde9fc33d1dcb6d3792efb"
+    },
+    {
+      "file": "cd41.png",
+      "origin": [
+        1517,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd41.png",
+      "source_sha256": "77c5a7508219ac7ec19664f6d7955ee291627950287099dc3370ab551e5c4b50"
+    },
+    {
+      "file": "cd02.png",
+      "origin": [
+        1517,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd02.png",
+      "source_sha256": "6e02ca776e64e7ced533bfbfc82964d856fe0c30ada19c9109a6dd6a65d7c33c"
+    },
+    {
+      "file": "cd03.png",
+      "origin": [
+        1517,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd03.png",
+      "source_sha256": "a0f21c3582fa8c9f6439548252f75cf1b2dc372f8dcb8944c2d1d9bce7369bf5"
+    },
+    {
+      "file": "cd08.png",
+      "origin": [
+        1517,
+        136
+      ],
+      "size": [
+        300,
+        420
+      ],
+      "source": "data/precheck/cd/cd08.png",
+      "source_sha256": "f155f0171678793dc1646982c67d9cc0f96c86d87f29c0bbba14594bbec402f6"
+    }
+  ]
+}
