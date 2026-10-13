@@ -1106,13 +1106,71 @@ def test_diamond_separates_the_two_clusters(readings, report) -> None:
     assert gap["absent_max"] < gap["present_min"]
 
 
-def test_diamond_verdicts_match_the_truth_of_the_batch(readings) -> None:
-    """逐条对：这一批里哪几条是"在"、哪几条是"不在"，按分数钉住。"""
+def test_diamond_slot_agrees_with_its_own_score_line(readings) -> None:
+    """**自洽**：`Valued` 的取值与它自己那个分数落在线的哪一边，必须一致。
+
+    这一条**不是真值核对** —— 它拿链自己的分数当参照，只能证「分数线那一支没接错」。
+    真值核对是下面那条（真值来自夹具的 `covers`，与分数无关）。
+    """
     for name, row in readings.items():
         slot = row["diamond"]
         assert isinstance(slot, Valued)
         if isinstance(slot.payload, Exact):
             assert slot.payload.value is (row["score"] >= field.DIAMOND_SOLID_SCORE)
+
+
+def test_diamond_verdicts_match_the_batch_truth(readings, harvest) -> None:
+    """**这一批 16 条：判决 == 真值** —— 真值来自夹具自己的 `covers`，不是链的分数。
+
+    真值怎么读（`取材.json` 的 `covers`）：写了「菱形在」的那 8 条是"在"，写了
+    「菱形不在」的那 1 条（`shot01_a`）是"不在"，**其余 7 条不写**（README 记着
+    「在 8 条 · 不在 8 条」）。所以先按 `covers` 折出真值、再核它**正好是 8 在 /
+    8 不在**：真值自己少写一条时，这条会先红在真值上，而不是把一次漏检吞掉。
+
+    **真值不许拿链的分数倒推**（本单裁定 2）：拿分数当面筛，量到的只有「判决与自己的
+    分数线一致」，量不到「判决与画面对得上」。画面对不对由取证图管 —— 16 格逐格裁出
+    菱形那个邻域，8 条"在"上都能看见那个黄菱形、8 条"不在"上一个都没有。
+
+    **两个方向分开点数**：漏检（该在却报不在 / 认不出）与**误报（不在却报在 —— 假事实，
+    最重）**。这一批实测：命中 **16** · 漏检 **0** · 误报 **0** · 认不出 **0**。
+
+    **两条余量**（这一批实测，判据一改要重跑）："在"那 8 条最低 **0.543291**，离
+    `DIAMOND_SOLID_SCORE = 0.45` 还有 **0.093291**；"不在"那 8 条最高 **0.279461**，
+    离 `DIAMOND_ABSENT_SCORE = 0.34` 还有 **0.060539**；两簇之间的空档 **0.263830** 宽。
+    最贴线的两条是 `shot22_a`（0.543291）与 `cd01_c`（0.279461）。
+    """
+    truth = {item["file"][:-4]: "菱形在" in item["covers"] for item in harvest["crops"]}
+    assert len(truth) == 16, sorted(truth)
+    assert sum(truth.values()) == 8, "真值自己不对：`covers` 里数不出 8 条「菱形在」"
+
+    counted = {"在": 0, "不在": 0, "认不出": 0}
+    missed: list[str] = []
+    false_positives: list[str] = []
+    for name, want in truth.items():
+        slot = readings[name]["diamond"]
+        if isinstance(slot, Valued) and isinstance(slot.payload, Exact):
+            got = "在" if slot.payload.value else "不在"
+        else:
+            got = "认不出"
+        counted[got] += 1
+        if got == "认不出":
+            continue
+        if got == ("在" if want else "不在"):
+            continue
+        if want:
+            missed.append(name)
+        else:
+            false_positives.append(name)
+
+    assert counted["认不出"] == 0, f"这一批里出现了认不出（单独点数，不算错）：{counted}"
+    assert counted["在"] == 8 and counted["不在"] == 8, counted
+    assert missed == [], f"漏检（该在却没报在）：{missed}"
+    assert false_positives == [], f"误报（不在却报在 —— 假事实，最重）：{false_positives}"
+
+    present = [readings[name]["score"] for name, want in truth.items() if want]
+    absent = [readings[name]["score"] for name, want in truth.items() if not want]
+    assert max(absent) < field.DIAMOND_ABSENT_SCORE, "不在那一簇顶到 0.34 线上了：这条线没有余量"
+    assert min(present) > field.DIAMOND_SOLID_SCORE, "在那一簇掉到 0.45 线上了：这条线没有余量"
 
 
 def test_diamond_is_searched_not_pinned(readings, batch) -> None:
