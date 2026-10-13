@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "box": [
+    300,
+    1040,
+    2799,
+    1259
+  ],
+  "crops": [
+    {
+      "file": "灰罩卡_备战席.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "screenshots/run-04/灰罩卡.png",
+      "source_sha256": "ba1c87a164ced7cd83659195dde693c3cde547269b79898dd9d494477a3cf5a1",
+      "current_cost": 20
+    },
+    {
+      "file": "干净卡对照_备战席.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "screenshots/run-04/干净卡对照.png",
+      "source_sha256": "43916fc5f964725dfba28bf9f0d65eb5064578fe1463f1f92d10dbcc0883b0fc",
+      "current_cost": 28
+    }
+  ],
+  "phase": "备战席第三态：缺费（灰卡）",
+  "labels_note": "两帧是同一局的两次暂停；卡位 / 干员 / 顺序 / 剩余可放置角色全一样，唯一变的是当前费用。所以标签是**代数**的、不是目视的。",
+  "labels": {
+    "current_cost": {
+      "灰罩卡.png": 20,
+      "干净卡对照.png": 28
+    },
+    "current_cost_source": "cost.read_cost_digits（链读出来的；灰罩 0.9986 · 干净 0.9986）",
+    "card_cost_right_to_left": [
+      25,
+      23,
+      22,
+      21,
+      21,
+      19,
+      16,
+      13,
+      12,
+      11
+    ],
+    "card_cost_chain_read_right_to_left": [
+      25,
+      23,
+      22,
+      21,
+      21,
+      null,
+      16,
+      13,
+      null,
+      11
+    ],
+    "card_cost_source": "bench.read_squad_row 逐张读；idx5/idx8 两帧上这条链都读不出（已有的欠账），那两位按**原图目视**读、并在这里标出来",
+    "card_cost_eyeballed": {
+      "5": 19,
+      "8": 12
+    },
+    "insufficient_right_to_left": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  }
+}

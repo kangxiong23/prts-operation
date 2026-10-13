@@ -1,0 +1,1443 @@
+{
+  "note": "第八单：备战席第三态（缺费灰卡）的差图与读数。石头是两张原图（同局的两次暂停）。",
+  "sources": {
+    "灰罩卡.png": "ba1c87a164ced7cd83659195dde693c3cde547269b79898dd9d494477a3cf5a1",
+    "干净卡对照.png": "43916fc5f964725dfba28bf9f0d65eb5064578fe1463f1f92d10dbcc0883b0fc"
+  },
+  "labels": {
+    "current_cost": {
+      "灰罩卡.png": 20,
+      "干净卡对照.png": 28
+    },
+    "current_cost_source": "cost.read_cost_digits（链读出来的；灰罩 0.9986 · 干净 0.9986）",
+    "card_cost_right_to_left": [
+      25,
+      23,
+      22,
+      21,
+      21,
+      19,
+      16,
+      13,
+      12,
+      11
+    ],
+    "card_cost_chain_read_right_to_left": [
+      25,
+      23,
+      22,
+      21,
+      21,
+      null,
+      16,
+      13,
+      null,
+      11
+    ],
+    "card_cost_source": "bench.read_squad_row 逐张读；idx5/idx8 两帧上这条链都读不出（已有的欠账），那两位按**原图目视**读、并在这里标出来",
+    "card_cost_eyeballed": {
+      "5": 19,
+      "8": 12
+    },
+    "insufficient_right_to_left": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "same_frame": [
+    {
+      "index": 9,
+      "cost": 11,
+      "insufficient": false,
+      "y": 171.4332729,
+      "chroma": 29.6374,
+      "s": 41.8984
+    },
+    {
+      "index": 8,
+      "cost": 12,
+      "insufficient": false,
+      "y": 156.0423191,
+      "chroma": 16.6638,
+      "s": 27.0874
+    },
+    {
+      "index": 7,
+      "cost": 13,
+      "insufficient": false,
+      "y": 148.772223,
+      "chroma": 18.4809,
+      "s": 42.4765
+    },
+    {
+      "index": 6,
+      "cost": 16,
+      "insufficient": false,
+      "y": 202.45848589999997,
+      "chroma": 33.0605,
+      "s": 41.2023
+    },
+    {
+      "index": 5,
+      "cost": 19,
+      "insufficient": false,
+      "y": 204.9223384,
+      "chroma": 23.3452,
+      "s": 31.4651
+    },
+    {
+      "index": 4,
+      "cost": 21,
+      "insufficient": true,
+      "y": 79.6301807,
+      "chroma": 13.2127,
+      "s": 38.4566
+    },
+    {
+      "index": 3,
+      "cost": 21,
+      "insufficient": true,
+      "y": 94.8623431,
+      "chroma": 10.0752,
+      "s": 28.0363
+    },
+    {
+      "index": 2,
+      "cost": 22,
+      "insufficient": true,
+      "y": 105.34608670000001,
+      "chroma": 3.0104,
+      "s": 8.4209
+    },
+    {
+      "index": 1,
+      "cost": 23,
+      "insufficient": true,
+      "y": 96.84271650000001,
+      "chroma": 10.2137,
+      "s": 28.5403
+    },
+    {
+      "index": 0,
+      "cost": 25,
+      "insufficient": true,
+      "y": 82.008626,
+      "chroma": 9.3846,
+      "s": 30.8695
+    }
+  ],
+  "corpus_absolute": {
+    "n": 68,
+    "ranges": {
+      "y": {
+        "insufficient": [
+          47.749,
+          105.346
+        ],
+        "clean": [
+          89.885,
+          208.415
+        ]
+      },
+      "chroma": {
+        "insufficient": [
+          3.01,
+          66.726
+        ],
+        "clean": [
+          4.981,
+          132.097
+        ]
+      },
+      "s": {
+        "insufficient": [
+          8.421,
+          157.741
+        ],
+        "clean": [
+          7.18,
+          158.521
+        ]
+      }
+    }
+  },
+  "diff": {
+    "strip": [
+      300,
+      1040,
+      2500,
+      220
+    ],
+    "whole": {
+      "diff_px": 199053,
+      "total_px": 550000,
+      "mean_abs": 24.44,
+      "max": 128
+    },
+    "outside_cards": {
+      "diff_px": 5252,
+      "total_px": 113440,
+      "mean_abs": 2.492
+    },
+    "cards": [
+      {
+        "index": 9,
+        "cost": 11,
+        "insufficient": false,
+        "card_diff_px": 16,
+        "card_mean_abs": 0.0,
+        "ident_diff_px": 0,
+        "ident_mean_abs": 0.0,
+        "share": 1.0
+      },
+      {
+        "index": 8,
+        "cost": 12,
+        "insufficient": false,
+        "card_diff_px": 18,
+        "card_mean_abs": 0.0,
+        "ident_diff_px": 0,
+        "ident_mean_abs": 0.0,
+        "share": 1.0
+      },
+      {
+        "index": 7,
+        "cost": 13,
+        "insufficient": false,
+        "card_diff_px": 26,
+        "card_mean_abs": 0.0,
+        "ident_diff_px": 0,
+        "ident_mean_abs": 0.0,
+        "share": 1.0
+      },
+      {
+        "index": 6,
+        "cost": 16,
+        "insufficient": false,
+        "card_diff_px": 8,
+        "card_mean_abs": 0.0,
+        "ident_diff_px": 0,
+        "ident_mean_abs": 0.0,
+        "share": 1.0
+      },
+      {
+        "index": 5,
+        "cost": 19,
+        "insufficient": false,
+        "card_diff_px": 360,
+        "card_mean_abs": 0.021,
+        "ident_diff_px": 0,
+        "ident_mean_abs": 0.0,
+        "share": 1.0
+      },
+      {
+        "index": 4,
+        "cost": 21,
+        "insufficient": true,
+        "card_diff_px": 37055,
+        "card_mean_abs": 48.763,
+        "ident_diff_px": 9998,
+        "ident_mean_abs": 76.765,
+        "share": 0.502
+      },
+      {
+        "index": 3,
+        "cost": 21,
+        "insufficient": true,
+        "card_diff_px": 38015,
+        "card_mean_abs": 53.344,
+        "ident_diff_px": 10000,
+        "ident_mean_abs": 92.026,
+        "share": 0.502
+      },
+      {
+        "index": 2,
+        "cost": 22,
+        "insufficient": true,
+        "card_diff_px": 34908,
+        "card_mean_abs": 53.459,
+        "ident_diff_px": 10000,
+        "ident_mean_abs": 103.182,
+        "share": 0.502
+      },
+      {
+        "index": 1,
+        "cost": 23,
+        "insufficient": true,
+        "card_diff_px": 42248,
+        "card_mean_abs": 81.784,
+        "ident_diff_px": 10000,
+        "ident_mean_abs": 95.871,
+        "share": 0.502
+      },
+      {
+        "index": 0,
+        "cost": 25,
+        "insufficient": true,
+        "card_diff_px": 41147,
+        "card_mean_abs": 64.061,
+        "ident_diff_px": 10000,
+        "ident_mean_abs": 80.1,
+        "share": 0.502
+      }
+    ]
+  },
+  "model": {
+    "fits": [
+      {
+        "index": 9,
+        "cost": 11,
+        "a": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "b": [
+          -0.0,
+          -0.0,
+          0.0
+        ],
+        "rms": 0.0
+      },
+      {
+        "index": 8,
+        "cost": 12,
+        "a": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "b": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rms": 0.0
+      },
+      {
+        "index": 7,
+        "cost": 13,
+        "a": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "b": [
+          0.0,
+          -0.0,
+          0.0
+        ],
+        "rms": 0.0
+      },
+      {
+        "index": 6,
+        "cost": 16,
+        "a": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "b": [
+          -0.0,
+          -0.0,
+          0.0
+        ],
+        "rms": 0.0
+      },
+      {
+        "index": 5,
+        "cost": 19,
+        "a": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "b": [
+          -0.0,
+          -0.0,
+          -0.0
+        ],
+        "rms": 0.0
+      },
+      {
+        "index": 4,
+        "cost": 21,
+        "a": [
+          0.4952,
+          0.4957,
+          0.4974
+        ],
+        "b": [
+          2.1161,
+          1.7281,
+          1.121
+        ],
+        "rms": 2.3587
+      },
+      {
+        "index": 3,
+        "cost": 21,
+        "a": [
+          0.4908,
+          0.4928,
+          0.4957
+        ],
+        "b": [
+          3.1168,
+          2.4205,
+          1.5184
+        ],
+        "rms": 2.0654
+      },
+      {
+        "index": 2,
+        "cost": 22,
+        "a": [
+          0.482,
+          0.4856,
+          0.4915
+        ],
+        "b": [
+          5.1304,
+          4.1043,
+          2.5467
+        ],
+        "rms": 1.9995
+      },
+      {
+        "index": 1,
+        "cost": 23,
+        "a": [
+          0.4968,
+          0.498,
+          0.4986
+        ],
+        "b": [
+          1.9477,
+          1.4432,
+          1.0491
+        ],
+        "rms": 2.1188
+      },
+      {
+        "index": 0,
+        "cost": 25,
+        "a": [
+          0.4848,
+          0.4923,
+          0.4956
+        ],
+        "b": [
+          3.8928,
+          2.2313,
+          1.4003
+        ],
+        "rms": 2.0446
+      }
+    ],
+    "verdict": {
+      "kind": "multiply",
+      "scalar": 0.5,
+      "chroma_flattened": false,
+      "luma_changed": true,
+      "same_scalar": true,
+      "rows": [
+        {
+          "index": 4,
+          "insufficient": true,
+          "chroma_clean_max": 173.0,
+          "chroma_gray_max": 87.0,
+          "chroma_over20_clean": 4577,
+          "chroma_over20_gray": 2786,
+          "luma_ratio": 0.5071,
+          "chroma_ratio_median": 0.5625
+        },
+        {
+          "index": 3,
+          "insufficient": true,
+          "chroma_clean_max": 155.0,
+          "chroma_gray_max": 78.0,
+          "chroma_over20_clean": 3931,
+          "chroma_over20_gray": 675,
+          "luma_ratio": 0.506,
+          "chroma_ratio_median": 0.5333
+        },
+        {
+          "index": 2,
+          "insufficient": true,
+          "chroma_clean_max": 70.0,
+          "chroma_gray_max": 35.0,
+          "chroma_over20_clean": 238,
+          "chroma_over20_gray": 23,
+          "luma_ratio": 0.5055,
+          "chroma_ratio_median": 0.5
+        },
+        {
+          "index": 1,
+          "insufficient": true,
+          "chroma_clean_max": 100.0,
+          "chroma_gray_max": 54.0,
+          "chroma_over20_clean": 3592,
+          "chroma_over20_gray": 696,
+          "luma_ratio": 0.5058,
+          "chroma_ratio_median": 0.5
+        },
+        {
+          "index": 0,
+          "insufficient": true,
+          "chroma_clean_max": 196.0,
+          "chroma_gray_max": 98.0,
+          "chroma_over20_clean": 3162,
+          "chroma_over20_gray": 1094,
+          "luma_ratio": 0.5066,
+          "chroma_ratio_median": 0.5714
+        }
+      ],
+      "null_rows_identical": true
+    }
+  },
+  "restore": {
+    "mean_before": 89.589,
+    "mean_after": 2.042,
+    "pairs": [
+      {
+        "index": 4,
+        "cost": 21,
+        "before_mean_abs": 76.765,
+        "before_max": 127,
+        "before_over8": 29883,
+        "after_mean_abs": 2.101,
+        "after_max": 52,
+        "after_over8": 2210
+      },
+      {
+        "index": 3,
+        "cost": 21,
+        "before_mean_abs": 92.026,
+        "before_max": 127,
+        "before_over8": 29977,
+        "after_mean_abs": 2.043,
+        "after_max": 29,
+        "after_over8": 2193
+      },
+      {
+        "index": 2,
+        "cost": 22,
+        "before_mean_abs": 103.182,
+        "before_max": 127,
+        "before_over8": 29997,
+        "after_mean_abs": 2.1,
+        "after_max": 29,
+        "after_over8": 2178
+      },
+      {
+        "index": 1,
+        "cost": 23,
+        "before_mean_abs": 95.871,
+        "before_max": 127,
+        "before_over8": 29995,
+        "after_mean_abs": 1.936,
+        "after_max": 29,
+        "after_over8": 1942
+      },
+      {
+        "index": 0,
+        "cost": 25,
+        "before_mean_abs": 80.1,
+        "before_max": 127,
+        "before_over8": 29993,
+        "after_mean_abs": 2.031,
+        "after_max": 29,
+        "after_over8": 2260
+      }
+    ]
+  },
+  "scores": {
+    "library": "对照帧自己那 10 张卡面（卡位0..卡位9）",
+    "rows": [
+      {
+        "index": 9,
+        "cost": 11,
+        "insufficient": false,
+        "reference": {
+          "top": 0.960217,
+          "name": "卡位9",
+          "runner_up": 0.550226,
+          "exact": true
+        },
+        "before": {
+          "top": 0.960217,
+          "name": "卡位9",
+          "runner_up": 0.550226,
+          "exact": true
+        },
+        "after": {
+          "top": 0.960217,
+          "name": "卡位9",
+          "runner_up": 0.550226,
+          "exact": true
+        },
+        "name_right": {
+          "before": true,
+          "after": true
+        },
+        "score_dropped": 0.0
+      },
+      {
+        "index": 8,
+        "cost": 12,
+        "insufficient": false,
+        "reference": {
+          "top": 0.973299,
+          "name": "卡位8",
+          "runner_up": 0.617589,
+          "exact": true
+        },
+        "before": {
+          "top": 0.973299,
+          "name": "卡位8",
+          "runner_up": 0.617589,
+          "exact": true
+        },
+        "after": {
+          "top": 0.973299,
+          "name": "卡位8",
+          "runner_up": 0.617589,
+          "exact": true
+        },
+        "name_right": {
+          "before": true,
+          "after": true
+        },
+        "score_dropped": 0.0
+      },
+      {
+        "index": 7,
+        "cost": 13,
+        "insufficient": false,
+        "reference": {
+          "top": 0.976542,
+          "name": "卡位7",
+          "runner_up": 0.61338,
+          "exact": true
+        },
+        "before": {
+          "top": 0.976542,
+          "name": "卡位7",
+          "runner_up": 0.61338,
+          "exact": true
+        },
+        "after": {
+          "top": 0.976542,
+          "name": "卡位7",
+          "runner_up": 0.61338,
+          "exact": true
+        },
+        "name_right": {
+          "before": true,
+          "after": true
+        },
+        "score_dropped": 0.0
+      },
+      {
+        "index": 6,
+        "cost": 16,
+        "insufficient": false,
+        "reference": {
+          "top": 0.96416,
+          "name": "卡位6",
+          "runner_up": 0.444575,
+          "exact": true
+        },
+        "before": {
+          "top": 0.96416,
+          "name": "卡位6",
+          "runner_up": 0.444575,
+          "exact": true
+        },
+        "after": {
+          "top": 0.96416,
+          "name": "卡位6",
+          "runner_up": 0.444575,
+          "exact": true
+        },
+        "name_right": {
+          "before": true,
+          "after": true
+        },
+        "score_dropped": 0.0
+      },
+      {
+        "index": 5,
+        "cost": 19,
+        "insufficient": false,
+        "reference": {
+          "top": 0.957487,
+          "name": "卡位5",
+          "runner_up": 0.532637,
+          "exact": true
+        },
+        "before": {
+          "top": 0.957487,
+          "name": "卡位5",
+          "runner_up": 0.532637,
+          "exact": true
+        },
+        "after": {
+          "top": 0.957487,
+          "name": "卡位5",
+          "runner_up": 0.532637,
+          "exact": true
+        },
+        "name_right": {
+          "before": true,
+          "after": true
+        },
+        "score_dropped": 0.0
+      },
+      {
+        "index": 4,
+        "cost": 21,
+        "insufficient": true,
+        "reference": {
+          "top": 0.969814,
+          "name": "卡位4",
+          "runner_up": 0.553286,
+          "exact": true
+        },
+        "before": {
+          "top": 0.967992,
+          "name": "卡位4",
+          "runner_up": 0.541377,
+          "exact": true
+        },
+        "after": {
+          "top": 0.967962,
+          "name": "卡位4",
+          "runner_up": 0.541545,
+          "exact": true
+        },
+        "name_right": {
+          "before": true,
+          "after": true
+        },
+        "score_dropped": 0.001822
+      },
+      {
+        "index": 3,
+        "cost": 21,
+        "insufficient": true,
+        "reference": {
+          "top": 0.959982,
+          "name": "卡位3",
+          "runner_up": 0.547585,
+          "exact": true
+        },
+        "before": {
+          "top": 0.95902,
+          "name": "卡位3",
+          "runner_up": 0.535968,
+          "exact": true
+        },
+        "after": {
+          "top": 0.958856,
+          "name": "卡位3",
+          "runner_up": 0.536192,
+          "exact": true
+        },
+        "name_right": {
+          "before": true,
+          "after": true
+        },
+        "score_dropped": 0.000963
+      },
+      {
+        "index": 2,
+        "cost": 22,
+        "insufficient": true,
+        "reference": {
+          "top": 0.931406,
+          "name": "卡位2",
+          "runner_up": 0.501381,
+          "exact": true
+        },
+        "before": {
+          "top": 0.927429,
+          "name": "卡位2",
+          "runner_up": 0.497735,
+          "exact": true
+        },
+        "after": {
+          "top": 0.927394,
+          "name": "卡位2",
+          "runner_up": 0.497756,
+          "exact": true
+        },
+        "name_right": {
+          "before": true,
+          "after": true
+        },
+        "score_dropped": 0.003977
+      },
+      {
+        "index": 1,
+        "cost": 23,
+        "insufficient": true,
+        "reference": {
+          "top": 0.948233,
+          "name": "卡位1",
+          "runner_up": 0.328984,
+          "exact": true
+        },
+        "before": {
+          "top": 0.946971,
+          "name": "卡位1",
+          "runner_up": 0.338664,
+          "exact": true
+        },
+        "after": {
+          "top": 0.947808,
+          "name": "卡位1",
+          "runner_up": 0.338055,
+          "exact": true
+        },
+        "name_right": {
+          "before": true,
+          "after": true
+        },
+        "score_dropped": 0.001263
+      },
+      {
+        "index": 0,
+        "cost": 25,
+        "insufficient": true,
+        "reference": {
+          "top": 0.969206,
+          "name": "卡位0",
+          "runner_up": 0.663024,
+          "exact": true
+        },
+        "before": {
+          "top": 0.964686,
+          "name": "卡位0",
+          "runner_up": 0.658377,
+          "exact": true
+        },
+        "after": {
+          "top": 0.964734,
+          "name": "卡位0",
+          "runner_up": 0.658257,
+          "exact": true
+        },
+        "name_right": {
+          "before": true,
+          "after": true
+        },
+        "score_dropped": 0.00452
+      }
+    ],
+    "library_1": {
+      "source": "tests/帧样本/立绘两组/库1.json（组1 编队页的 10 条立绘）",
+      "stage": "还原后（缺费那五格乘回去了）",
+      "rows": [
+        {
+          "index": 9,
+          "cost": 11,
+          "top": "组1·极境",
+          "score": 0.973042,
+          "runner": 0.5537541508674622,
+          "exact": true
+        },
+        {
+          "index": 8,
+          "cost": 12,
+          "top": "组1·凛御银灰",
+          "score": 0.958836,
+          "runner": 0.5796217918395996,
+          "exact": true
+        },
+        {
+          "index": 7,
+          "cost": 13,
+          "top": "组1·歌蕾蒂娅",
+          "score": 0.96137,
+          "runner": 0.6323492527008057,
+          "exact": true
+        },
+        {
+          "index": 6,
+          "cost": 16,
+          "top": "组1·白面鸮",
+          "score": 0.97099,
+          "runner": 0.5055469274520874,
+          "exact": true
+        },
+        {
+          "index": 5,
+          "cost": 19,
+          "top": "组1·凯尔希·思衡托",
+          "score": 0.937492,
+          "runner": 0.5412300229072571,
+          "exact": true
+        },
+        {
+          "index": 4,
+          "cost": 21,
+          "top": "组1·塞雷娅",
+          "score": 0.967096,
+          "runner": 0.5554774403572083,
+          "exact": true
+        },
+        {
+          "index": 3,
+          "cost": 21,
+          "top": "组1·温蒂",
+          "score": 0.935294,
+          "runner": 0.5840594172477722,
+          "exact": true
+        },
+        {
+          "index": 2,
+          "cost": 22,
+          "top": "组1·荒芜拉普兰德",
+          "score": 0.933306,
+          "runner": 0.5005229711532593,
+          "exact": true
+        },
+        {
+          "index": 1,
+          "cost": 23,
+          "top": "组1·荒芜拉普兰德",
+          "score": 0.325225,
+          "runner": 0.32217347621917725,
+          "exact": false
+        },
+        {
+          "index": 0,
+          "cost": 25,
+          "top": "组1·维什戴尔",
+          "score": 0.958507,
+          "runner": 0.6503734588623047,
+          "exact": true
+        }
+      ]
+    },
+    "library_2": {
+      "source": "tests/帧样本/立绘两组/库2.json",
+      "rows": [
+        {
+          "frame": "灰罩(还原后)",
+          "index": 9,
+          "cost": 11,
+          "lib1": [
+            "组1·极境",
+            0.973042
+          ],
+          "lib2": [
+            "组2·塞雷娅",
+            0.46228
+          ]
+        },
+        {
+          "frame": "灰罩(还原后)",
+          "index": 8,
+          "cost": 12,
+          "lib1": [
+            "组1·凛御银灰",
+            0.958836
+          ],
+          "lib2": [
+            "组2·凛御银灰",
+            0.673455
+          ]
+        },
+        {
+          "frame": "灰罩(还原后)",
+          "index": 7,
+          "cost": 13,
+          "lib1": [
+            "组1·歌蕾蒂娅",
+            0.96137
+          ],
+          "lib2": [
+            "组2·歌蕾蒂娅",
+            0.589499
+          ]
+        },
+        {
+          "frame": "灰罩(还原后)",
+          "index": 6,
+          "cost": 16,
+          "lib1": [
+            "组1·白面鸮",
+            0.97099
+          ],
+          "lib2": [
+            "组2·维什戴尔",
+            0.434788
+          ]
+        },
+        {
+          "frame": "灰罩(还原后)",
+          "index": 5,
+          "cost": 19,
+          "lib1": [
+            "组1·凯尔希·思衡托",
+            0.937492
+          ],
+          "lib2": [
+            "组2·温蒂",
+            0.488016
+          ]
+        },
+        {
+          "frame": "灰罩(还原后)",
+          "index": 4,
+          "cost": 21,
+          "lib1": [
+            "组1·塞雷娅",
+            0.967096
+          ],
+          "lib2": [
+            "组2·塞雷娅",
+            0.591992
+          ]
+        },
+        {
+          "frame": "灰罩(还原后)",
+          "index": 3,
+          "cost": 21,
+          "lib1": [
+            "组1·温蒂",
+            0.935294
+          ],
+          "lib2": [
+            "组2·温蒂",
+            0.559884
+          ]
+        },
+        {
+          "frame": "灰罩(还原后)",
+          "index": 2,
+          "cost": 22,
+          "lib1": [
+            "组1·荒芜拉普兰德",
+            0.933306
+          ],
+          "lib2": [
+            "组2·荒芜拉普兰德",
+            0.551187
+          ]
+        },
+        {
+          "frame": "灰罩(还原后)",
+          "index": 1,
+          "cost": 23,
+          "lib1": [
+            "组1·荒芜拉普兰德",
+            0.325225
+          ],
+          "lib2": [
+            "组2·圣聆初雪",
+            0.900848
+          ]
+        },
+        {
+          "frame": "灰罩(还原后)",
+          "index": 0,
+          "cost": 25,
+          "lib1": [
+            "组1·维什戴尔",
+            0.958507
+          ],
+          "lib2": [
+            "组2·凛御银灰",
+            0.580094
+          ]
+        },
+        {
+          "frame": "对照帧",
+          "index": 9,
+          "cost": 11,
+          "lib1": [
+            "组1·极境",
+            0.973042
+          ],
+          "lib2": [
+            "组2·塞雷娅",
+            0.46228
+          ]
+        },
+        {
+          "frame": "对照帧",
+          "index": 8,
+          "cost": 12,
+          "lib1": [
+            "组1·凛御银灰",
+            0.958836
+          ],
+          "lib2": [
+            "组2·凛御银灰",
+            0.673455
+          ]
+        },
+        {
+          "frame": "对照帧",
+          "index": 7,
+          "cost": 13,
+          "lib1": [
+            "组1·歌蕾蒂娅",
+            0.96137
+          ],
+          "lib2": [
+            "组2·歌蕾蒂娅",
+            0.589499
+          ]
+        },
+        {
+          "frame": "对照帧",
+          "index": 6,
+          "cost": 16,
+          "lib1": [
+            "组1·白面鸮",
+            0.97099
+          ],
+          "lib2": [
+            "组2·维什戴尔",
+            0.434788
+          ]
+        },
+        {
+          "frame": "对照帧",
+          "index": 5,
+          "cost": 19,
+          "lib1": [
+            "组1·凯尔希·思衡托",
+            0.937492
+          ],
+          "lib2": [
+            "组2·温蒂",
+            0.488016
+          ]
+        },
+        {
+          "frame": "对照帧",
+          "index": 4,
+          "cost": 21,
+          "lib1": [
+            "组1·塞雷娅",
+            0.973708
+          ],
+          "lib2": [
+            "组2·塞雷娅",
+            0.599989
+          ]
+        },
+        {
+          "frame": "对照帧",
+          "index": 3,
+          "cost": 21,
+          "lib1": [
+            "组1·温蒂",
+            0.940173
+          ],
+          "lib2": [
+            "组2·温蒂",
+            0.575229
+          ]
+        },
+        {
+          "frame": "对照帧",
+          "index": 2,
+          "cost": 22,
+          "lib1": [
+            "组1·荒芜拉普兰德",
+            0.93921
+          ],
+          "lib2": [
+            "组2·荒芜拉普兰德",
+            0.57576
+          ]
+        },
+        {
+          "frame": "对照帧",
+          "index": 1,
+          "cost": 23,
+          "lib1": [
+            "组1·极境",
+            0.3331
+          ],
+          "lib2": [
+            "组2·圣聆初雪",
+            0.903769
+          ]
+        },
+        {
+          "frame": "对照帧",
+          "index": 0,
+          "cost": 25,
+          "lib1": [
+            "组1·维什戴尔",
+            0.964036
+          ],
+          "lib2": [
+            "组2·凛御银灰",
+            0.585117
+          ]
+        }
+      ]
+    }
+  },
+  "fallback": {
+    "rows": [
+      {
+        "file": "shot05↔shot07",
+        "index": 0,
+        "same_slot_in_other_frame": 0,
+        "cost": 18,
+        "what": "状态没变（两帧逐位相同）",
+        "share": 1.0,
+        "fallback": false,
+        "algebra_5": true,
+        "algebra_7": true,
+        "score_before": 0.964231,
+        "score_after": 0.963877,
+        "above_line_before": true,
+        "above_line_after": true
+      },
+      {
+        "file": "shot05↔shot07",
+        "index": 1,
+        "same_slot_in_other_frame": 1,
+        "cost": 17,
+        "what": "状态没变（两帧逐位相同）",
+        "share": 1.0,
+        "fallback": false,
+        "algebra_5": true,
+        "algebra_7": true,
+        "score_before": 0.967328,
+        "score_after": 0.967126,
+        "above_line_before": true,
+        "above_line_after": true
+      },
+      {
+        "file": "shot05↔shot07",
+        "index": 2,
+        "same_slot_in_other_frame": 2,
+        "cost": 14,
+        "what": "状态没变（两帧逐位相同）",
+        "share": 1.0,
+        "fallback": false,
+        "algebra_5": true,
+        "algebra_7": true,
+        "score_before": 0.959597,
+        "score_after": 0.959508,
+        "above_line_before": true,
+        "above_line_after": true
+      },
+      {
+        "file": "shot05↔shot07",
+        "index": 3,
+        "same_slot_in_other_frame": 3,
+        "cost": 14,
+        "what": "状态没变（两帧逐位相同）",
+        "share": 1.0,
+        "fallback": false,
+        "algebra_5": true,
+        "algebra_7": true,
+        "score_before": 0.967956,
+        "score_after": 0.967991,
+        "above_line_before": true,
+        "above_line_after": true
+      },
+      {
+        "file": "shot05↔shot07",
+        "index": 4,
+        "same_slot_in_other_frame": 4,
+        "cost": 13,
+        "what": "状态没变（两帧逐位相同）",
+        "share": 1.0,
+        "fallback": false,
+        "algebra_5": true,
+        "algebra_7": true,
+        "score_before": 0.975657,
+        "score_after": 0.975648,
+        "above_line_before": true,
+        "above_line_after": true
+      },
+      {
+        "file": "shot05↔shot07",
+        "index": 6,
+        "same_slot_in_other_frame": 7,
+        "cost": 11,
+        "what": "同干员一净一灰",
+        "share": 0.5055,
+        "fallback": true,
+        "algebra_5": false,
+        "algebra_7": true,
+        "score_before": 0.957939,
+        "score_after": 0.958133,
+        "above_line_before": true,
+        "above_line_after": true
+      },
+      {
+        "file": "shot05↔shot07",
+        "index": 7,
+        "same_slot_in_other_frame": 8,
+        "cost": 10,
+        "what": "同干员一净一灰",
+        "share": 0.5164,
+        "fallback": true,
+        "algebra_5": false,
+        "algebra_7": true,
+        "score_before": 0.963872,
+        "score_after": 0.96392,
+        "above_line_before": true,
+        "above_line_after": true
+      }
+    ],
+    "lines": [
+      0.7,
+      0.85
+    ]
+  },
+  "relationship": {
+    "library_geometry_source": "立绘两组/库1.json 的 geometry（编队页左缘/卡距/立绘宽是常量）",
+    "sizes": {
+      "组1_编队页": [
+        10,
+        214
+      ],
+      "组2_编队页": [
+        10,
+        214
+      ],
+      "编队界面": [
+        10,
+        214
+      ]
+    },
+    "per_block": [
+      {
+        "k": 0,
+        "g1": [
+          "组1·圣聆初雪",
+          0.707023
+        ],
+        "g2": [
+          "组2·圣聆初雪",
+          0.999999
+        ]
+      },
+      {
+        "k": 1,
+        "g1": [
+          "组1·凛御银灰",
+          1.0
+        ],
+        "g2": [
+          "组2·凛御银灰",
+          0.711735
+        ]
+      },
+      {
+        "k": 2,
+        "g1": [
+          "组1·歌蕾蒂娅",
+          1.0
+        ],
+        "g2": [
+          "组2·歌蕾蒂娅",
+          0.597684
+        ]
+      },
+      {
+        "k": 3,
+        "g1": [
+          "组1·荒芜拉普兰德",
+          1.0
+        ],
+        "g2": [
+          "组2·荒芜拉普兰德",
+          0.943053
+        ]
+      },
+      {
+        "k": 4,
+        "g1": [
+          "组1·凯尔希·思衡托",
+          1.0
+        ],
+        "g2": [
+          "组2·凯尔希·思衡托",
+          0.636044
+        ]
+      },
+      {
+        "k": 5,
+        "g1": [
+          "组1·白面鸮",
+          1.0
+        ],
+        "g2": [
+          "组2·白面鸮",
+          0.709749
+        ]
+      },
+      {
+        "k": 6,
+        "g1": [
+          "组1·塞雷娅",
+          1.0
+        ],
+        "g2": [
+          "组2·塞雷娅",
+          0.760338
+        ]
+      },
+      {
+        "k": 7,
+        "g1": [
+          "组1·温蒂",
+          1.0
+        ],
+        "g2": [
+          "组2·温蒂",
+          0.634561
+        ]
+      },
+      {
+        "k": 8,
+        "g1": [
+          "组1·维什戴尔",
+          1.0
+        ],
+        "g2": [
+          "组2·维什戴尔",
+          0.621055
+        ]
+      },
+      {
+        "k": 9,
+        "g1": [
+          "组1·极境",
+          1.0
+        ],
+        "g2": [
+          "组2·极境",
+          0.671917
+        ]
+      }
+    ],
+    "same_as_group1": 9,
+    "same_as_group2": 1
+  }
+}
