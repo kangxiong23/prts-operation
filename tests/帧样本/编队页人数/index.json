@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "未知",
+  "crops": [
+    {
+      "file": "编队1-0.png",
+      "origin": [
+        0,
+        0
+      ],
+      "size": [
+        2800,
+        1260
+      ],
+      "source": "screenshots/run-05/编队1-0.png",
+      "source_sha256": "abb9447659154dbdbdc9d0149a184ea494d72c2ae5b3a0fc3e9f0d3a495d7cb5"
+    },
+    {
+      "file": "编队2-0.png",
+      "origin": [
+        0,
+        0
+      ],
+      "size": [
+        2800,
+        1260
+      ],
+      "source": "screenshots/run-05/编队2-0.png",
+      "source_sha256": "9f3ac219888c4457e5c284525a70f1594da009b8522865881a0648c2ab6497e3"
+    },
+    {
+      "file": "编队1-1_备战席.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "screenshots/run-05/编队1-1.png",
+      "source_sha256": "ec9e31948c29cef30c90e22226f00055944cea033acc9a5ebbf03a49c54b4761"
+    },
+    {
+      "file": "编队2-1_备战席.png",
+      "origin": [
+        300,
+        1040
+      ],
+      "size": [
+        2500,
+        220
+      ],
+      "source": "screenshots/run-05/编队2-1.png",
+      "source_sha256": "1ab88a07816082e38751c2b18dec653da5c87be8d0e4c4bd645a4f87ade4cff3"
+    }
+  ]
+}
