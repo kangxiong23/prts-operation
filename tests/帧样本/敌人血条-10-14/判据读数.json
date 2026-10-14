@@ -1,0 +1,1246 @@
+{
+  "note": "敌人血条那条链的判据读数。它不判断够不够 —— 那是规划者的事；这里只放逐帧读数、两簇的分布与空档、以及覆盖说明。",
+  "batch": "tests/帧样本/敌人血条-10-14",
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "未知",
+  "ruler": {
+    "colour": "逐像素离 ENEMY_FILL (218,106,53) 或 ENEMY_FILL_RED (197,41,40) 的逐通道最大差 <= SCREEN_TOL=34 —— **两族各筛一遍、不并掩膜**",
+    "shape": "只留竖着连成 8 行的像素（前景与背景各扫一遍的连续长度），再按连通块取 高 <= 12；宽的门按族分：橙族 >= 7、红族 >= 60",
+    "columns": "块里那 8 行逐列取中位色，离 ENEMY_FILL 的逐通道最大差 <= 34 的列算作填充段",
+    "exits": "分数 = 1 - 颜色距 / 255；>= 1-16/255 为在，<= 1-28/255 为不在，中间为未采样",
+    "rectangle": "矩形：每一列都亮着的那几行（条身）要装下整块的 >= 0.95 像素；内部均匀：那 8 行逐行取中位色，通道极差 <= 20",
+    "short": "填充段短于 MIN_FILL_COLUMNS=12 的候选**照样报在**，比例落未采样",
+    "track": "整长 = 填充段 + 空轨；空轨 = 与上下两块地形两侧都差 > TRACK_CONTRAST=12 的那一段",
+    "exclusion": "一块踩在我方血条那 8 行、或者紧贴它下面第 8 行的技力条那 8 行上（行差 <= 1）且列范围夹在我方那一格里（列差 <= 4） -> 剔掉",
+    "merge": "同一行带上、中间那几列更靠近填充色（半透明遮挡压出来的混色）的两块接回一根条",
+    "count": "条数：都分得开给 Exact；分不开的给 LowerBound（同一条带里相邻两根的整长交叠或相接、或中间至少有一列是混色 -> 那两块只算一根）。**分不开的不报精确**，也不高报"
+  },
+  "field": {
+    "rows": [
+      100,
+      1040
+    ]
+  },
+  "reads": [
+    {
+      "name": "不在_boss_红门",
+      "truth": "不在",
+      "covers": "boss 那一帧右上角的**红门**（地图上那道红色门形地形美术）。红族最像条的两块都在这里：x2320 y330（18 列 x 10 行，中位色 (203,50,31)，离 ENEMY_FILL_RED 9）与 x2373 y330（23 列 x 10 行，中位色 (192,52,33)，离 11）—— 它们都是**每一列一样高的整齐小矩形**，过得了色的门，靠的是形状门与红族的宽度门。同块里那块木料 x2362 y565 的逐行中位色是 (124,82,44) -> (217,103,54) -> (139,75,37)（渐变 90+）。**红门一块都不许读成条。**",
+      "presence": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.0
+      },
+      "count": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0
+        },
+        "confidence": 0.0
+      },
+      "bars": [],
+      "cores": []
+    },
+    {
+      "name": "在_boss_红宽条",
+      "truth": "在",
+      "covers": "boss 那一帧。**红宽条**在 x1562…1676 y1002…1011（填充 115 列、**10 行**、中位色 (197,41,40)、离 ENEMY_FILL_RED 0）；右边 x1677 起是一段**暗轨**（(45,44,42)），但那段轨与上下 8 行的中位色差只有 7…11（线是 TRACK_CONTRAST=12），所以链量不到空轨、整长量成 115、比例报 1.0（根因见 README）。同帧还有一根橙条 x1422 y1026（填充 100 列、整长 122）与一小截橙 x1608 y904（24 列，精确 1.0）。我方蓝条 x1234 y1017 在它左边 42 列、同一行带上。",
+      "presence": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.996078431372549
+      },
+      "count": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 3
+        },
+        "confidence": null
+      },
+      "bars": [
+        {
+          "origin": [
+            1608,
+            904
+          ],
+          "total_columns": 24,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": 0.10980392156862745
+          },
+          "colour_distance": 5,
+          "separated": true
+        },
+        {
+          "origin": [
+            1562,
+            1002
+          ],
+          "total_columns": 115,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": 0.0784313725490196
+          },
+          "colour_distance": 1,
+          "separated": true
+        },
+        {
+          "origin": [
+            1422,
+            1026
+          ],
+          "total_columns": 122,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.819672131147541,
+              "hi": 0.9900990099009901
+            },
+            "confidence": 0.12156862745098039
+          },
+          "colour_distance": 3,
+          "separated": true
+        }
+      ],
+      "cores": [
+        {
+          "origin": [
+            1608,
+            904
+          ],
+          "columns": 24,
+          "colour_distance": 5,
+          "masked": false
+        },
+        {
+          "origin": [
+            1562,
+            1002
+          ],
+          "columns": 115,
+          "colour_distance": 1,
+          "masked": false
+        },
+        {
+          "origin": [
+            1422,
+            1026
+          ],
+          "columns": 100,
+          "colour_distance": 3,
+          "masked": false
+        }
+      ]
+    },
+    {
+      "name": "在_快死的敌人",
+      "truth": "在",
+      "covers": "HUD 40/41。一根敌条 x1506 y481，**填充只有 7 列**（整长 122）、右边一长截深色空轨，正上方站着那只飞行的敌人。**7 列低于 MIN_FILL_COLUMNS=12** ⇒ 链报「在」（条确实在）、比例落**未采样**（短填充量不出「填了多少」）。",
+      "presence": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.9882352941176471
+      },
+      "count": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1
+        },
+        "confidence": null
+      },
+      "bars": [
+        {
+          "origin": [
+            1506,
+            481
+          ],
+          "total_columns": 122,
+          "fill": {
+            "state": "unsampled"
+          },
+          "colour_distance": 3,
+          "separated": true
+        }
+      ],
+      "cores": [
+        {
+          "origin": [
+            1506,
+            481
+          ],
+          "columns": 7,
+          "colour_distance": 3,
+          "masked": false
+        }
+      ]
+    },
+    {
+      "name": "在_压住干员",
+      "truth": "在",
+      "covers": "雪地亮底。一根敌条 x1339 y701（填充 30 列 / 整长 42，色距 5），**正踩在我方干员技力条那 8 行上**（我方血条 x1327 y693、技力条 y701）；我方那两根条在这一帧里是蓝的与绿的。",
+      "presence": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.9803921568627451
+      },
+      "count": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 1
+        },
+        "confidence": null
+      },
+      "bars": [
+        {
+          "origin": [
+            1339,
+            701
+          ],
+          "total_columns": 42,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.7142857142857143,
+              "hi": 0.8823529411764706
+            },
+            "confidence": 0.11372549019607843
+          },
+          "colour_distance": 5,
+          "separated": true
+        }
+      ],
+      "cores": [
+        {
+          "origin": [
+            1339,
+            701
+          ],
+          "columns": 30,
+          "colour_distance": 5,
+          "masked": false
+        }
+      ]
+    },
+    {
+      "name": "在_互叠1",
+      "truth": "在",
+      "covers": "H9-1 那一关，HUD 92/123。同一条行带上叠着**一摞**橙条（链条如实报 17 根，含一根 8 列的短条x1474 y568）；其中 {x1628,y569} 与 {x1808,y569} 中间那 26 列里有 9 列是**混色**（条被暗东西压过去）、{x1425,y451} 与 {x1478,y452} 的整长**交叠** —— 这两对各算分不开；分不开的 2 根比例落未采样。",
+      "presence": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.9882352941176471
+      },
+      "count": {
+        "state": "valued",
+        "payload": {
+          "form": "lower",
+          "lo": 15
+        },
+        "confidence": null
+      },
+      "bars": [
+        {
+          "origin": [
+            1682,
+            341
+          ],
+          "total_columns": 133,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.8872180451127819,
+              "hi": 0.9076923076923077
+            },
+            "confidence": 0.09019607843137255
+          },
+          "colour_distance": 7,
+          "separated": true
+        },
+        {
+          "origin": [
+            1542,
+            365
+          ],
+          "total_columns": 69,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.8840579710144928,
+              "hi": 0.8970588235294118
+            },
+            "confidence": 0.09019607843137255
+          },
+          "colour_distance": 8,
+          "separated": true
+        },
+        {
+          "origin": [
+            1664,
+            373
+          ],
+          "total_columns": 56,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.7321428571428571,
+              "hi": 0.7884615384615384
+            },
+            "confidence": 0.09411764705882353
+          },
+          "colour_distance": 4,
+          "separated": true
+        },
+        {
+          "origin": [
+            1549,
+            412
+          ],
+          "total_columns": 122,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.9262295081967213
+            },
+            "confidence": 0.09803921568627451
+          },
+          "colour_distance": 3,
+          "separated": true
+        },
+        {
+          "origin": [
+            1733,
+            440
+          ],
+          "total_columns": 142,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.7253521126760564,
+              "hi": 0.7357142857142858
+            },
+            "confidence": 0.09019607843137255
+          },
+          "colour_distance": 11,
+          "separated": true
+        },
+        {
+          "origin": [
+            1425,
+            451
+          ],
+          "total_columns": 102,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.23529411764705882
+            },
+            "confidence": 0.10980392156862745
+          },
+          "colour_distance": 3,
+          "separated": true
+        },
+        {
+          "origin": [
+            1478,
+            452
+          ],
+          "total_columns": 118,
+          "fill": {
+            "state": "unsampled"
+          },
+          "colour_distance": 5,
+          "separated": false
+        },
+        {
+          "origin": [
+            1817,
+            462
+          ],
+          "total_columns": 36,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.5833333333333334,
+              "hi": 0.6176470588235294
+            },
+            "confidence": 0.08627450980392157
+          },
+          "colour_distance": 7,
+          "separated": true
+        },
+        {
+          "origin": [
+            1691,
+            466
+          ],
+          "total_columns": 127,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "lower",
+              "lo": 0.9448818897637795
+            },
+            "confidence": 0.09803921568627451
+          },
+          "colour_distance": 5,
+          "separated": true
+        },
+        {
+          "origin": [
+            1693,
+            480
+          ],
+          "total_columns": 124,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.9274193548387096,
+              "hi": 0.9349593495934959
+            },
+            "confidence": 0.09019607843137255
+          },
+          "colour_distance": 8,
+          "separated": true
+        },
+        {
+          "origin": [
+            1698,
+            511
+          ],
+          "total_columns": 122,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.9508196721311475
+            },
+            "confidence": 0.09019607843137255
+          },
+          "colour_distance": 8,
+          "separated": true
+        },
+        {
+          "origin": [
+            1751,
+            546
+          ],
+          "total_columns": 37,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 1.0
+            },
+            "confidence": 0.11372549019607843
+          },
+          "colour_distance": 4,
+          "separated": true
+        },
+        {
+          "origin": [
+            1474,
+            568
+          ],
+          "total_columns": 8,
+          "fill": {
+            "state": "unsampled"
+          },
+          "colour_distance": 3,
+          "separated": true
+        },
+        {
+          "origin": [
+            1495,
+            569
+          ],
+          "total_columns": 105,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.8095238095238095
+            },
+            "confidence": 0.10588235294117647
+          },
+          "colour_distance": 7,
+          "separated": true
+        },
+        {
+          "origin": [
+            1628,
+            569
+          ],
+          "total_columns": 154,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "lower",
+              "lo": 0.11038961038961038
+            },
+            "confidence": 0.01568627450980392
+          },
+          "colour_distance": 4,
+          "separated": true
+        },
+        {
+          "origin": [
+            1808,
+            569
+          ],
+          "total_columns": 82,
+          "fill": {
+            "state": "unsampled"
+          },
+          "colour_distance": 4,
+          "separated": false
+        },
+        {
+          "origin": [
+            1765,
+            593
+          ],
+          "total_columns": 98,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.8673469387755102,
+              "hi": 0.8762886597938144
+            },
+            "confidence": 0.10588235294117647
+          },
+          "colour_distance": 3,
+          "separated": true
+        }
+      ],
+      "cores": [
+        {
+          "origin": [
+            1682,
+            341
+          ],
+          "columns": 118,
+          "colour_distance": 7,
+          "masked": false
+        },
+        {
+          "origin": [
+            1542,
+            365
+          ],
+          "columns": 61,
+          "colour_distance": 8,
+          "masked": false
+        },
+        {
+          "origin": [
+            1664,
+            373
+          ],
+          "columns": 41,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1549,
+            412
+          ],
+          "columns": 113,
+          "colour_distance": 3,
+          "masked": false
+        },
+        {
+          "origin": [
+            1733,
+            440
+          ],
+          "columns": 103,
+          "colour_distance": 11,
+          "masked": false
+        },
+        {
+          "origin": [
+            1425,
+            451
+          ],
+          "columns": 24,
+          "colour_distance": 3,
+          "masked": false
+        },
+        {
+          "origin": [
+            1478,
+            452
+          ],
+          "columns": 108,
+          "colour_distance": 5,
+          "masked": false
+        },
+        {
+          "origin": [
+            1817,
+            462
+          ],
+          "columns": 21,
+          "colour_distance": 7,
+          "masked": false
+        },
+        {
+          "origin": [
+            1691,
+            466
+          ],
+          "columns": 120,
+          "colour_distance": 5,
+          "masked": false
+        },
+        {
+          "origin": [
+            1693,
+            480
+          ],
+          "columns": 115,
+          "colour_distance": 8,
+          "masked": false
+        },
+        {
+          "origin": [
+            1698,
+            511
+          ],
+          "columns": 116,
+          "colour_distance": 8,
+          "masked": false
+        },
+        {
+          "origin": [
+            1751,
+            546
+          ],
+          "columns": 37,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1474,
+            568
+          ],
+          "columns": 8,
+          "colour_distance": 3,
+          "masked": false
+        },
+        {
+          "origin": [
+            1495,
+            569
+          ],
+          "columns": 85,
+          "colour_distance": 7,
+          "masked": false
+        },
+        {
+          "origin": [
+            1628,
+            569
+          ],
+          "columns": 154,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1808,
+            569
+          ],
+          "columns": 48,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1765,
+            593
+          ],
+          "columns": 85,
+          "colour_distance": 3,
+          "masked": false
+        }
+      ]
+    },
+    {
+      "name": "在_互叠2",
+      "truth": "在",
+      "covers": "H9-1 那一关，HUD 89/123。同一摞里链条报 18 根（**整帧**是 19 根 —— 裁剪把 y836 那一根切在外面了）；{x1591,y569}/{x1703,y569}/{x1825,y569} 与 {x1373,y451}/{x1583,y451} 各自连着（中间有混色列）—— 分不开的 3 根比例落未采样。",
+      "presence": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": true
+        },
+        "confidence": 0.9921568627450981
+      },
+      "count": {
+        "state": "valued",
+        "payload": {
+          "form": "lower",
+          "lo": 15
+        },
+        "confidence": null
+      },
+      "bars": [
+        {
+          "origin": [
+            1557,
+            351
+          ],
+          "total_columns": 128,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.9140625,
+              "hi": 0.9285714285714286
+            },
+            "confidence": 0.10980392156862745
+          },
+          "colour_distance": 3,
+          "separated": true
+        },
+        {
+          "origin": [
+            1683,
+            355
+          ],
+          "total_columns": 139,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.8633093525179856,
+              "hi": 0.8955223880597015
+            },
+            "confidence": 0.09019607843137255
+          },
+          "colour_distance": 4,
+          "separated": true
+        },
+        {
+          "origin": [
+            1587,
+            376
+          ],
+          "total_columns": 125,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.92
+            },
+            "confidence": 0.10588235294117647
+          },
+          "colour_distance": 7,
+          "separated": true
+        },
+        {
+          "origin": [
+            1680,
+            388
+          ],
+          "total_columns": 125,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.968
+            },
+            "confidence": 0.09411764705882353
+          },
+          "colour_distance": 5,
+          "separated": true
+        },
+        {
+          "origin": [
+            1548,
+            396
+          ],
+          "total_columns": 137,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.8613138686131386,
+              "hi": 0.8676470588235294
+            },
+            "confidence": 0.10980392156862745
+          },
+          "colour_distance": 4,
+          "separated": true
+        },
+        {
+          "origin": [
+            1733,
+            440
+          ],
+          "total_columns": 110,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.9818181818181818,
+              "hi": 0.9908256880733946
+            },
+            "confidence": 0.09019607843137255
+          },
+          "colour_distance": 5,
+          "separated": true
+        },
+        {
+          "origin": [
+            1373,
+            451
+          ],
+          "total_columns": 118,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.8305084745762712
+            },
+            "confidence": 0.09019607843137255
+          },
+          "colour_distance": 7,
+          "separated": true
+        },
+        {
+          "origin": [
+            1583,
+            451
+          ],
+          "total_columns": 143,
+          "fill": {
+            "state": "unsampled"
+          },
+          "colour_distance": 4,
+          "separated": false
+        },
+        {
+          "origin": [
+            1733,
+            452
+          ],
+          "total_columns": 136,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.33088235294117646,
+              "hi": 0.3488372093023256
+            },
+            "confidence": 0.09019607843137255
+          },
+          "colour_distance": 8,
+          "separated": true
+        },
+        {
+          "origin": [
+            1740,
+            463
+          ],
+          "total_columns": 132,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.8333333333333334,
+              "hi": 0.859375
+            },
+            "confidence": 0.09019607843137255
+          },
+          "colour_distance": 4,
+          "separated": true
+        },
+        {
+          "origin": [
+            1693,
+            480
+          ],
+          "total_columns": 121,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.9834710743801653
+            },
+            "confidence": 0.09803921568627451
+          },
+          "colour_distance": 5,
+          "separated": true
+        },
+        {
+          "origin": [
+            1699,
+            521
+          ],
+          "total_columns": 123,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.959349593495935
+            },
+            "confidence": 0.10196078431372549
+          },
+          "colour_distance": 4,
+          "separated": true
+        },
+        {
+          "origin": [
+            1751,
+            546
+          ],
+          "total_columns": 89,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "exact",
+              "value": 0.9775280898876404
+            },
+            "confidence": 0.09803921568627451
+          },
+          "colour_distance": 4,
+          "separated": true
+        },
+        {
+          "origin": [
+            1372,
+            569
+          ],
+          "total_columns": 124,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.9112903225806451,
+              "hi": 0.9186991869918699
+            },
+            "confidence": 0.10196078431372549
+          },
+          "colour_distance": 8,
+          "separated": true
+        },
+        {
+          "origin": [
+            1591,
+            569
+          ],
+          "total_columns": 70,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "lower",
+              "lo": 0.5142857142857142
+            },
+            "confidence": 0.011764705882352941
+          },
+          "colour_distance": 4,
+          "separated": true
+        },
+        {
+          "origin": [
+            1703,
+            569
+          ],
+          "total_columns": 108,
+          "fill": {
+            "state": "unsampled"
+          },
+          "colour_distance": 4,
+          "separated": false
+        },
+        {
+          "origin": [
+            1825,
+            569
+          ],
+          "total_columns": 59,
+          "fill": {
+            "state": "unsampled"
+          },
+          "colour_distance": 4,
+          "separated": false
+        },
+        {
+          "origin": [
+            1758,
+            590
+          ],
+          "total_columns": 68,
+          "fill": {
+            "state": "valued",
+            "payload": {
+              "form": "interval",
+              "lo": 0.5441176470588235,
+              "hi": 0.5522388059701493
+            },
+            "confidence": 0.11372549019607843
+          },
+          "colour_distance": 2,
+          "separated": true
+        }
+      ],
+      "cores": [
+        {
+          "origin": [
+            1557,
+            351
+          ],
+          "columns": 117,
+          "colour_distance": 3,
+          "masked": false
+        },
+        {
+          "origin": [
+            1683,
+            355
+          ],
+          "columns": 120,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1587,
+            376
+          ],
+          "columns": 115,
+          "colour_distance": 7,
+          "masked": false
+        },
+        {
+          "origin": [
+            1680,
+            388
+          ],
+          "columns": 121,
+          "colour_distance": 5,
+          "masked": false
+        },
+        {
+          "origin": [
+            1548,
+            396
+          ],
+          "columns": 118,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1733,
+            440
+          ],
+          "columns": 108,
+          "colour_distance": 5,
+          "masked": false
+        },
+        {
+          "origin": [
+            1373,
+            451
+          ],
+          "columns": 98,
+          "colour_distance": 7,
+          "masked": false
+        },
+        {
+          "origin": [
+            1583,
+            451
+          ],
+          "columns": 120,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1733,
+            452
+          ],
+          "columns": 45,
+          "colour_distance": 8,
+          "masked": false
+        },
+        {
+          "origin": [
+            1740,
+            463
+          ],
+          "columns": 110,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1693,
+            480
+          ],
+          "columns": 119,
+          "colour_distance": 5,
+          "masked": false
+        },
+        {
+          "origin": [
+            1699,
+            521
+          ],
+          "columns": 118,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1751,
+            546
+          ],
+          "columns": 87,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1372,
+            569
+          ],
+          "columns": 113,
+          "colour_distance": 8,
+          "masked": false
+        },
+        {
+          "origin": [
+            1591,
+            569
+          ],
+          "columns": 48,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1703,
+            569
+          ],
+          "columns": 108,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1825,
+            569
+          ],
+          "columns": 35,
+          "colour_distance": 4,
+          "masked": false
+        },
+        {
+          "origin": [
+            1758,
+            590
+          ],
+          "columns": 37,
+          "colour_distance": 2,
+          "masked": false
+        }
+      ]
+    },
+    {
+      "name": "不在_全满血",
+      "truth": "不在",
+      "covers": "另一个关卡，HUD 0/73。画面里那几个敌人**一根条都没有**；同块那块橙黄警戒线：外接框 x2362…2375 y700…715、块高 13 行（> MAX_BAR_ROWS=12）⇒ **形状门在高度那一步就把它丢了**，连颜色距都量不到。按链那套取法（那 8 行的**逐列**中位色、再对列取中位）算出来是 (231,99,61)、离 ENEMY_FILL 的逐通道最大差 13 —— 它确实**进得了颜色门**（34），挡它的一直是形状门（高 13 > 12）。",
+      "presence": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.0
+      },
+      "count": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0
+        },
+        "confidence": 0.0
+      },
+      "bars": [],
+      "cores": []
+    },
+    {
+      "name": "不在_压住干员面板",
+      "truth": "不在",
+      "covers": "同一帧的右上角：**敌人介绍面板**（乌萨斯突击者）整块都在战场那一段（100…1040 行）里，但那一区最近的像素离 ENEMY_FILL 有 **83**，一列都进不了颜色门。",
+      "presence": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": false
+        },
+        "confidence": 0.0
+      },
+      "count": {
+        "state": "valued",
+        "payload": {
+          "form": "exact",
+          "value": 0
+        },
+        "confidence": 0.0
+      },
+      "bars": [],
+      "cores": []
+    }
+  ]
+}

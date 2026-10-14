@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "vivo V2338A",
+  "note": "敌人血条那条链的基准集。每一根是原生帧上 640×640 的一块（一个像素都不缩）；验收时贴回画布再喂给链，ROI 的取法仍然真的在被测。四类真值见取材.json 的 truth 一栏。",
+  "crops": [
+    {
+      "file": "在_raw_a_左.png",
+      "origin": [
+        1000,
+        250
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "data/probe/raw_a.png",
+      "source_sha256": "7640b02e3d0c6ee51d517392a9539edb2602e1814f7bafb7f17e1d2552339cc6"
+    },
+    {
+      "file": "在_raw_a_右.png",
+      "origin": [
+        1400,
+        200
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "data/probe/raw_a.png",
+      "source_sha256": "7640b02e3d0c6ee51d517392a9539edb2602e1814f7bafb7f17e1d2552339cc6"
+    },
+    {
+      "file": "在_raw_b_上.png",
+      "origin": [
+        1500,
+        300
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "data/probe/raw_b.png",
+      "source_sha256": "fd2a64e4866d7a4d74dc06674c984a0c430652312d3a2fce07cd429cca286930"
+    },
+    {
+      "file": "在_raw_b_下.png",
+      "origin": [
+        1250,
+        500
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "data/probe/raw_b.png",
+      "source_sha256": "fd2a64e4866d7a4d74dc06674c984a0c430652312d3a2fce07cd429cca286930"
+    },
+    {
+      "file": "不在_cd01.png",
+      "origin": [
+        1500,
+        100
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "data/precheck/cd/cd01.png",
+      "source_sha256": "24d89d1a126246b4586b333b40ee19dfff0f07aae4a078493efff51746eccb6d"
+    },
+    {
+      "file": "不在_cd30.png",
+      "origin": [
+        1500,
+        100
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "data/precheck/cd/cd30.png",
+      "source_sha256": "4e919fec25853da664d07f5e6413bca56929f4e03ecfb89d5fbae126afa1b9f4"
+    },
+    {
+      "file": "反例_shot26_栏杆.png",
+      "origin": [
+        1100,
+        600
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "data/precheck/live/shot26.png",
+      "source_sha256": "e7ab528de460c011e37437c3ba96d901e4f4f8d5baed833248aea9578c08f43d"
+    },
+    {
+      "file": "反例_S5_栈道边_上.png",
+      "origin": [
+        900,
+        300
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "screenshots/run-02/S5-0-0.png",
+      "source_sha256": "17b562fcf8fee5eaf1e8da1ecdcdaa51d3a7471281edfaf3d7c0268f7de870ab"
+    },
+    {
+      "file": "反例_S5_栈道边_下.png",
+      "origin": [
+        1150,
+        600
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "screenshots/run-02/S5-0-0.png",
+      "source_sha256": "17b562fcf8fee5eaf1e8da1ecdcdaa51d3a7471281edfaf3d7c0268f7de870ab"
+    }
+  ]
+}

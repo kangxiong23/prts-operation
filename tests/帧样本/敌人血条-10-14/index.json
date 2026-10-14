@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "未知",
+  "note": "用户 10-14 补进来的 6 张原生真帧（screenshots/run-06）上裁下来的验收块：每一块 640x640、一个像素都不缩，带原点；验收时贴回画布再喂链，ROI 的取法仍然真的在被测。真值见取材.json 的 truth 一栏。",
+  "device_note": "run-06 那 6 张 PNG 里**没有**任何机型信息（PNG 只有 srgb 那个块），manifest.csv 也没有机型那一列 —— 所以写「未知」，不照抄上一批的 vivo V2338A。版面与 2800x1260 那个画布同款。",
+  "crops": [
+    {
+      "file": "不在_boss_红门.png",
+      "origin": [
+        2080,
+        280
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "screenshots/run-06/boss.png",
+      "source_sha256": "dd59da93456e7062b9701f671d6e409868b8f6826ac42adfe1d294121671b40b"
+    },
+    {
+      "file": "在_boss_红宽条.png",
+      "origin": [
+        1100,
+        420
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "screenshots/run-06/boss.png",
+      "source_sha256": "dd59da93456e7062b9701f671d6e409868b8f6826ac42adfe1d294121671b40b"
+    },
+    {
+      "file": "在_快死的敌人.png",
+      "origin": [
+        1250,
+        250
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "screenshots/run-06/快死的敌人.png",
+      "source_sha256": "974cefdb8f60255023316b2cbc3de70a74d9b99261accc60b4dbc900aa14cdef"
+    },
+    {
+      "file": "在_压住干员.png",
+      "origin": [
+        1100,
+        400
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "screenshots/run-06/敌人血条压住干员.png",
+      "source_sha256": "7fdfbb6e2a7d0dbe7c49885c3733a34fc72d55af396fef196bc5edb4dd8a7953"
+    },
+    {
+      "file": "在_互叠1.png",
+      "origin": [
+        1250,
+        150
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "screenshots/run-06/敌条互叠1.png",
+      "source_sha256": "9f1a7216271136b799bba9a1ccbb2f6a9ed8c5cea0b8377fe360a938fb28b0f9"
+    },
+    {
+      "file": "在_互叠2.png",
+      "origin": [
+        1250,
+        150
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "screenshots/run-06/敌条互叠2.png",
+      "source_sha256": "f73ccacaabbf4d0c9b4dc83c5419c54fe64ab989fa48e737b49a7cb342a2d7bc"
+    },
+    {
+      "file": "不在_全满血.png",
+      "origin": [
+        1780,
+        430
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "screenshots/run-06/全满血.png",
+      "source_sha256": "4a3cf6e5b4d60a254c1d777162aef4574f127f3ed38226a95554943ae7bb0dc3"
+    },
+    {
+      "file": "不在_压住干员面板.png",
+      "origin": [
+        2160,
+        0
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "screenshots/run-06/敌人血条压住干员.png",
+      "source_sha256": "7fdfbb6e2a7d0dbe7c49885c3733a34fc72d55af396fef196bc5edb4dd8a7953"
+    }
+  ]
+}
