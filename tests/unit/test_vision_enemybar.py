@@ -18,6 +18,10 @@
    （`raw_b` 那根就压了 8 行、列还重了 17 列），按「交叠」剔会把真敌条剔掉。
 4. **形状门只收紧**：矩形（每一列都亮着的那几行要装下整块 `RECT_FILL_MIN` 的像素）
    与内部均匀（那 8 行逐行中位色的极差 <= `RECT_ROW_SPREAD_MAX`）。
+5. **整长的量法要跟着画面走**（单 6）：**条身按量到的行数**（不写死 8）、量空轨时
+   与条身之间空 `TRACK_EDGE_GAP` 行、**这一列自己暗**（<= `TRACK_DARK_LINE`）的
+   暗底那一族换一支量法。这一条要是红了，先看那两根点名的条（`在_boss_红宽条`
+   的 115 列红条与 24 列那根）量出来的整长还是不是 154 / 122。
 
 ## 合成用例是在真帧之外造的
 
@@ -254,6 +258,24 @@ def test_a_soft_tail_widens_the_ratio_into_an_interval() -> None:
     assert bar.fill.payload.hi == pytest.approx(60 / 90)
 
 
+def test_a_track_measured_across_a_fall_back_is_only_a_lower_bound() -> None:
+    """**空轨是跨过回落才量完的 -> 比例只给下界**（用户 10-14 的裁定 3）。
+
+    画一根填 60 列 + 空轨 40 列的条，再把空轨**中间那两列**改回地形色。量空轨的
+    那一趟容得下跨过 `TRACK_GAP`（=2）列回落，所以整长照样量到 100 —— 可那两列
+    到底是轨道里的杂色、还是条本来就到头了，画面答不了。分母不再是**连着**量出来的：
+    真整长只可能更短、真比例只可能更大，所以给的是 `LowerBound(0.6)`，不是精确。
+    """
+    frame = _frame_with_bar(300, 300, 60, 40, enemybar.ENEMY_FILL)
+    pixels = frame.pixels.copy()
+    pixels[300 : 300 + enemybar.BAR_ROWS, 370:372] = BASE
+    frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
+    bar = enemybar.read_enemy_bars(frame).bars[0]
+    assert bar.rect.width == 100
+    assert isinstance(bar.fill, Valued)
+    assert bar.fill.payload == LowerBound(0.6)
+
+
 def test_a_track_that_is_too_soft_is_not_counted() -> None:
     """**空档那一侧的余量**：与地形差不到 `TRACK_CONTRAST` 的那一段**算不进整长**。
 
@@ -266,9 +288,53 @@ def test_a_track_that_is_too_soft_is_not_counted() -> None:
     assert isinstance(bar.fill, Valued) and bar.fill.payload == Exact(1.0)
 
 
+def test_the_bar_body_is_measured_not_hard_coded() -> None:
+    """**条身取量到的行数，不写死 8**（用户 10-14 的裁定 3）。
+
+    画一根 **10 行**的条（boss 那根红条就是 10 行）：填充 60 列 + 空轨 40 列。
+    量到的条身该是 **10 行**（不是写死的 8），整长 100、比例 0.6 —— 还按 8 行取底
+    的话，条自己多出来的那两行会被当成「带下面的地形」，差被拉平（boss 那根
+    就是这么读成 1.0 的）。这一条直接点名 `_body_rows` 量出来的行数 —— 写死 8 会当场红。
+    """
+    pixels = np.full((1260, 2800, 3), BASE, np.uint8)
+    track = np.clip(np.asarray(BASE, np.int16) - 52, 0, 255).astype(np.uint8)
+    pixels[300:310, 300:360] = enemybar.ENEMY_FILL
+    pixels[300:310, 360:400] = track
+    frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
+    region, top = enemybar._field(frame)
+    core = enemybar._screen(region, top)[0]
+    row, rows = enemybar._body_rows(region, core)
+    assert (row - core.y, rows) == (0, 10)
+    bar = enemybar.read_enemy_bars(frame).bars[0]
+    assert bar.rect.width == 100
+    # 裁定 2：rect 的高也是**量到的**（这条合成条是 10 行，不是写死的 8）。
+    assert (bar.rect.y, bar.rect.height) == (300, 10)
+    assert isinstance(bar.fill, Valued) and bar.fill.payload == Exact(0.6)
+
+
+def test_the_rail_is_still_measured_on_a_dark_ground() -> None:
+    """**暗底地形**：轨色与它一侧的地形长得一样时也要量到（用户 10-14 的裁定 3）。
+
+    画的地形是**深灰**：条上面那一块与**轨色几乎一样**（差 3），下面那一块才亮一点
+    （差 24）—— 实测 boss 那根红条正是这样（上面差 3、下面差 24），24 列那根是
+    反过来（下面差 8、上面差 26）。「两侧都要差够远」在这一族上会答成「没有空轨」，
+    所以这一列自己暗时按**逐通道、任一侧**算 —— 这一条要是红了，说明那一支被收掉了。
+    """
+    pixels = np.full((1260, 2800, 3), (48, 46, 43), np.uint8)
+    pixels[300:1260, :] = (69, 67, 63)
+    pixels[300:308, 300:360] = enemybar.ENEMY_FILL
+    pixels[300:308, 360:400] = (45, 44, 42)
+    frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
+    result = enemybar.read_enemy_bars(frame)
+    bar = result.bars[0]
+    assert bar.rect.width == 100
+    assert isinstance(bar.fill, Valued) and bar.fill.payload == Exact(0.6)
+
+
 def test_the_measured_crops_show_all_three_fill_forms(readings) -> None:
-    """真帧上三支都出现过：**精确**（raw_b 下面那根）· **区间**（raw_a 两根）·
-    **下界**（raw_b 上面那根被 1 列压过）。"""
+    """真帧上三支都出现过：**精确**（raw_b 下面那根）· **区间**（raw_a 右那根，
+    空轨尾巴是软的）· **下界**（两根：raw_b 上面那根填着的那一截被 1 列压断；
+    raw_a 左那根是空轨**跨过回落**才量完的）。"""
     forms = {}
     for name, entry in readings.items():
         for bar in entry["result"].bars:
@@ -276,10 +342,12 @@ def test_the_measured_crops_show_all_three_fill_forms(readings) -> None:
             forms.setdefault(name, set()).add(type(payload).__name__)
     assert forms["在_raw_b_下"] == {"Exact"}
     assert "Interval" in forms["在_raw_a_右"], "空轨尾巴是软的那一根该给区间"
-    assert forms["在_raw_a_左"] <= {"Exact", "Interval"}
+    # 用户 10-14 的裁定 3：这一根的空轨是跨过回落才量完的，分母不是连着量出来的
+    # —— 上一版报**精确 0.6512**（画面真值约 0.683），现在只能给下界。
+    assert forms["在_raw_a_左"] == {"LowerBound"}, "跨过回落的那一根不许给精确"
     assert forms["在_raw_b_上"] == {"LowerBound"}
-    # 两根 raw_a 各自整长 125 / 124 列（画面上是 122…123），比例都落在画面那一段
-    # （84/123 = 0.683）的 1.6% 以内 —— 逐根的整长与比例都在 `判据读数.json` 里。
+    # 两根 raw_a 各自整长 129 / 124 列（画面上是 122…123）。左那根从 125 涨到 129 是
+    # 单 6 改整长量法的后果（取哪几行改了），空档仍在下面那条用例的 131 以内。
 
 
 def test_the_measured_totals_of_raw_a_stay_near_the_picture(readings) -> None:
@@ -538,8 +606,9 @@ def _load_source_frame(batch_dir: Path, name: str) -> Frame:
 # ---------------------------------------------------------------------------
 #
 # 这一批的缺口与真值见 tests/帧样本/敌人血条-10-14/README.md。这里只钉**行为**：
-# 哪几块报在 / 不在、条数是精确还是下界、分不开的那几根比例落什么形态。
-# **不改这一层任何一条线**（这一批从头到尾没有动判据）。
+# 哪几块报在 / 不在、条数是精确还是下界、分不开的那几根比例落什么形态 ——
+# 另外钉住**单 6 那两根点名的条量对了**（整长 154 / 122）。那一次改的是**整长
+# 的量法**（条身按量到的行数、暗底那一支），三态与条数的判据一行没动。
 
 
 BATCH_1014 = REPO / "tests" / "帧样本" / "敌人血条-10-14"
@@ -692,30 +761,59 @@ def test_a_short_fill_is_present_but_its_ratio_is_unsampled(
 
 
 def test_the_red_wide_bar_is_read_by_the_red_family(readings_1014) -> None:
-    """boss 那一帧的**红宽条**：橙族读不到它，**红族**读到（用户这一单的裁定 1）。
+    """boss 那一帧的**红宽条**：橙族读不到它，**红族**读到，而且整长量对了。
 
     画布坐标下的画面事实：红条 x1562…1676 y1002…1011 —— **10 行**、填充 115 列、
-    中位色 (197,41,40)；离 `ENEMY_FILL_RED` 的逐像素最大差 **14**（进得了门），
-    离 `ENEMY_FILL` 的最小差 **59**（橙族读不到）。
+    中位色 (197,41,40)；离 ENEMY_FILL_RED 的逐像素最大差 **14**（进得了门），
+    离 ENEMY_FILL 的最小差 **59**（橙族读不到）。右边 x1677…1714 是一段**暗轨**
+    (45,44,42)，所以整长 **154**、比例 115/154 = **0.7468**（用户 10-14 要求给到
+    「约 0.74」）。
 
-    **它的填充比例这一版量成 1.0，而那是整长算错**：右边 x1677 起那段暗轨
-    （(45,44,42)）与它上下 8 行的中位色差只有 **7…11**，低于 `TRACK_CONTRAST=12`。
-    根因是**这根条有 10 行**：空轨那一步按 8 行取上下底，把条自己多出来的两行
-    当成了「上面的地形」。这一条量的是画面事实，比例那一头如实钉住（1.0 照报，
-    不拿未采样盖住 —— 见夹具 README 的缺口）。
+    **上一版这一根读成 1.0**：那时空轨按写死的 8 行取上下底，条自己多出来的
+    那两行（y1001 / y1012 还是轨色）被当成了地形，差被拉平到 7…11 <
+    `TRACK_CONTRAST`。这一条钉的就是**整长不许再量成填充段**。
     """
     result = readings_1014["在_boss_红宽条"]["result"]
     assert result.presence.payload == Exact(True)
     assert result.count.payload == Exact(3)
     assert [bar.rect.x for bar in result.bars] == [1608, 1562, 1422]
+    red = [bar for bar in result.bars if bar.rect.x == 1562][0]
+    assert red.rect.width == 154
+    # 用户 10-14 的裁定 2：rect 的高是**量到的**条身行数。这一根画面上就是 10 行，
+    # 报 8 就是拿常量冒充事实（BAR_ROWS 只当默认与上限）。
+    assert (red.rect.y, red.rect.height) == (1002, 10)
+    low, high = _bounds(red.fill)
+    assert low == pytest.approx(115 / 154, abs=0.001)
+    assert high < 0.79
     frame = readings_1014["在_boss_红宽条"]["frame"]
-    red = frame.pixels[1002:1012, 1562:1677]
-    assert red.shape == (10, 115, 3)
-    to_red = _red_distance(red)
+    body = frame.pixels[1002:1012, 1562:1677]
+    assert body.shape == (10, 115, 3)
+    to_red = _red_distance(body)
     assert to_red.min() == 0
     assert to_red.max() <= enemybar.SCREEN_TOL
-    assert _colour_distance(red).min() > enemybar.SCREEN_TOL
-    assert red.shape[1] >= enemybar.RED_MIN_COLUMNS
+    assert _colour_distance(body).min() > enemybar.SCREEN_TOL
+    assert body.shape[1] >= enemybar.RED_MIN_COLUMNS
+
+
+def test_the_twenty_four_column_bar_is_a_small_enemy_bar(readings_1014) -> None:
+    """那根 **24 列**的：用户 10-14 裁定它是**一根小怪的血条**，不是假阳性。
+
+    所以它上一版的 1.0 是错的 —— 真实比例约 24 ÷ **小怪那一档的条长**。这一版
+    量出来了：整长 **122**（与 `在_快死的敌人` 那根同宽，也就是小怪那一档）、
+    比例 24/122 = **0.1967**（用户要的「约五分之一」）。
+
+    它在机甲脚下那块**暗底**上：x1632…1709 的轨色与它一侧的地形几乎一样
+    （(25,18,20) 对下面 (30,28,30) 只差 8），靠 `TRACK_DARK_LINE` 那一支才量得
+    下来；x1710…1729 那 20 列 (44,43,41) 是它最后一段轨。
+    """
+    bar = [
+        item
+        for item in readings_1014["在_boss_红宽条"]["result"].bars
+        if item.rect.x == 1608
+    ][0]
+    assert bar.rect.width == 122
+    low, _ = _bounds(bar.fill)
+    assert low == pytest.approx(24 / 122, abs=0.005)
 
 
 def test_the_red_width_gate_still_leaves_the_boss_bar_in() -> None:
@@ -925,4 +1023,13 @@ def test_the_readings_files_record_the_new_gates(report, report_1014) -> None:
         assert "未采样" in ruler["short"]
         assert str(enemybar.RECT_FILL_MIN) in ruler["rectangle"]
         assert str(enemybar.RECT_ROW_SPREAD_MAX) in ruler["rectangle"]
+        assert str(enemybar.MAX_BAR_ROWS) in ruler["body"]
+        assert str(enemybar.BAR_ROWS) in ruler["body"]
+        assert "量到的行数" in ruler["body"]
+        assert "TRACK_EDGE_GAP" in ruler["track"]
+        assert "TRACK_DARK_LINE" in ruler["track"]
+        # 裁定 3：比例形态那一支（空轨跨过回落时只给下界）也要落在尺子上。
+        assert "LowerBound" in ruler["fill"]
+        assert "跨过" in ruler["fill"]
+        assert "Exact" in ruler["fill"]
 

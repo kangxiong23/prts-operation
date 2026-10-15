@@ -10,11 +10,13 @@
   "ruler": {
     "colour": "逐像素离 ENEMY_FILL (218,106,53) 或 ENEMY_FILL_RED (197,41,40) 的逐通道最大差 <= SCREEN_TOL=34 —— **两族各筛一遍、不并掩膜**",
     "shape": "只留竖着连成 8 行的像素（前景与背景各扫一遍的连续长度），再按连通块取 高 <= 12；宽的门按族分：橙族 >= 7、红族 >= 60",
-    "columns": "块里那 8 行逐列取中位色，离 ENEMY_FILL 的逐通道最大差 <= 34 的列算作填充段",
+    "columns": "块里**量到的条身那几行**逐列取中位色，离这一族参考色的逐通道最大差 <= 34 的列算作填充段",
+    "body": "条身**按量到的行数**（不写死 8）：自那一块的行起，上下扩到「填充段那几列的中位色不再像这一族参考色」为止，封顶 MAX_BAR_ROWS=12。每一根报出来的高（EnemyBar.rect）就是这个**量到的行数**，不是常量 BAR_ROWS=8",
     "exits": "分数 = 1 - 颜色距 / 255；>= 1-16/255 为在，<= 1-28/255 为不在，中间为未采样",
     "rectangle": "矩形：每一列都亮着的那几行（条身）要装下整块的 >= 0.95 像素；内部均匀：那 8 行逐行取中位色，通道极差 <= 20",
     "short": "填充段短于 MIN_FILL_COLUMNS=12 的候选**照样报在**，比例落未采样",
-    "track": "整长 = 填充段 + 空轨；空轨 = 与上下两块地形两侧都差 > TRACK_CONTRAST=12 的那一段",
+    "track": "整长 = 填充段 + 空轨。量空轨时与条身之间空 TRACK_EDGE_GAP=1 行；空轨的判据：这一列自己暗（亮度 <= TRACK_DARK_LINE=55）时**逐通道**比、上下**任一侧**差 > TRACK_CONTRAST=12 就算，否则与上下两块地形的**均值**两侧都差 > 12 才算。**终止**：连着 TRACK_GAP+1 列都不够远就停",
+    "fill": "填充比例 = 填充段 / 整长，按四支落形态：填充段中间被切断 -> LowerBound；空轨尾巴是软的 -> Interval；空轨量到上限 -> Interval；**空轨是跨过回落才量完的（走到那儿得先跨过几列「不是轨道」） -> LowerBound** —— 分母不是连着量出来的，真整长只可能更短、真比例只可能更大，所以只给下界；其余 -> Exact",
     "exclusion": "一块踩在我方血条那 8 行、或者紧贴它下面第 8 行的技力条那 8 行上（行差 <= 1）且列范围夹在我方那一格里（列差 <= 4） -> 剔掉",
     "merge": "同一行带上、中间那几列更靠近填充色（半透明遮挡压出来的混色）的两块接回一根条",
     "count": "条数：都分得开给 Exact；分不开的给 LowerBound（同一条带里相邻两根的整长交叠或相接、或中间至少有一列是混色 -> 那两块只算一根）。**分不开的不报精确**，也不高报"
@@ -75,12 +77,14 @@
             1608,
             904
           ],
-          "total_columns": 24,
+          "total_columns": 122,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
-              "form": "exact",
-              "value": 1.0
+              "form": "interval",
+              "lo": 0.19672131147540983,
+              "hi": 0.20869565217391303
             },
             "confidence": 0.10980392156862745
           },
@@ -92,14 +96,16 @@
             1562,
             1002
           ],
-          "total_columns": 115,
+          "total_columns": 154,
+          "rows": 10,
           "fill": {
             "state": "valued",
             "payload": {
-              "form": "exact",
-              "value": 1.0
+              "form": "interval",
+              "lo": 0.7467532467532467,
+              "hi": 0.7876712328767124
             },
-            "confidence": 0.0784313725490196
+            "confidence": 0.08235294117647059
           },
           "colour_distance": 1,
           "separated": true
@@ -110,12 +116,12 @@
             1026
           ],
           "total_columns": 122,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
-              "form": "interval",
-              "lo": 0.819672131147541,
-              "hi": 0.9900990099009901
+              "form": "exact",
+              "value": 0.819672131147541
             },
             "confidence": 0.12156862745098039
           },
@@ -180,6 +186,7 @@
             481
           ],
           "total_columns": 122,
+          "rows": 8,
           "fill": {
             "state": "unsampled"
           },
@@ -226,6 +233,7 @@
             701
           ],
           "total_columns": 42,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
@@ -277,13 +285,14 @@
             1682,
             341
           ],
-          "total_columns": 133,
+          "total_columns": 124,
+          "rows": 9,
           "fill": {
             "state": "valued",
             "payload": {
               "form": "interval",
-              "lo": 0.8872180451127819,
-              "hi": 0.9076923076923077
+              "lo": 0.9516129032258065,
+              "hi": 0.9672131147540983
             },
             "confidence": 0.09019607843137255
           },
@@ -296,6 +305,7 @@
             365
           ],
           "total_columns": 69,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
@@ -314,6 +324,7 @@
             373
           ],
           "total_columns": 56,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
@@ -332,6 +343,7 @@
             412
           ],
           "total_columns": 122,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
@@ -349,12 +361,13 @@
             440
           ],
           "total_columns": 142,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
               "form": "interval",
               "lo": 0.7253521126760564,
-              "hi": 0.7357142857142858
+              "hi": 0.7518248175182481
             },
             "confidence": 0.09019607843137255
           },
@@ -366,12 +379,13 @@
             1425,
             451
           ],
-          "total_columns": 102,
+          "total_columns": 53,
+          "rows": 9,
           "fill": {
             "state": "valued",
             "payload": {
               "form": "exact",
-              "value": 0.23529411764705882
+              "value": 0.4528301886792453
             },
             "confidence": 0.10980392156862745
           },
@@ -383,7 +397,8 @@
             1478,
             452
           ],
-          "total_columns": 118,
+          "total_columns": 143,
+          "rows": 8,
           "fill": {
             "state": "unsampled"
           },
@@ -396,6 +411,7 @@
             462
           ],
           "total_columns": 36,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
@@ -413,12 +429,13 @@
             1691,
             466
           ],
-          "total_columns": 127,
+          "total_columns": 120,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
               "form": "lower",
-              "lo": 0.9448818897637795
+              "lo": 1.0
             },
             "confidence": 0.09803921568627451
           },
@@ -431,6 +448,7 @@
             480
           ],
           "total_columns": 124,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
@@ -448,12 +466,14 @@
             1698,
             511
           ],
-          "total_columns": 122,
+          "total_columns": 126,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
-              "form": "exact",
-              "value": 0.9508196721311475
+              "form": "interval",
+              "lo": 0.9206349206349206,
+              "hi": 0.9354838709677419
             },
             "confidence": 0.09019607843137255
           },
@@ -465,12 +485,14 @@
             1751,
             546
           ],
-          "total_columns": 37,
+          "total_columns": 135,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
-              "form": "exact",
-              "value": 1.0
+              "form": "interval",
+              "lo": 0.2740740740740741,
+              "hi": 0.2868217054263566
             },
             "confidence": 0.11372549019607843
           },
@@ -483,6 +505,7 @@
             568
           ],
           "total_columns": 8,
+          "rows": 9,
           "fill": {
             "state": "unsampled"
           },
@@ -495,11 +518,13 @@
             569
           ],
           "total_columns": 105,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
-              "form": "exact",
-              "value": 0.8095238095238095
+              "form": "interval",
+              "lo": 0.8095238095238095,
+              "hi": 0.8333333333333334
             },
             "confidence": 0.10588235294117647
           },
@@ -511,12 +536,13 @@
             1628,
             569
           ],
-          "total_columns": 154,
+          "total_columns": 162,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
               "form": "lower",
-              "lo": 0.11038961038961038
+              "lo": 0.10493827160493827
             },
             "confidence": 0.01568627450980392
           },
@@ -528,7 +554,8 @@
             1808,
             569
           ],
-          "total_columns": 82,
+          "total_columns": 75,
+          "rows": 8,
           "fill": {
             "state": "unsampled"
           },
@@ -541,6 +568,7 @@
             593
           ],
           "total_columns": 98,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
@@ -736,13 +764,13 @@
             1557,
             351
           ],
-          "total_columns": 128,
+          "total_columns": 129,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
-              "form": "interval",
-              "lo": 0.9140625,
-              "hi": 0.9285714285714286
+              "form": "lower",
+              "lo": 0.9069767441860465
             },
             "confidence": 0.10980392156862745
           },
@@ -755,12 +783,13 @@
             355
           ],
           "total_columns": 139,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
               "form": "interval",
               "lo": 0.8633093525179856,
-              "hi": 0.8955223880597015
+              "hi": 0.8888888888888888
             },
             "confidence": 0.09019607843137255
           },
@@ -772,12 +801,14 @@
             1587,
             376
           ],
-          "total_columns": 125,
+          "total_columns": 150,
+          "rows": 9,
           "fill": {
             "state": "valued",
             "payload": {
-              "form": "exact",
-              "value": 0.92
+              "form": "interval",
+              "lo": 0.7666666666666667,
+              "hi": 0.777027027027027
             },
             "confidence": 0.10588235294117647
           },
@@ -789,12 +820,14 @@
             1680,
             388
           ],
-          "total_columns": 125,
+          "total_columns": 126,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
-              "form": "exact",
-              "value": 0.968
+              "form": "interval",
+              "lo": 0.9603174603174603,
+              "hi": 0.983739837398374
             },
             "confidence": 0.09411764705882353
           },
@@ -807,6 +840,7 @@
             396
           ],
           "total_columns": 137,
+          "rows": 9,
           "fill": {
             "state": "valued",
             "payload": {
@@ -824,13 +858,13 @@
             1733,
             440
           ],
-          "total_columns": 110,
+          "total_columns": 108,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
-              "form": "interval",
-              "lo": 0.9818181818181818,
-              "hi": 0.9908256880733946
+              "form": "exact",
+              "value": 1.0
             },
             "confidence": 0.09019607843137255
           },
@@ -842,12 +876,13 @@
             1373,
             451
           ],
-          "total_columns": 118,
+          "total_columns": 122,
+          "rows": 9,
           "fill": {
             "state": "valued",
             "payload": {
               "form": "exact",
-              "value": 0.8305084745762712
+              "value": 0.8032786885245902
             },
             "confidence": 0.09019607843137255
           },
@@ -860,6 +895,7 @@
             451
           ],
           "total_columns": 143,
+          "rows": 8,
           "fill": {
             "state": "unsampled"
           },
@@ -871,13 +907,14 @@
             1733,
             452
           ],
-          "total_columns": 136,
+          "total_columns": 124,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
               "form": "interval",
-              "lo": 0.33088235294117646,
-              "hi": 0.3488372093023256
+              "lo": 0.3629032258064516,
+              "hi": 0.36585365853658536
             },
             "confidence": 0.09019607843137255
           },
@@ -890,12 +927,13 @@
             463
           ],
           "total_columns": 132,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
               "form": "interval",
               "lo": 0.8333333333333334,
-              "hi": 0.859375
+              "hi": 0.873015873015873
             },
             "confidence": 0.09019607843137255
           },
@@ -908,6 +946,7 @@
             480
           ],
           "total_columns": 121,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
@@ -925,6 +964,7 @@
             521
           ],
           "total_columns": 123,
+          "rows": 9,
           "fill": {
             "state": "valued",
             "payload": {
@@ -942,6 +982,7 @@
             546
           ],
           "total_columns": 89,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
@@ -959,12 +1000,12 @@
             569
           ],
           "total_columns": 124,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
-              "form": "interval",
-              "lo": 0.9112903225806451,
-              "hi": 0.9186991869918699
+              "form": "exact",
+              "value": 0.9112903225806451
             },
             "confidence": 0.10196078431372549
           },
@@ -976,12 +1017,13 @@
             1591,
             569
           ],
-          "total_columns": 70,
+          "total_columns": 59,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {
               "form": "lower",
-              "lo": 0.5142857142857142
+              "lo": 0.6101694915254238
             },
             "confidence": 0.011764705882352941
           },
@@ -994,6 +1036,7 @@
             569
           ],
           "total_columns": 108,
+          "rows": 8,
           "fill": {
             "state": "unsampled"
           },
@@ -1006,6 +1049,7 @@
             569
           ],
           "total_columns": 59,
+          "rows": 8,
           "fill": {
             "state": "unsampled"
           },
@@ -1018,6 +1062,7 @@
             590
           ],
           "total_columns": 68,
+          "rows": 8,
           "fill": {
             "state": "valued",
             "payload": {

@@ -138,6 +138,9 @@ def run_batch(root: pathlib.Path) -> None:
                     {
                         "origin": [int(bar.rect.x), int(bar.rect.y)],
                         "total_columns": int(bar.rect.width),
+                        # 报出来的高就是**量到的条身行数**（用户 10-14 的裁定 2），
+                        # 不是常量 BAR_ROWS —— 落盘时一并记下，好让它可核对。
+                        "rows": int(bar.rect.height),
                         "fill": slot_of(bar.fill),
                         "colour_distance": bar.distance,
                         "separated": bar.separated,
@@ -172,8 +175,11 @@ def run_batch(root: pathlib.Path) -> None:
                 enemybar.MIN_CANDIDATE_COLUMNS,
                 enemybar.RED_MIN_COLUMNS,
             ),
-            "columns": "块里那 8 行逐列取中位色，离 ENEMY_FILL 的逐通道最大差 <= %d 的列算作填充段"
+            "columns": "块里**量到的条身那几行**逐列取中位色，离这一族参考色的逐通道最大差 <= %d 的列算作填充段"
             % enemybar.SCREEN_TOL,
+            "body": "条身**按量到的行数**（不写死 8）：自那一块的行起，上下扩到「填充段那几列的中位色不再像这一族参考色」为止，封顶 MAX_BAR_ROWS=%d。"
+            "每一根报出来的高（EnemyBar.rect）就是这个**量到的行数**，不是常量 BAR_ROWS=%d"
+            % (enemybar.MAX_BAR_ROWS, enemybar.BAR_ROWS),
             "exits": "分数 = 1 - 颜色距 / 255；>= 1-%d/255 为在，<= 1-%d/255 为不在，中间为未采样"
             % (enemybar.SOLID_TOL, enemybar.ABSENT_TOL),
             "rectangle": "矩形：每一列都亮着的那几行（条身）要装下整块的 >= %s 像素；"
@@ -181,8 +187,16 @@ def run_batch(root: pathlib.Path) -> None:
             % (enemybar.RECT_FILL_MIN, enemybar.RECT_ROW_SPREAD_MAX),
             "short": "填充段短于 MIN_FILL_COLUMNS=%d 的候选**照样报在**，比例落未采样"
             % enemybar.MIN_FILL_COLUMNS,
-            "track": "整长 = 填充段 + 空轨；空轨 = 与上下两块地形两侧都差 > TRACK_CONTRAST=%d 的那一段"
-            % enemybar.TRACK_CONTRAST,
+            "track": "整长 = 填充段 + 空轨。量空轨时与条身之间空 TRACK_EDGE_GAP=%d 行；空轨的判据：这一列自己暗（亮度 <= TRACK_DARK_LINE=%d）时**逐通道**比、上下**任一侧**差 > TRACK_CONTRAST=%d 就算，否则与上下两块地形的**均值**两侧都差 > %d 才算。**终止**：连着 TRACK_GAP+1 列都不够远就停"
+            % (
+                enemybar.TRACK_EDGE_GAP,
+                enemybar.TRACK_DARK_LINE,
+                enemybar.TRACK_CONTRAST,
+                enemybar.TRACK_CONTRAST,
+            ),
+            "fill": "填充比例 = 填充段 / 整长，按四支落形态：填充段中间被切断 -> LowerBound；空轨尾巴是软的 -> Interval；空轨量到上限 -> Interval；"
+            "**空轨是跨过回落才量完的（走到那儿得先跨过几列「不是轨道」） -> LowerBound** —— 分母不是连着量出来的，"
+            "真整长只可能更短、真比例只可能更大，所以只给下界；其余 -> Exact",
             "exclusion": "一块踩在我方血条那 8 行、或者紧贴它下面第 %d 行的技力条那 8 行上（行差 <= %d）且列范围夹在我方那一格里（列差 <= %d） -> 剔掉"
             % (enemybar.SKILL_ROW_OFFSET, enemybar.ROW_SLACK, enemybar.COL_SLACK),
             "merge": "同一行带上、中间那几列更靠近填充色（半透明遮挡压出来的混色）的两块接回一根条",

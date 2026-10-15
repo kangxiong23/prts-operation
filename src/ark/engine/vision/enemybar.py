@@ -88,15 +88,29 @@
 量到 `154），所以整长只能**量**：
 
 - **填充段**：自左缘起连续算作填充的那些列（容 `TRACK_GAP` 列，与我方条同一支）；
+- **条身**：**按量到的行数**，不写死 8（见 `_body_rows`）—— 小怪与红门那些整齐的块是
+  8 行，boss 那根红条是 **10 行**，`raw_b` 上那根是 9 行；
 - **空轨**：填充段右边那一段**与它上下那两块地形都不一样**的列 —— 有**偏暗**的
   （raw_a：带内 43 而上下 65），也有**偏亮**的（raw_b：一段纯灰 177 而上下 74）。
-  所以判据取「上下两侧**都**差得够远」，不是「更暗」；
+  所以判据取「上下两侧**都**差得够远」，不是「更暗」；量那两段地形时**与条身之间
+  空 TRACK_EDGE_GAP 行**（条的上下边是软的，贴着的那一行还是条自己）；
+  量到的那一列**自己就暗**（亮度 <= TRACK_DARK_LINE）时换一支：**逐通道**比、
+  上下**任一侧**够远就算 —— 暗底那一族里轨色会与它一侧的地形长得一样，
+  两侧都要会系统性答成「没有空轨」（见 TRACK_DARK_LINE）；
 - **整长 = 填充段 + 空轨**。填满时没有空轨，整长就等于填充段 —— 实测
   `screenshots/_probe.png` 那根满条就是这样（123 列，右邻一列回到地形）。
 
 **遮挡按「下界」降级**：填充段中间被切断（缝两边都还亮着）时，缝底下藏着什么
 看不见，所以只能说「**至少**缝之前那一截」—— 与我方血条那条链的 LowerBound
 同一套纪律，不另立一套。
+
+**整长量得不干净时，比例也不许报「精确」**：量空轨的那一趟容得下跨过
+`TRACK_GAP` 列回落（顶着一条半透明的边时那是常态），可**只要跨过过**，
+那个「整长」就不是**连着**量出来的 —— 它可能多吃了一截地形，于是分母偏大、
+比例偏小。这时给的是 **`LowerBound(填充 / 整长)`**（真整长只可能更短，真比例
+只可能更大，所以量到的这一个正是**下界**），不是 `Exact`。**理由**：分母是
+**量**出来的；量得不干净还说「精确」，就是把「不知道」写成了「知道」。
+软尾那一支（边界落在末尾几列弱差里）给的是**区间**，信息比下界多，所以先走它。
 
 ## 条数：分不开时给**下界**，不给精确
 
@@ -151,6 +165,8 @@ __all__ = [
     "MAX_BAR_ROWS",
     "MIN_FILL_COLUMNS",
     "TRACK_CONTRAST",
+    "TRACK_EDGE_GAP",
+    "TRACK_DARK_LINE",
     "TRACK_GAP",
     "MAX_BAR_COLUMNS",
     "FIELD_TOP",
@@ -297,8 +313,8 @@ RECT_ROW_SPREAD_MAX: Final[int] = 20
 41 起 —— 空档只有 7，当不了门。
 """
 TRACK_CONTRAST: Final[int] = 12
-"""空轨那道门：带内那 8 行的中位色均值，离**它上面那 8 行**与**它下面那 8 行**
-的均值，**两侧都要**差过这个数，才算「这一段不是地形」。
+"""空轨那道门：**条身那几行**（按量到的，见 `_body_rows`）的中位色均值，离**它上面
+那几行**与**它下面那几行**的均值，**两侧都要**差过这个数，才算「这一段不是地形」。
 
 **这个数也取在空档里**（量出来的）：
 
@@ -309,6 +325,60 @@ TRACK_CONTRAST: Final[int] = 12
 
 所以空档是 **8…20**，线取 12，两侧余量 **4 与 8**。取 12 而不是取 8 的用处，
 恰恰是**不把那道软尾巴算进整长**：算进去整长会多 24 列，比例就从 0.69 掉到 0.57。
+"""
+
+TRACK_EDGE_GAP: Final[int] = 1
+"""量空轨时，条身与「借来当地形的那几行」之间**空一行**。
+
+一根条的上下边是**软的**（抗锯齿 + 半透明）：贴着条身的那一行常常还是条自己的颜色。
+实测最要紧的一处是 boss 那根红条 —— 它 **10 行**（y1002…1011），而 y1001 与 y1012
+**还是那条轨**（(45,43,41)），真正的地形从 y1013 才开始。不留缝的时候，`_off_terrain`
+的「上面」那一窗（y992…1001）把 y1001 那道轨算了进去、中位色被拉低到 (48,46,43)，
+与轨色 (45,44,42) 只差 **2** —— 空轨当场量不到，整长 = 填充段。
+
+**1 行就够**（量出来的）：条的软边实测就是 1 行 —— `在_压住干员` 那根的 y700 与
+y709、`raw_b` 上那根的 y489 都还是条自己，再往外才是地形。留 2 行会把
+`在_压住干员` 那根的软尾从 4 列算成 12 列，比例形态从**区间**掉成**精确**
+（那一支本来不敢给精确数）。
+"""
+
+TRACK_DARK_LINE: Final[int] = 55
+"""**暗底地形**上量空轨的开关：这一列自己的亮度 <= 55 就换一支量法。
+
+**为什么非有它不可**（量出来的）：空轨是**半透明压暗** —— 它压在地形上，地形暗它就暗。
+所以**地形本身很暗**那一族里，轨色会与它一侧的地形**长得几乎一样**：
+
+| 那一根（画布坐标） | 轨色 | 上面地形 | 下面地形 | 逐通道最大差 |
+| --- | --- | --- | --- | --- |
+| `在_boss_红宽条` x1677（红条） | (45,44,42) | (48,46,43) | (69,67,63) | 上面只有 **3**、下面 24 |
+| `在_boss_红宽条` x1632（24 列） | (25,18,20) | (92,24,26) | (30,28,30) | 下面只有 **10**、上面 67 |
+| `在_boss_红宽条` x1690（24 列） | (12,10,9) | (35,10,8) | (15,14,11) | 上面 23、下面 **4** |
+
+「两侧都要差够远」在这一族上会**系统性答成「没有空轨」**（整长 = 填充段），
+而那正是那两根读成 1.0 的成因。所以**这一列自己就暗**时换一支：
+
+1. **逐通道**比（`|差|.max()`）—— 上面 x1690 那一行，逐通道是 23，而三个通道的
+   **均值**只差 7.3（红的差 23、绿蓝几乎不变），均值那一支会把轨道漏掉；
+2. 上面、下面**任一侧**够远就算 —— 另一侧与轨色重合是这一族的常态。
+
+**55 取在量出来的空档里、并往暗那一侧靠**：
+
+- **必须走这一支**的那些列，亮度实测 **10…45**（最松的是那根 24 列的 x1682 / x1684，
+  两个都是 44.7）；
+- **必须不走**这一支的最近样本是 `在_压住干员` 里那根绿技力条，亮度 **100**
+  —— 它离下面那块地形只差 1，当场停下，那一帧的读数与单 5 **逐位相同**
+  （区间 0.7143…0.8824）。
+
+所以空档是 **45…100**，线取 55：下留 **10**、上留 **45**。**故意往暗那一侧靠** ——
+亮底走的 min 那一支是**严**的那一支（地形与自己差 0，天然停得住），暗底走的 max 那一支
+是**宽**的那一支，线压低一点，宽的那一支就少盖几列。
+
+**亮底那一族走的还是原来那一支量法**（带内均值 vs 上下均值、取小的那个）；
+`raw_a` 左那根从 125 涨到 129 是**取哪几行**改了（条身量到的 + 空 1 行），不是这一支改了。
+
+**暗底那一支只有一个真值条件**：这一批里「轨色与一侧地形重合」只被 boss 那两根验过，
+而且是同一帧、同一块机甲脚 —— 别的暗底（暗地板、夜里、阴影里）**零**。这一条
+如实写在夹具 README 的缺口里。
 """
 
 TRACK_GAP: Final[int] = 2
@@ -391,7 +461,10 @@ class EnemyBar:
     """一根敌人条：**整根**的矩形 + 填充比例 + 它跟旁边分不分得开。
 
     `rect` 是**整根条**（填充段 + 空轨），不是填充段 —— 因为「填了多少」这个
-    比例的分母是整根。`fill` 是那个比例（0…1），形态见模块开头那张表。
+    比例的分母是整根。它的**高是量到的条身行数**（`_body_rows`），不是常量
+    `BAR_ROWS`：一根量到 10 行的条报成 8 行，就是拿写死的数去描述一个量出来的
+    东西（`BAR_ROWS` 只当默认与上限）。`fill` 是那个比例（0…1），形态见模块
+    开头那张表。
 
     `separated` = **这一根能确认跟旁边那些分得开**（它就是一根完整的条）。
     `False` 时 `fill` 落 `Unsampled()`：**整长量不准，比例就没有分母** ——
@@ -470,7 +543,7 @@ def read_enemy_bars(
     **取区越出画布 -> 抛异常**（能力缺失，不是「看不到」）。
     """
     region, top = _field(frame)
-    read: list[tuple[_Core, int, SlotValue]] = []
+    read: list[tuple[_Core, int, int, int, SlotValue]] = []
     screened: list[ScreenedCore] = []
     best = 0.0
     middle = False
@@ -481,11 +554,17 @@ def read_enemy_bars(
             continue
         best = max(best, entry.score)
         if core.distance <= SOLID_TOL:
-            total, fill = _read_bar(region, core)
+            total, row, rows, fill = _read_bar(region, core)
             # 填充段短于 MIN_FILL_COLUMNS：**存在性照报，比例不给**（见模块开头
             # 「宽度：进门松、出口严」）—— 短填充给不出「填了多少」该有的证据。
             read.append(
-                (core, total, Unsampled() if core.width < MIN_FILL_COLUMNS else fill)
+                (
+                    core,
+                    total,
+                    row,
+                    rows,
+                    Unsampled() if core.width < MIN_FILL_COLUMNS else fill,
+                )
             )
         elif core.distance < ABSENT_TOL:
             middle = True
@@ -493,12 +572,14 @@ def read_enemy_bars(
     grouped = _inseparable(region, read)
     bars = tuple(
         EnemyBar(
-            rect=PixelRect(core.x, core.y + top, total, BAR_ROWS),
+            # 高是**量到的条身行数**（`_body_rows`）：写死 BAR_ROWS 去描述一根量到
+            # 10 行的条，就是拿常量冒充事实。y 也跟着量到的那一行走。
+            rect=PixelRect(core.x, row + top, total, rows),
             fill=fill if grouped[index] == index else Unsampled(),
             distance=core.distance,
             separated=grouped[index] == index,
         )
-        for index, (core, total, fill) in enumerate(read)
+        for index, (core, total, row, rows, fill) in enumerate(read)
     )
     if bars:
         presence: SlotValue = Valued(Exact(True), best)
@@ -832,30 +913,107 @@ def _resumes(lit: np.ndarray, filled: int) -> bool:
 # ---------------------------------------------------------------------------
 
 
-def _band_mean(region: np.ndarray, row: int, column: int) -> float:
-    """某一列上那 8 行的中位色的均值。"""
-    return float(np.median(region[row : row + BAR_ROWS, column], axis=0).mean())
+def _body_rows(region: np.ndarray, core: _Core) -> tuple[int, int]:
+    """这一根条**量到的**条身 -> (条身顶行, 条身高)。**不许写死 8**。
+
+    自 `core.y` 起上下扩：**填充段那几列**上，条身以内是填充色、以外不是 ——
+    走到不亮为止。封顶 `MAX_BAR_ROWS`（形状门已经保证那一块不高于它）。
+
+    实测两档：小怪与红门那些整齐的块是 **8 行**，boss 那根红条是 **10 行**
+    （`在_boss_红宽条` x1562，y1002…1011），`raw_b` 上那根是 **9 行**。
+    「条身取几行按量到的」是用户这一单的裁定 3 —— 写死 8 的代价见 `TRACK_EDGE_GAP`。
+    """
+    reference = np.asarray(core.reference, np.int16)
+    columns = region[:, core.x + 2 : core.x + max(3, min(core.width, 12))]
+    columns = columns.astype(np.int16)
+
+    def lit(row: int) -> bool:
+        colour = np.median(columns[row], axis=0)
+        return int(np.abs(colour - reference).max()) <= SCREEN_TOL
+
+    top = core.y
+    while top - 1 >= 0 and lit(top - 1):
+        top -= 1
+    bottom = core.y
+    while bottom + 1 < columns.shape[0] and lit(bottom + 1):
+        if bottom - top + 2 > MAX_BAR_ROWS:
+            break
+        bottom += 1
+    return top, max(BAR_ROWS, bottom - top + 1)
 
 
-def _off_terrain(region: np.ndarray, row: int, column: int) -> float:
-    """这一列**离地形多远**：带内那 8 行与**上面 8 行**、**下面 8 行**的差，取小的那个。
+def _band_median(
+    region: np.ndarray, start: int, rows: int, column: int
+) -> np.ndarray | None:
+    """某一列上自 `start` 起 `rows` 行的中位色；这一段跑到区外时给 `None`。
+
+    **要夹一下**：条身最多 12 行、上下再各让出 `TRACK_EDGE_GAP` 行，战场那一条
+    只多借了 8 行底 —— 贴着战场边的那一根会伸出去。伸出去的那一侧就当「借不到」，
+    另一侧照样算（只影响贴着战场上下沿的那几根）。
+    """
+    lo = max(0, start)
+    hi = min(region.shape[0], start + rows)
+    if hi - lo < 2:
+        return None
+    return np.median(region[lo:hi, column], axis=0)
+
+
+def _off_terrain(
+    region: np.ndarray, row: int, rows: int, column: int
+) -> float:
+    """这一列**离地形多远**：条身那 `rows` 行与它**上面**、**下面**那两段的差。
 
     取**两侧都要差**是必要的：`raw_b` 那一段空轨是**纯灰 177**，而它的上下都是
     74 左右 —— 「更暗才算轨道」这条判据在那里会当场失效（那段灰正是那根条的
     没填到的那一截）。反过来 `raw_a` 那一段是偏暗的（43 对 65）。
     **两个方向都算，才盖得住这两种。**
+
+    **暗底那一族改取「任一侧」**（见 `TRACK_DARK_LINE`）：那一族里轨色与它一侧的
+    地形长得一样，「两侧都要」会系统性答成「没有空轨」。闸门是**这一列自己暗**，
+    不是「哪一族地形」—— 亮底那一族走的还是**上面那一支量法**
+    （带内均值 vs 上下均值、取小的那个），改的只是「取哪几行」。
     """
-    inside = _band_mean(region, row, column)
-    above = _band_mean(region, row - BAR_ROWS, column)
-    below = _band_mean(region, row + BAR_ROWS, column)
-    return min(abs(inside - above), abs(inside - below))
+    inside = _band_median(region, row, rows, column)
+    if inside is None:
+        return 0.0
+    sides = []
+    for start in (row - TRACK_EDGE_GAP - rows, row + rows + TRACK_EDGE_GAP):
+        side = _band_median(region, start, rows, column)
+        if side is not None:
+            sides.append(side)
+    if not sides:
+        return 0.0
+    middle = float(inside.mean())
+    if middle <= TRACK_DARK_LINE:
+        # 暗底那一族：**逐通道**量（只差一个通道也算），取两侧**任一**
+        return float(
+            max(
+                int(abs(inside.astype(np.int16) - side.astype(np.int16)).max())
+                for side in sides
+            )
+        )
+    # 亮底那一族：与今天同一支（带内均值 vs 上下均值，取小的那个）
+    return min(abs(middle - float(side.mean())) for side in sides)
 
 
-def _track_end(region: np.ndarray, row: int, start: int) -> tuple[int, int]:
+def _track_end(
+    region: np.ndarray, row: int, rows: int, start: int
+) -> tuple[int, int, bool]:
     """自 `start` 起量空轨 -> (最后一个「不是地形」的列 + 1, 那一段软尾的列数)。
+
+    **终止条件**：连着 `TRACK_GAP + 1` 列都「离地形不够远」就停。它停得住的理由
+    是**量的就是「离这一列上下那两段地形多远」** —— 地形自己与自己的差是 0，
+    所以它不会一路吃到地里去；`raw_a` 那两根量到 129 / 124 列、`raw_b` 那根 154，
+    画面上的众数是 122…123 与 154。
 
     软尾 = 末尾那几列**差得过线、但差不过两倍线**的列。边界落在它们里面时，
     「整根到哪儿为止」是一个**区间**而不是一个数（与「边界渐变」那一支同源）。
+
+    第三个给回的是**这一趟有没有跨过回落**（bridged）：前面已经有过「是轨道」的
+    列，后面出现「不是轨道」的列，再后面**又接上**「是轨道」—— 说明这一趟是
+    **跨过**几列才走下来的。那几列到底是轨道里的杂色、还是条本来就到头了，画面
+    答不了；于是整长就不是**连着**量出来的，比例只能给下界的形态（见 _read_bar）。
+    紧贴填充段的那几列不算：那几列出现的时候，还没有出现过「是轨道」的列。
     """
     width = region.shape[1]
     limit = min(width, start + MAX_BAR_COLUMNS)
@@ -863,9 +1021,15 @@ def _track_end(region: np.ndarray, row: int, start: int) -> tuple[int, int]:
     last = start
     miss = 0
     tail = 0
+    hit = False
+    bridged = False
     while column < limit:
-        amount = _off_terrain(region, row, column)
+        amount = _off_terrain(region, row, rows, column)
         if amount > TRACK_CONTRAST:
+            if hit and miss:
+                # 这一列是**跨过**前面那几列回落才接上的：整长不是连着量出来的。
+                bridged = True
+            hit = True
             last = column + 1
             tail = tail + 1 if amount <= 2 * TRACK_CONTRAST else 0
             miss = 0
@@ -874,11 +1038,13 @@ def _track_end(region: np.ndarray, row: int, start: int) -> tuple[int, int]:
             if miss > TRACK_GAP:
                 break
         column += 1
-    return last, tail
+    return last, tail, bridged
 
 
-def _read_bar(region: np.ndarray, core: _Core) -> tuple[int, SlotValue]:
-    """一根条 -> (整长, 填充比例)。**整长 = 填充段 + 空轨**。
+def _read_bar(
+    region: np.ndarray, core: _Core
+) -> tuple[int, int, int, SlotValue]:
+    """一根条 -> (整长, 条身顶行, 条身行数, 填充比例)。**整长 = 填充段 + 空轨**。
 
     比色用的是**这一根自己那一族的参考色**（`core.reference`）：红族那根比的是
     `ENEMY_FILL_RED`，不是橙族那一支 —— 比错了它整根都不亮、填充段会量成 0。
@@ -890,6 +1056,7 @@ def _read_bar(region: np.ndarray, core: _Core) -> tuple[int, SlotValue]:
     | 填充段中间被切断（缝两边都还亮着） | `LowerBound(严那一段 / 整长)` |
     | 空轨的尾巴是软的（边界落在几列里） | `Interval(填充 / 整长, 填充 / 短整长)` |
     | 空轨量到了上限还没到头 | `Interval(填充 / 上限, 填充 / 整长)` |
+    | 空轨量得不干净（跨过过回落） | `LowerBound(填充 / 整长)` |
     | 其余（含填满：没有空轨） | `Exact(填充 / 整长)` |
 
     **填满那一支不需要另开一条路**：没有空轨时整长就等于填充段，比例就是 1.0 ——
@@ -897,30 +1064,37 @@ def _read_bar(region: np.ndarray, core: _Core) -> tuple[int, SlotValue]:
     就回到地形，差 0…3；`raw_a` 那两根则各自留了 40 与 47 列空轨）。
     """
     reference = np.asarray(core.reference, dtype=np.int16)
+    row, rows = _body_rows(region, core)
     span = core.width + MAX_BAR_COLUMNS
     profile = np.median(
-        region[core.y : core.y + BAR_ROWS, core.x : core.x + span], axis=0
+        region[row : row + rows, core.x : core.x + span], axis=0
     )
     distance = np.abs(profile.astype(np.int16) - reference).max(axis=1)
     lit = distance <= SCREEN_TOL
     strict, tolerant = _leading_run(lit, TRACK_GAP)
-    end, tail = _track_end(region, core.y, core.x + tolerant)
+    end, tail, bridged = _track_end(region, row, rows, core.x + tolerant)
     total = max(tolerant, end - core.x)
     if strict < tolerant or _resumes(lit, tolerant):
-        return total, Valued(
+        return total, row, rows, Valued(
             LowerBound(strict / total), _fill_confidence(distance, strict)
         )
     if tail and tail < total - tolerant:
-        return total, Valued(
+        return total, row, rows, Valued(
             Interval(tolerant / total, tolerant / (total - tail)),
             _fill_confidence(distance, tolerant),
         )
     if total - tolerant >= MAX_BAR_COLUMNS:
-        return total, Valued(
+        return total, row, rows, Valued(
             Interval(tolerant / (tolerant + MAX_BAR_COLUMNS), tolerant / total),
             _fill_confidence(distance, tolerant),
         )
-    return total, Valued(
+    if bridged:
+        # 空轨是**跨过**回落才量完的：那个分母不是连着量出来的，可能多算了一截
+        # 地形 —— 真整长只可能更短、真比例只可能更大，所以这里给的是下界。
+        return total, row, rows, Valued(
+            LowerBound(tolerant / total), _fill_confidence(distance, tolerant)
+        )
+    return total, row, rows, Valued(
         Exact(tolerant / total), _fill_confidence(distance, tolerant)
     )
 
@@ -947,7 +1121,7 @@ def _fill_confidence(distance: np.ndarray, filled: int) -> float:
 
 
 def _inseparable(
-    region: np.ndarray, read: Sequence[tuple[_Core, int, SlotValue]]
+    region: np.ndarray, read: Sequence[tuple[_Core, int, int, int, SlotValue]]
 ) -> list[int]:
     """每一根条归到哪一组：自己一组的返回自己的下标，分不开的返回这一组的最小下标。
 
@@ -980,7 +1154,7 @@ def _inseparable(
 
 
 def _bands(
-    read: Sequence[tuple[_Core, int, SlotValue]]
+    read: Sequence[tuple[_Core, int, int, int, SlotValue]]
 ) -> list[list[int]]:
     """把条按**行带**切开，每一条带里按列排好。
 
@@ -1003,8 +1177,8 @@ def _bands(
 
 def _touching(
     region: np.ndarray,
-    first: tuple[_Core, int, SlotValue],
-    second: tuple[_Core, int, SlotValue],
+    first: tuple[_Core, int, int, int, SlotValue],
+    second: tuple[_Core, int, int, int, SlotValue],
 ) -> bool:
     """同一条带上的两块**分不分得开**：分不开才 True。
 
