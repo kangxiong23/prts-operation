@@ -15,8 +15,10 @@ r"""敌人血条那一批基准集的**重跑**：裁剪 -> 读数。
    调用方会交给链的那份记录。它从**裁剪自己的像素**上折，不碰源帧 ——
    所以源帧不在本机，这一份也照样重跑得出来。
 3. **跑链、落 `判据读数.json`**：`read_enemy_bars` 逐块跑一遍，三个出口 +
-   **条数（精确还是下界）** + 逐根填充比例与「分不分得开」+ 形状门与三条线的原样
-   写下去。
+   **条数（精确还是下界）** + **三栏各自的原样**：`bars`（逐根的填充段列数与比例，
+   各自带形态与余量）· `clumps`（一堆的区域 / 哪一档 / 填充总列数 / 至少几根）·
+   `unsampled`（有东西、但填了多少读不出来）+ 逐块筛出来的那些块 + 形状门与
+   几条线的原样写下去。
 
 **它不改判据、不改裁剪、不判「够不够」**：那份读数是给人核对的（哪几块判成在 /
 不在 / 认不出、每一根量到多少、条数是精确还是下界），「够不够」是规划者的事。
@@ -90,6 +92,15 @@ def slot_of(value) -> dict:
     return {"state": "valued", "payload": form, "confidence": value.confidence}
 
 
+def reading_of(reading) -> dict:
+    """一条读数 -> 落盘用的那一份：**值（形态）** + **余量**。
+
+    `margin` 是「**定下这次读数的两侧离判据的门有多远**」，不是概率；`None` = 这一条
+    不是读出来的（比如「至少几根」是除法算的）。**这一层没有 0–1 的总分。**
+    """
+    return {"value": slot_of(reading.value), "margin": reading.margin}
+
+
 def source_hash(path: pathlib.Path) -> str:
     """源帧的 **RAW sha256**（二进制按文件字节，不折算换行）。"""
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -134,23 +145,53 @@ def run_batch(root: pathlib.Path) -> None:
                 "covers": by_file[case.name + ".png"]["covers"],
                 "presence": slot_of(result.presence),
                 "count": slot_of(result.count),
+                # **三栏互斥**（见判据的模块开头「三样读法」）：三样各自一眼分得开。
                 "bars": [
                     {
-                        "origin": [int(bar.rect.x), int(bar.rect.y)],
-                        "total_columns": int(bar.rect.width),
-                        # 报出来的高就是**量到的条身行数**（用户 10-14 的裁定 2），
-                        # 不是常量 BAR_ROWS —— 落盘时一并记下，好让它可核对。
-                        "rows": int(bar.rect.height),
-                        "fill": slot_of(bar.fill),
+                        "origin": [int(bar.fill_rect.x), int(bar.fill_rect.y)],
+                        # **填充段列数**（不是整长 —— 这一版没有「整长」这个东西：
+                        # 分母是按族查表的两档常量，见 `ruler["dial"]`）。
+                        "fill_columns": int(bar.fill_rect.width),
+                        "rows": int(bar.fill_rect.height),
+                        "columns": reading_of(bar.columns),
+                        "fill": reading_of(bar.fill),
                         "colour_distance": bar.distance,
-                        "separated": bar.separated,
                     }
                     for bar in result.bars
                 ],
+                "clumps": [
+                    {
+                        "region": [
+                            int(clump.region.x),
+                            int(clump.region.y),
+                            int(clump.region.width),
+                            int(clump.region.height),
+                        ],
+                        "tier": {
+                            "name": clump.tier.name,
+                            "full_columns": clump.tier.full_columns,
+                            "body_rows": clump.tier.body_rows,
+                        },
+                        "columns": reading_of(clump.columns),
+                        "least": reading_of(clump.least),
+                    }
+                    for clump in result.clumps
+                ],
+                "unsampled": [
+                    {
+                        "origin": [int(bar.fill_rect.x), int(bar.fill_rect.y)],
+                        "fill_columns": int(bar.fill_rect.width),
+                        "rows": int(bar.fill_rect.height),
+                        "columns": reading_of(bar.columns),
+                        "fill": reading_of(bar.fill),
+                        "colour_distance": bar.distance,
+                    }
+                    for bar in result.unsampled
+                ],
                 "cores": [
                     {
-                        "origin": [int(core.rect.x), int(core.rect.y)],
-                        "columns": int(core.rect.width),
+                        "origin": [int(core.fill_rect.x), int(core.fill_rect.y)],
+                        "columns": int(core.fill_rect.width),
                         "colour_distance": core.distance,
                         "masked": core.masked,
                     }
@@ -162,7 +203,7 @@ def run_batch(root: pathlib.Path) -> None:
     report = {
         "note": "敌人血条那条链的判据读数。它不判断够不够 —— 那是规划者的事；这里只放逐帧读数、两簇的分布与空档、以及覆盖说明。",
         "batch": str(root.relative_to(REPO)).replace("\\", "/"),
-        "version": 1,
+        "version": 2,
         "canvas": [CANVAS_2800x1260.width, CANVAS_2800x1260.height],
         "device": batch.device,
         "ruler": {
@@ -175,33 +216,45 @@ def run_batch(root: pathlib.Path) -> None:
                 enemybar.MIN_CANDIDATE_COLUMNS,
                 enemybar.RED_MIN_COLUMNS,
             ),
-            "columns": "块里**量到的条身那几行**逐列取中位色，离这一族参考色的逐通道最大差 <= %d 的列算作填充段"
-            % enemybar.SCREEN_TOL,
+            "columns": "块里**量到的条身那几行**逐列取中位色，离这一族参考色的逐通道最大差 <= SCREEN_TOL=%d 的列算作填充段，"
+            "中间容 FILL_GAP=%d 列不亮（抗锯齿、一根窄遮挡）。**填充段列数**就是容得下那个缝的数："
+            "干净 -> Exact · 右边还接着亮（没读到右端）-> LowerBound；**列数这一支不看缝**"
+            "（缝底下是半透明遮挡压出来的，那几列算进这一段）—— 缝只压低它的**余量**"
+            % (enemybar.SCREEN_TOL, enemybar.FILL_GAP),
             "body": "条身**按量到的行数**（不写死 8）：自那一块的行起，上下扩到「填充段那几列的中位色不再像这一族参考色」为止，封顶 MAX_BAR_ROWS=%d。"
-            "每一根报出来的高（EnemyBar.rect）就是这个**量到的行数**，不是常量 BAR_ROWS=%d"
-            % (enemybar.MAX_BAR_ROWS, enemybar.BAR_ROWS),
+            "每一根报出来的高（`EnemyBar.fill_rect.height`）就是这个**量到的行数**；它**比这一档更高**时"
+            "（小怪 MOB_BODY_ROWS=%d / boss BOSS_BODY_ROWS=%d）这一根落 `unsampled` —— 跨档校验**只拦更高的那一头**"
+            % (enemybar.MAX_BAR_ROWS, enemybar.MOB_BODY_ROWS, enemybar.BOSS_BODY_ROWS),
             "exits": "分数 = 1 - 颜色距 / 255；>= 1-%d/255 为在，<= 1-%d/255 为不在，中间为未采样"
             % (enemybar.SOLID_TOL, enemybar.ABSENT_TOL),
             "rectangle": "矩形：每一列都亮着的那几行（条身）要装下整块的 >= %s 像素；"
             "内部均匀：那 8 行逐行取中位色，通道极差 <= %d"
             % (enemybar.RECT_FILL_MIN, enemybar.RECT_ROW_SPREAD_MAX),
-            "short": "填充段短于 MIN_FILL_COLUMNS=%d 的候选**照样报在**，比例落未采样"
+            "unsampled": "`unsampled` 那一栏落的是**未采样**（`Unsampled()`）：那一根确实"
+            "有东西、但**填了多少读不出来** —— 填充段短于 MIN_FILL_COLUMNS=%d（条照报在、"
+            "列数照量），或者条身行数比这一档更高。它与 `clumps` 是两件事"
+            "（一堆 = 知道那一坨在哪、多大、至少几只）"
             % enemybar.MIN_FILL_COLUMNS,
-            "track": "整长 = 填充段 + 空轨。量空轨时与条身之间空 TRACK_EDGE_GAP=%d 行；空轨的判据：这一列自己暗（亮度 <= TRACK_DARK_LINE=%d）时**逐通道**比、上下**任一侧**差 > TRACK_CONTRAST=%d 就算，否则与上下两块地形的**均值**两侧都差 > %d 才算。**终止**：连着 TRACK_GAP+1 列都不够远就停"
-            % (
-                enemybar.TRACK_EDGE_GAP,
-                enemybar.TRACK_DARK_LINE,
-                enemybar.TRACK_CONTRAST,
-                enemybar.TRACK_CONTRAST,
-            ),
-            "fill": "填充比例 = 填充段 / 整长，按四支落形态：填充段中间被切断 -> LowerBound；空轨尾巴是软的 -> Interval；空轨量到上限 -> Interval；"
-            "**空轨是跨过回落才量完的（走到那儿得先跨过几列「不是轨道」） -> LowerBound** —— 分母不是连着量出来的，"
-            "真整长只可能更短、真比例只可能更大，所以只给下界；其余 -> Exact",
+            "dial": "分母是**按族查表的两档常量**：橙族 -> 小怪档 MOB_FILL_COLUMNS=%d、"
+            "红族 -> boss 档 BOSS_FILL_COLUMNS=%d（都是**画布宽 2800 下的绝对像素**；别的分辨率未验，"
+            "见模块开头「分辨率」那一节）。运行时**不量轨道**：比例 = 填充段列数 / 那一档的满条长"
+            % (enemybar.MOB_FILL_COLUMNS, enemybar.BOSS_FILL_COLUMNS),
+            "fill": "填充比例 = 填充段列数 / 那一档的满条长，按四支落形态：填充段短于 "
+            "MIN_FILL_COLUMNS=%d -> 未采样；条身行数**比这一档更高** -> 未采样（跨档校验）；"
+            "填充段中间有缝、或者右边没到头 -> LowerBound(缝前那一截 / 满条长)；其余 -> Exact"
+            % enemybar.MIN_FILL_COLUMNS,
             "exclusion": "一块踩在我方血条那 8 行、或者紧贴它下面第 %d 行的技力条那 8 行上（行差 <= %d）且列范围夹在我方那一格里（列差 <= %d） -> 剔掉"
             % (enemybar.SKILL_ROW_OFFSET, enemybar.ROW_SLACK, enemybar.COL_SLACK),
             "merge": "同一行带上、中间那几列更靠近填充色（半透明遮挡压出来的混色）的两块接回一根条",
-            "count": "条数：都分得开给 Exact；分不开的给 LowerBound（同一条带里相邻两根的整长交叠或相接、"
-            "或中间至少有一列是混色 -> 那两块只算一根）。**分不开的不报精确**，也不高报",
+            "clump": "「一堆」（`clumps`）：**分不开**（同一条带里相邻两根的填充交叠 / 相接 / 中间至少有一列是混色）"
+            "或者**填充总列数 > 那一档的满条长** -> 整坨报成**区域 + 至少几根 + 填充总列数**，"
+            "**不给单根比例**。**按族归组、不许跨族**（所以每一堆都带 tier）。"
+            "填充总列数 = 组里各根的填充段列数**相加**：组里有一条没读到右端 -> LowerBound、否则 Exact；"
+            "至少几根 = ceil(填充总列数 / 这一档的满条长)，落 LowerBound —— **只是下界**，"
+            "**上界由状态层拿账配、不从像素来**",
+            "count": "条数：**一堆都没有** -> Exact(逐根 + 未采样的那些)；有一堆 -> LowerBound(逐根 + 未采样 + "
+            "各堆的「至少几根」之和)，**两边不打架**。**这一支永远不高报**"
+            "（分不开的整坨只按 ceil(填充总列数 / 满条长) 贡献）",
         },
         "field": {"rows": [enemybar.FIELD_TOP, enemybar.FIELD_BOTTOM]},
         "reads": reads,
@@ -247,6 +300,19 @@ def run_batch(root: pathlib.Path) -> None:
                 )
                 for item in reads
             ),
+        )
+    )
+    print(
+        "[%s] 三栏：%s"
+        % (
+            root.name,
+            " · ".join(
+                "%s bars=%d clumps=%d unsampled=%d"
+                % (item["name"], len(item["bars"]), len(item["clumps"]), len(item["unsampled"]))
+                for item in reads
+                if item["bars"] or item["clumps"] or item["unsampled"]
+            )
+            or "（这一批三栏都空）",
         )
     )
     print("[%s] 落盘：%s" % (root.name, (root / REPORT_NAME).relative_to(REPO)))

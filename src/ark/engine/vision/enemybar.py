@@ -1,5 +1,5 @@
 
-"""敌人血条：**整张战场上一次筛完**，逐根报填充比例。
+"""敌人血条：**整张战场上一次筛完**，报**逐根的填充比例**、**拆不开的那一堆**与**未采样**。
 
 《视觉层/敌方单位》管这一层。它只回答一件事：**这一帧画面上看得见几根敌人血条、
 各自填了多少**。
@@ -23,7 +23,7 @@
 
 1. **色相**：逐像素离 ENEMY_FILL 的逐通道最大差 <= SCREEN_TOL 的那些像素；
 2. **形状**：只留**竖着连成 8 行**的像素（血条高 8 行，见 BAR_ROWS）；再按连通块取
-   宽 >= MIN_FILL_COLUMNS、高 <= MAX_BAR_ROWS 的块；
+   宽 >= MIN_CANDIDATE_COLUMNS、高 <= MAX_BAR_ROWS 的块；
 3. **逐列比色**（与我方血条那条链**同一个口径**，只是参考色换了）：块里那一 8 行
    逐列取中位色，离 ENEMY_FILL 多远 —— 这就是这一块的颜色分。
 
@@ -53,8 +53,9 @@
 条有两族颜色：**橙**（小怪那一档，`ENEMY_FILL`）与**红**
 （**只有 boss**，`ENEMY_FILL_RED` —— 用户裁定：红条的敌人只有 boss 那一档）。
 红族**做窄的**，不是「所有偏红的都收」—— 所以它除了那一支参考色，还多一道
-**宽度门** `RED_MIN_COLUMNS`：boss 是**宽**的（实测 116 列），而红族最像条的
-假阳性（`boss.png` 那一帧红门上的红色碎块）只有 18…32 列。
+**宽度门** `RED_MIN_COLUMNS`：boss 是**宽**的（那一档满条长 `BOSS_FILL_COLUMNS`
+是 154 列），而红族最像条的假阳性（`boss.png` 那一帧红门上的红色碎块）只有
+18…32 列。
 
 ## 形状门：候选必须是**矩形 + 内部均匀**
 
@@ -81,47 +82,108 @@
 **「在门以下」不是通往「不在」的一条路**：颜色说它是条就报「在」，颜色说不清
 是不是条就落**未采样**，只有颜色说它**不是**条才是「不在」。
 
-## 填充比例：**整根条** = 填充段 + 空轨，逐根量
+## 比例：**分母是常量，不是画面上量出来的那一截**
 
-与我方血条同源：**逐列比色 + 空轨判断**。区别只有一条 —— 我方血条的整长是常量
-（146），而敌人条的整长**要看敌人**（实测小怪那一档量到 122…123，raw_b 那根精英
-量到 `154），所以整长只能**量**：
+**血条长度只有两档**（用户 10-15 的裁定）：
 
-- **填充段**：自左缘起连续算作填充的那些列（容 `TRACK_GAP` 列，与我方条同一支）；
-- **条身**：**按量到的行数**，不写死 8（见 `_body_rows`）—— 小怪与红门那些整齐的块是
-  8 行，boss 那根红条是 **10 行**，`raw_b` 上那根是 9 行；
-- **空轨**：填充段右边那一段**与它上下那两块地形都不一样**的列 —— 有**偏暗**的
-  （raw_a：带内 43 而上下 65），也有**偏亮**的（raw_b：一段纯灰 177 而上下 74）。
-  所以判据取「上下两侧**都**差得够远」，不是「更暗」；量那两段地形时**与条身之间
-  空 TRACK_EDGE_GAP 行**（条的上下边是软的，贴着的那一行还是条自己）；
-  量到的那一列**自己就暗**（亮度 <= TRACK_DARK_LINE）时换一支：**逐通道**比、
-  上下**任一侧**够远就算 —— 暗底那一族里轨色会与它一侧的地形长得一样，
-  两侧都要会系统性答成「没有空轨」（见 TRACK_DARK_LINE）；
-- **整长 = 填充段 + 空轨**。填满时没有空轨，整长就等于填充段 —— 实测
-  `screenshots/_probe.png` 那根满条就是这样（123 列，右邻一列回到地形）。
+| 档 | 谁 | 满条长（列） | 条身（行） |
+| --- | --- | --- | --- |
+| **小怪档** | **所有小怪**（含精英、经验怪）—— 橙族 | `MOB_FILL_COLUMNS = 123` | `MOB_BODY_ROWS = 8` |
+| **boss 档** | **只有 boss** —— 红族 | `BOSS_FILL_COLUMNS = 154` | `BOSS_BODY_ROWS = 10` |
 
-**遮挡按「下界」降级**：填充段中间被切断（缝两边都还亮着）时，缝底下藏着什么
-看不见，所以只能说「**至少**缝之前那一截」—— 与我方血条那条链的 LowerBound
-同一套纪律，不另立一套。
+**用哪一档看族、不看类型**：橙族走小怪档、红族走 boss 档（见 `_Family`）。比例 =
+**填充段列数 ÷ 那一档的满条长**。
 
-**整长量得不干净时，比例也不许报「精确」**：量空轨的那一趟容得下跨过
-`TRACK_GAP` 列回落（顶着一条半透明的边时那是常态），可**只要跨过过**，
-那个「整长」就不是**连着**量出来的 —— 它可能多吃了一截地形，于是分母偏大、
-比例偏小。这时给的是 **`LowerBound(填充 / 整长)`**（真整长只可能更短，真比例
-只可能更大，所以量到的这一个正是**下界**），不是 `Exact`。**理由**：分母是
-**量**出来的；量得不干净还说「精确」，就是把「不知道」写成了「知道」。
-软尾那一支（边界落在末尾几列弱差里）给的是**区间**，信息比下界多，所以先走它。
+**分母不来自画面** —— 这是这一版最大的一处改动，理由是一条实证：没填到的那一截
+（半透明暗带）压在**任意背景**上，背景暗它就量不到，于是「拿它当分母」会读出一堆
+互不相容的数 —— 实测同一屏里量到过 **73 / 117 / 122 / 127 / 129** 五种宽度、
+互叠时量到 **9 行**、`S8-3-4` 沿集装箱一路走满 200 列上限。**那条路整个退役**
+（原来量空轨的那几个常量、连同 `_track_end` / `_off_terrain` / `_band_median`
+三个私有件、以及「量到上限」那一支都已删掉）。而「填了多少」**不需要**那个分母：两档长度是反推
+出来的**常量** —— 各自的依据写在它们自己的 docstring 里。
 
-## 条数：分不开时给**下界**，不给精确
+## 填充段：怎么起、怎么止（可复核）
 
-叠在一起的条**不要求数清**（用户 10-14 裁定：**尽力而为，而不是一定要全识别
-出来**）—— 那是**信息本身不在画面上**。所以这一层的输出是两件：`bars`（逐根，
-每根带 `separated`）与 `count`。
+- **左端**：候选块的左缘 —— 条只可能从自己的左缘开始填；
+- **右端**：在**量到的条身那几行**上逐列取中位色，离这一族参考色的**逐通道最大差**
+  <= `SCREEN_TOL` 的**最后一列**；中间容 `FILL_GAP` 列不亮（抗锯齿、一根窄遮挡）；
+- **那道容差跨过过**（`strict < tolerant`）或填充段右边**还接着亮**（`_resumes`）
+  ⇒ 填充段**被切断**，缝底下藏着什么都看不见 ⇒ 只给
+  `LowerBound(严格那一段 / 满条长)`（与我方血条那条链同一套纪律，不另立一套）；
+- **填充段短于 `MIN_FILL_COLUMNS`** ⇒ 条照报「在」、填充列数照量（是这两支里唯一
+  读得出列数的那一支），**填了多少读不出来** ⇒ 这一根落 `unsampled`（见「三样
+  读法」那一节）；
+- **填充段长过这一档的满条长** ⇒ 这一根（连同它那一组）落成**一堆**（见「三样
+  读法」那一节），**不给单根比例**；
+- **条身行数比这一档更高** ⇒ 这一根落 `unsampled`（防「橙条 boss」那一道便宜的
+  跨档闸门；**它只拦更高的那一头**，矮一点的不拦）。
 
-**分不开的一堆只算 1 根**：`LowerBound(k)` 里的 `k` 只数确实互相分得开的那些，
-所以这一支**永远不高报**；分得开才给 `Exact`。**把分不开的报成精确正是这一支
-要挡的那件事**（条数报多了，下游会以为还有更多的敌人；报精确了，下游就没法
-知道这个数只是个下限）。
+**可复核的两个点**（都在夹具里）：`raw_a` 那两根的填充段都是 **84 列**
+（x1320…x1403 的中位色 (220,109,57)；x1404 是 (87,102,83)，逐通道差 132 > 34）
+⇒ 84/123 = **0.6829**，与画面上量出来的约 0.683 对上；`在_raw_b_下` 那根 **57 列**
+⇒ 57/123 = 0.4634 —— 它右边那 28 列**白条**是「这一下掉了多少血」的打击感展示，
+**一列都不算进去**（用户 10-15 的裁定）。
+
+## 分辨率：两档是**画布宽 2800 下的绝对像素**
+
+两档常量都写成**原生画布 2800×1260 下的列数**，与 `field.BAR_WIDTH = 146` 同一个
+规矩（都是常量分母，都不是从画面上量的）。**不写折算公式**：现有素材**全是
+2800×1260**，别的分辨率**一个样本都没有** ⇒ 折算系数**未验**。
+若将来出现别的分辨率，按 **`canvas.width / 2800`** 折算 —— 理由是**画布就是屏幕**
+（《契约层》§2：画布 = 捕获分辨率本身，不缩放），游戏 UI 按屏幕排；**不拿战场区
+宽当基准**：那是**这条链自己划的窗**，游戏不知道它存在。
+
+## 三样读法：逐根 / 一堆 / 未采样（用户 10-15 的裁定）
+
+这一层的输出是**三栏并列**，一眼分得开：
+
+| 栏 | 是什么 | 带什么 |
+| --- | --- | --- |
+| `bars` | **逐根**读得出来的 | 填充段列数 + 比例（各自带**形态**与**余量**） |
+| `clumps` | **一堆**：挤在一起、拆不开的那一坨 | **区域** + **至少几根** + **这一坨的填充总列数** |
+| `unsampled` | 那一根确实有东西、但**填了多少读不出来** | 位置 + 那两项读数（都落未采样） |
+
+三栏**互斥**，合起来正好是颜色说「是条」的那些块。**「一堆」与「未采样」是两件
+事**：未采样 = 那里有东西、连填充都读不出来；一堆 = 知道那一坨在哪、多大、至少
+几只。**一堆里没有单根比例**（硬给就是编）。
+
+**判「一堆」用的是已经有的那两条**（不新立一套）：
+
+1. **分不开**：同一条行带里相邻两块，填充段交叠 / 相接，或者中间夹着**混色**列
+   （`_inseparable` —— 就是原来把条数降成下界的那件事）；
+2. **填充总列数长过这一档的满条长**：一根条的填充不可能长过它那一档的满条长
+   （`raw_b_上` 那 130 列就是这一支）。
+
+**按族归组，不许跨族**：一堆里的成员**同一族**，否则「至少几根」要除以哪一档的
+满条长就说不清。所以每一堆都带 `tier`（小怪 / boss）。
+
+**「至少几根」= 算术下界**：`ceil(这一坨的填充总列数 / 那一档的满条长)`。
+**条数的上界不从像素来** —— 像素只能给下界；上界由状态层拿**账**配（这一关还该有
+在场几只）。**别在像素上找上界。**
+
+**「这一坨的填充总列数」是那个读得准的数**（它换算过来就是「这一堆怪**加起来**
+还剩多少血」，止损就靠它）。它**自己带形态**：干净 ⇒ **精确** · 右边被盖住 ⇒
+**下界**。**「至少几根」跟着它算**，所以两边不打架：`count` 的下界**等于**逐根
+那几根 + 各堆的「至少几根」之和。
+
+**一条读数各自一份形态与余量，但没有总分。** 每条读数（单根的列数 / 比例、一堆的
+总列数 / 至少几根）各自落 精确 / 下界 / 区间 / 未采样 里合适的那一档，各自带一个
+**余量**（「定下这次读数的两侧离判据的门有多远」，量出来的、单调的）。**这一层
+没有「置信度 / 可信度 / 相似度」这种 0–1 总分**：叠条这一档全库只有两三帧，标不出
+一个有意义的分数，而一个分数还会把「往哪个方向不确定」丢掉（「**至少** 90」与
+「90 **上下差 3**」是两件事）。下游若只要一个标量，**让它自己从「形态 + 余量」算**。
+
+**这一版产不出「区间」，这里如实记着**：单根只产 精确 与 下界 两支（干净 / 有缝
+或右边没到头），求和之后还是这两支 ⇒ `Interval` 那一档**没有来路** —— 单 7 把
+「软尾」那一支连同量轨道整个退役了。**不为了让它出现而新造一个判据。**
+
+**分不开的一堆只算起 1 根**：`LowerBound(k)` 里的 `k` 是一堆一堆加起来的下界，
+所以这一支**永远不高报**；**把分不开的报成精确正是这一支要挡的那件事**（条数报多
+了，下游会以为还有更多的敌人；报精确了，下游就没法知道这个数只是个下限）。
+**那道便宜的算术门的代价如实说**：填满那一档的条右邻若正好有几列「看起来像填充
+色」的地形，那几列会把填充段读长，于是这一支也会报出 >= 2 —— 它只在**填充段本身
+读长了**的时候误报，而那种时候画面自己也说不清那几列是不是填充（用户 10-15 认了
+这个代价，不做更贵的形式）。
 """
 
 from __future__ import annotations
@@ -134,7 +196,6 @@ import numpy as np
 
 from ark.contracts import (
     Exact,
-    Interval,
     LowerBound,
     PixelRect,
     SlotValue,
@@ -149,7 +210,12 @@ __all__ = [
     "screened_cores",
     "ScreenedCore",
     "EnemyBar",
+    "EnemyClump",
     "EnemyBars",
+    "Reading",
+    "BarTier",
+    "MOB_TIER",
+    "BOSS_TIER",
     "ENEMY_FILL",
     "ENEMY_FILL_RED",
     "SCREEN_TOL",
@@ -164,11 +230,11 @@ __all__ = [
     "BAR_ROWS",
     "MAX_BAR_ROWS",
     "MIN_FILL_COLUMNS",
-    "TRACK_CONTRAST",
-    "TRACK_EDGE_GAP",
-    "TRACK_DARK_LINE",
-    "TRACK_GAP",
-    "MAX_BAR_COLUMNS",
+    "MOB_FILL_COLUMNS",
+    "BOSS_FILL_COLUMNS",
+    "MOB_BODY_ROWS",
+    "BOSS_BODY_ROWS",
+    "FILL_GAP",
     "FIELD_TOP",
     "FIELD_BOTTOM",
     "ROW_SLACK",
@@ -243,6 +309,14 @@ ABSENT_SCORE: Final[float] = 1.0 - ABSENT_TOL / 255.0
 """分数 = 1 - 颜色距 / 255 的那条下线。"""
 
 BAR_ROWS: Final[int] = 8
+"""形状门那一步「竖着连成几行」：**8**。它同时是**小怪档**的条身行数。
+
+**为什么门取 8**：小怪那一档的条实测就是 8 行（`MOB_BODY_ROWS`），而地貌那些
+「红扁条」在颜色门里只剩 4…6 行 —— 8 正好掐在这一段空档上。**boss 那一档是 10 行**
+（`BOSS_BODY_ROWS`），它照样过得了这道门（连通块高 10 <= `MAX_BAR_ROWS`，
+`_band_row` 在那 10 行里滑一个 8 行的窗）。所以这一道门**不是**「一根条有多高」
+的判据，只是「竖着连不够长的整片消失」。
+"""
 """一根敌人条的高（行）。**实测**：全库筛出来的每一块都是 8 行。
 
 （`raw_b` 那一带有两块是 9 行，那是抗锯齿多出来的一行，不是「一根更高的条」。）
@@ -312,93 +386,85 @@ RECT_ROW_SPREAD_MAX: Final[int] = 20
 **为什么不按逐列极差设门**：那一支真条能到 **34**（被压过的那些），而假阳性
 41 起 —— 空档只有 7，当不了门。
 """
-TRACK_CONTRAST: Final[int] = 12
-"""空轨那道门：**条身那几行**（按量到的，见 `_body_rows`）的中位色均值，离**它上面
-那几行**与**它下面那几行**的均值，**两侧都要**差过这个数，才算「这一段不是地形」。
+MOB_FILL_COLUMNS: Final[int] = 123
+"""**小怪那一档**的满条长（列）。比例的分母：填充段列数 / 123。
 
-**这个数也取在空档里**（量出来的）：
+**谁算小怪**：**所有小怪** —— 含精英、经验怪（用户 10-15 的括注）。用哪一档
+**看族**（橙族 = 小怪档），**不看类型**。
 
-- **不是空轨**这一侧：平地上两侧差 **0…5**；条自己那道**很软**的尾巴差 **6…8**
-  （`raw_a` 那根条的 x1799…1822，两侧都差 6…8）—— 最大 8；
-- **是空轨**这一侧：偏暗的那一段差 **20…32**（raw_a x1761…1798），
-  偏亮的那一段差 **100 以上**（raw_b x1676…1684 那段纯灰）—— 最小 20。
+**它是自己反推出来的**（规划者没把数发下来），三条独立的手：
 
-所以空档是 **8…20**，线取 12，两侧余量 **4 与 8**。取 12 而不是取 8 的用处，
-恰恰是**不把那道软尾巴算进整长**：算进去整长会多 24 列，比例就从 0.69 掉到 0.57。
+1. **一根满条**：`screenshots/_probe.png` x648 y395 那根填了 **123 列**，而紧挨着的
+   下一列 **x771 就是背景本身** —— (43,47,50)，与它正下方那段地形 (41,44,46)
+   逐通道差 <= 4。**这根条没有「没填到的那一段」**；
+2. **全库的天花板**：`screenshots/**` 与 `data/precheck/**` 里 **167 张 2800x1260**
+   的帧整张筛一遍，橙族一共 **131 块**，填充列数的顶上是 **123 列 × 11 块**，横跨
+   5 帧：`_probe.png` x648/x1790/x2088/x1630、`run-01` 那三帧 shot_...202939-929
+   x1989/x1039、shot_...202959-919 x2262/x2373、shot_...203049-920 x1069/x2101、
+   以及 `special_带弹药机制的有竖线间隔的橙色技能条.png` x2083。比它长的只有两块，
+   **都不是条**：154 列（`敌条互叠1` x1628，两根的填充接在一起）与 125 列
+   （`hard_多个技能条紧挨着` x2019，餐厅界面里的橙条）；
+3. **同一档「没填到的那一段」**：`run-06/快死的敌人` x1506 那根填充只有 **7 列**，
+   它后面那段带子（比上下两块地形都暗 >= 8）**到 x+122 为止** —— 正好 123 列。
+
+**第 2 条里那 11 块「到头了」怎么判**：9 块的**下一列就是背景**（与上下地形差
+<= 10，多半 <= 5）；剩下 2 块（`_probe.png` x2088 / x1790）的下一列确实更暗，但把
+那一段的纵向剖面拉出来看，**暗区不是只占条身那 8 行**（x2088 是 12 行、往条身下面
+多出 4 行，混进地形自己的暗区），x1790 是地形自己的亮/暗交界 —— **都不是「没填到的
+那一段」**。若这一档真长过 123，那 11 根填到 123 的条**每一根**都该在 x+123 起露
+出一段暗带；实际只在 2 根上看到，而那两处都有别的解释。
+
+**交叉验证**：`raw_a` 那两根的填充段都是 **84 列** ⇒ 84/123 = **0.6829**，与画面上
+量出来的约 0.683 对上。
 """
 
-TRACK_EDGE_GAP: Final[int] = 1
-"""量空轨时，条身与「借来当地形的那几行」之间**空一行**。
+BOSS_FILL_COLUMNS: Final[int] = 154
+"""**boss 那一档**的满条长（列）。红族比例的分母：填充段列数 / 154。
 
-一根条的上下边是**软的**（抗锯齿 + 半透明）：贴着条身的那一行常常还是条自己的颜色。
-实测最要紧的一处是 boss 那根红条 —— 它 **10 行**（y1002…1011），而 y1001 与 y1012
-**还是那条轨**（(45,43,41)），真正的地形从 y1013 才开始。不留缝的时候，`_off_terrain`
-的「上面」那一窗（y992…1001）把 y1001 那道轨算了进去、中位色被拉低到 (48,46,43)，
-与轨色 (45,44,42) 只差 **2** —— 空轨当场量不到，整长 = 填充段。
+**用哪一档看族**：红族 ⇒ boss 档（用户 10-15 的裁定 —— 也就是 10-14 那条「红条
+只有 boss」的另一面）。**这个数按用户 (c) 记账** —— 认，但把来路记清楚：
 
-**1 行就够**（量出来的）：条的软边实测就是 1 行 —— `在_压住干员` 那根的 y700 与
-y709、`raw_b` 上那根的 y489 都还是条自己，再往外才是地形。留 2 行会把
-`在_压住干员` 那根的软尾从 4 列算成 12 列，比例形态从**区间**掉成**精确**
-（那一支本来不敢给精确数）。
+1. **红族全库只有这一根真值**：167 帧里红族的真条就 `screenshots/run-06/boss.png`
+   x1562 那一根（另有 4 块是红门上的地形碎块、一块是界面的红条，都不算）；
+2. **那次标定借了「量轨道」这条已经退役的路**：那根红条**不是满的**（填充 115 列），
+   所以要拿它右边那段暗带 (45,44,42) 的右端当满条长 —— 那段带子到 x1715 为止、
+   条从 x1561 起（填充从 x1562 起）⇒ **154**；
+3. **`123 × 1.25 = 153.75` 与 `条身 8 行 × 1.25 = 10 行` 是同一条旁证**、而且落在
+   同一根条上，**不是两次独立验证**。
+
+⇒ **将来出现第二根 boss 条、或者一根满的红条时复核这个数。运行时不量轨道**：
+红族比例 = 填充列数 / 154。
 """
 
-TRACK_DARK_LINE: Final[int] = 55
-"""**暗底地形**上量空轨的开关：这一列自己的亮度 <= 55 就换一支量法。
+MOB_BODY_ROWS: Final[int] = 8
+BOSS_BODY_ROWS: Final[int] = 10
+"""两档的**条身行数**：小怪 8 行、boss 10 行（`_body_rows` 量出来的）。
 
-**为什么非有它不可**（量出来的）：空轨是**半透明压暗** —— 它压在地形上，地形暗它就暗。
-所以**地形本身很暗**那一族里，轨色会与它一侧的地形**长得几乎一样**：
+**小怪 8 行**：全库筛出来的每一块小怪条都是 8 行（`raw_b` 那一带有两块量到 **9 行**，
+那是抗锯齿多出来的一行 —— 它**过得了**跨档校验那一关，见下）。
 
-| 那一根（画布坐标） | 轨色 | 上面地形 | 下面地形 | 逐通道最大差 |
-| --- | --- | --- | --- | --- |
-| `在_boss_红宽条` x1677（红条） | (45,44,42) | (48,46,43) | (69,67,63) | 上面只有 **3**、下面 24 |
-| `在_boss_红宽条` x1632（24 列） | (25,18,20) | (92,24,26) | (30,28,30) | 下面只有 **10**、上面 67 |
-| `在_boss_红宽条` x1690（24 列） | (12,10,9) | (35,10,8) | (15,14,11) | 上面 23、下面 **4** |
+**boss 10 行**：`boss.png` 那根红宽条 y1002…1011 —— 10 行。它与 `BOSS_FILL_COLUMNS`
+的 **1.25 倍**是**同一条旁证**（都在同一根条上），别当成两次独立验证。
 
-「两侧都要差够远」在这一族上会**系统性答成「没有空轨」**（整长 = 填充段），
-而那正是那两根读成 1.0 的成因。所以**这一列自己就暗**时换一支：
-
-1. **逐通道**比（`|差|.max()`）—— 上面 x1690 那一行，逐通道是 23，而三个通道的
-   **均值**只差 7.3（红的差 23、绿蓝几乎不变），均值那一支会把轨道漏掉；
-2. 上面、下面**任一侧**够远就算 —— 另一侧与轨色重合是这一族的常态。
-
-**55 取在量出来的空档里、并往暗那一侧靠**：
-
-- **必须走这一支**的那些列，亮度实测 **10…45**（最松的是那根 24 列的 x1682 / x1684，
-  两个都是 44.7）；
-- **必须不走**这一支的最近样本是 `在_压住干员` 里那根绿技力条，亮度 **100**
-  —— 它离下面那块地形只差 1，当场停下，那一帧的读数与单 5 **逐位相同**
-  （区间 0.7143…0.8824）。
-
-所以空档是 **45…100**，线取 55：下留 **10**、上留 **45**。**故意往暗那一侧靠** ——
-亮底走的 min 那一支是**严**的那一支（地形与自己差 0，天然停得住），暗底走的 max 那一支
-是**宽**的那一支，线压低一点，宽的那一支就少盖几列。
-
-**亮底那一族走的还是原来那一支量法**（带内均值 vs 上下均值、取小的那个）；
-`raw_a` 左那根从 125 涨到 129 是**取哪几行**改了（条身量到的 + 空 1 行），不是这一支改了。
-
-**暗底那一支只有一个真值条件**：这一批里「轨色与一侧地形重合」只被 boss 那两根验过，
-而且是同一帧、同一块机甲脚 —— 别的暗底（暗地板、夜里、阴影里）**零**。这一条
-如实写在夹具 README 的缺口里。
+**它们是一道便宜的跨档校验**（用户 10-15 给的查法）：**选档仍按族**，可某一根
+**量到的条身行数与它那一档对不上**时，那一根**不给精确比例**（落未采样）——
+防的是「橙条 boss」那一类：一根橙色的条若其实是 boss 档（10 行 / 154 列），
+拿橙族的 123 当分母就会系统性报高。**代价如实说**：`_body_rows` 在小怪那一档上
+本来就会量到 9 行（抗锯齿），这一支会把那些根的比例一起降成未采样 —— 但它
+**只降不升**，不会把「不知道」写成「知道」。
 """
 
-TRACK_GAP: Final[int] = 2
-"""跨过「看起来像地形」的那几列时，最多连续放几列（填充段与空轨**共用**这一个数）。
+FILL_GAP: Final[int] = 2
+"""填充段里最多连续放几列不亮（抗锯齿列、一根窄遮挡）。
 
-与我方条那一支同一个用处：填充段里的抗锯齿列、空轨里的 1 列杂色，不该把一整段
-判成「到此为止」。`raw_b` 那根条正中间就有**1 列**被压暗（x1577 上那一条竖线）——
-1 这一档刚好跨不过去，整长会从 130 掉到 98。**它跨不过缝**：真正被压断的那一档
-由 LowerBound 接。
+**它现在只服务「填充段到哪儿为止」这一件事** —— 原来这个数与空轨共用，空轨退役
+之后只剩填充段这一头。`raw_b` 上那根条正中间就有 **1 列**被压暗（x1577 上那条
+竖线）—— 所以容差至少要 1。
 
-**为什么是 2 而不是 3**：3 起，地形自己的杂色（一根条右邻那片地上零星的「不是地形」
-列）会把整长一路推出去 —— 实测 `raw_a` 那两根会从 124/125 推到 131/131，
-而它们画面上的整长是 122…123（同批 20 根满条量到的众数就是 123）。
-"""
-
-MAX_BAR_COLUMNS: Final[int] = 200
-"""一根条整长的上限：量到这个宽度还没到头，就当「到头了也不知道」。
-
-实测最长的整长是 raw_b 那根 `154。200 是它的余量，也是搜索窗的上限 ——
-没有它，一次量错就会把整张战场扫穿。
+**为什么是 2 而不是更大**：3 起，地形自己的杂色（一根条右邻那片地上零星的「看
+起来像条色」的列）会把填充段一路推出去 —— 原来量整长的时候实测 `raw_a` 那两根
+会从 124/125 推到 131，而它们画面上的填充段只有 84 列。**那两个数都是从旧那条路
+上量出来的**，这里如实记着（空轨那一头已经退役）。
 """
 
 FIELD_TOP: Final[int] = 100
@@ -434,11 +500,64 @@ COL_SLACK: Final[int] = 4
 
 
 @dataclass(frozen=True)
-class ScreenedCore:
-    """筛出来的一块**填充段**（还没量空轨）。
+class BarTier:
+    """血条长度的那一档。**一堆要能看出它是哪一档**，靠的就是这个。
 
-    - `rect`：这一块的 8 行矩形（左上角 + 宽 8 高）；
-    - `distance`：它的**中位色距**（逐列中位色离 ENEMY_FILL 的逐通道最大差，
+    | 档 | 谁 | 满条长（列） | 条身（行） |
+    | --- | --- | --- | --- |
+    | **小怪档** | **所有小怪**（含精英、经验怪）—— 橙族 | `MOB_FILL_COLUMNS` | `MOB_BODY_ROWS` |
+    | **boss 档** | **只有 boss** —— 红族 | `BOSS_FILL_COLUMNS` | `BOSS_BODY_ROWS` |
+
+    `full_columns` 是比例的分母（按族查表，**不来自画面**）；`body_rows` 是这一档
+    条身的行数（跨档校验用）。**用哪一档看族、不看类型**（见 `_Family`）。
+    两档常量各自的来路写在它们自己的 docstring 里。
+    """
+
+    name: str
+    full_columns: int
+    body_rows: int
+
+
+MOB_TIER: Final[BarTier] = BarTier("小怪", MOB_FILL_COLUMNS, MOB_BODY_ROWS)
+BOSS_TIER: Final[BarTier] = BarTier("boss", BOSS_FILL_COLUMNS, BOSS_BODY_ROWS)
+"""两档常量（用户 10-15 定稿：执行者反推 + 规划者独立复核）。
+
+**它们的来路**在 `MOB_FILL_COLUMNS` 与 `BOSS_FILL_COLUMNS` 的 docstring 里 ——
+boss 那一档按用户 (c) 记账（红族全库只有一根真值、且那根不满）。
+"""
+
+
+@dataclass(frozen=True)
+class Reading:
+    """一条读数：**值（形态就长在值自己身上）** + **余量**。
+
+    `value` 是 `SlotValue`：`Valued(Exact / LowerBound / Interval)`，或者
+    `Unsampled()`（这一条读不出来）。
+
+    `margin` 是「**定下这次读数的两侧离判据的门有多远**」（0…1，量出来的、单调的，
+    口径与 `_fill_confidence` 一模一样）—— **不是概率、不是置信度、不是总分**：
+    `Valued.confidence` 里带的是同一个数（那是原语算出的连续量），这里再摆一份是
+    因为下游要拿它算自己的阈值。`None` = 这一条不是读出来的（比如「至少几根」是
+    除法算的）。
+
+    **一条读数各自一份余量**（用户 10-15 的裁定 3）：单根上「填充列数」与「比例」
+    各有各的余量 —— 有缝的那一根两者不一样（见 `_measure`）。
+
+    **这一层没有 0–1 的总分**（理由见模块开头「三样读法」那一节）。
+    """
+
+    value: SlotValue
+    margin: float | None
+
+
+@dataclass(frozen=True)
+class ScreenedCore:
+    """筛出来的一块**填充段**（候选那一步量到的）。
+
+    - `fill_rect`：这一块**填充段**的矩形（左上角 + 填充列数 + `BAR_ROWS` 高）。
+      **名字里那个 fill 是承重的**：空轨退役之后，这一块的宽就是**填充段列数**，
+      把它叫 `rect` 会让人以为它是「整根条」；
+    - `distance`：它的**中位色距**（逐列中位色离这一族参考色的逐通道最大差，
       取这一段的中位）；
     - `masked`：它是不是**被我方条的位置挡掉**的那一块（调用方给的 `our_bars`）。
 
@@ -446,7 +565,7 @@ class ScreenedCore:
     与「那里什么都没有」是两件事**，混掉就是把排除做成了否认。
     """
 
-    rect: PixelRect
+    fill_rect: PixelRect
     distance: int
     masked: bool
 
@@ -458,57 +577,105 @@ class ScreenedCore:
 
 @dataclass(frozen=True)
 class EnemyBar:
-    """一根敌人条：**整根**的矩形 + 填充比例 + 它跟旁边分不分得开。
+    """**逐根**读出来的一根：填充段本身 + 填充列数 + 由它算出的比例。
 
-    `rect` 是**整根条**（填充段 + 空轨），不是填充段 —— 因为「填了多少」这个
-    比例的分母是整根。它的**高是量到的条身行数**（`_body_rows`），不是常量
-    `BAR_ROWS`：一根量到 10 行的条报成 8 行，就是拿写死的数去描述一个量出来的
-    东西（`BAR_ROWS` 只当默认与上限）。`fill` 是那个比例（0…1），形态见模块
-    开头那张表。
+    `fill_rect` 是**填充段**（原点 + 填充列数 + 量到的条身行数）—— **不是整根条**。
+    这一版的比例是「填充段列数 ÷ 那一档的满条长」，**分母是常量、不来自画面**（见
+    模块开头「比例」那一节），所以这里没有「整长」这个东西可报。
 
-    `separated` = **这一根能确认跟旁边那些分得开**（它就是一根完整的条）。
-    `False` 时 `fill` 落 `Unsampled()`：**整长量不准，比例就没有分母** ——
-    它可能只是某一根条被压出来的一截（分不开的判据见 `_inseparable`）。
+    `columns` 与 `fill` **各是一条读数**（各自带形态与余量，见 `Reading`）：
+
+    - `columns`：填充段**列数** —— 干净 ⇒ `Exact` · 右边被盖住 ⇒ `LowerBound`；
+    - `fill`：**比例**（0…1）—— 干净 ⇒ `Exact(列数 / 满条长)` · 有缝或右边被盖住 ⇒
+      `LowerBound(缝前那一截 / 满条长)` · 条身行数比这一档更高、或者填充段短于
+      `MIN_FILL_COLUMNS` ⇒ `Unsampled()`。
+
+    `fill_rect.height` 是**量到的条身行数**（`_body_rows`），不是常量 `BAR_ROWS`：
+    一根量到 10 行的条报成 8 行，就是拿写死的数去描述一个量出来的东西。
+
+    `distance` 是这一块的中位色距（读数与核对都要它）。
+
+    **`fill` 落 `Unsampled()` 的那一根不进 `bars`、进 `unsampled`**（见 `EnemyBars`）：
+    「这一根有东西、但填了多少读不出来」与「这一根读出来了」是两件事。
     """
 
-    rect: PixelRect
-    fill: SlotValue
+    fill_rect: PixelRect
+    columns: Reading
+    fill: Reading
     distance: int
-    separated: bool
+
+
+@dataclass(frozen=True)
+class EnemyClump:
+    """**一堆**：挤在一起、拆不开的那一坨 —— 当成**一件事**报出来（用户 10-15 的裁定）。
+
+    - `region`：这一坨**占画面哪一块**（组里每一根**填充段**的外接框，填着的那一块，
+      不含空轨）；
+    - `tier`：**哪一档**（小怪 / boss）—— 「至少几根」要除以哪一档的满条长，所以这
+      一栏不能省。**按族归组、不许跨族**正是为了这一栏说得清；
+    - `columns`：这一坨的**填充总列数** —— 这是**读得准**的那个数，它换算过来就是
+      「这一堆怪**加起来**还剩多少血」（止损就靠它）。它**自己带形态**：干净 ⇒
+      `Exact` · 右边被盖住 ⇒ `LowerBound`（见模块开头「三样读法」）；
+    - `least`：**至少几根** = `ceil(填充总列数 / 这一档的满条长)`，落 `LowerBound`
+      —— 它**只是下界**。**上界不从像素来**：上界由状态层拿**账**配（这一关还该有
+      在场几只）。
+
+    **拆不开就不给单根比例**（硬给就是编）：一堆里没有「逐根」那一栏。
+    「一堆」与「未采样」是两件事：未采样 = 那里有东西、连填充都读不出来；
+    一堆 = 知道那一坨在哪、多大、至少几只。
+    """
+
+    region: PixelRect
+    tier: BarTier
+    columns: Reading
+    least: Reading
 
 
 @dataclass(frozen=True)
 class EnemyBars:
-    """这一帧的读数：三个出口 + **条数** + 逐根 + 被我方条挡掉的那几块。
+    """这一帧的读数：**三个出口** + **条数** + **三样读法** + 被我方条挡掉的那些块。
 
     `presence` 是**这一帧画面上看不看得见敌人血条**那个布尔（三态）：
     `Valued(Exact(True))` 在 / `Valued(Exact(False))` 不在 / `Unsampled()` 认不出。
-    `bars` 非空当且仅当它在。
+    **三栏里只要有一栏非空就是「在」**。
 
-    `count` 是**这一帧有几根**，与 `bars` 分开报 —— 叠在一起的条不要求数清
-    （用户 10-14 裁定），所以这一支要能降级：
+    **三样一眼分得开**（用户 10-15 的裁定 1）：
+
+    | 栏 | 是什么 | 带什么 |
+    | --- | --- | --- |
+    | `bars` | **逐根**读得出来的 | 填充段列数 + 比例（各自带形态与余量） |
+    | `clumps` | **一堆**（挤在一起、拆不开） | 区域 + 至少几根 + 这一坨的填充总列数 |
+    | `unsampled` | 那一根确实有东西、但**填了多少读不出来** | 位置 + 那两项读数 |
+
+    三栏**互斥**、合起来正好是颜色说「是条」的那些块：分不开的整坨进 `clumps`，
+    其余逐根进 `bars`（比例读出来了）或 `unsampled`（没读出来）。**一堆里没有
+    单根比例。**
+
+    `count` 是**这一帧有几根的下界**：
 
     | 情形 | 落法 |
     | --- | --- |
-    | 每一根都分得开（`separated` 全 True） | `Valued(Exact(len(bars)))` |
-    | 有分不开的 | `Valued(LowerBound(k))`，k = 分不开的那一堆各自只算一根 |
+    | 一堆都没有 | `Valued(Exact(len(bars) + len(unsampled)))` |
+    | 有一堆（或更多） | `Valued(LowerBound(逐根 + 各堆的「至少几根」之和))` |
     | 这一帧认不出 | `Unsampled()`（与 `presence` 同一个出口） |
 
-    **`LowerBound` 这一支永远不高报**：它说的是「**至少** k 根」，所以 k 只数
-    确实互相分得开的那些，分不开的一堆只贡献 1。`len(bars)` 与它不总相等 ——
-    差值正是这一支存在的理由（分不开时 `len(bars)` 会把一截数成一根）。
+    **两边不打架**（用户 10-15 的裁定 4）：那个下界**等于**逐根那几根 + 各堆的
+    「至少几根」之和。**它永远不高报**：分不开的一堆只按
+    `ceil(填充总列数 / 满条长)` 贡献，而那个除法只用得上「总列数」这一个数。
     """
 
     presence: SlotValue
     count: SlotValue
     bars: tuple[EnemyBar, ...]
+    clumps: tuple[EnemyClump, ...]
+    unsampled: tuple[EnemyBar, ...]
     cores: tuple[ScreenedCore, ...]
 
 
 def screened_cores(
     frame: Frame, *, our_bars: Sequence[PixelRect] = ()
 ) -> tuple[ScreenedCore, ...]:
-    """把这张战场**一次筛完**，给回每一块候选（不量空轨、不落三态）。
+    """把这张战场**一次筛完**，给回每一块候选（不量比例、不落三态）。
 
     它是 `read_enemy_bars` 的那一半公开件：夹具要让别人拿**同一条链的中间产物**
     去核对（哪些块被筛出来了、哪几块被我方条挡掉了），就不能让人另写一份筛法 ——
@@ -533,17 +700,23 @@ def read_enemy_bars(
     | 每一块都 <= `ABSENT_SCORE`，或者一块都没有 | `Valued(Exact(False), 最高分)` |
     | 有块、但最高的那块的分数落在中间带 | `Unsampled()` |
 
-    `count` 与 `bars` 一起给（见模块开头「条数」那一节）：**分得开才给
-    `Exact`，分不开就降成 `LowerBound`**，分不开的那几根 `fill` 落 `Unsampled()`。
+    **三样读法**（见模块开头「三样读法」那一节）：颜色说「是条」的每一块，最后要么
+    进 `bars`（逐根读出来了）、要么进 `clumps`（拆不开的那一坨）、要么进
+    `unsampled`（有东西、但填了多少读不出来）。分不开的那几根和长过满条长的
+    那一根**整坨进 `clumps`**（`_is_clump`）；其余逐根进 `_bar`。三栏互斥。
+
+    `count` 是**条数的下界**（见 `EnemyBars`）：一堆都没有时才给 `Exact`，
+    否则 `LowerBound(逐根 + 各堆的「至少几根」之和)`；这一帧认不出时落
+    `Unsampled()`（与 `presence` 同一个出口）。
 
     `our_bars` 是**我们自己那两根条的位置**（每条给血条那块矩形，144/146 宽、
     8 行高都行 —— 这一层按「血条 + 紧贴它下面第 8 行的技力条」那 16 行解释它）。
-    被我方条挡掉的块**不进 `bars`、也不参与这个布尔**，但留在 `cores` 里。
+    被我方条挡掉的块**不进这三栏、也不参与这个布尔**，但留在 `cores` 里。
 
     **取区越出画布 -> 抛异常**（能力缺失，不是「看不到」）。
     """
     region, top = _field(frame)
-    read: list[tuple[_Core, int, int, int, SlotValue]] = []
+    measured: list[_Measured] = []
     screened: list[ScreenedCore] = []
     best = 0.0
     middle = False
@@ -554,49 +727,62 @@ def read_enemy_bars(
             continue
         best = max(best, entry.score)
         if core.distance <= SOLID_TOL:
-            total, row, rows, fill = _read_bar(region, core)
-            # 填充段短于 MIN_FILL_COLUMNS：**存在性照报，比例不给**（见模块开头
-            # 「宽度：进门松、出口严」）—— 短填充给不出「填了多少」该有的证据。
-            read.append(
-                (
-                    core,
-                    total,
-                    row,
-                    rows,
-                    Unsampled() if core.width < MIN_FILL_COLUMNS else fill,
-                )
-            )
+            # 量的是**填充段**（怎么起、怎么止见 `_measure`）：「短填充 / 长过满条长 /
+            # 条身比这一档更高」三支分别在 `_bar` 与 `_clump` 里落定 —— 塞在这一层
+            # 做，就得把它量到的那几行再算一遍。
+            measured.append(_measure(region, core))
         elif core.distance < ABSENT_TOL:
             middle = True
-    read.sort(key=lambda item: (item[0].y, item[0].x))
-    grouped = _inseparable(region, read)
-    bars = tuple(
-        EnemyBar(
-            # 高是**量到的条身行数**（`_body_rows`）：写死 BAR_ROWS 去描述一根量到
-            # 10 行的条，就是拿常量冒充事实。y 也跟着量到的那一行走。
-            rect=PixelRect(core.x, row + top, total, rows),
-            fill=fill if grouped[index] == index else Unsampled(),
-            distance=core.distance,
-            separated=grouped[index] == index,
-        )
-        for index, (core, total, row, rows, fill) in enumerate(read)
-    )
-    if bars:
+    measured.sort(key=lambda item: (item.core.y, item.core.x))
+    grouped = _inseparable(region, measured)
+    groups: dict[int, list[_Measured]] = {}
+    for index, item in enumerate(measured):
+        groups.setdefault(grouped[index], []).append(item)
+    bars: list[EnemyBar] = []
+    clumps: list[EnemyClump] = []
+    unsampled: list[EnemyBar] = []
+    counted = 0
+    for root in sorted(groups):
+        members = groups[root]
+        if _is_clump(members):
+            # 拆不开／长过满条长的一坨：**整坨进一堆**，里面那几根不单独报比例。
+            clump = _clump(top, members)
+            clumps.append(clump)
+            counted += int(clump.least.value.payload.lo)  # type: ignore[union-attr]
+            continue
+        # 这一组只有一根（不止一根的都在上面那一支整坨进了一堆）：比例读得出来就进
+        # `bars`，读不出来就进 `unsampled` ——「有东西、但填了多少读不出来」与
+        # 「读出来了」是两件事。**按成员走而不是只取第一个**：只取第一个的话，
+        # 「分组说它们分不开、`_is_clump` 却说不是一堆」这种自相矛盾的状态会**静悄悄
+        # 吞掉几根**（红证那条用例把这种状态摆出来过）。
+        for item in members:
+            bar = _bar(top, item)
+            counted += 1
+            if isinstance(bar.fill.value, Unsampled):
+                unsampled.append(bar)
+            else:
+                bars.append(bar)
+    if bars or clumps or unsampled:
         presence: SlotValue = Valued(Exact(True), best)
     elif middle:
         presence = Unsampled()
     else:
         presence = Valued(Exact(False), best)
-    # 条数是**几何分组**的结论，不是颜色挣来的 —— 所以置信度写 None（§1：None =
-    # 不是读来的），不把颜色那一头的分数挪过来冒充它。
-    if not bars:
+    # 条数是**几何分组 + 一道除法**的结论，不是颜色挣来的 —— 所以置信度写 None
+    # （§1：None = 不是读来的），不把颜色那一头的分数挪过来冒充它。
+    if not bars and not clumps and not unsampled:
         count: SlotValue = Unsampled() if middle else Valued(Exact(0), best)
-    elif all(bar.separated for bar in bars):
-        count = Valued(Exact(len(bars)), None)
+    elif clumps:
+        count = Valued(LowerBound(counted), None)
     else:
-        count = Valued(LowerBound(len(set(grouped))), None)
+        count = Valued(Exact(counted), None)
     return EnemyBars(
-        presence=presence, count=count, bars=bars, cores=tuple(screened)
+        presence=presence,
+        count=count,
+        bars=tuple(bars),
+        clumps=tuple(clumps),
+        unsampled=tuple(unsampled),
+        cores=tuple(screened),
     )
 
 
@@ -608,8 +794,8 @@ def read_enemy_bars(
 def _field(frame: Frame) -> tuple[np.ndarray, int]:
     """战场那一条的像素 + 它在画布上的原点行。
 
-    上下各多留 8 行（`BAR_ROWS`）：量空轨时要拿「带子上方那 8 行」当底，
-    贴着战场边的那一根条不该因为借不到底而读不出来。**判据只认战场那一段
+    上下各多留 8 行（`BAR_ROWS`）：量条身时得拿「带子上方那几行」当底，
+    贴着战场边的那一根条不该因为**量不到头**而读不出来。**判据只认战场那一段
     里的块**（见 `_inside_field`），多留的那几行只是给量法用的底。
     """
     if not isinstance(frame, Frame):
@@ -636,7 +822,7 @@ def _screened(
 ) -> ScreenedCore:
     """一块私有候选 -> 对外的读数（补上画布坐标与「是不是被我方条挡掉」）。"""
     return ScreenedCore(
-        rect=PixelRect(core.x, core.y + top, core.width, BAR_ROWS),
+        fill_rect=PixelRect(core.x, core.y + top, core.width, BAR_ROWS),
         distance=core.distance,
         masked=_is_ours(core, our_bars, top),
     )
@@ -648,14 +834,84 @@ def _screened(
 
 
 @dataclass(frozen=True)
+class _Family:
+    """一条**色族**。族同时定下它那一档的三个数（用户 10-15：**看族、不看类型**）。
+
+    - `reference`：这一族的填充色（橙 `ENEMY_FILL` / 红 `ENEMY_FILL_RED`）；
+    - `min_columns`：这一族候选的**宽度门**（橙 7 / 红 `RED_MIN_COLUMNS`）；
+    - `tier`：这一族**是哪一档**（`MOB_TIER` / `BOSS_TIER`）—— 满条长（比例的分母）
+      与条身行数（跨档校验）都在它里面。**一堆报出去的那一档就是它。**
+    """
+
+    reference: tuple[int, int, int]
+    min_columns: int
+    tier: BarTier
+
+    @property
+    def full_columns(self) -> int:
+        """这一族满条长的列数（比例的分母）。"""
+        return self.tier.full_columns
+
+    @property
+    def body_rows(self) -> int:
+        """这一族条身的行数（跨档校验用）。"""
+        return self.tier.body_rows
+
+
+_ENEMY_FAMILY: Final[_Family] = _Family(ENEMY_FILL, MIN_CANDIDATE_COLUMNS, MOB_TIER)
+_BOSS_FAMILY: Final[_Family] = _Family(ENEMY_FILL_RED, RED_MIN_COLUMNS, BOSS_TIER)
+_FAMILIES: Final[tuple[_Family, ...]] = (_ENEMY_FAMILY, _BOSS_FAMILY)
+"""两族各筛一遍（不并掩膜的理由见 `_screen_family`）。**族到档的对应只有这一处。**"""
+
+
+@dataclass(frozen=True)
 class _Core:
-    """私有的那一块：**帧内坐标**（行相对战场那一条的顶，列就是画布列）。"""
+    """私有的那一块：**帧内坐标**（行相对战场那一条的顶，列就是画布列）。
+
+    `width` 是在**那 8 行**上量到的**填充段列数**（容 `FILL_GAP` 列不亮的连续亮列）
+    —— 它只做两件事：过**候选宽度门**、给 `_measure` 的扫描窗垫底；**报出去的那个数
+    由 `_measure` 在量到的条身那几行上重新量**（见 `_Measured.columns`）。
+    `family` 是这一块走的族，分母与条身行数都在它里面。
+    """
 
     x: int
     y: int
     width: int
     distance: int
-    reference: tuple[int, int, int]
+    family: _Family
+
+
+@dataclass(frozen=True)
+class _Measured:
+    """一根候选**量出来的全部东西**（`_measure` 的产物，私有的）。
+
+    它是「一堆」与「逐根」两支共用的原料：分组（`_inseparable`）只看 `core`
+    与 `columns`，报出去的那些数由 `_bar` / `_clump` 从这里取。
+
+    - `columns`：量到的**填充段列数**（跨得过 `FILL_GAP` 列不亮的那一段）；
+    - `strict`：**缝前那一截**（一格缝都不跨的那一段）—— 缝底下藏着什么看不见，
+      所以**比例**那一支只用得了它；
+    - `covered`：这一段填充的**右端没读到**（右边还接着亮）⇒ 「列数」那一支
+      落 `LowerBound`；
+    - `columns_margin` / `ratio_margin`：**两条读数各自的余量**（用户 10-15 的
+      裁定 3）—— 前者量的是「这一段读到哪儿为止」那个门、后者量的是「缝之前那一段」
+      那个门，所以有缝的那一根两者不一样；
+    - `row` / `rows`：**量到的**条身（顶行 + 行数），不写死 `BAR_ROWS`。
+    """
+
+    core: _Core
+    columns: int
+    strict: int
+    covered: bool
+    columns_margin: float
+    ratio_margin: float
+    row: int
+    rows: int
+
+    @property
+    def clean(self) -> bool:
+        """这一段填充两头都干脆：没有缝、右边也没接着亮。"""
+        return self.strict == self.columns and not self.covered
 
 
 def _screen(region: np.ndarray, top: int) -> tuple[_Core, ...]:
@@ -678,8 +934,9 @@ def _screen(region: np.ndarray, top: int) -> tuple[_Core, ...]:
 
     最后一步 `_merge` 把「被一条窄东西压过去」的两块接回一根条。
     """
-    found = list(_screen_family(region, top, ENEMY_FILL, MIN_CANDIDATE_COLUMNS))
-    found.extend(_screen_family(region, top, ENEMY_FILL_RED, RED_MIN_COLUMNS))
+    found: list[_Core] = []
+    for family in _FAMILIES:
+        found.extend(_screen_family(region, top, family))
     found.sort(key=lambda core: (core.y, core.x))
     return _merge(found, region)
 
@@ -687,8 +944,7 @@ def _screen(region: np.ndarray, top: int) -> tuple[_Core, ...]:
 def _screen_family(
     region: np.ndarray,
     top: int,
-    reference: tuple[int, int, int],
-    min_columns: int,
+    family: _Family,
 ) -> list[_Core]:
     """**一族颜色**单独筛一遍 -> 这一族里够格当候选的块。
 
@@ -696,16 +952,19 @@ def _screen_family(
     本来分开的块连成一块 —— 实测 `敌条互叠2` 那一帧会因此把 7 根条并进别的块里、
     那些块的高度涨过 `MAX_BAR_ROWS` 而**整批丢掉**。那是**在改量法**，不是加一族
     颜色；分成两遍，橙族那一边的量法与加红族之前**逐块一样**。
+
+    这一族走**哪一档**由传进来的 `family` 定：参考色、候选宽度门、满条长（分母）、
+    条身行数都在它里面（见 `_Family`）。
     """
     pixels = region.astype(np.int16)
-    family = np.asarray(reference, np.int16)
-    mask = np.abs(pixels - family).max(axis=2) <= SCREEN_TOL
+    reference = np.asarray(family.reference, np.int16)
+    mask = np.abs(pixels - reference).max(axis=2) <= SCREEN_TOL
     tall = _long_runs(mask, BAR_ROWS).astype(np.uint8)
     count, _, stats, _ = cv2.connectedComponentsWithStats(tall, connectivity=8)
     found: list[_Core] = []
     for index in range(1, count):
         x, y, width, height, area = (int(value) for value in stats[index])
-        if height > MAX_BAR_ROWS or width < min_columns:
+        if height > MAX_BAR_ROWS or width < family.min_columns:
             continue
         row = _band_row(mask, y, height, x, width)
         if row < 0 or not _inside_field(row, top):
@@ -715,18 +974,23 @@ def _screen_family(
         if not _rectangular(band, block, area, width):
             continue
         profile = np.median(band, axis=0)
-        distance = np.abs(profile.astype(np.int16) - family).max(axis=1)
+        distance = np.abs(profile.astype(np.int16) - reference).max(axis=1)
         lit = distance <= SCREEN_TOL
-        tolerant = _leading_run(lit, TRACK_GAP)[1]
-        if tolerant < MIN_CANDIDATE_COLUMNS:
-            continue
+        tolerant = _leading_run(lit, FILL_GAP)[1]
+        # **这里原来还有一道 `tolerant < family.min_columns` 的宽度检查 —— 删掉了**
+        # （用户 10-15 的裁定 6：恒真就删）。实测它是**恒真的**：全库 167 张
+        # 2800x1260 整张筛一遍，过得了形状门的候选 **140 块**，量到的 `tolerant`
+        # 最小 **7**（= `MIN_CANDIDATE_COLUMNS`，橙族那一支），那一道**一次都没触发**。
+        # 它的内容由上面 `width < family.min_columns` 那道门管住了：连通块的宽与这
+        # 一段填充的宽是同一个量级（`tolerant` 只会更长，因为它容得下 `FILL_GAP`
+        # 列不亮）。
         found.append(
             _Core(
                 x=x,
                 y=row,
                 width=tolerant,
                 distance=int(np.median(distance[:tolerant])),
-                reference=tuple(int(v) for v in family),
+                family=family,
             )
         )
     return found
@@ -783,7 +1047,7 @@ def _merge(cores: list[_Core], region: np.ndarray) -> tuple[_Core, ...]:
                     y=head.y,
                     width=right - head.x,
                     distance=min(head.distance, core.distance),
-                    reference=head.reference,
+                    family=head.family,
                 )
             )
         else:
@@ -792,7 +1056,15 @@ def _merge(cores: list[_Core], region: np.ndarray) -> tuple[_Core, ...]:
 
 
 def _attached(left: _Core, right: _Core, region: np.ndarray) -> bool:
-    """右边那一块是不是**左边那一根条被压过去之后接着露出来的那一截**。"""
+    """右边那一块是不是**左边那一根条被压过去之后接着露出来的那一截**。
+
+    **跨族不接**：红的与橙的不可能是一根条的两截（`_screen` 把两族筛出来的块放在
+    一张表里 `_merge`，所以这一道门得有）。`_blended` 那一支比的是橙族的参考色，
+    红条混色那一头会答成「不是混色」—— 两道加起来，红核之间既不接也不并组
+    （保守：各算一根，不高报）。
+    """
+    if left.family != right.family:
+        return False
     if right.x < left.x + left.width:
         return False
     if abs(right.y - left.y) > 1:
@@ -810,10 +1082,9 @@ def _blended(region: np.ndarray, row: int, column: int) -> bool:
 
     判据：这一列的颜色**离填充色更近**，而不是离它上下那两块地形更近。
 
-    **为什么不用 `_off_terrain`**：那一支比的是「与地形的差」，而**压在一条填充色
-    上面的半透明遮挡**压出来的混色，亮度可能正好与它下面那块地形接近 ——
-    实测 `raw_b` 那条 1 列宽的缝（x1577）就是：`_off_terrain` 只有 **4.2**
-    （低于 `TRACK_CONTRAST`），可它离填充色 **64**、离上下地形 **99 / 112**。
+    **为什么不比「与地形的差」**：**压在一条填充色上面的半透明遮挡**压出来的混色，
+    亮度可能正好与它下面那块地形接近 —— 实测 `raw_b` 那条 1 列宽的缝（x1577）就是：
+    它与上下地形差不了多少（**4.2**），可它离填充色 **64**、离上下地形 **99 / 112**。
     所以「更靠近填充色」才是这一列压的是条、不是空地的证据。
 
     **参考色写死橙族那一支**：红族的核心要走到这里（`_merge` / `_inseparable` 都要
@@ -902,28 +1173,34 @@ def _leading_run(flags: np.ndarray, gap: int) -> tuple[int, int]:
 def _resumes(lit: np.ndarray, filled: int) -> bool:
     """`filled` 之后**还接着亮**吗 —— 也就是「填着的那一截被切断过」。
 
-    `_leading_run` 连着碰到 `TRACK_GAP + 1` 个假列就停下了，所以它停下的**那一侧**
+    `_leading_run` 连着碰到 `FILL_GAP + 1` 个假列就停下了，所以它停下的**那一侧**
     只要还有亮列，就是缝底下压着东西、条并没有到此为止。
     """
     return bool(lit[filled : filled + MERGE_GAP].any())
 
 
 # ---------------------------------------------------------------------------
-# 空轨与比例
+# 填充段与比例
 # ---------------------------------------------------------------------------
 
 
 def _body_rows(region: np.ndarray, core: _Core) -> tuple[int, int]:
     """这一根条**量到的**条身 -> (条身顶行, 条身高)。**不许写死 8**。
 
-    自 `core.y` 起上下扩：**填充段那几列**上，条身以内是填充色、以外不是 ——
-    走到不亮为止。封顶 `MAX_BAR_ROWS`（形状门已经保证那一块不高于它）。
+    自 `core.y` 起上下扩：**填充段那几列**上，条身以内是这一族的填充色、以外不是
+    —— 走到不亮为止。封顶 `MAX_BAR_ROWS`（形状门已经保证那一块不高于它）。
 
-    实测两档：小怪与红门那些整齐的块是 **8 行**，boss 那根红条是 **10 行**
-    （`在_boss_红宽条` x1562，y1002…1011），`raw_b` 上那根是 **9 行**。
-    「条身取几行按量到的」是用户这一单的裁定 3 —— 写死 8 的代价见 `TRACK_EDGE_GAP`。
+    实测两档：小怪与红门那些整齐的块是 **8 行**（`MOB_BODY_ROWS`），boss 那根红条是
+    **10 行**（`BOSS_BODY_ROWS`；`在_boss_红宽条` x1562 的 y1002…1011），`raw_b` 上
+    那根是 **9 行**（抗锯齿多出来的一行）。
+
+    **它同时是「取哪几行」与「跨档校验」的输入**：量到的条身决定逐列比色取哪几行、
+    也决定 `fill_rect.height` 报几行；它**比这一档更高**时 `_bar` 就把这一根落成
+    `unsampled`（用户 10-15 的裁定 6：**只拦更高的那一头**，矮一点的不拦）——
+    防的是「一根橙色的条其实是 boss 档（10 行 / 154 列）」，拿 123 当分母会系统性
+    报高。**它只降不升。**
     """
-    reference = np.asarray(core.reference, np.int16)
+    reference = np.asarray(core.family.reference, np.int16)
     columns = region[:, core.x + 2 : core.x + max(3, min(core.width, 12))]
     columns = columns.astype(np.int16)
 
@@ -942,169 +1219,160 @@ def _body_rows(region: np.ndarray, core: _Core) -> tuple[int, int]:
     return top, max(BAR_ROWS, bottom - top + 1)
 
 
-def _band_median(
-    region: np.ndarray, start: int, rows: int, column: int
-) -> np.ndarray | None:
-    """某一列上自 `start` 起 `rows` 行的中位色；这一段跑到区外时给 `None`。
+def _measure(region: np.ndarray, core: _Core) -> _Measured:
+    """一根候选 -> **它量出来的全部东西**（见 `_Measured`）。
 
-    **要夹一下**：条身最多 12 行、上下再各让出 `TRACK_EDGE_GAP` 行，战场那一条
-    只多借了 8 行底 —— 贴着战场边的那一根会伸出去。伸出去的那一侧就当「借不到」，
-    另一侧照样算（只影响贴着战场上下沿的那几根）。
+    **量法一个字节都没变**（与我方血条那条链同一套逐列比色 + 容差）：
+
+    - 条身取**量到的行数**（`_body_rows`，不写死 8）；
+    - 扫描窗取「这一档的满条长 + `FILL_GAP` + 1」：填充段**不可能**长过满条长，
+      所以看到窗底还亮着就已经不止一根了（那一支由 `_is_clump` 接走）；
+    - `columns`（容得下 `FILL_GAP` 列不亮的那一段）是**这一段的填充总列数** ——
+      缝底下是半透明遮挡压出来的，那几列算在里头；
+    - `strict`（一格缝都不跨的那一段）是**比例**那一支的下界；
+    - `covered` 是「这一段填充的右边**还接着亮**」⇒ 没读到右端。
+
+    **两个余量分别算、各归各的读数**（用户 10-15 的裁定 3）：列数那一支量的是
+    「这一段读到哪儿为止」那个门，比例那一支量的是「缝之前那一段」那个门 ——
+    一根条上有缝时，前者的余量会被那缝压到 0（那正是余量该说的话）。
+
+    比色用的是**这一根自己那一族的参考色**（`core.family.reference`）：红族那根比的
+    是 `ENEMY_FILL_RED`，不是橙族那一支 —— 比错了它整根都不亮、填充段会量成 0。
     """
-    lo = max(0, start)
-    hi = min(region.shape[0], start + rows)
-    if hi - lo < 2:
-        return None
-    return np.median(region[lo:hi, column], axis=0)
-
-
-def _off_terrain(
-    region: np.ndarray, row: int, rows: int, column: int
-) -> float:
-    """这一列**离地形多远**：条身那 `rows` 行与它**上面**、**下面**那两段的差。
-
-    取**两侧都要差**是必要的：`raw_b` 那一段空轨是**纯灰 177**，而它的上下都是
-    74 左右 —— 「更暗才算轨道」这条判据在那里会当场失效（那段灰正是那根条的
-    没填到的那一截）。反过来 `raw_a` 那一段是偏暗的（43 对 65）。
-    **两个方向都算，才盖得住这两种。**
-
-    **暗底那一族改取「任一侧」**（见 `TRACK_DARK_LINE`）：那一族里轨色与它一侧的
-    地形长得一样，「两侧都要」会系统性答成「没有空轨」。闸门是**这一列自己暗**，
-    不是「哪一族地形」—— 亮底那一族走的还是**上面那一支量法**
-    （带内均值 vs 上下均值、取小的那个），改的只是「取哪几行」。
-    """
-    inside = _band_median(region, row, rows, column)
-    if inside is None:
-        return 0.0
-    sides = []
-    for start in (row - TRACK_EDGE_GAP - rows, row + rows + TRACK_EDGE_GAP):
-        side = _band_median(region, start, rows, column)
-        if side is not None:
-            sides.append(side)
-    if not sides:
-        return 0.0
-    middle = float(inside.mean())
-    if middle <= TRACK_DARK_LINE:
-        # 暗底那一族：**逐通道**量（只差一个通道也算），取两侧**任一**
-        return float(
-            max(
-                int(abs(inside.astype(np.int16) - side.astype(np.int16)).max())
-                for side in sides
-            )
-        )
-    # 亮底那一族：与今天同一支（带内均值 vs 上下均值，取小的那个）
-    return min(abs(middle - float(side.mean())) for side in sides)
-
-
-def _track_end(
-    region: np.ndarray, row: int, rows: int, start: int
-) -> tuple[int, int, bool]:
-    """自 `start` 起量空轨 -> (最后一个「不是地形」的列 + 1, 那一段软尾的列数)。
-
-    **终止条件**：连着 `TRACK_GAP + 1` 列都「离地形不够远」就停。它停得住的理由
-    是**量的就是「离这一列上下那两段地形多远」** —— 地形自己与自己的差是 0，
-    所以它不会一路吃到地里去；`raw_a` 那两根量到 129 / 124 列、`raw_b` 那根 154，
-    画面上的众数是 122…123 与 154。
-
-    软尾 = 末尾那几列**差得过线、但差不过两倍线**的列。边界落在它们里面时，
-    「整根到哪儿为止」是一个**区间**而不是一个数（与「边界渐变」那一支同源）。
-
-    第三个给回的是**这一趟有没有跨过回落**（bridged）：前面已经有过「是轨道」的
-    列，后面出现「不是轨道」的列，再后面**又接上**「是轨道」—— 说明这一趟是
-    **跨过**几列才走下来的。那几列到底是轨道里的杂色、还是条本来就到头了，画面
-    答不了；于是整长就不是**连着**量出来的，比例只能给下界的形态（见 _read_bar）。
-    紧贴填充段的那几列不算：那几列出现的时候，还没有出现过「是轨道」的列。
-    """
-    width = region.shape[1]
-    limit = min(width, start + MAX_BAR_COLUMNS)
-    column = start
-    last = start
-    miss = 0
-    tail = 0
-    hit = False
-    bridged = False
-    while column < limit:
-        amount = _off_terrain(region, row, rows, column)
-        if amount > TRACK_CONTRAST:
-            if hit and miss:
-                # 这一列是**跨过**前面那几列回落才接上的：整长不是连着量出来的。
-                bridged = True
-            hit = True
-            last = column + 1
-            tail = tail + 1 if amount <= 2 * TRACK_CONTRAST else 0
-            miss = 0
-        else:
-            miss += 1
-            if miss > TRACK_GAP:
-                break
-        column += 1
-    return last, tail, bridged
-
-
-def _read_bar(
-    region: np.ndarray, core: _Core
-) -> tuple[int, int, int, SlotValue]:
-    """一根条 -> (整长, 条身顶行, 条身行数, 填充比例)。**整长 = 填充段 + 空轨**。
-
-    比色用的是**这一根自己那一族的参考色**（`core.reference`）：红族那根比的是
-    `ENEMY_FILL_RED`，不是橙族那一支 —— 比错了它整根都不亮、填充段会量成 0。
-
-    填充比例（0…1）按「下界 / 区间 / 精确」三支落：
-
-    | 情形 | 落法 |
-    | --- | --- |
-    | 填充段中间被切断（缝两边都还亮着） | `LowerBound(严那一段 / 整长)` |
-    | 空轨的尾巴是软的（边界落在几列里） | `Interval(填充 / 整长, 填充 / 短整长)` |
-    | 空轨量到了上限还没到头 | `Interval(填充 / 上限, 填充 / 整长)` |
-    | 空轨量得不干净（跨过过回落） | `LowerBound(填充 / 整长)` |
-    | 其余（含填满：没有空轨） | `Exact(填充 / 整长)` |
-
-    **填满那一支不需要另开一条路**：没有空轨时整长就等于填充段，比例就是 1.0 ——
-    实测 `screenshots/_probe.png` 那根满条就是这样（填充段 123 列，右邻第一列
-    就回到地形，差 0…3；`raw_a` 那两根则各自留了 40 与 47 列空轨）。
-    """
-    reference = np.asarray(core.reference, dtype=np.int16)
+    family = core.family
     row, rows = _body_rows(region, core)
-    span = core.width + MAX_BAR_COLUMNS
-    profile = np.median(
-        region[row : row + rows, core.x : core.x + span], axis=0
-    )
-    distance = np.abs(profile.astype(np.int16) - reference).max(axis=1)
+    span = max(core.width, family.full_columns) + FILL_GAP + 1
+    profile = np.median(region[row : row + rows, core.x : core.x + span], axis=0)
+    distance = np.abs(
+        profile.astype(np.int16) - np.asarray(family.reference, np.int16)
+    ).max(axis=1)
     lit = distance <= SCREEN_TOL
-    strict, tolerant = _leading_run(lit, TRACK_GAP)
-    end, tail, bridged = _track_end(region, row, rows, core.x + tolerant)
-    total = max(tolerant, end - core.x)
-    if strict < tolerant or _resumes(lit, tolerant):
-        return total, row, rows, Valued(
-            LowerBound(strict / total), _fill_confidence(distance, strict)
-        )
-    if tail and tail < total - tolerant:
-        return total, row, rows, Valued(
-            Interval(tolerant / total, tolerant / (total - tail)),
-            _fill_confidence(distance, tolerant),
-        )
-    if total - tolerant >= MAX_BAR_COLUMNS:
-        return total, row, rows, Valued(
-            Interval(tolerant / (tolerant + MAX_BAR_COLUMNS), tolerant / total),
-            _fill_confidence(distance, tolerant),
-        )
-    if bridged:
-        # 空轨是**跨过**回落才量完的：那个分母不是连着量出来的，可能多算了一截
-        # 地形 —— 真整长只可能更短、真比例只可能更大，所以这里给的是下界。
-        return total, row, rows, Valued(
-            LowerBound(tolerant / total), _fill_confidence(distance, tolerant)
-        )
-    return total, row, rows, Valued(
-        Exact(tolerant / total), _fill_confidence(distance, tolerant)
+    strict, columns = _leading_run(lit, FILL_GAP)
+    return _Measured(
+        core=core,
+        columns=columns,
+        strict=strict,
+        covered=bool(_resumes(lit, columns)),
+        columns_margin=_fill_confidence(distance, columns),
+        ratio_margin=_fill_confidence(distance, min(strict, columns)),
+        row=row,
+        rows=rows,
     )
+
+
+def _bar(top: int, item: _Measured) -> EnemyBar:
+    """**单出来的一根** -> 逐根那一栏的一个读数。
+
+    | 情形 | `fill`（比例） |
+    | --- | --- |
+    | 条身行数**比这一档更高** | `Unsampled()`（跨档校验 —— **只拦更高的那一头**） |
+    | 填充段短于 `MIN_FILL_COLUMNS` | `Unsampled()`（条照报「在」、列数照量） |
+    | 干净 | `Exact(填充列数 / 满条长)` |
+    | 有缝、或者右边没到头 | `LowerBound(缝前那一截 / 满条长)` |
+
+    **`columns`（填充段列数）不看缝、只看右端有没有被盖住**：缝是「条被半透明的
+    东西压过去」（`FILL_GAP` 就是为它留的），那几列算进这一段的填充列数；**比例**
+    那一支照单 7 的规矩更保守（只用缝之前那一截 —— 缝底下藏着什么看不见）。
+    **这两支口径不同是刻意的**：一个答「这一段多宽」、一个答「填了多少」。
+    **切断了为什么比例只给下界**：与我方血条那条链的 `LowerBound` 同一套纪律，
+    不另立一套。
+    """
+    core = item.core
+    family = core.family
+    columns_value: SlotValue = (
+        Valued(LowerBound(item.columns), item.columns_margin)
+        if item.covered
+        else Valued(Exact(item.columns), item.columns_margin)
+    )
+    if item.rows > family.body_rows or item.columns < MIN_FILL_COLUMNS:
+        # 跨档没过（量法与这一档对不上）／填充段短于 MIN_FILL_COLUMNS：存在性照报，
+        # **填了多少不给**（见模块开头「宽度：进门松、出口严」）—— 这一根落
+        # `unsampled`（由 `read_enemy_bars` 分栏）。
+        fill_value: SlotValue = Unsampled()
+    elif item.clean:
+        fill_value = Valued(
+            Exact(item.columns / family.full_columns), item.ratio_margin
+        )
+    else:
+        fill_value = Valued(
+            LowerBound(item.strict / family.full_columns), item.ratio_margin
+        )
+    return EnemyBar(
+        # 填充段本身：原点 + 填充列数（在**量到的条身那几行**上量的）+ 量到的条身
+        # 行数。写死 BAR_ROWS 去描述一根量到 10 行的条，就是拿常量冒充事实；
+        # y 也跟着量到的那一行走。
+        fill_rect=PixelRect(core.x, item.row + top, item.columns, item.rows),
+        columns=Reading(columns_value, item.columns_margin),
+        fill=Reading(
+            fill_value,
+            item.ratio_margin if isinstance(fill_value, Valued) else None,
+        ),
+        distance=core.distance,
+    )
+
+
+def _is_clump(members: Sequence[_Measured]) -> bool:
+    """这一组是不是**一堆**（用户 10-15 的裁定 2：用已经有的那两条，不新立一套）。
+
+    - **分不开**：这一组不止一根（`_inseparable` 把它们并成一组了）—— 同一条带上
+      相邻两根的填充交叠 / 相接，或者中间夹着混色列；
+    - **填充总列数长过这一档的满条长**：一根条的填充不可能长过它那一档的满条长
+      （`raw_b_上` 那 130 列就是这一支）。
+    """
+    if len(members) > 1:
+        return True
+    return members[0].columns > members[0].core.family.full_columns
+
+
+def _clump(top: int, members: Sequence[_Measured]) -> EnemyClump:
+    """一组 -> **一堆**那一个读数（区域 + 至少几根 + 这一坨的填充总列数）。
+
+    **填充总列数** = 组里每一根的填充段列数**相加**（含缝那几列，见 `_measure`）。
+    它的形态只分两支：**右边被盖住**（组里有一条没读到右端）-> `LowerBound`；
+    否则 -> `Exact`。**为什么只有两支**：`Interval` 要有「两头都模糊」的来路，
+    而单根只产 精确 / 下界 两支（见模块开头「三样读法」那一节）。
+
+    **至少几根** = `ceil(总列数 / 这一档的满条长)`，落 `LowerBound` —— 它**只是
+    下界**，**上界不从像素来**。它的余量取**总列数那个读数**的余量（会动的东西只有
+    总列数）。
+
+    **按族归组**（`_inseparable` 已经保证）：所以 `tier` 只有一个，取第一个成员
+    的就对。
+    """
+    tier = members[0].core.family.tier
+    total = sum(item.columns for item in members)
+    margin = min(item.columns_margin for item in members)
+    if any(item.covered for item in members):
+        columns_value: SlotValue = Valued(LowerBound(total), margin)
+    else:
+        columns_value = Valued(Exact(total), margin)
+    least = max(1, -(-total // tier.full_columns))
+    return EnemyClump(
+        region=_group_rect(top, members),
+        tier=tier,
+        columns=Reading(columns_value, margin),
+        least=Reading(Valued(LowerBound(least), None), margin),
+    )
+
+
+def _group_rect(top: int, members: Sequence[_Measured]) -> PixelRect:
+    """这一组的**区域**：组里每一根**填充段**的外接框（填着的那一块，不含空轨）。
+
+    坐标补上战场那一段的原点 `top`（与 `EnemyBar.fill_rect` 同一套画布坐标）。
+    """
+    left = min(item.core.x for item in members)
+    right = max(item.core.x + item.columns for item in members)
+    first = min(item.row for item in members)
+    last = max(item.row + item.rows for item in members)
+    return PixelRect(left, first + top, right - left, last - first)
 
 
 def _fill_confidence(distance: np.ndarray, filled: int) -> float:
     """这一根比例读数有多稳：**定下这次读数的两个判据两侧隔了多远** / 255。
 
     与我方血条那条链同一个口径：里头最弱的一列（离色线最近的）与右边那一列
-    （它必须干脆地在线外）里，小的那个。**另一边（空轨那一头）不进来** ——
-    空轨量错只改分母，改不了「填充段到哪儿为止」这个事实。
+    （它必须干脆地在线外）里，小的那个。**分母那一头不进来** —— 分母是常量，
+    它错不了；能错的只有「填充段到哪儿为止」。
     """
     if filled <= 0 or filled > distance.size:
         return 0.0
@@ -1116,22 +1384,26 @@ def _fill_confidence(distance: np.ndarray, filled: int) -> float:
 
 
 # ---------------------------------------------------------------------------
-# 分不开的那几根：条数只能给下界
+# 分不开的那几根：整坨算一堆，条数只能给下界
 # ---------------------------------------------------------------------------
 
 
 def _inseparable(
-    region: np.ndarray, read: Sequence[tuple[_Core, int, int, int, SlotValue]]
+    region: np.ndarray, read: Sequence[_Measured]
 ) -> list[int]:
     """每一根条归到哪一组：自己一组的返回自己的下标，分不开的返回这一组的最小下标。
 
     **判据只有一条**：两根条**踩在同一条行带上**（行差 <= `ROW_SLACK`），而且中间
-    **分不开**（见 `_touching`）。分不开的那一堆只贡献 1 根 —— 这就是 `count`
-    那一支下界的来源。
+    **分不开**（见 `_touching`）。这一组就是「一堆」的候选（`_is_clump` 再看那一
+    组是一根还是一堆）：分不开的可能本来就是一根被压出来的一截，所以条数只能给
+    下界，而那几根也不单独报比例。
+
+    **按族归组、不许跨族**（用户 10-15 的裁定 2）：一堆里的成员同一族 —— 否则
+    「至少几根」要除以哪一档的满条长就说不清，而红条与橙条本来也不可能是一根。
 
     **这里不合并、也不动任何一条线**：把两块接回一根是 `_merge` 的事（间距
     `MERGE_GAP` 以内、且中间**每一列**都混色）。这里只是**承认分不开**，
-    把条数降成下界 —— 精细的活儿在别处，这一支只负责**不假装数清了**。
+    把那一组送进 `_clump` —— 精细的活儿在别处，这一支只负责**不假装数清了**。
     """
     parent = list(range(len(read)))
 
@@ -1145,6 +1417,8 @@ def _inseparable(
         # **只比同一条带里相邻的两根**：隔着一根去比，中间那一根的列本身就会让
         # 「中间有没有混色」答成有 —— 三根同带的条会因此串成一组。
         for left, right in zip(band, band[1:]):
+            if read[left].core.family != read[right].core.family:
+                continue
             if not _touching(region, read[left], read[right]):
                 continue
             first, second = root(left), root(right)
@@ -1153,56 +1427,57 @@ def _inseparable(
     return [root(index) for index in range(len(read))]
 
 
-def _bands(
-    read: Sequence[tuple[_Core, int, int, int, SlotValue]]
-) -> list[list[int]]:
+def _bands(read: Sequence[_Measured]) -> list[list[int]]:
     """把条按**行带**切开，每一条带里按列排好。
 
     「行带」是**连着**算的：行差 <= `ROW_SLACK`（与判我方条同一个容差）就算同一条，
     所以 451 与 452 同带、452 与 453 也同带 —— 一列 1 行一行的阶梯本来就分不开，
     把它切成两条带才是假装分开了。
     """
-    order = sorted(range(len(read)), key=lambda i: (read[i][0].y, read[i][0].x))
+    order = sorted(
+        range(len(read)), key=lambda i: (read[i].core.y, read[i].core.x)
+    )
     bands: list[list[int]] = []
     current: list[int] = []
     for index in order:
-        if current and read[index][0].y - read[current[-1]][0].y > ROW_SLACK:
+        if current and read[index].core.y - read[current[-1]].core.y > ROW_SLACK:
             bands.append(current)
             current = []
         current.append(index)
     if current:
         bands.append(current)
-    return [sorted(band, key=lambda i: read[i][0].x) for band in bands]
+    return [sorted(band, key=lambda i: read[i].core.x) for band in bands]
 
 
-def _touching(
-    region: np.ndarray,
-    first: tuple[_Core, int, int, int, SlotValue],
-    second: tuple[_Core, int, int, int, SlotValue],
-) -> bool:
-    """同一条带上的两块**分不分得开**：分不开才 True。
+def _touching(region: np.ndarray, first: _Measured, second: _Measured) -> bool:
+    """同一条带上的两块**分不开**吗：分不开才 True。
 
-    两种情形都不给「这是两根」这句话作保：
+    **判据只用填充段自己的像素**（空轨退役之后，这里再没有「整长」可用）：
 
-    - **整长交叠或相接**：同一条 8 行带上，两根整条不可能这样并排放 ——
-      至少有一根是被截出来的一截；
-    - **中间至少有一列是「混色」**（`_blended`：那一列比它上下两块地形更靠近
-      填充色）—— 那正是「条被半透明的东西压过去」的像素证据，于是这两块
-      可能本来就是同一根条的两截。
+    - **填充段交叠或相接**：填着的那两段在列上压着/贴着 —— 一根条只从自己的左缘
+      开始填，两段填充这样并排不可能各自都从头填起，所以至少有一根是被截出来的
+      一截（也可能是同一根被压断、`_merge` 没敢接）；
+    - **中间至少有一列是「混色」**（`_blended`：那一列比它上下两块地形更靠近填充
+      色）—— 那正是「条被半透明的东西压过去」的像素证据，于是这两块可能本来就是
+      同一根条的两截。
 
     **只找「混色」，不找「条色」**：中间那一截又亮起来的（同一条带上被我们自己的
-    技能光压断）在 `_screen` 里已经接回去了（`_merge`）；走到这里还分开的，
-    中间那几列要么是地形（那就真的是两根），要么是压在条上的半透明东西。
+    技能光压断）在 `_screen` 里已经接回去了（`_merge`）；走到这里还分开的，中间
+    那几列要么是地形（那就真的是两根），要么是压在条上的半透明东西。
+
+    **它只把条数降成下界、把这一组送进「一堆」**（见 `_inseparable` 与 `_clump`）：
+    判不准的两块当然也可能是两根，所以这一支永远不高报。
+
+    **跨族不比**：`_inseparable` 先按族分过了 —— 红条与橙条不可能是一根条的两截。
     """
-    left, right = (first, second) if first[0].x <= second[0].x else (second, first)
-    core, total = left[0], left[1]
-    gap = right[0].x - (core.x + total)
+    left, right = (first, second) if first.core.x <= second.core.x else (second, first)
+    gap = right.core.x - (left.core.x + left.columns)
     if gap <= 0:
         return True
-    row = max(core.y, right[0].y)
+    row = max(left.core.y, right.core.y)
     return any(
         _blended(region, row, column)
-        for column in range(core.x + total, right[0].x)
+        for column in range(left.core.x + left.columns, right.core.x)
     )
 
 

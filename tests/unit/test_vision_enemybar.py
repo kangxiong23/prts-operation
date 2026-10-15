@@ -18,14 +18,17 @@
    （`raw_b` 那根就压了 8 行、列还重了 17 列），按「交叠」剔会把真敌条剔掉。
 4. **形状门只收紧**：矩形（每一列都亮着的那几行要装下整块 `RECT_FILL_MIN` 的像素）
    与内部均匀（那 8 行逐行中位色的极差 <= `RECT_ROW_SPREAD_MAX`）。
-5. **整长的量法要跟着画面走**（单 6）：**条身按量到的行数**（不写死 8）、量空轨时
-   与条身之间空 `TRACK_EDGE_GAP` 行、**这一列自己暗**（<= `TRACK_DARK_LINE`）的
-   暗底那一族换一支量法。这一条要是红了，先看那两根点名的条（`在_boss_红宽条`
-   的 115 列红条与 24 列那根）量出来的整长还是不是 154 / 122。
+5. **比例的分母是按族查表的两档常量**（用户 10-15 的裁定）：橙族 -> 小怪档
+   `MOB_FILL_COLUMNS = 123`、红族 -> boss 档 `BOSS_FILL_COLUMNS = 154` ——
+   **分母不来自画面**（量轨道那一套整个退役）。这一条要是红了，先看那两根点名的条
+   （`在_boss_红宽条` 的红条 115/154 = 0.7468 与 24 列那根 24/123 = 0.1951）。
+6. **三支便宜的降级只降不升**：填充段**长过满条长** -> 条数按 `ceil` 降成下界、
+   那一根不给比例；**条身行数与这一档对不上** -> 不给比例（防「橙条 boss」）；
+   **填充段短于 `MIN_FILL_COLUMNS`** -> 条照报在、比例不给。
 
 ## 合成用例是在真帧之外造的
 
-真帧里没有「中间带那一档」「空轨与地形差不到 12 那一档」「敌条短于 12 列」这几档，
+真帧里没有「中间带那一档」「填充段长过满条长那一档」「敌条短于 12 列」这几档，
 它们如实写在 `tests/帧样本/敌人血条/README.md` 的「没覆盖到什么」里。所以那几支用
 合成帧钉：一块空地色 + 画上去的一根条，**判据的形状与「谁画的」无关**，所以画出来
 的那一支是真的走了一遍那条分支。**合成用例一条都不许混进真值**。
@@ -136,11 +139,17 @@ def test_both_directions_are_counted(readings, report) -> None:
     assert all(got[name] == truth[name] for name in truth)
 
 
-def test_the_bar_count_matches_the_recorded_reading(readings, report) -> None:
-    """条数就是 `len(bars)`（这一层不另给一个计数），与落盘的那份读数一致。"""
+def test_the_three_columns_match_the_recorded_reading(readings, report) -> None:
+    """**三栏与落盘的那份读数逐条一致**：逐根 / 一堆 / 未采样各自数一遍。
+
+    （这一层不另给一个计数：条数是那三栏算出来的，见下面「条数」那一组。）
+    """
     recorded = {item["name"]: item for item in report["reads"]}
     for name, entry in readings.items():
-        assert len(entry["result"].bars) == len(recorded[name]["bars"]), name
+        result = entry["result"]
+        assert len(result.bars) == len(recorded[name]["bars"]), name
+        assert len(result.clumps) == len(recorded[name]["clumps"]), name
+        assert len(result.unsampled) == len(recorded[name]["unsampled"]), name
 
 
 def test_the_railing_is_not_a_bar(readings) -> None:
@@ -168,17 +177,24 @@ def test_a_full_health_enemy_has_no_bar(readings) -> None:
     assert _presence(readings[HOUND]) == "不在"
 
 
-def test_the_present_crops_each_carry_exactly_one_bar(readings) -> None:
-    """「在」那四块各自量到**一根**：整长与原点都对得上源帧。"""
+def test_the_present_crops_report_the_origin_of_their_bar(readings) -> None:
+    """「在」那四块各自读出一件东西：**原点**都对得上源帧（条数那件事另有一组用例）。
+
+    `在_raw_b_上` 那一块落的是**一堆**（130 列 > 123），所以它的落点读
+    `clumps[0].region`；另外三块是**逐根**，读 `bars[0].fill_rect`。
+    """
     for name, x, y in (
         ("在_raw_a_左", 1320, 517),
         ("在_raw_a_右", 1677, 480),
-        ("在_raw_b_上", 1546, 481),
         ("在_raw_b_下", 1438, 634),
     ):
         bars = readings[name]["result"].bars
         assert len(bars) == 1, name
-        assert (bars[0].rect.x, bars[0].rect.y) == (x, y), name
+        assert (bars[0].fill_rect.x, bars[0].fill_rect.y) == (x, y), name
+    clumps = readings["在_raw_b_上"]["result"].clumps
+    assert len(clumps) == 1
+    assert (clumps[0].region.x, clumps[0].region.y) == (1546, 481)
+
 
 
 # ---------------------------------------------------------------------------
@@ -233,156 +249,242 @@ def test_a_middle_band_core_never_becomes_exact_false() -> None:
 
 
 def test_a_clean_bar_reads_its_ratio_exactly() -> None:
-    """填 60 + 空轨 40 -> 精确 0.6（空轨量得干净时不给区间）。"""
-    frame = _frame_with_bar(300, 300, 60, 40, enemybar.ENEMY_FILL)
-    bar = enemybar.read_enemy_bars(frame).bars[0]
-    assert bar.rect.width == 100
-    assert isinstance(bar.fill, Valued) and bar.fill.payload == Exact(0.6)
+    """填 60 列 -> 精确 **60/123**（分母是那一档的常量，不是画面上量到的那一截）。
 
-
-def test_a_full_bar_has_no_track_and_reads_one() -> None:
-    """填满（右边一列就是地形）-> 整长就等于填充段 -> **精确 1.0**。"""
-    frame = _frame_with_bar(300, 300, 120, 0, enemybar.ENEMY_FILL)
-    bar = enemybar.read_enemy_bars(frame).bars[0]
-    assert bar.rect.width == 120
-    assert isinstance(bar.fill, Valued) and bar.fill.payload == Exact(1.0)
-
-
-def test_a_soft_tail_widens_the_ratio_into_an_interval() -> None:
-    """空轨尾巴是软的（差在 12…24 之间）-> 整长是个**区间**，比例也是。"""
-    frame = _frame_with_bar(300, 300, 60, 40, enemybar.ENEMY_FILL, fade=10)
-    bar = enemybar.read_enemy_bars(frame).bars[0]
-    assert bar.rect.width == 100
-    assert isinstance(bar.fill, Valued) and isinstance(bar.fill.payload, Interval)
-    assert bar.fill.payload.lo == pytest.approx(0.6)
-    assert bar.fill.payload.hi == pytest.approx(60 / 90)
-
-
-def test_a_track_measured_across_a_fall_back_is_only_a_lower_bound() -> None:
-    """**空轨是跨过回落才量完的 -> 比例只给下界**（用户 10-14 的裁定 3）。
-
-    画一根填 60 列 + 空轨 40 列的条，再把空轨**中间那两列**改回地形色。量空轨的
-    那一趟容得下跨过 `TRACK_GAP`（=2）列回落，所以整长照样量到 100 —— 可那两列
-    到底是轨道里的杂色、还是条本来就到头了，画面答不了。分母不再是**连着**量出来的：
-    真整长只可能更短、真比例只可能更大，所以给的是 `LowerBound(0.6)`，不是精确。
+    干净的那一根：**列数**与**比例**两条读数都落精确，各自带自己的余量。
     """
     frame = _frame_with_bar(300, 300, 60, 40, enemybar.ENEMY_FILL)
-    pixels = frame.pixels.copy()
-    pixels[300 : 300 + enemybar.BAR_ROWS, 370:372] = BASE
+    bar = enemybar.read_enemy_bars(frame).bars[0]
+    assert bar.fill_rect.width == 60
+    assert isinstance(bar.columns.value, Valued)
+    assert bar.columns.value.payload == Exact(60)
+    assert bar.columns.margin is not None
+    assert isinstance(bar.fill.value, Valued)
+    assert bar.fill.value.payload == Exact(60 / enemybar.MOB_FILL_COLUMNS)
+
+
+
+def test_a_full_bar_reads_one() -> None:
+    """**填满那一档**（123 列）-> 精确 1.0。"""
+    full = enemybar.MOB_FILL_COLUMNS
+    frame = _frame_with_bar(300, 300, full, 0, enemybar.ENEMY_FILL)
+    bar = enemybar.read_enemy_bars(frame).bars[0]
+    assert bar.fill_rect.width == full
+    assert isinstance(bar.fill.value, Valued)
+    assert bar.fill.value.payload == Exact(1.0)
+
+
+
+def test_the_denominator_comes_from_the_dial_not_from_the_picture() -> None:
+    """**分母不来自画面**（用户 10-15 的裁定）：右边那一段亮不亮、多宽，都不影响比例。
+
+    同一根**填 100 列**的条，右边画 0 列、40 列、200 列「没填到的那一段」——
+    三次都必须读到 **100/123 = 0.8130**。老那一版把「填充 + 空轨」当整长，
+    同一个画面能读出 0.7143…1.0 一串数，那正是这一版退役掉的东西。
+    """
+    want = Exact(100 / enemybar.MOB_FILL_COLUMNS)
+    for track in (0, 40, 200):
+        frame = _frame_with_bar(300, 300, 100, track, enemybar.ENEMY_FILL)
+        bar = enemybar.read_enemy_bars(frame).bars[0]
+        assert bar.fill_rect.width == 100, track
+        assert isinstance(bar.fill.value, Valued), track
+        assert bar.fill.value.payload == want, track
+
+
+
+def test_a_fill_measured_across_a_blend_is_only_a_lower_bound() -> None:
+    """**填充段中间被压过一截 -> 比例只给下界**（用户 10-15，接过老那一支的位置）。
+
+    画一根填 60 列的条，正中间那 2 列换成**混色**（离填充色 58 > `SCREEN_TOL`，
+    可它离上下那两块地形更远 —— 也就是 `_blended` 认得的那种「被半透明的东西压过」）。
+    `_merge` 会把两块接回一根，而**填充段**那一趟容得下跨过 `FILL_GAP`（= 2）列，
+    所以量到的填充段是 60 列、**严格那一段**只有 50：缝底下藏着什么看不见，
+    只能说「**至少** 50/123」。这与我方血条那条链的 LowerBound 是同一套纪律。
+
+    **两根读数的口径在这一支上刻意不同**（用户 10-15：「填充总列数 = 那个读得准的
+    数」）：`columns`（这一段多宽）是 **60**（缝是压在条上的半透明东西，那两列算在
+    里头），`fill`（填了多少）是 **≥50**（保守）。而且**两条读数各带自己的余量** ——
+    缝那一列把 `columns` 的余量压到 0，`fill` 的余量量的是缝前那一段的门。
+    """
+    pixels = np.full((1260, 2800, 3), BASE, np.uint8)
+    pixels[300:308, 300:360] = enemybar.ENEMY_FILL
+    pixels[300:308, 350:352] = (160, 100, 60)
     frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
     bar = enemybar.read_enemy_bars(frame).bars[0]
-    assert bar.rect.width == 100
-    assert isinstance(bar.fill, Valued)
-    assert bar.fill.payload == LowerBound(0.6)
+    assert bar.fill_rect.width == 60
+    assert isinstance(bar.columns.value, Valued)
+    assert bar.columns.value.payload == Exact(60)
+    assert bar.columns.margin == 0.0, "缝那一列就在门上，余量该是 0"
+    assert isinstance(bar.fill.value, Valued)
+    assert bar.fill.value.payload == LowerBound(50 / enemybar.MOB_FILL_COLUMNS)
+    assert bar.fill.margin is not None and bar.fill.margin > 0.0
 
 
-def test_a_track_that_is_too_soft_is_not_counted() -> None:
-    """**空档那一侧的余量**：与地形差不到 `TRACK_CONTRAST` 的那一段**算不进整长**。
 
-    实测不是空轨的那一侧最大差 **8**、是空轨的最小差 **20**，线取 **12**。
-    差 6 的那一段读不到 —— 这是取舍，如实钉在这里（代价是比例偏高，最坏读到 1.0）。
+def test_what_is_right_of_the_fill_is_never_counted() -> None:
+    """**「没填到的那一段」一列都不算**：它亮也好暗也好，都改不了比例。
+
+    右边画一段**比底色亮**的带子（老那一版靠「与地形差多少」去量它 ——
+    `raw_b` 那张纯灰 177 的带子正是这一档）。这一版连看都不看它：
+    比例只由填充段列数决定。
     """
-    frame = _frame_with_bar(300, 300, 60, 40, enemybar.ENEMY_FILL, fade=40, fade_gap=6)
+    pixels = np.full((1260, 2800, 3), BASE, np.uint8)
+    bright = np.clip(np.asarray(BASE, np.int16) + 81, 0, 255).astype(np.uint8)
+    pixels[300:308, 300:360] = enemybar.ENEMY_FILL
+    pixels[300:308, 360:400] = bright
+    frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
     bar = enemybar.read_enemy_bars(frame).bars[0]
-    assert bar.rect.width == 60
-    assert isinstance(bar.fill, Valued) and bar.fill.payload == Exact(1.0)
+    assert bar.fill_rect.width == 60
+    assert isinstance(bar.fill.value, Valued)
+    assert bar.fill.value.payload == Exact(60 / enemybar.MOB_FILL_COLUMNS)
+
 
 
 def test_the_bar_body_is_measured_not_hard_coded() -> None:
-    """**条身取量到的行数，不写死 8**（用户 10-14 的裁定 3）。
+    """**条身取量到的行数，不写死 8**（用户 10-14 的裁定 2 + 10-15 的跨档校验）。
 
-    画一根 **10 行**的条（boss 那根红条就是 10 行）：填充 60 列 + 空轨 40 列。
-    量到的条身该是 **10 行**（不是写死的 8），整长 100、比例 0.6 —— 还按 8 行取底
-    的话，条自己多出来的那两行会被当成「带下面的地形」，差被拉平（boss 那根
-    就是这么读成 1.0 的）。这一条直接点名 `_body_rows` 量出来的行数 —— 写死 8 会当场红。
+    画一根 **10 行**的**红**条（boss 那一档就是 10 行）：填充 60 列。量到的条身该是
+    **10 行**（不是写死的 8），比例 60/154 —— 这一根的量法**对得上它那一档**，
+    所以比例照给（橙色的 10 行那一根不给，见下一条）。
     """
     pixels = np.full((1260, 2800, 3), BASE, np.uint8)
-    track = np.clip(np.asarray(BASE, np.int16) - 52, 0, 255).astype(np.uint8)
-    pixels[300:310, 300:360] = enemybar.ENEMY_FILL
-    pixels[300:310, 360:400] = track
+    pixels[300:310, 300:360] = enemybar.ENEMY_FILL_RED
     frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
     region, top = enemybar._field(frame)
     core = enemybar._screen(region, top)[0]
     row, rows = enemybar._body_rows(region, core)
     assert (row - core.y, rows) == (0, 10)
     bar = enemybar.read_enemy_bars(frame).bars[0]
-    assert bar.rect.width == 100
-    # 裁定 2：rect 的高也是**量到的**（这条合成条是 10 行，不是写死的 8）。
-    assert (bar.rect.y, bar.rect.height) == (300, 10)
-    assert isinstance(bar.fill, Valued) and bar.fill.payload == Exact(0.6)
+    assert bar.fill_rect.width == 60
+    # 裁定 2：fill_rect 的高也是**量到的**（这条合成条是 10 行，不是写死的 8）。
+    assert (bar.fill_rect.y, bar.fill_rect.height) == (300, 10)
+    assert isinstance(bar.fill.value, Valued)
+    assert bar.fill.value.payload == Exact(60 / enemybar.BOSS_FILL_COLUMNS)
 
 
-def test_the_rail_is_still_measured_on_a_dark_ground() -> None:
-    """**暗底地形**：轨色与它一侧的地形长得一样时也要量到（用户 10-14 的裁定 3）。
+def test_an_orange_bar_with_boss_rows_gets_no_ratio() -> None:
+    """**跨档校验**（用户 10-15 那道便宜闸门）：橙条量到 10 行 -> 不给比例。
 
-    画的地形是**深灰**：条上面那一块与**轨色几乎一样**（差 3），下面那一块才亮一点
-    （差 24）—— 实测 boss 那根红条正是这样（上面差 3、下面差 24），24 列那根是
-    反过来（下面差 8、上面差 26）。「两侧都要差够远」在这一族上会答成「没有空轨」，
-    所以这一列自己暗时按**逐通道、任一侧**算 —— 这一条要是红了，说明那一支被收掉了。
+    橙族走小怪档（8 行），**量到 10 行比这一档更高**，就是「这一根的量法与它那一档
+    对不上」—— 它可能是**橙色的 boss**（那一档是 154 列），拿 123 当分母会系统性
+    报高。这一支**只降不升**：条照报「在」、填充列数照量，这一根落 `unsampled`
+    （比例那一条读数落未采样）。
+
+    **它只拦更高的那一头**（用户 10-15 的裁定 6）：矮一点的不拦。
     """
-    pixels = np.full((1260, 2800, 3), (48, 46, 43), np.uint8)
-    pixels[300:1260, :] = (69, 67, 63)
-    pixels[300:308, 300:360] = enemybar.ENEMY_FILL
-    pixels[300:308, 360:400] = (45, 44, 42)
+    pixels = np.full((1260, 2800, 3), BASE, np.uint8)
+    pixels[300:310, 300:360] = enemybar.ENEMY_FILL
     frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
     result = enemybar.read_enemy_bars(frame)
-    bar = result.bars[0]
-    assert bar.rect.width == 100
-    assert isinstance(bar.fill, Valued) and bar.fill.payload == Exact(0.6)
+    assert result.bars == ()
+    assert len(result.unsampled) == 1
+    bar = result.unsampled[0]
+    assert bar.fill_rect.height == 10
+    assert isinstance(bar.fill.value, Unsampled)
+    assert bar.columns.value.payload == Exact(60), "列数照量，读不出来的是「填了多少」"
+    assert result.count.payload == Exact(1)
+    assert enemybar.MOB_BODY_ROWS != 10
+    assert enemybar.BOSS_BODY_ROWS == 10
 
 
-def test_the_measured_crops_show_all_three_fill_forms(readings) -> None:
-    """真帧上三支都出现过：**精确**（raw_b 下面那根）· **区间**（raw_a 右那根，
-    空轨尾巴是软的）· **下界**（两根：raw_b 上面那根填着的那一截被 1 列压断；
-    raw_a 左那根是空轨**跨过回落**才量完的）。"""
+
+def test_a_fill_longer_than_the_dial_is_more_than_one_bar() -> None:
+    """**一道便宜的算术门**（用户 10-15）：填充段长过满条长 -> **这一坨是一堆**。
+
+    画一根填 **130 列**的橙条：一根小怪的填充不可能长过 123 列，所以这一块落成
+    **一堆**，它的**至少几根** = `ceil(130/123)` = **2** —— 不需要任何「把两根切开来」
+    的能力。**这一堆里没有单根比例**（硬给就是编，「填了 130 列」这件事本身就说明
+    它不止一根）。
+    """
+    frame = _frame_with_bar(300, 300, 130, 0, enemybar.ENEMY_FILL)
+    result = enemybar.read_enemy_bars(frame)
+    assert result.bars == (), "一堆里不许出现单根比例"
+    assert len(result.clumps) == 1
+    clump = result.clumps[0]
+    assert clump.tier == enemybar.MOB_TIER
+    assert clump.columns.value.payload == Exact(130)
+    assert clump.least.value.payload == LowerBound(2)
+    assert result.count.payload == LowerBound(2)
+
+
+
+def test_the_measured_crops_show_the_fill_forms(readings) -> None:
+    """真帧上这几支都出现过：**精确**（raw_a 那两根 84/123、raw_b 下面那根 57/123）·
+    **一堆**（raw_b 上面那 130 列 > 123）· **未采样**（旧批这一批里没有——它由
+    10-14 那两帧钉）。
+
+    **下界**那一支由合成用例
+    （`test_a_fill_measured_across_a_blend_is_only_a_lower_bound`）与 10-14 的互叠
+    那两帧钉。`Interval` 那一档这一版**没有来路**（见判据模块开头「三样读法」）。
+    """
     forms = {}
     for name, entry in readings.items():
         for bar in entry["result"].bars:
-            payload = bar.fill.payload
-            forms.setdefault(name, set()).add(type(payload).__name__)
+            forms.setdefault(name, set()).add(
+                "Unsampled"
+                if isinstance(bar.fill.value, Unsampled)
+                else type(bar.fill.value.payload).__name__
+            )
+    assert forms["在_raw_a_左"] == {"Exact"}
+    assert forms["在_raw_a_右"] == {"Exact"}
     assert forms["在_raw_b_下"] == {"Exact"}
-    assert "Interval" in forms["在_raw_a_右"], "空轨尾巴是软的那一根该给区间"
-    # 用户 10-14 的裁定 3：这一根的空轨是跨过回落才量完的，分母不是连着量出来的
-    # —— 上一版报**精确 0.6512**（画面真值约 0.683），现在只能给下界。
-    assert forms["在_raw_a_左"] == {"LowerBound"}, "跨过回落的那一根不许给精确"
-    assert forms["在_raw_b_上"] == {"LowerBound"}
-    # 两根 raw_a 各自整长 129 / 124 列（画面上是 122…123）。左那根从 125 涨到 129 是
-    # 单 6 改整长量法的后果（取哪几行改了），空档仍在下面那条用例的 131 以内。
+    assert readings["在_raw_b_上"]["result"].bars == ()
+    assert len(readings["在_raw_b_上"]["result"].clumps) == 1
 
 
-def test_the_measured_totals_of_raw_a_stay_near_the_picture(readings) -> None:
-    """`raw_a` 那两根的**整长**要落在画面上那个数附近。
 
-    画面事实：同一批里 20 根满条量到的**众数是 123 列**（`screenshots/_probe.png`
-    那根满条右邻第一列就回到地形，量到 123），而 `raw_a` 那两根的填充段都是 84 列。
-    所以整长该量到 123 上下。**这条钉的是「整长是量出来的、不是拿填充段当整长」**：
-    不量空轨的话，那两根都会读成满条 1.0。
+def test_the_measured_fill_of_raw_a_is_the_picture_truth(readings) -> None:
+    """`raw_a` 那两根的填充段都是 **84 列** -> 精确 **84/123 = 0.6829**。
+
+    画面事实：那两根的填充段都是 84 列（x1320…x1403 的中位色 (220,109,57)；
+    x1404 是 (87,102,83)，逐通道差 132 > `SCREEN_TOL`）。老那一版把这一支读成
+    下界 / 区间（0.6512、0.677…0.683）—— 它们得先**量出**整长才敢给比例。
+    这一版的分母是常量，所以两根都给**精确的同一个数**：它们本来就是同一档。
     """
     for name in ("在_raw_a_左", "在_raw_a_右"):
         bar = readings[name]["result"].bars[0]
-        assert 84 < bar.rect.width <= 131, (name, bar.rect.width)
-        low, _ = _bounds(bar.fill)
-        assert low == pytest.approx(84 / bar.rect.width, abs=0.01), name
+        assert bar.fill_rect.width == 84, name
+        assert isinstance(bar.fill.value, Valued), name
+        assert bar.fill.value.payload == Exact(84 / enemybar.MOB_FILL_COLUMNS), name
 
 
-def test_the_lower_bound_of_a_pressed_bar_is_still_a_valid_bound(readings) -> None:
-    """`raw_b` 上面那根被一条 1 列宽的东西压过：填着的那一截被切断 -> **下界**。
 
-    下界说的是「**至少**这么多」，所以它必须**不大于**整长减掉那一段之后的真实比例 ——
-    这条钉的就是「下界不许被读成上界」。
+def test_the_raw_b_top_core_is_a_clump_of_at_least_two(readings) -> None:
+    """`raw_b` 上面那一块：填充段 **130 列 > 123** -> **一堆**（用户 10-15）。
+
+    画面事实（用户裁定）：那 130 列是**两根的填充首尾相接**，真值是**两根**。
+    链**不要求切开它**（用户原话：是否落成两根「有待讨论，要考虑实现难度」）——
+    只要把它报成**一堆**：**区域 + 至少 2 根 + 填充总列数**；而且**这一堆里
+    没有单根比例**（**不许给 130/123 = 1.06** 这种精确值，> 1 本来也不该出现）。
+
+    用户那道便宜的算术门就是这一支：**填充总列数 > 满条长 ⇒ 这里不止一根**，
+    `ceil(130/123)` = **2**。
     """
-    bar = readings["在_raw_b_上"]["result"].bars[0]
-    assert isinstance(bar.fill, Valued) and isinstance(bar.fill.payload, LowerBound)
-    assert bar.fill.payload.lo == pytest.approx(31 / bar.rect.width)
-    assert bar.fill.payload.lo < 130 / bar.rect.width
+    result = readings["在_raw_b_上"]["result"]
+    assert result.bars == ()
+    assert len(result.cores) == 1 and len(result.clumps) == 1
+    clump = result.clumps[0]
+    assert clump.tier.name == "小怪" and clump.tier.full_columns == 123
+    assert clump.columns.value.payload == Exact(130)
+    assert clump.least.value.payload == LowerBound(2)
+    assert clump.region.width == 130
+    assert isinstance(result.count, Valued)
+    assert isinstance(result.count.payload, LowerBound)
+    assert result.count.payload.lo >= 2
 
 
-def test_a_pressed_bar_stays_one_bar_not_two(readings) -> None:
-    """被 1 列压过的那一根**还是一根**（接回去），不是两根。"""
+
+def test_a_one_column_seam_does_not_split_the_core(readings) -> None:
+    """`raw_b` 上面那一块**筛出来还是一块**：正中间那条 1 列宽的暗缝由 `_merge` 接回。
+
+    接回之后它是 **130 列的一整块**（`cores` 也是 1 块）—— **接回不等于「它是一根
+    条」**：130 > 123 说明这里**不止一根**（见上一条）。那条缝本身只是用户 10-15
+    说的**分不开的边界候选**，**不许当精确切点**。
+    """
     entry = readings["在_raw_b_上"]
-    assert len(entry["result"].bars) == 1
     assert len(entry["result"].cores) == 1
-    assert entry["result"].cores[0].rect.width == 130
+    assert entry["result"].cores[0].fill_rect.width == 130
+
 
 
 # ---------------------------------------------------------------------------
@@ -399,16 +501,20 @@ def test_our_own_bar_next_to_an_enemy_bar_does_not_eat_it(readings, harvest) -> 
     assert entry["result"].bars, "我方条把敌条吃掉了"
     kept = [core for core in entry["result"].cores if not core.masked]
     assert len(kept) == 1
-    assert kept[0].rect.x == 1677
+    assert kept[0].fill_rect.x == 1677
 
 
 def test_the_raw_b_overlap_is_not_a_coincidence() -> None:
-    """`raw_b` 那根敌条的**行带整段**压在我方条上（8 行）、列还重 17 列 -> 仍不许被剔。"""
+    """`raw_b` 那根敌条的**行带整段**压在我方条上（8 行）、列还重 17 列 -> 仍不许被剔。
+
+    这一块落的是**一堆**（130 列 > 123），所以落点读 `clumps[0].region`。
+    """
     frame = _load_source_frame(BATCH, "在_raw_b_上")
     ours = [PixelRect(1417, 476, 146, 8)]
     result = enemybar.read_enemy_bars(frame, our_bars=ours)
-    assert len(result.bars) == 1
-    assert result.bars[0].rect.x == 1546
+    assert len(result.clumps) == 1
+    assert result.clumps[0].region.x == 1546
+    assert result.bars == ()
     assert all(not core.masked for core in result.cores)
 
 
@@ -418,7 +524,7 @@ def test_a_core_that_sits_on_our_bar_is_dropped() -> None:
     enemy = PixelRect(1677, 480, 146, 8)
     result = enemybar.read_enemy_bars(frame, our_bars=[enemy])
     assert any(core.masked for core in result.cores)
-    assert all(bar.rect.x != 1677 for bar in result.bars)
+    assert all(bar.fill_rect.x != 1677 for bar in result.bars)
 
 
 def test_the_skill_bar_slot_of_our_own_ui_is_also_ours() -> None:
@@ -464,10 +570,12 @@ def _bounds(fill: SlotValue) -> tuple[float, float]:
 
 
 def test_a_fill_between_the_two_width_gates_is_a_short_bar() -> None:
-    """两道宽度门之间的那一档：**存在性照报，比例未采样**（用户这一单的裁定 2）。
+    """两道宽度门之间的那一档：**存在性照报、列数照量，填了多少不给**。
 
     `MIN_CANDIDATE_COLUMNS`（7）是候选的门、`MIN_FILL_COLUMNS`（12）是够不够量
-    比例的门 —— 11 落在中间，所以它是一条**条**，只是比例不给。
+    比例的门 —— 11 落在中间，所以它是一条**条**，只是**填了多少读不出来**：
+    这一根落 `unsampled` 那一栏（用户 10-15：「未采样只留给那一根确实有东西、
+    但连填充都读不出来」）。
     """
     narrow = enemybar.MIN_FILL_COLUMNS - 1
     assert narrow >= enemybar.MIN_CANDIDATE_COLUMNS
@@ -475,8 +583,11 @@ def test_a_fill_between_the_two_width_gates_is_a_short_bar() -> None:
     result = enemybar.read_enemy_bars(frame)
     assert len(result.cores) == 1
     assert result.presence.payload == Exact(True)
-    assert [bar.rect.x for bar in result.bars] == [300]
-    assert isinstance(result.bars[0].fill, Unsampled)
+    assert result.bars == ()
+    assert [bar.fill_rect.x for bar in result.unsampled] == [300]
+    assert isinstance(result.unsampled[0].fill.value, Unsampled)
+    assert result.unsampled[0].columns.value.payload == Exact(narrow)
+    assert result.count.payload == Exact(1)
 
 
 def test_a_fill_below_the_candidate_gate_is_not_a_bar() -> None:
@@ -519,7 +630,7 @@ def test_the_field_still_reads_a_bar_just_inside_it() -> None:
     row = enemybar.FIELD_BOTTOM - enemybar.BAR_ROWS
     frame = _frame_with_bar(300, row, 60, 40, enemybar.ENEMY_FILL)
     result = enemybar.read_enemy_bars(frame)
-    assert len(result.bars) == 1 and result.bars[0].rect.y == row
+    assert len(result.bars) == 1 and result.bars[0].fill_rect.y == row
 
 
 # ---------------------------------------------------------------------------
@@ -572,23 +683,19 @@ def _frame_with_bar(
     track: int,
     colour: tuple[int, int, int],
     *,
-    fade: int = 0,
-    fade_gap: int = 20,
+    rows: int = enemybar.BAR_ROWS,
 ) -> Frame:
-    """一块空地色 + 画上去的一根条：填充 `fill` 列、空轨 `track` 列、软尾 `fade` 列。
+    """一块空地色 + 画上去的一根条：填充 `fill` 列、**没填到的那一段** `track` 列。
 
-    空轨的颜色比底色暗 52（远过 `TRACK_CONTRAST`）；软尾的颜色比底色暗 `fade_gap`。
+    那一段的颜色比底色暗 52（离填充色很远）：它**一列都不算填充**（这一版量的是
+    填充段，`track` 只是用来钉「画面右边那一段再亮也不算数」）。`rows` 是画多高，
+    用来钉跨档校验（小怪 8 行 / boss 10 行）。
     """
     pixels = np.full((1260, 2800, 3), BASE, np.uint8)
-    pixels[y : y + enemybar.BAR_ROWS, x : x + fill] = colour
+    pixels[y : y + rows, x : x + fill] = colour
     base = np.asarray(BASE, np.int16)
     track_colour = np.clip(base - 52, 0, 255).astype(np.uint8)
-    fade_colour = np.clip(base - fade_gap, 0, 255).astype(np.uint8)
-    strong = track - fade
-    pixels[y : y + enemybar.BAR_ROWS, x + fill : x + fill + strong] = track_colour
-    pixels[
-        y : y + enemybar.BAR_ROWS, x + fill + strong : x + fill + track
-    ] = fade_colour
+    pixels[y : y + rows, x + fill : x + fill + track] = track_colour
     return Frame(canvas=CANVAS_2800x1260, pixels=pixels)
 
 
@@ -607,8 +714,8 @@ def _load_source_frame(batch_dir: Path, name: str) -> Frame:
 #
 # 这一批的缺口与真值见 tests/帧样本/敌人血条-10-14/README.md。这里只钉**行为**：
 # 哪几块报在 / 不在、条数是精确还是下界、分不开的那几根比例落什么形态 ——
-# 另外钉住**单 6 那两根点名的条量对了**（整长 154 / 122）。那一次改的是**整长
-# 的量法**（条身按量到的行数、暗底那一支），三态与条数的判据一行没动。
+# 另外钉住**那两根点名的条按两档常量读对了**（红条 115/154、24 列那根 24/123），
+# 以及**跨档校验**（橙条 10 行不给比例）那一道便宜闸门。
 
 
 BATCH_1014 = REPO / "tests" / "帧样本" / "敌人血条-10-14"
@@ -682,6 +789,11 @@ def test_the_10_14_crops_read_the_way_the_readings_file_says(
         ), name
         payload = item["count"]["payload"]
         assert len(result.bars) == len(item["bars"]), name
+        assert len(result.clumps) == len(item["clumps"]), name
+        assert len(result.unsampled) == len(item["unsampled"]), name
+        assert len(result.bars) + len(result.unsampled) + sum(
+            int(clump["least"]["value"]["payload"]["lo"]) for clump in item["clumps"]
+        ) == (payload["value"] if payload["form"] == "exact" else payload["lo"]), name
         if payload["form"] == "exact":
             assert result.count.payload == Exact(payload["value"]), name
         else:
@@ -709,6 +821,7 @@ def test_a_full_health_frame_has_no_bar_at_all(readings_1014) -> None:
     assert result.presence.payload == Exact(False)
     assert result.count.payload == Exact(0)
     assert result.bars == ()
+    assert result.clumps == () and result.unsampled == ()
     assert result.cores == ()
 
 
@@ -745,12 +858,13 @@ def test_a_short_fill_is_present_but_its_ratio_is_unsampled(
     result = entry["result"]
     assert result.presence.payload == Exact(True)
     assert result.count.payload == Exact(1)
-    assert len(result.bars) == 1
+    assert result.bars == ()
+    assert len(result.unsampled) == 1
     assert result.cores != ()
-    bar = result.bars[0]
-    assert (bar.rect.x, bar.rect.y) == (1506, 481)
-    assert isinstance(bar.fill, Unsampled)
-    assert bar.separated
+    bar = result.unsampled[0]
+    assert (bar.fill_rect.x, bar.fill_rect.y) == (1506, 481)
+    assert isinstance(bar.fill.value, Unsampled)
+    assert bar.columns.value.payload == Exact(7), "列数照量，读不出来的是「填了多少」"
     fill = entry["frame"].pixels[481:489, 1506:1630]
     runs = (_colour_distance(fill) <= enemybar.SCREEN_TOL).all(axis=0)
     leading = 0
@@ -761,30 +875,26 @@ def test_a_short_fill_is_present_but_its_ratio_is_unsampled(
 
 
 def test_the_red_wide_bar_is_read_by_the_red_family(readings_1014) -> None:
-    """boss 那一帧的**红宽条**：橙族读不到它，**红族**读到，而且整长量对了。
+    """boss 那一帧的**红宽条**：橙族读不到它，**红族**读到，比例 = 115/154 = 0.7468。
 
     画布坐标下的画面事实：红条 x1562…1676 y1002…1011 —— **10 行**、填充 115 列、
     中位色 (197,41,40)；离 ENEMY_FILL_RED 的逐像素最大差 **14**（进得了门），
-    离 ENEMY_FILL 的最小差 **59**（橙族读不到）。右边 x1677…1714 是一段**暗轨**
-    (45,44,42)，所以整长 **154**、比例 115/154 = **0.7468**（用户 10-14 要求给到
-    「约 0.74」）。
+    离 ENEMY_FILL 的最小差 **59**（橙族读不到）。
 
-    **上一版这一根读成 1.0**：那时空轨按写死的 8 行取上下底，条自己多出来的
-    那两行（y1001 / y1012 还是轨色）被当成了地形，差被拉平到 7…11 <
-    `TRACK_CONTRAST`。这一条钉的就是**整长不许再量成填充段**。
+    分母是**红族那一档的常量** `BOSS_FILL_COLUMNS = 154` —— 用户 10-15 认这个数，
+    但按 (c) 记账：红族全库只有这一根真值，而且那次标定借过「量轨道」那条退役的路
+    （那根红条自己**不满**，只有 115 列）。**运行时不再量轨道**。
     """
     result = readings_1014["在_boss_红宽条"]["result"]
     assert result.presence.payload == Exact(True)
     assert result.count.payload == Exact(3)
-    assert [bar.rect.x for bar in result.bars] == [1608, 1562, 1422]
-    red = [bar for bar in result.bars if bar.rect.x == 1562][0]
-    assert red.rect.width == 154
-    # 用户 10-14 的裁定 2：rect 的高是**量到的**条身行数。这一根画面上就是 10 行，
-    # 报 8 就是拿常量冒充事实（BAR_ROWS 只当默认与上限）。
-    assert (red.rect.y, red.rect.height) == (1002, 10)
-    low, high = _bounds(red.fill)
-    assert low == pytest.approx(115 / 154, abs=0.001)
-    assert high < 0.79
+    assert [bar.fill_rect.x for bar in result.bars] == [1608, 1562, 1422]
+    red = [bar for bar in result.bars if bar.fill_rect.x == 1562][0]
+    assert red.fill_rect.width == 115
+    # 裁定 2：fill_rect 的高是**量到的**条身行数。这一根画面上就是 10 行。
+    assert (red.fill_rect.y, red.fill_rect.height) == (1002, 10)
+    assert isinstance(red.fill.value, Valued)
+    assert red.fill.value.payload == Exact(115 / enemybar.BOSS_FILL_COLUMNS)
     frame = readings_1014["在_boss_红宽条"]["frame"]
     body = frame.pixels[1002:1012, 1562:1677]
     assert body.shape == (10, 115, 3)
@@ -795,25 +905,22 @@ def test_the_red_wide_bar_is_read_by_the_red_family(readings_1014) -> None:
     assert body.shape[1] >= enemybar.RED_MIN_COLUMNS
 
 
+
 def test_the_twenty_four_column_bar_is_a_small_enemy_bar(readings_1014) -> None:
     """那根 **24 列**的：用户 10-14 裁定它是**一根小怪的血条**，不是假阳性。
 
-    所以它上一版的 1.0 是错的 —— 真实比例约 24 ÷ **小怪那一档的条长**。这一版
-    量出来了：整长 **122**（与 `在_快死的敌人` 那根同宽，也就是小怪那一档）、
-    比例 24/122 = **0.1967**（用户要的「约五分之一」）。
-
-    它在机甲脚下那块**暗底**上：x1632…1709 的轨色与它一侧的地形几乎一样
-    （(25,18,20) 对下面 (30,28,30) 只差 8），靠 `TRACK_DARK_LINE` 那一支才量得
-    下来；x1710…1729 那 20 列 (44,43,41) 是它最后一段轨。
+    所以它上一版的 1.0 是错的 —— 分母是**小怪那一档**的 `MOB_FILL_COLUMNS = 123`：
+    24/123 = **0.1951**（用户 10-14 要的「约五分之一」）。
     """
     bar = [
         item
         for item in readings_1014["在_boss_红宽条"]["result"].bars
-        if item.rect.x == 1608
+        if item.fill_rect.x == 1608
     ][0]
-    assert bar.rect.width == 122
-    low, _ = _bounds(bar.fill)
-    assert low == pytest.approx(24 / 122, abs=0.005)
+    assert bar.fill_rect.width == 24
+    assert isinstance(bar.fill.value, Valued)
+    assert bar.fill.value.payload == Exact(24 / enemybar.MOB_FILL_COLUMNS)
+
 
 
 def test_the_red_width_gate_still_leaves_the_boss_bar_in() -> None:
@@ -875,7 +982,7 @@ def test_a_blob_with_fringes_is_not_a_rectangle() -> None:
     assert body * window.shape[1] < enemybar.RECT_FILL_MIN * int(mask.sum())
     cores = enemybar.screened_cores(frame)
     assert all(
-        not (core.rect.x == 2120 and core.rect.y == 317) for core in cores
+        not (core.fill_rect.x == 2120 and core.fill_rect.y == 317) for core in cores
     ), "这一块被读成候选了"
 
 
@@ -891,6 +998,7 @@ def test_the_two_hard_negatives_are_still_absent(readings) -> None:
         entry = readings[name]
         assert entry["result"].presence.payload == Exact(False), name
         assert entry["result"].bars == (), name
+        assert entry["result"].clumps == () and entry["result"].unsampled == (), name
         assert entry["result"].cores == (), name
 
 
@@ -910,64 +1018,115 @@ def test_the_bar_pressed_against_our_operator_is_not_dropped(readings_1014) -> N
     """**敌条压住我方干员的条**：那一根要读到，而且不许被当成我们自己的剔掉。
 
     它正踩在我方技力条那 8 行上，而我方血条的左缘在它左边 12 列（> `COL_SLACK`）——
-    所以判「重合」不会把它吃掉。它这一支的填充是**区间**（空轨尾巴是软的）。
+    所以判「重合」不会把它吃掉。
+
+    **那一根没被压住**（用户 10-15 的裁定）：真值就是 123 列 / 填充 30 列，
+    比例 **30/123 = 0.2439**、**精确**、不给下界。老那一版只量到 42 列、给的是区间
+    0.7143…0.8824 —— 根因是**半透明的轨道被底下那条我方条染了色**。这是
+    「轨道不可信」的**第二条实证**（第一条是 `S8-3-4`）。
     """
     entry = readings_1014["在_压住干员"]
     result = entry["result"]
     assert result.presence.payload == Exact(True)
     assert result.count.payload == Exact(1)
     assert len(result.bars) == 1
-    assert result.bars[0].rect.x == 1339 and result.bars[0].rect.y == 701
-    assert isinstance(result.bars[0].fill.payload, Interval)
+    bar = result.bars[0]
+    assert (bar.fill_rect.x, bar.fill_rect.y) == (1339, 701)
+    assert bar.fill_rect.width == 30
+    assert isinstance(bar.fill.value, Valued)
+    assert bar.fill.value.payload == Exact(30 / enemybar.MOB_FILL_COLUMNS)
     assert all(core.masked is False for core in result.cores)
+
 
 
 def test_the_overlap_frames_never_report_an_exact_count(readings_1014) -> None:
     """**叠在一起的那两帧：条数不许报精确**（用户 10-14 的裁定）。
 
-    它们报的是「至少几根」，而且那个数**不许高报** —— 所以它必须 <= 链看到的根数，
-    分不开的那几根也必须落**未采样**（整长量不准，比例就没有分母）。
+    它们报的是「至少几根」，而且那个数**不许高报**。分不开的那几根**整坨落成一堆**
+    （用户 10-15：「一堆」是一条正经的读数），**一堆里没有单根比例**。
+
+    **两边不打架**（用户 10-15 的裁定 4）：下界 = 逐根 + 未采样 + 各堆的
+    「至少几根」之和。
     """
     for name in ("在_互叠1", "在_互叠2"):
         result = readings_1014[name]["result"]
         assert result.presence.payload == Exact(True), name
         assert isinstance(result.count, Valued), name
         assert isinstance(result.count.payload, LowerBound), name
-        loose = [bar for bar in result.bars if not bar.separated]
-        assert loose, name
-        assert all(isinstance(bar.fill, Unsampled) for bar in loose), name
-        assert result.count.payload.lo <= len(result.bars), name
-        assert result.count.payload.lo == len(result.bars) - len(loose), name
+        assert result.clumps, name
+        least = sum(int(clump.least.value.payload.lo) for clump in result.clumps)
+        assert result.count.payload.lo == (
+            len(result.bars) + len(result.unsampled) + least
+        ), name
 
 
-def test_the_first_batch_never_has_to_degrade_its_count(readings) -> None:
-    """上一批 9 块**一根都没有分不开的** —— 条数全是精确，行为与加这一支之前一样。"""
+def test_a_clump_carries_its_total_fill_and_its_least_bars(readings_1014) -> None:
+    """**要求 5①**：叠条那一坨落成「一堆」，而且带**填充总列数 + 至少几根**。
+
+    真帧 `在_互叠1`：x1628 那 138 列与 x1808 那 48 列的两块**分不开**（同一条行带、
+    填充挨着），所以它们**整坨**落成一堆 —— 区域是这两根填充段的外接框（1628 宽 228），
+    填充总列数是两根**相加**（186），至少几根 = `ceil(186/123)` = **2**。
+
+    这一堆的**填充总列数落的是下界**（组里有一条的右边没读到）—— 那正是用户要的
+    「它自己带形态」，而「至少几根」跟着它算。
+    """
+    result = readings_1014["在_互叠1"]["result"]
+    assert len(result.clumps) == 1
+    clump = result.clumps[0]
+    assert clump.tier == enemybar.MOB_TIER, "一堆要能看出是哪一档"
+    assert (clump.region.x, clump.region.width) == (1628, 228)
+    assert clump.columns.value.payload == LowerBound(186)
+    assert clump.columns.margin is not None
+    assert clump.least.value.payload == LowerBound(2)
+    least = sum(int(item.least.value.payload.lo) for item in result.clumps)
+    assert result.count.payload.lo == len(result.bars) + len(result.unsampled) + least
+
+
+
+def test_the_first_batch_degrades_its_count_in_exactly_one_place(readings) -> None:
+    """旧批 9 块：**8 块的条数精确、且等于三栏的根数**；只有 `在_raw_b_上` 降成
+    下界 —— 它的填充段 130 列 > 123，说明那里**不止一根**（用户 10-15 的裁定）。
+
+    也就是说：这一处降级**不是判据变松了**，是用户把那一块的真值从 1 根改成了 2 根。
+    """
     for name, entry in readings.items():
-        payload = entry["result"].count.payload
-        assert isinstance(payload, Exact), name
-        assert payload.value == len(entry["result"].bars), name
-        assert all(bar.separated for bar in entry["result"].bars), name
+        result = entry["result"]
+        if name == "在_raw_b_上":
+            assert isinstance(result.count.payload, LowerBound), name
+            assert result.count.payload.lo >= 2, name
+            assert len(result.clumps) == 1 and result.bars == (), name
+            continue
+        assert result.clumps == (), name
+        assert isinstance(result.count.payload, Exact), name
+        assert result.count.payload.value == len(result.bars) + len(result.unsampled), name
 
 
-def test_two_bars_on_one_row_band_are_not_counted_twice() -> None:
-    """合成：**同一条行带上、整长交叠**的两块 —— 条数降成「至少 1 根」。
 
-    左边那根的空轨**伸到右边那根的底下**，所以两块的整长交叠。同一条 8 行带上
-    不可能这样并排放，所以至少有一块是被截出来的一截 —— 「至少 1 根」是真的，
-    而「根数 = 2」是一个没有依据的精确主张。
+def test_two_cores_on_one_row_band_are_not_counted_twice() -> None:
+    """合成：**同一条行带上、填充段被一段不混色的东西断开** -> 整坨落成**一堆**。
+
+    右边那一块（x352 那 8 列）与左边那一根同带，而且左边那一根的**填充段那一趟**
+    容得下跨过中间那 2 列 `FILL_GAP` —— 也就是说这两块**分不开**（`_touching`
+    判的是**填充段自己的像素**：跨过去了就是相接）。同一条行带上两段填充这么并排，
+    至少有一段是被截出来的一截 —— 所以「根数 = 2」是一个没有依据的精确主张。
+
+    **要求 5②**：这一堆里**一根都不给单根比例**（`bars` 是空的）—— 硬给就是编。
     """
     pixels = np.full((1260, 2800, 3), BASE, np.uint8)
     track = np.clip(np.asarray(BASE, np.int16) - 52, 0, 255).astype(np.uint8)
-    pixels[300:308, 300:320] = enemybar.ENEMY_FILL
-    pixels[300:308, 320:410] = track
-    pixels[300:308, 390:410] = enemybar.ENEMY_FILL
-    pixels[300:308, 410:500] = track
+    pixels[300:308, 300:350] = enemybar.ENEMY_FILL
+    pixels[300:308, 350:352] = track
+    pixels[300:308, 352:360] = enemybar.ENEMY_FILL
     frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
     result = enemybar.read_enemy_bars(frame)
-    assert [bar.rect.x for bar in result.bars] == [300, 390]
-    assert [bar.separated for bar in result.bars] == [True, False]
+    assert result.bars == (), "一堆里不许出现单根比例"
+    assert len(result.clumps) == 1
+    clump = result.clumps[0]
+    assert (clump.region.x, clump.region.width) == (300, 60)
+    assert clump.columns.value.payload == Exact(68)
+    assert clump.least.value.payload == LowerBound(1)
     assert result.count.payload == LowerBound(1)
-    assert isinstance(result.bars[1].fill, Unsampled)
+
 
 
 def test_two_bars_on_different_bands_are_counted_exactly() -> None:
@@ -980,8 +1139,51 @@ def test_two_bars_on_different_bands_are_counted_exactly() -> None:
     frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
     result = enemybar.read_enemy_bars(frame)
     assert len(result.bars) == 2
-    assert all(bar.separated for bar in result.bars)
+    assert result.clumps == ()
     assert result.count.payload == Exact(2)
+
+
+def test_two_families_never_share_a_clump() -> None:
+    """**按族归组、不许跨族**（用户 10-15 的裁定 2）：橙条与红条挨着也各算一根。
+
+    画一根 60 列的橙条，紧挨着它右边画一根 64 列的红条（**填充首尾相接**）。
+    没有族门的话这两块会被接成一根（或者并成一组）—— 那样「至少几根」要除以哪一档
+    的满条长就说不清了；有族门就是**两根**，各走各的档（橙 -> 小怪 123、
+    红 -> boss 154）。
+    """
+    pixels = np.full((1260, 2800, 3), BASE, np.uint8)
+    pixels[300:308, 300:360] = enemybar.ENEMY_FILL
+    pixels[300:308, 360:424] = enemybar.ENEMY_FILL_RED
+    frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
+    result = enemybar.read_enemy_bars(frame)
+    assert result.clumps == (), "跨族并成一组了"
+    assert [bar.fill_rect.x for bar in result.bars] == [300, 360]
+    assert result.count.payload == Exact(2)
+
+
+def test_the_clump_branch_is_load_bearing(monkeypatch, readings_1014) -> None:
+    """**要求 5④ 红证**：把「一堆」这一支**整个拆掉**，本文件钉「一堆」的那几条用例
+    必须变红 —— 拆了还绿，就说明它们钉的不是这一支。
+
+    拆法：`_is_clump` 恒假。于是
+
+    - `在_raw_b_上` 那 130 列的一坨**不再是一堆**：它被当成一根读，**条数报成精确
+      1**（真值是至少 2）—— 正是这一支要挡的那种「假精确」；
+    - `在_互叠1` 那两栏也塌成一栏（`clumps` 空），条数报成**精确 17**（真值是
+      下界 17）—— 用户 10-14「叠在一起的条不许报精确」那条裁定就被推翻了。
+
+    这里断言的是**拆掉之后的状态**，与文件里那几条用例的断言正好相反。
+    """
+    assert readings_1014["在_互叠1"]["result"].clumps
+    monkeypatch.setattr(enemybar, "_is_clump", lambda members: False)
+    raw_b = enemybar.read_enemy_bars(_load_source_frame(BATCH, "在_raw_b_上"))
+    assert raw_b.clumps == ()
+    assert len(raw_b.bars) == 1
+    assert raw_b.count.payload == Exact(1), "拆掉之后真值 >= 2 的地方报成了精确 1"
+    overlap = enemybar.read_enemy_bars(readings_1014["在_互叠1"]["frame"])
+    assert overlap.clumps == ()
+    assert len(overlap.bars) + len(overlap.unsampled) == 17
+    assert overlap.count.payload == Exact(17), "分不开的那一帧被报成了精确"
 
 
 def test_a_frame_with_nothing_in_it_counts_zero() -> None:
@@ -1010,26 +1212,47 @@ def test_the_readings_files_record_the_count_rule(report, report_1014) -> None:
         assert "LowerBound" in rule and "Exact" in rule
         assert "不高报" in rule
         assert "条数" in rule
+        assert "一堆" in rule
+        assert "不打架" in rule
 
 
 def test_the_readings_files_record_the_new_gates(report, report_1014) -> None:
-    """**形状门、短条、红族**这几支也落在尺子上 —— 判据变了，读数就得跟着变。"""
+    """**两档常量、跨档校验、短条、红族**这几支都落在尺子上 —— 判据变了，读数跟着变。"""
     for payload in (report, report_1014):
         ruler = payload["ruler"]
         assert "ENEMY_FILL_RED" in ruler["colour"]
         assert str(enemybar.MIN_CANDIDATE_COLUMNS) in ruler["shape"]
         assert str(enemybar.RED_MIN_COLUMNS) in ruler["shape"]
-        assert str(enemybar.MIN_FILL_COLUMNS) in ruler["short"]
-        assert "未采样" in ruler["short"]
+        assert str(enemybar.MIN_FILL_COLUMNS) in ruler["unsampled"]
+        assert "未采样" in ruler["unsampled"]
+        assert "clumps" in ruler["unsampled"]
         assert str(enemybar.RECT_FILL_MIN) in ruler["rectangle"]
         assert str(enemybar.RECT_ROW_SPREAD_MAX) in ruler["rectangle"]
         assert str(enemybar.MAX_BAR_ROWS) in ruler["body"]
-        assert str(enemybar.BAR_ROWS) in ruler["body"]
+        assert str(enemybar.MOB_BODY_ROWS) in ruler["body"]
+        assert str(enemybar.BOSS_BODY_ROWS) in ruler["body"]
         assert "量到的行数" in ruler["body"]
-        assert "TRACK_EDGE_GAP" in ruler["track"]
-        assert "TRACK_DARK_LINE" in ruler["track"]
-        # 裁定 3：比例形态那一支（空轨跨过回落时只给下界）也要落在尺子上。
+        assert "更高" in ruler["body"], "跨档校验只拦更高的那一头"
+        # 两档常量（分母）那一栏：两条都要写进去，并说清「画布宽 2800」与「未验」。
+        dial = ruler["dial"]
+        assert str(enemybar.MOB_FILL_COLUMNS) in dial
+        assert str(enemybar.BOSS_FILL_COLUMNS) in dial
+        assert "2800" in dial
+        assert "未验" in dial
+        # **两条读数各自的形态**都要落在尺子上（列数一条、比例一条）。
+        assert "Exact" in ruler["columns"] and "LowerBound" in ruler["columns"]
+        assert "FILL_GAP=" in ruler["columns"]
         assert "LowerBound" in ruler["fill"]
-        assert "跨过" in ruler["fill"]
+        assert "未采样" in ruler["fill"]
         assert "Exact" in ruler["fill"]
+        # 「一堆」那一支的规则：判据（分不开 / 长过满条长）、按族归组、至少几根。
+        assert "分不开" in ruler["clump"] and "满条长" in ruler["clump"]
+        assert "不许跨族" in ruler["clump"]
+        assert "至少几根" in ruler["clump"]
+        assert "上界" in ruler["clump"]
+        # 轨道那一套**整个退役**：尺子上不许再有那一栏；旧的 short 那一栏也并进
+        # `unsampled` 了（同一条判据不写两遍）。
+        assert "track" not in ruler
+        assert "short" not in ruler
+
 

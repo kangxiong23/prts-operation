@@ -1,7 +1,7 @@
 {
   "note": "敌人血条那条链的判据读数。它不判断够不够 —— 那是规划者的事；这里只放逐帧读数、两簇的分布与空档、以及覆盖说明。",
   "batch": "tests/帧样本/敌人血条",
-  "version": 1,
+  "version": 2,
   "canvas": [
     2800,
     1260
@@ -10,16 +10,17 @@
   "ruler": {
     "colour": "逐像素离 ENEMY_FILL (218,106,53) 或 ENEMY_FILL_RED (197,41,40) 的逐通道最大差 <= SCREEN_TOL=34 —— **两族各筛一遍、不并掩膜**",
     "shape": "只留竖着连成 8 行的像素（前景与背景各扫一遍的连续长度），再按连通块取 高 <= 12；宽的门按族分：橙族 >= 7、红族 >= 60",
-    "columns": "块里**量到的条身那几行**逐列取中位色，离这一族参考色的逐通道最大差 <= 34 的列算作填充段",
-    "body": "条身**按量到的行数**（不写死 8）：自那一块的行起，上下扩到「填充段那几列的中位色不再像这一族参考色」为止，封顶 MAX_BAR_ROWS=12。每一根报出来的高（EnemyBar.rect）就是这个**量到的行数**，不是常量 BAR_ROWS=8",
+    "columns": "块里**量到的条身那几行**逐列取中位色，离这一族参考色的逐通道最大差 <= SCREEN_TOL=34 的列算作填充段，中间容 FILL_GAP=2 列不亮（抗锯齿、一根窄遮挡）。**填充段列数**就是容得下那个缝的数：干净 -> Exact · 右边还接着亮（没读到右端）-> LowerBound；**列数这一支不看缝**（缝底下是半透明遮挡压出来的，那几列算进这一段）—— 缝只压低它的**余量**",
+    "body": "条身**按量到的行数**（不写死 8）：自那一块的行起，上下扩到「填充段那几列的中位色不再像这一族参考色」为止，封顶 MAX_BAR_ROWS=12。每一根报出来的高（`EnemyBar.fill_rect.height`）就是这个**量到的行数**；它**比这一档更高**时（小怪 MOB_BODY_ROWS=8 / boss BOSS_BODY_ROWS=10）这一根落 `unsampled` —— 跨档校验**只拦更高的那一头**",
     "exits": "分数 = 1 - 颜色距 / 255；>= 1-16/255 为在，<= 1-28/255 为不在，中间为未采样",
     "rectangle": "矩形：每一列都亮着的那几行（条身）要装下整块的 >= 0.95 像素；内部均匀：那 8 行逐行取中位色，通道极差 <= 20",
-    "short": "填充段短于 MIN_FILL_COLUMNS=12 的候选**照样报在**，比例落未采样",
-    "track": "整长 = 填充段 + 空轨。量空轨时与条身之间空 TRACK_EDGE_GAP=1 行；空轨的判据：这一列自己暗（亮度 <= TRACK_DARK_LINE=55）时**逐通道**比、上下**任一侧**差 > TRACK_CONTRAST=12 就算，否则与上下两块地形的**均值**两侧都差 > 12 才算。**终止**：连着 TRACK_GAP+1 列都不够远就停",
-    "fill": "填充比例 = 填充段 / 整长，按四支落形态：填充段中间被切断 -> LowerBound；空轨尾巴是软的 -> Interval；空轨量到上限 -> Interval；**空轨是跨过回落才量完的（走到那儿得先跨过几列「不是轨道」） -> LowerBound** —— 分母不是连着量出来的，真整长只可能更短、真比例只可能更大，所以只给下界；其余 -> Exact",
+    "unsampled": "`unsampled` 那一栏落的是**未采样**（`Unsampled()`）：那一根确实有东西、但**填了多少读不出来** —— 填充段短于 MIN_FILL_COLUMNS=12（条照报在、列数照量），或者条身行数比这一档更高。它与 `clumps` 是两件事（一堆 = 知道那一坨在哪、多大、至少几只）",
+    "dial": "分母是**按族查表的两档常量**：橙族 -> 小怪档 MOB_FILL_COLUMNS=123、红族 -> boss 档 BOSS_FILL_COLUMNS=154（都是**画布宽 2800 下的绝对像素**；别的分辨率未验，见模块开头「分辨率」那一节）。运行时**不量轨道**：比例 = 填充段列数 / 那一档的满条长",
+    "fill": "填充比例 = 填充段列数 / 那一档的满条长，按四支落形态：填充段短于 MIN_FILL_COLUMNS=12 -> 未采样；条身行数**比这一档更高** -> 未采样（跨档校验）；填充段中间有缝、或者右边没到头 -> LowerBound(缝前那一截 / 满条长)；其余 -> Exact",
     "exclusion": "一块踩在我方血条那 8 行、或者紧贴它下面第 8 行的技力条那 8 行上（行差 <= 1）且列范围夹在我方那一格里（列差 <= 4） -> 剔掉",
     "merge": "同一行带上、中间那几列更靠近填充色（半透明遮挡压出来的混色）的两块接回一根条",
-    "count": "条数：都分得开给 Exact；分不开的给 LowerBound（同一条带里相邻两根的整长交叠或相接、或中间至少有一列是混色 -> 那两块只算一根）。**分不开的不报精确**，也不高报"
+    "clump": "「一堆」（`clumps`）：**分不开**（同一条带里相邻两根的填充交叠 / 相接 / 中间至少有一列是混色）或者**填充总列数 > 那一档的满条长** -> 整坨报成**区域 + 至少几根 + 填充总列数**，**不给单根比例**。**按族归组、不许跨族**（所以每一堆都带 tier）。填充总列数 = 组里各根的填充段列数**相加**：组里有一条没读到右端 -> LowerBound、否则 Exact；至少几根 = ceil(填充总列数 / 这一档的满条长)，落 LowerBound —— **只是下界**，**上界由状态层拿账配、不从像素来**",
+    "count": "条数：**一堆都没有** -> Exact(逐根 + 未采样的那些)；有一堆 -> LowerBound(逐根 + 未采样 + 各堆的「至少几根」之和)，**两边不打架**。**这一支永远不高报**（分不开的整坨只按 ceil(填充总列数 / 满条长) 贡献）"
   },
   "field": {
     "rows": [
@@ -31,7 +32,7 @@
     {
       "name": "在_raw_a_左",
       "truth": "在",
-      "covers": "敌人条 1 根（y518 x1320，填充 84 列）；同帧还有两根我方蓝条",
+      "covers": "敌人条 1 根（y518 x1320，填充 84 列 -> 84/123 = 0.6829 精确）；同帧还有两根我方蓝条",
       "presence": {
         "state": "valued",
         "payload": {
@@ -54,20 +55,35 @@
             1320,
             517
           ],
-          "total_columns": 129,
+          "fill_columns": 84,
           "rows": 8,
-          "fill": {
-            "state": "valued",
-            "payload": {
-              "form": "lower",
-              "lo": 0.6511627906976745
+          "columns": {
+            "value": {
+              "state": "valued",
+              "payload": {
+                "form": "exact",
+                "value": 84
+              },
+              "confidence": 0.11372549019607843
             },
-            "confidence": 0.11372549019607843
+            "margin": 0.11372549019607843
           },
-          "colour_distance": 1,
-          "separated": true
+          "fill": {
+            "value": {
+              "state": "valued",
+              "payload": {
+                "form": "exact",
+                "value": 0.6829268292682927
+              },
+              "confidence": 0.11372549019607843
+            },
+            "margin": 0.11372549019607843
+          },
+          "colour_distance": 1
         }
       ],
+      "clumps": [],
+      "unsampled": [],
       "cores": [
         {
           "origin": [
@@ -83,7 +99,7 @@
     {
       "name": "在_raw_a_右",
       "truth": "在",
-      "covers": "敌人条 1 根（y481 x1677，填充 84 列）；它**压在我方蓝条右端上**（那根我方条只剩 119 列）",
+      "covers": "敌人条 1 根（y481 x1677，填充 84 列 -> 84/123 = 0.6829 精确）；它**压在我方蓝条右端上**（那根我方条只剩 119 列）",
       "presence": {
         "state": "valued",
         "payload": {
@@ -106,21 +122,35 @@
             1677,
             480
           ],
-          "total_columns": 124,
+          "fill_columns": 84,
           "rows": 8,
-          "fill": {
-            "state": "valued",
-            "payload": {
-              "form": "interval",
-              "lo": 0.6774193548387096,
-              "hi": 0.6829268292682927
+          "columns": {
+            "value": {
+              "state": "valued",
+              "payload": {
+                "form": "exact",
+                "value": 84
+              },
+              "confidence": 0.12549019607843137
             },
-            "confidence": 0.12549019607843137
+            "margin": 0.12549019607843137
           },
-          "colour_distance": 2,
-          "separated": true
+          "fill": {
+            "value": {
+              "state": "valued",
+              "payload": {
+                "form": "exact",
+                "value": 0.6829268292682927
+              },
+              "confidence": 0.12549019607843137
+            },
+            "margin": 0.12549019607843137
+          },
+          "colour_distance": 2
         }
       ],
+      "clumps": [],
+      "unsampled": [],
       "cores": [
         {
           "origin": [
@@ -136,7 +166,7 @@
     {
       "name": "在_raw_b_上",
       "truth": "在",
-      "covers": "敌人条 1 根（y482 x1546，填充 130 列；中间被 1 列压过 → 下界）",
+      "covers": "敌人条 **2 根**（用户 10-15 的裁定）：y482 x1546 起，两根的填充**首尾相接**、共 130 列（中间 x1577 有 1 列宽的暗缝，**不许当精确切点**）。链**不要求切开它** —— 报「条数下界 >= 2 + 比例未采样」，**不给 130/123** 这种精确值。",
       "presence": {
         "state": "valued",
         "payload": {
@@ -148,31 +178,50 @@
       "count": {
         "state": "valued",
         "payload": {
-          "form": "exact",
-          "value": 1
+          "form": "lower",
+          "lo": 2
         },
         "confidence": null
       },
-      "bars": [
+      "bars": [],
+      "clumps": [
         {
-          "origin": [
+          "region": [
             1546,
-            481
+            481,
+            130,
+            8
           ],
-          "total_columns": 154,
-          "rows": 8,
-          "fill": {
-            "state": "valued",
-            "payload": {
-              "form": "lower",
-              "lo": 0.2012987012987013
-            },
-            "confidence": 0.011764705882352941
+          "tier": {
+            "name": "小怪",
+            "full_columns": 123,
+            "body_rows": 8
           },
-          "colour_distance": 3,
-          "separated": true
+          "columns": {
+            "value": {
+              "state": "valued",
+              "payload": {
+                "form": "exact",
+                "value": 130
+              },
+              "confidence": 0.0
+            },
+            "margin": 0.0
+          },
+          "least": {
+            "value": {
+              "state": "valued",
+              "payload": {
+                "form": "lower",
+                "lo": 2
+              },
+              "confidence": null
+            },
+            "margin": 0.0
+          }
         }
       ],
+      "unsampled": [],
       "cores": [
         {
           "origin": [
@@ -188,7 +237,7 @@
     {
       "name": "在_raw_b_下",
       "truth": "在",
-      "covers": "敌人条 1 根（y635 x1438，填充 57 列），与上面那根不是同一根",
+      "covers": "另一根橙条（y635 x1438，填充 57 列 -> 57/123 = 0.4634 精确），与上面那根不是同一根。**它右边那 28 列白条是「这一下掉了多少血」的打击感展示**（用户 10-15 的裁定）—— 一列都不算进填充段。",
       "presence": {
         "state": "valued",
         "payload": {
@@ -211,20 +260,35 @@
             1438,
             634
           ],
-          "total_columns": 85,
+          "fill_columns": 57,
           "rows": 8,
-          "fill": {
-            "state": "valued",
-            "payload": {
-              "form": "exact",
-              "value": 0.6705882352941176
+          "columns": {
+            "value": {
+              "state": "valued",
+              "payload": {
+                "form": "exact",
+                "value": 57
+              },
+              "confidence": 0.10980392156862745
             },
-            "confidence": 0.10980392156862745
+            "margin": 0.10980392156862745
           },
-          "colour_distance": 3,
-          "separated": true
+          "fill": {
+            "value": {
+              "state": "valued",
+              "payload": {
+                "form": "exact",
+                "value": 0.4634146341463415
+              },
+              "confidence": 0.10980392156862745
+            },
+            "margin": 0.10980392156862745
+          },
+          "colour_distance": 3
         }
       ],
+      "clumps": [],
+      "unsampled": [],
       "cores": [
         {
           "origin": [
@@ -258,6 +322,8 @@
         "confidence": 0.0
       },
       "bars": [],
+      "clumps": [],
+      "unsampled": [],
       "cores": []
     },
     {
@@ -281,6 +347,8 @@
         "confidence": 0.0
       },
       "bars": [],
+      "clumps": [],
+      "unsampled": [],
       "cores": []
     },
     {
@@ -304,6 +372,8 @@
         "confidence": 0.0
       },
       "bars": [],
+      "clumps": [],
+      "unsampled": [],
       "cores": []
     },
     {
@@ -327,6 +397,8 @@
         "confidence": 0.0
       },
       "bars": [],
+      "clumps": [],
+      "unsampled": [],
       "cores": []
     },
     {
@@ -350,6 +422,8 @@
         "confidence": 0.0
       },
       "bars": [],
+      "clumps": [],
+      "unsampled": [],
       "cores": []
     }
   ]
