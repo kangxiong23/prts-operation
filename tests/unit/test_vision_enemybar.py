@@ -446,6 +446,31 @@ def test_a_nine_row_orange_bar_keeps_its_ratio() -> None:
 
 
 
+def test_a_tall_red_bar_is_not_gated_at_all() -> None:
+    """**红族不设这道门**（单 10 的裁定）：红条量到多高，跨档校验都不插嘴。
+
+    这道门只为防「**橙条 boss**」—— 一根**橙色**的条量到 boss 那么高，就有可能是 boss
+    档，拿 123 当分母会系统性报高。**红族自己就是最高那一档**，没有更高的档可比 ——
+    在它身上「比本档更高」这句话**没有对象**，所以这一道门**根本不设在红族上**（单 9
+    那一版写的是「只拦比自己更高的（11 行起）」，实践上等价，但多一句没有对象的判断）。
+
+    这里量到 **12 行**（`MAX_BAR_ROWS` 的顶）的红条照样给**精确比例** —— 它是红族，
+    分母就是 154。**只降不升**那条纪律在红族上也不受影响。
+    """
+    rows = enemybar.MAX_BAR_ROWS
+    pixels = np.full((1260, 2800, 3), BASE, np.uint8)
+    pixels[300 : 300 + rows, 300:360] = enemybar.ENEMY_FILL_RED
+    frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
+    result = enemybar.read_enemy_bars(frame)
+    assert result.unsampled == (), "红族被跨档校验拦下了"
+    assert len(result.bars) == 1
+    bar = result.bars[0]
+    assert bar.fill_rect.height == rows
+    assert rows > enemybar.MOB_BODY_ROWS, "这一根比小怪那一档高"
+    assert isinstance(bar.fill.value, Valued)
+    assert bar.fill.value.payload == Exact(60 / enemybar.BOSS_FILL_COLUMNS)
+
+
 def test_a_fill_longer_than_the_dial_is_more_than_one_bar() -> None:
     """**一道便宜的算术门**（用户 10-15）：填充段长过满条长 -> **这一坨是一堆**。
 
@@ -1379,6 +1404,7 @@ def test_the_readings_files_record_the_new_gates(report, report_1014) -> None:
         # 跨档校验的门**对着 boss 那一档设**。
         assert str(enemybar.CROSS_TIER_ROWS) in ruler["body"]
         assert "9 行及以下放过" in ruler["body"]
+        assert "红族不设这道门" in ruler["body"]
         # 一堆的「来路」那一栏。
         assert "来路" in ruler["clump"] and "route" in ruler["clump"]
         assert "track" not in ruler

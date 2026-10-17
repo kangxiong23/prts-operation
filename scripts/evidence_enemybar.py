@@ -18,9 +18,19 @@ r"""敌人血条两批夹具的**取证图**：一个颜色一个意思，随重
 - **白细框** = 筛出来但**没进三栏**的块（被我方条挡掉的，或者颜色只落在中间带
   不当条的）。
 
-标注里的 `h<行数>` 是**量到的条身**（不写死 8）；clump 那一栏带 `n>=<至少几根>`、
-`cols=<总列数>` 与来路。**负例那一批里三栏都空的那几块不出图**（图上没有框、
-只剩一个表头）；10-14 那一批逐块都出（它的负例也是点名的）。
+**每一块都出图，一个都不跳**（用户 10-15 的裁定）：负例（「不在」）那一张正是
+「我看过、这里没有」的证据 —— 判决表上那几行没有它就没骨头；而且同一类东西两批
+两种策略，将来没人说得清哪些块「该有图」。
+
+标注里带三样（都用 ASCII，`cv2.putText` 的 Hershey 字体画不出别的字）：
+
+- **读数**：**精确只写数**（`bar 84`）· **下界带 `>=`**（`bar >=120`；框比读数宽时
+  两个都写，`bar 60 >=50` —— 前面那个是**框**的宽、后面那个是**这次的主张**）。
+  两者本来就**可以不一样**：框画的是**量到的那一段**、读数给的是**这次的主张**
+  （有缝那一根框 60 列、读数只给 >=50）；
+- `h<行数>` 是**量到的条身**（不写死 8）· `small` 是那个**小尺寸标记**；
+- clump 那一栏：`n>=<至少几根>`、`cols=<总列数>`（精确）或 `cols>=<总列数>`（下界）、
+  以及**来路**。
 """
 
 from __future__ import annotations
@@ -45,9 +55,6 @@ DEFAULT_BATCHES = (
     REPO / "tests" / "帧样本" / "敌人血条-10-14",
 )
 """不给目录时跑的那两批（与 `bench_enemybar` 的默认批一致）。"""
-
-DRAW_EMPTY_BATCHES = ("敌人血条-10-14",)
-"""三栏都空的那几块也出图的批次（负例也是点名的那一批）。"""
 
 GREEN = (0, 255, 0)
 YELLOW = (0, 255, 255)
@@ -78,6 +85,58 @@ def _slot(payload: dict):
     return payload.get("value", payload.get("lo"))
 
 
+def _shown(payload: dict) -> str:
+    """一条读数在图上写成什么样：**精确只写数，下界 / 区间带前缀**。
+
+    形态要写在图上：框画的是**量到的那一段**、读数给的是**这次的主张** —— 有缝的那
+    一根框 60 列、读数给 `>=50`，图上不写形态，60 配 >=50 就成了打架。
+    **只用 ASCII**：`cv2.putText` 的 Hershey 字体画不出别的字。
+    """
+    form = payload["form"]
+    if form == "exact":
+        return "%d" % payload["value"]
+    if form == "lower":
+        return ">=%d" % payload["lo"]
+    return "%d..%d" % (payload["lo"], payload["hi"])
+
+
+def _bar_label(kind: str, bar: dict) -> str:
+    """一根的标注：`<kind> <框宽> <读数> h<行数>[ small]`。
+
+    **只在两者字面不同的时候把框宽也摆出来**：精确的那一根框宽就是读数本身
+    （`bar 84 h8`）；有缝的那一根框 60 列、读数只有 `>=50`，两个都得写
+    （`bar 60 >=50 h8`）—— 框回答「在哪儿」、读数回答「多少」。
+    """
+    payload = bar["columns"]["value"]["payload"]
+    columns = int(bar["fill_columns"])
+    shown = _shown(payload)
+    head = kind + " " + shown
+    if int(_slot(payload)) != columns:
+        # 框比读数宽（量到的那一段跨过了缝）：两个数都得摆出来。
+        head = "%s %d %s" % (kind, columns, shown)
+    label = head + " h%d" % int(bar["rows"])
+    if bar.get("short_fill"):
+        label += " small"
+    return label
+
+
+def _clump_label(clump: dict) -> str:
+    """一堆的标注：`clump <哪一档> n>=<至少几根> cols=<总列数> <来路>`。
+
+    `cols` 那一栏跟着**总列数**的形态走：精确 -> `cols=130` · 下界 -> `cols>=186`。
+    """
+    payload = clump["columns"]["value"]["payload"]
+    shown = _shown(payload)
+    total = ("cols=" + shown) if payload["form"] == "exact" else ("cols" + shown)
+    least = clump["least"]["value"]["payload"]["lo"]
+    return "clump %s n>=%s %s %s" % (
+        clump["tier"]["name"],
+        least,
+        total,
+        clump["route"],
+    )
+
+
 def draw(root: pathlib.Path | str) -> list[tuple[str, int]]:
     """读这一批的 `判据读数.json`，重出它的取证图 -> [(文件名, 字节数)]。
 
@@ -89,10 +148,6 @@ def draw(root: pathlib.Path | str) -> list[tuple[str, int]]:
     by_file = {item["file"]: item for item in harvest["crops"]}
     out: list[tuple[str, int]] = []
     for read in report["reads"]:
-        if not any(read[key] for key in ("bars", "clumps", "unsampled")) and (
-            root.name not in DRAW_EMPTY_BATCHES
-        ):
-            continue
         name = read["name"] + ".png"
         origin = by_file[name]["origin"]
         # `imdecode` + `np.fromfile` 而不是 `cv2.imread`：裁剪目录名里有非 ASCII 字。
@@ -109,33 +164,32 @@ def draw(root: pathlib.Path | str) -> list[tuple[str, int]]:
         for bar in read["bars"]:
             x = bar["origin"][0] - origin[0]
             y = bar["origin"][1] - origin[1]
-            label = "bar h%d" % int(bar["rows"])
-            if bar.get("short_fill"):
-                label += " small"
             _box(
-                pic, x, y, int(bar["fill_columns"]), int(bar["rows"]), GREEN, label
+                pic,
+                x,
+                y,
+                int(bar["fill_columns"]),
+                int(bar["rows"]),
+                GREEN,
+                _bar_label("bar", bar),
             )
         for bar in read["unsampled"]:
             x = bar["origin"][0] - origin[0]
             y = bar["origin"][1] - origin[1]
             _box(
-                pic, x, y, int(bar["fill_columns"]), int(bar["rows"]), YELLOW,
-                "uns h%d" % int(bar["rows"]),
+                pic,
+                x,
+                y,
+                int(bar["fill_columns"]),
+                int(bar["rows"]),
+                YELLOW,
+                _bar_label("uns", bar),
             )
         for clump in read["clumps"]:
             rx, ry, rw, rh = clump["region"]
             x, y = rx - origin[0], ry - origin[1]
-            total = _slot(clump["columns"]["value"]["payload"])
-            least = clump["least"]["value"]["payload"]["lo"]
             _box(
-                pic,
-                x,
-                y,
-                int(rw),
-                int(rh),
-                MAGENTA,
-                "clump %s n>=%s cols=%s %s"
-                % (clump["tier"]["name"], least, total, clump["route"]),
+                pic, x, y, int(rw), int(rh), MAGENTA, _clump_label(clump)
             )
         # 表头分两行：一条统计行 + 一条图例行。**图例要能整行看全** —— 它写着
         # 「一个颜色一个意思」那张表，一行放不下就会被裁掉尾巴（读者就只能靠 README）。
@@ -164,7 +218,8 @@ def draw(root: pathlib.Path | str) -> list[tuple[str, int]]:
         )
         cv2.putText(
             pic,
-            "green=bar  yellow=unsampled  magenta=clump  white=screened-only",
+            "green=bar  yellow=unsampled  magenta=clump  white=screened-only"
+            "   (>= is a lower bound)",
             (6, 38),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.45,

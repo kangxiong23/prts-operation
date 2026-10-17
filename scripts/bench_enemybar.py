@@ -238,13 +238,12 @@ def run_batch(root: pathlib.Path) -> None:
             "body": "条身**按量到的行数**（不写死 8）：自那一块的行起，上下扩到「填充段那几列的中位色不再像这一族参考色」为止，"
             "封顶 MAX_BAR_ROWS=%d，报出来的高就是这个量到的行数。**跨档校验的门对着 boss 那一档设**"
             "（用户 10-15 的裁定）：小怪那一档（MOB_BODY_ROWS=%d）量到 >= CROSS_TIER_ROWS=%d 行才拦"
-            "（**9 行及以下放过**）、红族（BOSS_BODY_ROWS=%d）只拦比自己更高的 —— 被拦的那一根落 "
-            "`unsampled`，**列数照量**"
+            "（**9 行及以下放过**）—— **红族不设这道门**（它本来就是最高那一档、没有更高的档"
+            "可比，这道门只为防「橙条 boss」）。被拦的那一根落 `unsampled`，**列数照量**"
             % (
                 enemybar.MAX_BAR_ROWS,
                 enemybar.MOB_BODY_ROWS,
                 enemybar.CROSS_TIER_ROWS,
-                enemybar.BOSS_BODY_ROWS,
             ),
             "exits": "分数 = 1 - 颜色距 / 255；>= 1-%d/255 为在，<= 1-%d/255 为不在，中间为未采样"
             % (enemybar.SOLID_TOL, enemybar.ABSENT_TOL),
