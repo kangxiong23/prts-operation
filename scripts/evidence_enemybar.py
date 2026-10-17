@@ -265,15 +265,38 @@ def _readout_label(read: dict) -> str:
     )
 
 
+def _guard_truth(read: dict) -> None:
+    """真值**自己跟自己**要自洽：`不在` ⇒ **0 根**；`在` ⇒ **没数过（`null`）或者 >= 1 根**。
+
+    它检的既不是「真值对不对」（那是真值主本的事），也不是「链读得对不对」（那是用例的事）——
+    它挡的是**手写真值时打错**：负例块写了个根数、或者「在」的块写了 0。真值靠手写，
+    这种错在图上和点数里都不会响（单 13 之前就是这么过去的）。
+    """
+    truth = _truth_text(read["truth"])
+    count = read["truth_count"]
+    _truth_count_text(count)  # 顺手把非整数 / 负数在这里炸掉
+    if truth == "out" and count != 0:
+        raise ValueError(
+            "%s：真值是「不在」，根数却是 %r —— 负例必须 0 根" % (read.get("name"), count)
+        )
+    if truth == "in" and count is not None and count < 1:
+        raise ValueError(
+            "%s：真值是「在」，根数却是 %r —— 要么没数过（null），要么 >= 1"
+            % (read.get("name"), count)
+        )
+
+
 def check_reads(reads: list[dict]) -> None:
-    """把图上要写的那两半文字先拼一遍 ——**在写任何文件之前**把拼不出来的当场炸掉。
+    """把图上要写的那两半文字先拼一遍，再把真值自洽核一遍 ——**在写任何文件之前**。
 
     `bench_enemybar` 落盘之前先调它：不然就是**半落盘**（读数更新了、图没更新），
-    而且那种状态没人会发现。
+    而且那种状态没人会发现。核的是 `_truth_label` / `_readout_label` 拼不拼得出来，
+    以及 `_guard_truth` 那条真值自洽的不变量。
     """
     for read in reads:
         _truth_label(read)
         _readout_label(read)
+        _guard_truth(read)
 
 
 def draw(root: pathlib.Path | str) -> list[tuple[str, int]]:

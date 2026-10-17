@@ -73,3 +73,13 @@ def test_evidence_header_carries_truth_count_and_never_covers_a_box() -> None:
     # 反面：把一件东西挪进表头，那条判据必须响（不然上面等于没测）
     with pytest.raises(ValueError):
         ev._guard_header([("bar", ev.HEADER_ROWS - 1)])
+
+    # 反面：真值自己跟自己不自洽也得响（真值靠手写，这种错图上和点数里都不会露）
+    bad = json.loads(json.dumps(_read(LEFT, "不在_cd01")))
+    bad["truth_count"] = 2
+    with pytest.raises(ValueError):
+        ev.check_reads([bad])
+    bad = json.loads(json.dumps(_read(LEFT, "在_raw_a_左")))
+    bad["truth_count"] = 0
+    with pytest.raises(ValueError):
+        ev.check_reads([bad])

@@ -224,7 +224,7 @@ def run_batch(root: pathlib.Path) -> None:
     report = {
         "note": "敌人血条那条链的判据读数。它不判断够不够 —— 那是规划者的事；这里只放逐帧读数、两簇的分布与空档、以及覆盖说明。",
         "batch": str(root.relative_to(REPO)).replace("\\", "/"),
-        "version": 3,
+        "version": 4,
         "canvas": [CANVAS_2800x1260.width, CANVAS_2800x1260.height],
         "device": batch.device,
         "ruler": {
