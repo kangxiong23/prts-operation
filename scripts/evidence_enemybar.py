@@ -22,6 +22,18 @@ r"""敌人血条两批夹具的**取证图**：一个颜色一个意思，随重
 「我看过、这里没有」的证据 —— 判决表上那几行没有它就没骨头；而且同一类东西两批
 两种策略，将来没人说得清哪些块「该有图」。
 
+**表头三行**（单 11 起），每一行都留得下看得见的余量：
+
+1. **真值并排链的读数**（**青** + **黄**）：`truth=in` / `truth=out` 与
+   `read in=True count=…`。真值来自夹具 `取材.json` 的 `truth`（`bench` 把它抄进了
+   读数的 `reads`），是**画面事实**、不是链读出来的 —— **只写链的读数就是让图自己
+   证明自己**，负例尤其如此：它得证明「这里确实没有」，而不是「链没读出来」。
+   `cv2.putText` 的 Hershey 字体画不出汉字，所以 `在 -> in`、`不在 -> out`
+   （**只用 ASCII**）；碰上没见过的真值**报错**，不静默画占位符；
+2. **颜色表** —— 这张图上的框各是什么意思，外加 `cyan=truth`；
+3. **`(>= is a lower bound)`** —— 下界那个记号是 ASCII `>=`（画不出 `≥`），
+   不解释会被读成「约等于」。
+
 标注里带三样（都用 ASCII，`cv2.putText` 的 Hershey 字体画不出别的字）：
 
 - **读数**：**精确只写数**（`bar 84`）· **下界带 `>=`**（`bar >=120`；框比读数宽时
@@ -63,6 +75,48 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 QUALITY = 80
 """落盘用的那几个常量：颜色就是「一个颜色一个意思」那张表。"""
+
+CYAN = (255, 255, 0)
+"""表头第一行那个**真值**的颜色 —— 它不画框，所以与上面那张颜色表不冲突。"""
+
+FONT = cv2.FONT_HERSHEY_SIMPLEX
+HEADER_SCALE = 0.45
+HEADER_ROWS = 70
+TEXT_X = 6
+FIRST_Y = 17
+SECOND_Y = 38
+THIRD_Y = 59
+TRUTH_GAP = 12
+"""表头的几何（单 11 起三行）：黑底 `HEADER_ROWS` 行，三行字的基线在 17 / 38 / 59，
+`truth=` 与链的读数**左右并排**（中间隔 `TRUTH_GAP`）。三行各自右边缘在真图上的实测
+位置写在两份 README 的缺口里 —— 每一行都要留得下看得见的余量。"""
+
+COLOUR_TABLE = (
+    "green=bar  yellow=unsampled  magenta=clump  white=screened-only  cyan=truth"
+)
+BOUND_NOTE = "(>= is a lower bound)"
+TRUTH_TEXT = {"在": "in", "不在": "out"}
+"""表头那三行字与真值的写法。**只用 ASCII**：`cv2.putText` 的 Hershey 字体画不出别的字。"""
+
+
+def _line(pic, text: str, y: int, colour, x: int = TEXT_X) -> None:
+    """表头的一行字。**字号与左边距只有这一处** —— 三行各自的余量都由它兜着。"""
+    cv2.putText(pic, text, (x, y), FONT, HEADER_SCALE, colour, 1, cv2.LINE_AA)
+
+
+def _truth_text(value: str) -> str:
+    """真值那一栏在图上写成什么样：`在 -> in`、`不在 -> out`。
+
+    真值是**画面事实**（夹具 `取材.json` 的 `truth`），与链读出来的那几栏是两回事 ——
+    图上把它**并排**写出来，图就不再**自己证明自己**。`cv2.putText` 的 Hershey 字体
+    画不出汉字（**只用 ASCII**）。碰上没见过的真值**报错**：真值多了、或者改了口径，
+    要有人看过，不许静默画一个占位符糊过去。
+    """
+    if value not in TRUTH_TEXT:
+        raise ValueError(
+            "真值 %r 没有对应的 ASCII 写法（在 -> in · 不在 -> out）" % value
+        )
+    return TRUTH_TEXT[value]
 
 
 def _box(pic, x, y, columns, rows, colour, label) -> None:
@@ -191,42 +245,28 @@ def draw(root: pathlib.Path | str) -> list[tuple[str, int]]:
             _box(
                 pic, x, y, int(rw), int(rh), MAGENTA, _clump_label(clump)
             )
-        # 表头分两行：一条统计行 + 一条图例行。**图例要能整行看全** —— 它写着
-        # 「一个颜色一个意思」那张表，一行放不下就会被裁掉尾巴（读者就只能靠 README）。
-        cv2.rectangle(pic, (0, 0), (pic.shape[1] - 1, 48), BLACK, -1)
+        # 表头三行（单 11）：真值并排链的读数 + 颜色表 + `>=` 的说明。
+        # **每一行都要留得下看得见的余量** —— 颜色表那一行是「一个颜色一个意思」那张表，
+        # 尾巴被裁掉读者就只能靠 README。
+        cv2.rectangle(pic, (0, 0), (pic.shape[1] - 1, HEADER_ROWS - 1), BLACK, -1)
         payload = read["count"]["payload"]
         count = _slot(payload)
         presence = read["presence"]["payload"].get("value", "unsampled")
-        cv2.putText(
-            pic,
-            "in=%s count=%s:%s bars=%d small=%d clumps=%d uns=%d"
-            % (
-                presence,
-                payload["form"],
-                count,
-                len(read["bars"]),
-                sum(1 for bar in read["bars"] if bar.get("short_fill")),
-                len(read["clumps"]),
-                len(read["unsampled"]),
-            ),
-            (6, 17),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.45,
-            YELLOW,
-            1,
-            cv2.LINE_AA,
+        truth = "truth=" + _truth_text(read["truth"])
+        readout = "read in=%s count=%s:%s bars=%d small=%d clumps=%d uns=%d" % (
+            presence,
+            payload["form"],
+            count,
+            len(read["bars"]),
+            sum(1 for bar in read["bars"] if bar.get("short_fill")),
+            len(read["clumps"]),
+            len(read["unsampled"]),
         )
-        cv2.putText(
-            pic,
-            "green=bar  yellow=unsampled  magenta=clump  white=screened-only"
-            "   (>= is a lower bound)",
-            (6, 38),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.45,
-            YELLOW,
-            1,
-            cv2.LINE_AA,
-        )
+        _line(pic, truth, FIRST_Y, CYAN)
+        truth_width = cv2.getTextSize(truth, FONT, HEADER_SCALE, 1)[0][0]
+        _line(pic, readout, FIRST_Y, YELLOW, TEXT_X + truth_width + TRUTH_GAP)
+        _line(pic, COLOUR_TABLE, SECOND_Y, YELLOW)
+        _line(pic, BOUND_NOTE, THIRD_Y, YELLOW)
         target = root / ("取证_" + read["name"] + ".jpg")
         target.write_bytes(
             cv2.imencode('.jpg', pic, [cv2.IMWRITE_JPEG_QUALITY, QUALITY])[1].tobytes()
