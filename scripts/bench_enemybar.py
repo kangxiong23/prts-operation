@@ -15,13 +15,17 @@ r"""敌人血条那一批基准集的**重跑**：裁剪 -> 读数。
    调用方会交给链的那份记录。它从**裁剪自己的像素**上折，不碰源帧 ——
    所以源帧不在本机，这一份也照样重跑得出来。
 3. **跑链、落 `判据读数.json`**：`read_enemy_bars` 逐块跑一遍，三个出口 +
+   **每一块连夹具的真值一起抄**（`truth` = 在 / 不在、`truth_count` = 真值根数，
+   `null` 表示没数过 / 不数）—— 取证图用的就是这一份。
    **条数（精确还是下界）** + **三栏各自的原样**：`bars`（逐根的填充段列数与比例，
    各自带形态与余量，短填充还带 `short_fill` 标记）· `clumps`（一堆的区域 / 哪一档 /
    填充总列数 / 至少几根 / **来路**）· `unsampled`（有东西、但填了多少读不出来）+
    逐块筛出来的那些块 + 形状门与几条线的原样写下去。
 4. **重出取证图**：落完读数就调 `scripts/evidence_enemybar.py`（`evidence_enemybar.draw`）。
    它读的是**刚落盘的那份 `判据读数.json`**，所以图与读数永远同步；同一个输入跑两次，
-   图**逐字节相同**（幂等）。
+   图**逐字节相同**（幂等）**落盘之前**先叫
+   `evidence_enemybar.check_reads(reads)` 把真值能不能画成图上那半句验一遍：画不出来就
+   一个字都不写。
 
 **它不改判据、不改裁剪、不判「够不够」**：那份读数是给人核对的（哪几块判成在 /
 不在 / 认不出、每一根量到多少、条数是精确还是下界），「够不够」是规划者的事。
@@ -153,6 +157,9 @@ def run_batch(root: pathlib.Path) -> None:
             {
                 "name": case.name,
                 "truth": by_file[case.name + ".png"]["truth"],
+                # 夹具的**真值根数**（`null` = 没数过 / 不数）：取证图上「真值几根 vs 链读出几根」
+                # 用的就是这一栏 —— 所以它跟着 `truth` 一起抄。
+                "truth_count": by_file[case.name + ".png"]["truth_count"],
                 "covers": by_file[case.name + ".png"]["covers"],
                 "presence": slot_of(result.presence),
                 "count": slot_of(result.count),
@@ -286,6 +293,9 @@ def run_batch(root: pathlib.Path) -> None:
         "field": {"rows": [enemybar.FIELD_TOP, enemybar.FIELD_BOTTOM]},
         "reads": reads,
     }
+    # **落盘之前先校验真值**：图上那半句拼不出来就在这里炸 —— 两份 JSON 一个字都不写，
+    # 不给「读数更新了、图没更新」那种半落盘。
+    evidence_enemybar.check_reads(reads)
     # **钉死 LF**：`write_text` 在 Windows 上默认把 `\n` 翻成 `\r\n`，而这个仓库
     # 里每一份文本都是 LF —— 不钉的话同一份落盘文件在两次重跑之间 RAW 字节不同。
     (root / HARVEST_NAME).write_text(

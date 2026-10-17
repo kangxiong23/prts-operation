@@ -24,15 +24,20 @@ r"""敌人血条两批夹具的**取证图**：一个颜色一个意思，随重
 
 **表头三行**（单 11 起），每一行都留得下看得见的余量：
 
-1. **真值并排链的读数**（**青** + **黄**）：`truth=in` / `truth=out` 与
-   `read in=True count=…`。真值来自夹具 `取材.json` 的 `truth`（`bench` 把它抄进了
-   读数的 `reads`），是**画面事实**、不是链读出来的 —— **只写链的读数就是让图自己
-   证明自己**，负例尤其如此：它得证明「这里确实没有」，而不是「链没读出来」。
-   `cv2.putText` 的 Hershey 字体画不出汉字，所以 `在 -> in`、`不在 -> out`
-   （**只用 ASCII**）；碰上没见过的真值**报错**，不静默画占位符；
+1. **真值并排链的读数**（**青** + **黄**）：`truth=in n=1` / `truth=in n=2` /
+   `truth=in n=?` / `truth=out n=0` 与 `read in=True count=…`。真值来自夹具
+   `取材.json` 的 `truth` + `truth_count`（`bench` 把它们抄进了读数的 `reads`），
+   是**画面事实**、不是链读出来的 —— **只写链的读数就是让图自己证明自己**，负例尤其
+   如此：它得证明「这里确实没有」，而不是「链没读出来」。`n=` 那半个就是拿**真值几根**
+   对**链读出几根**。`cv2.putText` 的 Hershey 字体画不出汉字，所以 `在 -> in`、
+   `不在 -> out`、`null -> ?`（**只用 ASCII**）；碰上没见过的真值**报错**，不静默画
+   占位符 —— 而且**在写任何文件之前**就报（见 `check_reads`）；
 2. **颜色表** —— 这张图上的框各是什么意思，外加 `cyan=truth`；
 3. **`(>= is a lower bound)`** —— 下界那个记号是 ASCII `>=`（画不出 `≥`），
    不解释会被读成「约等于」。
+
+**表头不许盖住任何一块东西**：出图时先算一遍「每一件东西最高的那一行」有没有伸进表头
+那一整条黑底（它是最后画的、盖满全宽），伸进去就**当场响**（`_guard_header`）、不静默盖住。
 
 标注里带三样（都用 ASCII，`cv2.putText` 的 Hershey 字体画不出别的字）：
 
@@ -119,6 +124,53 @@ def _truth_text(value: str) -> str:
     return TRUTH_TEXT[value]
 
 
+def _truth_count_text(value) -> str:
+    """真值根数在图上写成什么样：整数照写，`None`（没数过 / 不数）写 `?`。
+
+    **只用 ASCII**。整数以外的（字符串、布尔、负数）当场报错 —— 它不是一个估计，
+    是**真值主本给的一个数**。
+    """
+    if value is None:
+        return "?"
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError("真值根数 %r 既不是整数也不是 null" % (value,))
+    if value < 0:
+        raise ValueError("真值根数 %r 是负数" % (value,))
+    return str(value)
+
+def _tops(read: dict, origin) -> list[tuple[str, int]]:
+    """这一块上**画上去的每一件东西**最高的那一行（图像坐标）：框、白细框、还有标注。
+
+    标注画在框的上方（基线在框顶再往上 10 行、字高 12），所以一件东西的「脚」要算到
+    **框顶 - 22 行**。**表头那一整条黑底是最后画上去的、盖满全宽** —— 盖没盖住只用比**行**。
+    """
+    tops: list[tuple[str, int]] = []
+    for core in read["cores"]:
+        if core["masked"] or core["colour_distance"] > SOLID_TOL:
+            tops.append(("core", core["origin"][1] - origin[1] - 4))
+    for bar in read["bars"]:
+        tops.append(("bar", bar["origin"][1] - origin[1] - 22))
+    for bar in read["unsampled"]:
+        tops.append(("uns", bar["origin"][1] - origin[1] - 22))
+    for clump in read["clumps"]:
+        tops.append(("clump", clump["region"][1] - origin[1] - 22))
+    return tops
+
+
+def _guard_header(tops: list[tuple[str, int]]) -> None:
+    """表头盖住任何一件东西就**当场响** —— 缩字号、挪表头，或者换一块样本。
+
+    表头是最后画的、盖满全宽，所以被盖住的那一件在图上是**没有痕迹**的：它不影响读数
+    （读数在落盘的 JSON 里），却让这张「证据照」少了一件证据。
+    """
+    covered = [(what, top) for what, top in tops if top < HEADER_ROWS]
+    if covered:
+        raise ValueError(
+            "表头（0..%d 行）盖住了 %s —— 缩字号、挪表头，或者换一块样本"
+            % (HEADER_ROWS - 1, "、".join("%s@y=%d" % item for item in covered))
+        )
+
+
 def _box(pic, x, y, columns, rows, colour, label) -> None:
     """在 `(x, y)` 起、宽 `columns` 高 `rows` 的那一块外面画一个框 + 一行标注。"""
     cv2.rectangle(pic, (x - 6, y - 6), (x + columns + 6, y + rows + 5), colour, 3)
@@ -191,6 +243,39 @@ def _clump_label(clump: dict) -> str:
     )
 
 
+def _truth_label(read: dict) -> str:
+    """图上真值那半句：`truth=in n=1` · `truth=in n=2` · `truth=in n=?` · `truth=out n=0`。"""
+    return "truth=%s n=%s" % (
+        _truth_text(read["truth"]),
+        _truth_count_text(read["truth_count"]),
+    )
+
+
+def _readout_label(read: dict) -> str:
+    """链的读数那半句：`read in=True count=exact:1 bars=1 small=0 clumps=0 uns=0`。"""
+    payload = read["count"]["payload"]
+    return "read in=%s count=%s:%s bars=%d small=%d clumps=%d uns=%d" % (
+        read["presence"]["payload"].get("value", "unsampled"),
+        payload["form"],
+        _slot(payload),
+        len(read["bars"]),
+        sum(1 for bar in read["bars"] if bar.get("short_fill")),
+        len(read["clumps"]),
+        len(read["unsampled"]),
+    )
+
+
+def check_reads(reads: list[dict]) -> None:
+    """把图上要写的那两半文字先拼一遍 ——**在写任何文件之前**把拼不出来的当场炸掉。
+
+    `bench_enemybar` 落盘之前先调它：不然就是**半落盘**（读数更新了、图没更新），
+    而且那种状态没人会发现。
+    """
+    for read in reads:
+        _truth_label(read)
+        _readout_label(read)
+
+
 def draw(root: pathlib.Path | str) -> list[tuple[str, int]]:
     """读这一批的 `判据读数.json`，重出它的取证图 -> [(文件名, 字节数)]。
 
@@ -200,6 +285,8 @@ def draw(root: pathlib.Path | str) -> list[tuple[str, int]]:
     report = json.loads((root / "判据读数.json").read_text(encoding="utf-8"))
     harvest = json.loads((root / "取材.json").read_text(encoding="utf-8"))
     by_file = {item["file"]: item for item in harvest["crops"]}
+    # **先校验、再动图**：真值画不出来就在这里炸，别落到「画了一半」。
+    check_reads(report["reads"])
     out: list[tuple[str, int]] = []
     for read in report["reads"]:
         name = read["name"] + ".png"
@@ -248,20 +335,10 @@ def draw(root: pathlib.Path | str) -> list[tuple[str, int]]:
         # 表头三行（单 11）：真值并排链的读数 + 颜色表 + `>=` 的说明。
         # **每一行都要留得下看得见的余量** —— 颜色表那一行是「一个颜色一个意思」那张表，
         # 尾巴被裁掉读者就只能靠 README。
+        _guard_header(_tops(read, origin))
         cv2.rectangle(pic, (0, 0), (pic.shape[1] - 1, HEADER_ROWS - 1), BLACK, -1)
-        payload = read["count"]["payload"]
-        count = _slot(payload)
-        presence = read["presence"]["payload"].get("value", "unsampled")
-        truth = "truth=" + _truth_text(read["truth"])
-        readout = "read in=%s count=%s:%s bars=%d small=%d clumps=%d uns=%d" % (
-            presence,
-            payload["form"],
-            count,
-            len(read["bars"]),
-            sum(1 for bar in read["bars"] if bar.get("short_fill")),
-            len(read["clumps"]),
-            len(read["unsampled"]),
-        )
+        truth = _truth_label(read)
+        readout = _readout_label(read)
         _line(pic, truth, FIRST_Y, CYAN)
         truth_width = cv2.getTextSize(truth, FONT, HEADER_SCALE, 1)[0][0]
         _line(pic, readout, FIRST_Y, YELLOW, TEXT_X + truth_width + TRUTH_GAP)
