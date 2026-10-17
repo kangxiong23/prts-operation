@@ -123,6 +123,19 @@
       ],
       "source": "screenshots/run-02/S5-0-0.png",
       "source_sha256": "17b562fcf8fee5eaf1e8da1ecdcdaa51d3a7471281edfaf3d7c0268f7de870ab"
+    },
+    {
+      "file": "在_S8-3-4_暗底.png",
+      "origin": [
+        500,
+        620
+      ],
+      "size": [
+        640,
+        640
+      ],
+      "source": "screenshots/run-02/S8-3-4.png",
+      "source_sha256": "8ab10791ad4bd249b79dc7c016a3100d4514d47811159b019b685539f66b54e2"
     }
   ]
 }

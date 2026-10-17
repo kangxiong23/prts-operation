@@ -22,20 +22,24 @@
    `MOB_FILL_COLUMNS = 123`、红族 -> boss 档 `BOSS_FILL_COLUMNS = 154` ——
    **分母不来自画面**（量轨道那一套整个退役）。这一条要是红了，先看那两根点名的条
    （`在_boss_红宽条` 的红条 115/154 = 0.7468 与 24 列那根 24/123 = 0.1951）。
-6. **三支便宜的降级只降不升**：填充段**长过满条长** -> 条数按 `ceil` 降成下界、
-   那一根不给比例；**条身行数与这一档对不上** -> 不给比例（防「橙条 boss」）；
-   **填充段短于 `MIN_FILL_COLUMNS`** -> 条照报在、比例不给。
+6. **降级只降不升**（单 9 起只剩两条）：填充段**长过满条长** -> 条数按 `ceil` 降成
+   下界、那一根不给比例（它是**一堆**）；**条身行数够得着更高那一档** -> 不给比例
+   （防「橙条 boss」）。**填充段短于 `MIN_FILL_COLUMNS` 不再降级**（用户 10-15 的
+   裁定）：列数与比例都照给，只多一个 `short_fill` 标记 —— 那几列是**读出来了**的，
+   抹掉它就是用降级盖住已经知道的东西。**同一根上两条读数同一支口径**：有缝或右边
+   没读到 -> 两个都是下界；没缝 -> 两个都精确。
 
 ## 合成用例是在真帧之外造的
 
-真帧里没有「中间带那一档」「填充段长过满条长那一档」「敌条短于 12 列」这几档，
-它们如实写在 `tests/帧样本/敌人血条/README.md` 的「没覆盖到什么」里。所以那几支用
-合成帧钉：一块空地色 + 画上去的一根条，**判据的形状与「谁画的」无关**，所以画出来
-的那一支是真的走了一遍那条分支。**合成用例一条都不许混进真值**。
+真帧里没有「中间带那一档」「填充总列数长过满条长那一档」这几档（「短于 12 列」与
+「一堆」在 10-14 那一批里有真帧），它们如实写在 `tests/帧样本/敌人血条/README.md`
+的「没覆盖到什么」里。所以真帧没有的那几支用合成帧钉：一块空地色 + 画上去的一根条，
+**判据的形状与「谁画的」无关**，所以画出来的那一支是真的走了一遍那条分支。
+**合成用例一条都不许混进真值**。
 
 ## 重活只跑一次
 
-一帧解出来是 14 MB，9 条。所以**整批只跑一遍、装在模块级夹具里**，用例只读结果。
+一帧解出来是 14 MB，10 条。所以**整批只跑一遍、装在模块级夹具里**，用例只读结果。
 """
 
 from __future__ import annotations
@@ -124,7 +128,7 @@ def _presence(entry) -> str:
 def test_every_crop_reads_the_way_the_picture_looks(readings, report) -> None:
     """**逐帧判决**：这一批 9 块，每一块链条读出来的话与 `取材.json` 里那一栏一致。"""
     truth = {item["name"]: item["truth"] for item in report["reads"]}
-    assert len(truth) == 9
+    assert len(truth) == 10
     for name, want in truth.items():
         assert _presence(readings[name]) == want, name
 
@@ -133,7 +137,7 @@ def test_both_directions_are_counted(readings, report) -> None:
     """**两个方向都点**：四类真值各自数一遍，「在」与「不在」都要各有几块。"""
     truth = {item["name"]: item["truth"] for item in report["reads"]}
     got = {name: _presence(readings[name]) for name in truth}
-    assert sum(1 for name in truth if got[name] == "在") == 4
+    assert sum(1 for name in truth if got[name] == "在") == 5
     assert sum(1 for name in truth if got[name] == "不在") == 5
     assert sum(1 for name in truth if got[name] == "认不出") == 0
     assert all(got[name] == truth[name] for name in truth)
@@ -178,15 +182,16 @@ def test_a_full_health_enemy_has_no_bar(readings) -> None:
 
 
 def test_the_present_crops_report_the_origin_of_their_bar(readings) -> None:
-    """「在」那四块各自读出一件东西：**原点**都对得上源帧（条数那件事另有一组用例）。
+    """「在」那五块各自读出一件东西：**原点**都对得上源帧（条数那件事另有一组用例）。
 
     `在_raw_b_上` 那一块落的是**一堆**（130 列 > 123），所以它的落点读
-    `clumps[0].region`；另外三块是**逐根**，读 `bars[0].fill_rect`。
+    `clumps[0].region`；另外四块是**逐根**，读 `bars[0].fill_rect`。
     """
     for name, x, y in (
         ("在_raw_a_左", 1320, 517),
         ("在_raw_a_右", 1677, 480),
         ("在_raw_b_下", 1438, 634),
+        ("在_S8-3-4_暗底", 756, 910),
     ):
         bars = readings[name]["result"].bars
         assert len(bars) == 1, name
@@ -194,6 +199,34 @@ def test_the_present_crops_report_the_origin_of_their_bar(readings) -> None:
     clumps = readings["在_raw_b_上"]["result"].clumps
     assert len(clumps) == 1
     assert (clumps[0].region.x, clumps[0].region.y) == (1546, 481)
+
+
+def test_the_dark_background_bar_is_read_in_full(readings) -> None:
+    """**暗底那一根**（单 9 加进来的夹具）：背景暗到看不出空轨，填充照样读得准。
+
+    画面事实（用户 10-15 点名的那一根）：`screenshots/run-02/S8-3-4.png` (756,910) 的
+    填充是 **22 列**、8 行、两端直边 —— 真值 **在 · 1 根 · 22/123 = 0.1789 精确**。
+    它是这一条链**唯一**「背景很暗、但填充仍清晰」的样本，也正是「**分母不能从画面
+    量**」的活证：旧量法在那里沿集装箱的橙边走满 **200 列**上限，而这一版的分母是
+    按族查表的常量（小怪 123），所以这一根**不用降级**。
+
+    **它进逐根那一栏、两条读数都是精确、也不带小尺寸标记**（22 >= `MIN_FILL_COLUMNS`）。
+    """
+    entry = readings["在_S8-3-4_暗底"]
+    result = entry["result"]
+    assert result.presence.payload == Exact(True)
+    assert result.count.payload == Exact(1)
+    assert len(result.bars) == 1 and result.unsampled == () and result.clumps == ()
+    bar = result.bars[0]
+    assert (bar.fill_rect.x, bar.fill_rect.y) == (756, 910)
+    assert bar.fill_rect.width == 22
+    assert bar.fill_rect.height == enemybar.BAR_ROWS
+    assert bar.short_fill is False
+    assert isinstance(bar.columns.value, Valued)
+    assert bar.columns.value.payload == Exact(22)
+    assert isinstance(bar.fill.value, Valued)
+    assert bar.fill.value.payload == Exact(22 / enemybar.MOB_FILL_COLUMNS)
+    assert bar.columns.margin == bar.fill.margin, "同一支口径 -> 同一个余量"
 
 
 
@@ -208,7 +241,7 @@ def test_the_two_colour_lines_sit_inside_the_measured_gap(report) -> None:
     全库 176 帧按松门（60）扫一遍，把所有「8 行高的橙块」的中位色距做成分布：
     真条 **1…12**（56 块）、非条那一堆从 **34** 起**密起来**、中间 13…33 **稀疏**
     （21 块）。所以线取 `SOLID_TOL=16` / `ABSENT_TOL=28` —— 离两簇各留 **4 与 6**。
-    这一批里的四块全落在真条那一簇里（最大 3）。
+    这一批里的五块全落在真条那一簇里（最大 3）。
     """
     assert enemybar.SOLID_TOL == 16
     assert enemybar.ABSENT_TOL == 28
@@ -216,7 +249,7 @@ def test_the_two_colour_lines_sit_inside_the_measured_gap(report) -> None:
     distances = [
         core["colour_distance"] for item in report["reads"] for core in item["cores"]
     ]
-    assert len(distances) == 4, "这批该有四块（四块「在」各一块）"
+    assert len(distances) == 5, "这批该有五块（五块「在」各一块）"
     assert max(distances) <= 3
 
 
@@ -292,32 +325,37 @@ def test_the_denominator_comes_from_the_dial_not_from_the_picture() -> None:
 
 
 
-def test_a_fill_measured_across_a_blend_is_only_a_lower_bound() -> None:
-    """**填充段中间被压过一截 -> 比例只给下界**（用户 10-15，接过老那一支的位置）。
+def test_a_fill_measured_across_a_blend_has_both_readings_lowered() -> None:
+    """**填充段中间被压过一截 -> 两条读数一起落成下界**（用户 10-15 的裁定）。
 
     画一根填 60 列的条，正中间那 2 列换成**混色**（离填充色 58 > `SCREEN_TOL`，
     可它离上下那两块地形更远 —— 也就是 `_blended` 认得的那种「被半透明的东西压过」）。
     `_merge` 会把两块接回一根，而**填充段**那一趟容得下跨过 `FILL_GAP`（= 2）列，
-    所以量到的填充段是 60 列、**严格那一段**只有 50：缝底下藏着什么看不见，
-    只能说「**至少** 50/123」。这与我方血条那条链的 LowerBound 是同一套纪律。
+    所以量到的填充段是 60 列、**严格那一段**只有 50。
 
-    **两根读数的口径在这一支上刻意不同**（用户 10-15：「填充总列数 = 那个读得准的
-    数」）：`columns`（这一段多宽）是 **60**（缝是压在条上的半透明东西，那两列算在
-    里头），`fill`（填了多少）是 **≥50**（保守）。而且**两条读数各带自己的余量** ——
-    缝那一列把 `columns` 的余量压到 0，`fill` 的余量量的是缝前那一段的门。
+    **同一支口径**（单 9 改的就是这一处）：缝底下藏着什么看不见，所以**列数与比例
+    都只说「至少」** —— 列数 `LowerBound(50)`、比例 `LowerBound(50/123)`。**不许一个
+    精确一个下界**：那两个数说的是同一件事（缝那几列到底算不算填充），一个精确一个
+    下界会让读的人以为「列数我知道了、比例不知道」。改这一处之前，`columns` 报的是
+    **精确 60**（容忍那一段），两条读数不同口径。
+
+    **两条读数共用一个余量**：口径统一之后，决定它们的是**同一个门**（严格那一段的
+    右端），所以 `columns.margin == fill.margin`。**`fill_rect.width` 仍是 60**：框画的
+    是**量到的那一段填充**（含缝），读数给的是它的下界 —— 两个数问的不是同一件事。
     """
     pixels = np.full((1260, 2800, 3), BASE, np.uint8)
     pixels[300:308, 300:360] = enemybar.ENEMY_FILL
     pixels[300:308, 350:352] = (160, 100, 60)
     frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
     bar = enemybar.read_enemy_bars(frame).bars[0]
-    assert bar.fill_rect.width == 60
+    assert bar.fill_rect.width == 60, "框画的是量到的那一段（含缝）"
+    assert bar.fill_rect.height == enemybar.BAR_ROWS
     assert isinstance(bar.columns.value, Valued)
-    assert bar.columns.value.payload == Exact(60)
-    assert bar.columns.margin == 0.0, "缝那一列就在门上，余量该是 0"
+    assert bar.columns.value.payload == LowerBound(50)
+    assert bar.columns.margin is not None and bar.columns.margin > 0.0
     assert isinstance(bar.fill.value, Valued)
     assert bar.fill.value.payload == LowerBound(50 / enemybar.MOB_FILL_COLUMNS)
-    assert bar.fill.margin is not None and bar.fill.margin > 0.0
+    assert bar.columns.margin == bar.fill.margin, "同一支口径 -> 同一个余量"
 
 
 
@@ -365,12 +403,12 @@ def test_the_bar_body_is_measured_not_hard_coded() -> None:
 def test_an_orange_bar_with_boss_rows_gets_no_ratio() -> None:
     """**跨档校验**（用户 10-15 那道便宜闸门）：橙条量到 10 行 -> 不给比例。
 
-    橙族走小怪档（8 行），**量到 10 行比这一档更高**，就是「这一根的量法与它那一档
-    对不上」—— 它可能是**橙色的 boss**（那一档是 154 列），拿 123 当分母会系统性
-    报高。这一支**只降不升**：条照报「在」、填充列数照量，这一根落 `unsampled`
-    （比例那一条读数落未采样）。
+    **门对着 boss 那一档设**（单 9 的裁定）：小怪那一档**量到 >= 10 行（= `BOSS_BODY_ROWS`）
+    才拦** —— 橙条量到 boss 那么高，就是「这一根的量法与它那一档对不上」：它可能是
+    **橙色的 boss**（那一档是 154 列），拿 123 当分母会系统性报高。这一支**只降不升**：
+    条照报「在」、填充列数照量，这一根落 `unsampled`（比例那一条读数落未采样）。
 
-    **它只拦更高的那一头**（用户 10-15 的裁定 6）：矮一点的不拦。
+    **9 行及以下放过**（见下一条用例）：9 是抗锯齿与叠条在 8 行上多压出来的，9 != 10。
     """
     pixels = np.full((1260, 2800, 3), BASE, np.uint8)
     pixels[300:310, 300:360] = enemybar.ENEMY_FILL
@@ -385,6 +423,26 @@ def test_an_orange_bar_with_boss_rows_gets_no_ratio() -> None:
     assert result.count.payload == Exact(1)
     assert enemybar.MOB_BODY_ROWS != 10
     assert enemybar.BOSS_BODY_ROWS == 10
+    assert enemybar.CROSS_TIER_ROWS == enemybar.BOSS_BODY_ROWS, "门对着 boss 那一档设"
+
+
+def test_a_nine_row_orange_bar_keeps_its_ratio() -> None:
+    """**橙条量到 9 行放过**（单 9 的裁定）：门是对着 boss 那一档（10 行）设的。
+
+    9 行是抗锯齿与叠条压出来的（`raw_b` 那一带实测就有两块 9 行的），**9 不等于 10**。
+    拿「比 8 大」当门会把互叠那两帧 **6 根真条**的比例全拦掉（单 8 就是这么丢的：
+    `在_互叠1` 118 / 24 / 8 列那三根、`在_互叠2` 115 / 118 / 118 列那三根）。
+    这一根**照给比例**。
+    """
+    pixels = np.full((1260, 2800, 3), BASE, np.uint8)
+    pixels[300:309, 300:360] = enemybar.ENEMY_FILL
+    frame = Frame(canvas=CANVAS_2800x1260, pixels=pixels)
+    result = enemybar.read_enemy_bars(frame)
+    assert len(result.bars) == 1 and result.unsampled == ()
+    bar = result.bars[0]
+    assert bar.fill_rect.height == 9
+    assert isinstance(bar.fill.value, Valued)
+    assert bar.fill.value.payload == Exact(60 / enemybar.MOB_FILL_COLUMNS)
 
 
 
@@ -405,6 +463,47 @@ def test_a_fill_longer_than_the_dial_is_more_than_one_bar() -> None:
     assert clump.columns.value.payload == Exact(130)
     assert clump.least.value.payload == LowerBound(2)
     assert result.count.payload == LowerBound(2)
+
+
+def test_the_route_says_which_rule_made_the_clump() -> None:
+    """**来路那一栏**（用户 10-15 的裁定）：分不开 / 长过一根的上限 / 两者。
+
+    两条证据的强度不同 ——「长过一根的上限」是**算术**（总列数长过满条长 ⇒ 至少不止
+    一根），「分不开」是**判断**（几块挨着 / 交叠 / 中间夹着混色列）。三种各造一个：
+
+    - 一根 **130 列**的橙条（> 123）：只有一块、**没有相邻的块** ⇒ **长过一根的上限**；
+    - 一根 50 列 + 右边紧挨着 8 列（中间夹着 2 列不亮的混色）：两块分不开、总列数
+      **68 < 123** ⇒ **分不开**；
+    - 同样那一对，左边改成 120 列（两块加起来 **138 > 123**）⇒ **两者**。
+    """
+    long_only = enemybar.read_enemy_bars(
+        _frame_with_bar(300, 300, 130, 0, enemybar.ENEMY_FILL)
+    )
+    clump = long_only.clumps[0]
+    assert clump.route.name == "长过一根的上限"
+    assert (clump.route.inseparable, clump.route.over_full) == (False, True)
+    assert clump.columns.value.payload == Exact(130)
+    assert clump.least.value.payload == LowerBound(2)
+
+    track = np.clip(np.asarray(BASE, np.int16) - 52, 0, 255).astype(np.uint8)
+    split = np.full((1260, 2800, 3), BASE, np.uint8)
+    split[300:308, 300:350] = enemybar.ENEMY_FILL
+    split[300:308, 350:352] = track
+    split[300:308, 352:360] = enemybar.ENEMY_FILL
+    frame = Frame(canvas=CANVAS_2800x1260, pixels=split)
+    clump = enemybar.read_enemy_bars(frame).clumps[0]
+    assert clump.route.name == "分不开"
+    assert (clump.route.inseparable, clump.route.over_full) == (True, False)
+    assert clump.columns.value.payload == Exact(68)
+
+    both = np.full((1260, 2800, 3), BASE, np.uint8)
+    both[300:308, 300:420] = enemybar.ENEMY_FILL
+    both[300:308, 420:422] = track
+    both[300:308, 422:430] = enemybar.ENEMY_FILL
+    frame = Frame(canvas=CANVAS_2800x1260, pixels=both)
+    clump = enemybar.read_enemy_bars(frame).clumps[0]
+    assert clump.route.name == "两者"
+    assert clump.route.inseparable and clump.route.over_full
 
 
 
@@ -467,6 +566,8 @@ def test_the_raw_b_top_core_is_a_clump_of_at_least_two(readings) -> None:
     assert clump.tier.name == "小怪" and clump.tier.full_columns == 123
     assert clump.columns.value.payload == Exact(130)
     assert clump.least.value.payload == LowerBound(2)
+    assert clump.route.name == "长过一根的上限", "来路：这一坨不是靠分不开判出来的"
+    assert (clump.route.inseparable, clump.route.over_full) == (False, True)
     assert clump.region.width == 130
     assert isinstance(result.count, Valued)
     assert isinstance(result.count.payload, LowerBound)
@@ -569,13 +670,13 @@ def _bounds(fill: SlotValue) -> tuple[float, float]:
 # ---------------------------------------------------------------------------
 
 
-def test_a_fill_between_the_two_width_gates_is_a_short_bar() -> None:
-    """两道宽度门之间的那一档：**存在性照报、列数照量，填了多少不给**。
+def test_a_short_fill_keeps_its_readings_and_gets_a_marker() -> None:
+    """两道宽度门之间的那一档：**列数与比例都给精确值**，只多一个「小尺寸标记」。
 
-    `MIN_CANDIDATE_COLUMNS`（7）是候选的门、`MIN_FILL_COLUMNS`（12）是够不够量
-    比例的门 —— 11 落在中间，所以它是一条**条**，只是**填了多少读不出来**：
-    这一根落 `unsampled` 那一栏（用户 10-15：「未采样只留给那一根确实有东西、
-    但连填充都读不出来」）。
+    `MIN_CANDIDATE_COLUMNS`（7）是候选的门、`MIN_FILL_COLUMNS`（12）是「这一块小得
+    可疑」的门 —— 11 落在中间，所以它是一条**条**（存在性照报），而且**填了多少也照报**
+    （用户 10-15 的裁定：那几列是**读出来了**的，抹掉它就是用降级盖住已经知道的东西）。
+    风险由 `short_fill` 那个标记带出去：**这一块够不够格当一根条**没把握。
     """
     narrow = enemybar.MIN_FILL_COLUMNS - 1
     assert narrow >= enemybar.MIN_CANDIDATE_COLUMNS
@@ -583,11 +684,27 @@ def test_a_fill_between_the_two_width_gates_is_a_short_bar() -> None:
     result = enemybar.read_enemy_bars(frame)
     assert len(result.cores) == 1
     assert result.presence.payload == Exact(True)
-    assert result.bars == ()
-    assert [bar.fill_rect.x for bar in result.unsampled] == [300]
-    assert isinstance(result.unsampled[0].fill.value, Unsampled)
-    assert result.unsampled[0].columns.value.payload == Exact(narrow)
+    assert result.unsampled == (), "短填充不落未采样"
+    assert [bar.fill_rect.x for bar in result.bars] == [300]
+    bar = result.bars[0]
+    assert bar.short_fill is True
+    assert isinstance(bar.columns.value, Valued)
+    assert bar.columns.value.payload == Exact(narrow)
+    assert isinstance(bar.fill.value, Valued)
+    assert bar.fill.value.payload == Exact(narrow / enemybar.MOB_FILL_COLUMNS)
     assert result.count.payload == Exact(1)
+
+
+def test_a_long_enough_fill_is_not_marked_short() -> None:
+    """够长的那一根**不带**小尺寸标记（标记说的是「短」这件事，不是常挂着的）。
+    """
+    frame = _frame_with_bar(
+        300, 300, enemybar.MIN_FILL_COLUMNS, 40, enemybar.ENEMY_FILL
+    )
+    bar = enemybar.read_enemy_bars(frame).bars[0]
+    assert bar.short_fill is False
+    assert isinstance(bar.columns.value, Valued)
+    assert bar.columns.value.payload == Exact(enemybar.MIN_FILL_COLUMNS)
 
 
 def test_a_fill_below_the_candidate_gate_is_not_a_bar() -> None:
@@ -843,28 +960,28 @@ def test_the_hazard_stripe_in_the_full_health_frame_is_one_row_too_tall(
     assert _longest_vertical_run(mask) > enemybar.MAX_BAR_ROWS
 
 
-def test_a_short_fill_is_present_but_its_ratio_is_unsampled(
-    readings_1014,
-) -> None:
-    """**快死那一帧：条在，比例不给** —— 进门松、出口严（用户这一单的裁定 2）。
+def test_the_dying_enemy_keeps_its_seven_column_reading(readings_1014) -> None:
+    """**快死那一帧：条在，读数也在**（单 9 改的）—— 7 列 ⇒ 7/123 = 0.0569 精确。
 
     画面事实：那一根的填充只有 **7 列**（右边是一长截深色空轨）。7 在
-    `MIN_CANDIDATE_COLUMNS` 与 `MIN_FILL_COLUMNS` 之间，所以它是**候选**：
-    存在性照报「在」（条确实在），比例落**未采样** —— 短填充给不出「填了多少」
-    这句话该有的证据。它以前在 `_screen` 里就被丢掉，那一帧因此报出**精确的
-    「不在」**（假事实）。
+    `MIN_CANDIDATE_COLUMNS` 与 `MIN_FILL_COLUMNS` 之间，所以它是一条**候选**：
+    存在性照报「在」，**列数与比例都照给**（从前比例落未采样 —— 那正是「降级盖住了
+    已经知道的东西」）。它现在进**逐根**那一栏，只多一个 `short_fill` 标记。
+
+    **它以前在 `_screen` 里就被丢掉**：那一帧因此报出**精确的「不在」**（假事实）。
     """
     entry = readings_1014["在_快死的敌人"]
     result = entry["result"]
     assert result.presence.payload == Exact(True)
     assert result.count.payload == Exact(1)
-    assert result.bars == ()
-    assert len(result.unsampled) == 1
-    assert result.cores != ()
-    bar = result.unsampled[0]
+    assert result.unsampled == ()
+    assert len(result.bars) == 1
+    bar = result.bars[0]
+    assert bar.short_fill is True
     assert (bar.fill_rect.x, bar.fill_rect.y) == (1506, 481)
-    assert isinstance(bar.fill.value, Unsampled)
-    assert bar.columns.value.payload == Exact(7), "列数照量，读不出来的是「填了多少」"
+    assert bar.fill_rect.width == 7
+    assert isinstance(bar.fill.value, Valued)
+    assert bar.fill.value.payload == Exact(7 / enemybar.MOB_FILL_COLUMNS)
     fill = entry["frame"].pixels[481:489, 1506:1630]
     runs = (_colour_distance(fill) <= enemybar.SCREEN_TOL).all(axis=0)
     leading = 0
@@ -1078,6 +1195,8 @@ def test_a_clump_carries_its_total_fill_and_its_least_bars(readings_1014) -> Non
     assert clump.columns.value.payload == LowerBound(186)
     assert clump.columns.margin is not None
     assert clump.least.value.payload == LowerBound(2)
+    assert clump.route.name == "两者", "组里不止一块、而且总列数 > 123"
+    assert clump.route.inseparable and clump.route.over_full
     least = sum(int(item.least.value.payload.lo) for item in result.clumps)
     assert result.count.payload.lo == len(result.bars) + len(result.unsampled) + least
 
@@ -1124,6 +1243,7 @@ def test_two_cores_on_one_row_band_are_not_counted_twice() -> None:
     clump = result.clumps[0]
     assert (clump.region.x, clump.region.width) == (300, 60)
     assert clump.columns.value.payload == Exact(68)
+    assert clump.route.name == "分不开", "两块加起来 68 < 123"
     assert clump.least.value.payload == LowerBound(1)
     assert result.count.payload == LowerBound(1)
 
@@ -1169,8 +1289,8 @@ def test_the_clump_branch_is_load_bearing(monkeypatch, readings_1014) -> None:
 
     - `在_raw_b_上` 那 130 列的一坨**不再是一堆**：它被当成一根读，**条数报成精确
       1**（真值是至少 2）—— 正是这一支要挡的那种「假精确」；
-    - `在_互叠1` 那两栏也塌成一栏（`clumps` 空），条数报成**精确 17**（真值是
-      下界 17）—— 用户 10-14「叠在一起的条不许报精确」那条裁定就被推翻了。
+    - `在_互叠1` 那一堆的两块**被当成两根逐根报**（`clumps` 空），条数报成**精确 17**
+      （真值是下界 17）—— 用户 10-14「叠在一起的条不许报精确」那条裁定就被推翻了。
 
     这里断言的是**拆掉之后的状态**，与文件里那几条用例的断言正好相反。
     """
@@ -1252,6 +1372,15 @@ def test_the_readings_files_record_the_new_gates(report, report_1014) -> None:
         assert "上界" in ruler["clump"]
         # 轨道那一套**整个退役**：尺子上不许再有那一栏；旧的 short 那一栏也并进
         # `unsampled` 了（同一条判据不写两遍）。
+        # 小尺寸标记那一栏（单 9）：短填充不再降级，只多一个标记。
+        assert "small" in ruler
+        assert "short_fill" in ruler["small"]
+        assert str(enemybar.MIN_FILL_COLUMNS) in ruler["small"]
+        # 跨档校验的门**对着 boss 那一档设**。
+        assert str(enemybar.CROSS_TIER_ROWS) in ruler["body"]
+        assert "9 行及以下放过" in ruler["body"]
+        # 一堆的「来路」那一栏。
+        assert "来路" in ruler["clump"] and "route" in ruler["clump"]
         assert "track" not in ruler
         assert "short" not in ruler
 
