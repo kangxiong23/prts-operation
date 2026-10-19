@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "canvas": [
+    2800,
+    1260
+  ],
+  "device": "未知",
+  "crops": [
+    {
+      "file": "助战.png",
+      "origin": [
+        0,
+        0
+      ],
+      "size": [
+        2800,
+        1260
+      ],
+      "source": "screenshots/run-05/助战.png",
+      "source_sha256": "439525406668128f05cf2728474284910a6a4e1f98fad2e7a609c3dcf92e29de"
+    }
+  ]
+}

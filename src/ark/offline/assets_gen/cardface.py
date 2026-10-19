@@ -41,6 +41,7 @@ from ark.offline.assets_gen.roster_names import load_roster_names
 
 __all__ = [
     "cut_formation_arts",
+    "cut_support_art",
     "load_formation_page",
     "load_cardfaces",
     "FORMATION_LEFT0",
@@ -50,6 +51,8 @@ __all__ = [
     "FORMATION_ART_WIDTH",
     "FORMATION_ROWS",
     "FORMATION_CARDS",
+    "SUPPORT_NAME",
+    "SUPPORT_BOX",
     "FORMATION_MANIFEST",
     "MANIFEST_NAME",
     "REPO",
@@ -115,6 +118,99 @@ FORMATION_ROWS: Final[tuple[tuple[int, int, int], ...]] = (
 
 FORMATION_CARDS: Final[int] = sum(count for _, _, count in FORMATION_ROWS)
 """**仓里那份示例清单**切得出几块立绘（11）—— 不是"一帧编队页有几块"。"""
+
+SUPPORT_NAME: Final[str] = "助战"
+"""助战干员那一格在**库里**那条的名字（用户给的：编队页不印它的名字）。
+
+它**不是读出来的**：那一格上印的是「助战干员 / SUPPORT UNIT」那个标签，不是干员名。
+所以库里那一条统一叫「助战」—— 一位助战干员读出来就是「助战」，与它的真名无关。
+"""
+
+SUPPORT_BOX: Final[tuple[int, int, int, int]] = (2081, 125, 259, 505)
+"""右上那一格「助战干员」的**橙色高亮框** `(x, y, 宽, 高)`（原生像素）。
+
+**量出来的，不是算出来的**：在 `screenshots/run-05/` 的 `助战.png`（那一格**有人**）
+与 `编队1-0.png`（那一格**空着**）上各自量橙色像素的包围盒
+（`R > 170 且 50 < G < 170 且 B < 100`），**两帧同值**：
+左 2081 · 右 2339（宽 259）· 上 125 · 下 629（高 505）。
+⇒ 它是**那一格的框**，与那一格有没有人**无关**（`_check_support_box` 钉着）。
+
+**这句话有网**：`tests/unit/test_formation_support_slot.py` 的
+`test_the_box_is_measured_again_from_the_pixels` 在这三帧上**重新量一遍**包围盒，
+逐帧比这里的常量；`test_each_edge_of_the_box_is_a_real_edge` 再钉四条边各自是真边。
+
+它与卡片几何的两条关系（都对常量算）：
+
+1. **上下各外扩 12 px**：`137 - 12 = 125`、`617 + 12 = 629` —— 它把**上行那一条卡片带**包住；
+2. **它跨在第 7 列的格位上**：左缘 2081 < `470 + 271 × 6 = 2096` < 右缘 2340；
+   而它**不是又一列卡**：宽 259 不等于 `FORMATION_CARD_WIDTH`，左缘也不落在
+   `470 + 271k` 上（差 15 px）—— 那是那一格自己的版式。
+
+**为什么整块取、不按卡片的取法**：卡片那条取区（`[卡左缘, 卡左缘 + 214)`）是从
+「立绘画 = 卡宽减右边那条底纹」推出来的，而这一格**没有底纹、也不在列网格上**；
+按类比去凑一个「214 宽的取区」就是**拿算出来的数当量出来的数**（[D-全局-25]）。
+所以这里取**量到的框本身**：它的内容（立绘 + 底下那条「助战干员」带）就是这一格。
+"""
+
+
+def _check_support_box() -> None:
+    """`SUPPORT_BOX` 的四条不变式 —— **全对常量算**（与 `_check_geometry` 那三条同一个做法）。
+
+    它挡的是「常量被改坏了而没人看见」，因为常量才是代码实际跑的那一份。
+    """
+    x, y, width, height = SUPPORT_BOX
+    top, bottom = FORMATION_ROWS[0][0], FORMATION_ROWS[0][1]
+    if (y, y + height - 1) != (top - 12, bottom + 12):
+        raise ValueError(
+            "助战那一格的框上下要**各外扩 12 px**：上缘 " + repr(top - 12) + "、下缘 "
+            + repr(bottom + 12) + "，而常量给的是 " + repr((y, y + height - 1))
+        )
+    seventh = FORMATION_LEFT0 + FORMATION_PITCH * 6
+    if not x < seventh < x + width:
+        raise ValueError(
+            "助战那一格的框要**跨在第 7 列的格位上**（" + repr(seventh)
+            + "），而常量给的 x 与宽是 " + repr((x, width))
+        )
+    if (x - FORMATION_LEFT0) % FORMATION_PITCH == 0:
+        raise ValueError(
+            "助战那一格的左缘落在卡片列网格上了（" + repr(x)
+            + "）：它不是又一列卡，左缘不该是 470 + 271k"
+        )
+    if x < 0 or y < 0 or x + width > CANVAS_2800x1260.width or y + height > CANVAS_2800x1260.height:
+        raise ValueError("助战那一格的框跑到画布外了：" + repr(SUPPORT_BOX))
+
+
+def cut_support_art(frame: Frame) -> np.ndarray:
+    """编队页右上那一格「助战干员」→ **一块立绘**（`(高, 宽, 3)` 的 RGB、是拷贝）。
+
+    **它不判那一格有没有人**：空着的时候切出来的是那张**空占位**（灰剪影 + 一个加号，
+    底下同样印着「助战干员 / SUPPORT UNIT」）。要哪一格由调用方说 ——
+    与「每行几张」是同一个做法（见 `load_cardfaces` 的 `support=`）。
+
+    **那一格有没有人可以从画面判**（这一单量到的两个数，都在 `SUPPORT_BOX` 的中央 80×80 里）：
+    空着 **1821** 个白像素、平均饱和 **0.35**（那个加号是纯白）；有人 **399** 个白像素、
+    平均饱和 **32.72**。**但这一版没有把它接成判据**（用户裁定：要动判据先报）。
+
+    **这几个数指得出网**（不是只住在这里）：`tests/unit/test_formation_support_slot.py` 的
+    `test_the_numbers_recorded_in_the_fixture_are_the_numbers_on_the_picture` 拿夹具那份真值
+    **现算一遍**与画面比；`SUPPORT_BOX` 本身由 `test_the_box_is_measured_again_from_the_pixels`
+    回画面上**重新量一次**（三帧）。上一版这里只有一条**字面量相等**（把常量抄一遍），
+    **没有回画面上量**；改坏常量只有 `_check_support_box` 的自洽关系会响，
+    而自洽关系挡不住一组数同时错。
+    """
+    if not isinstance(frame, Frame):
+        raise TypeError(f"要切的是一帧，收到 {type(frame).__name__}")
+    if frame.canvas != CANVAS_2800x1260:
+        raise ValueError(
+            f"助战那一格的几何是在 {CANVAS_2800x1260.width}×{CANVAS_2800x1260.height} 上"
+            f"量的，这一帧是 {frame.canvas.width}×{frame.canvas.height}："
+            "定死运行环境，不做分辨率适配"
+        )
+    _check_support_box()
+    x, y, width, height = SUPPORT_BOX
+    return np.ascontiguousarray(frame.pixels[y : y + height, x : x + width])
+
+
 
 
 def cut_formation_arts(
@@ -196,6 +292,7 @@ def load_cardfaces(
     manifest: str | Path = FORMATION_MANIFEST,
     *,
     names_from: str | Path | None = None,
+    support: bool | None = None,
 ) -> tuple[tuple[str, np.ndarray], ...]:
     """清单 → **库**（`(名字, 立绘块)`，按 cut_order）。
 
@@ -211,6 +308,10 @@ def load_cardfaces(
     （`assets/roster/<局指纹>.json`，由 `roster_names` 读出来的那一份），就用它的
     `names`，清单里那份留着当兼容。**清单仍然要给**：`frame`、`geometry` 与张数都住它那儿，
     而名字与块数必须一样多 —— 两处对不上就报错，不猜谁对。
+
+    **`support` 是右上那一格「助战干员」**（用户给的）：`True` 就把那一格的框切一块、以固定的名字 `SUPPORT_NAME`（「助战」）**接在库的最后一条**，名字与块数一起多一条。`None`（默认）读清单里的 `support` 那一项 —— **没有这一项就是「这一帧的助战位不进库」**。
+
+    它与「每行几张」是**同一个做法**：都由调用方/清单说，链不判那一格有没有人（判法见 `cut_support_art`）。清单的 `names` **不许**已经写着「助战」—— 那个名字是这一条的位置。
     """
     manifest = Path(manifest)
     if not manifest.is_file():
@@ -222,6 +323,13 @@ def load_cardfaces(
         if key not in record:
             raise KeyError(f"{manifest} 缺 {key!r}")
     counts = _check_geometry(record.get("geometry"), manifest)
+
+    if support is None:
+        support = record.get("support", False)
+    if not isinstance(support, bool):
+        raise TypeError(
+            f"{manifest} 的 support 要是布尔（助战那一格有没有人），收到 {support!r}：没有这一项就是「不进库」，不是「不知道」"
+        )
 
     frame_path = record["frame"]
     if not isinstance(frame_path, str) or not frame_path:
@@ -235,12 +343,21 @@ def load_cardfaces(
         if not isinstance(name, str) or not name:
             raise TypeError(f"{manifest} 的 names[{position}] 要是非空字符串，收到 {name!r}")
 
-    arts = cut_formation_arts(load_formation_page(REPO / frame_path), counts=counts)
+    page = load_formation_page(REPO / frame_path)
+    arts = cut_formation_arts(page, counts=counts)
     if len(names) != len(arts):
         raise ValueError(
             f"{manifest} 给了 {len(names)} 个名字，而编队页切出 {len(arts)} 块立绘："
             "对不上就是有卡位没有身份，而它在库里看起来仍然有一条"
         )
+    if support:
+        if SUPPORT_NAME in names:
+            raise ValueError(
+                f"{manifest} 的 names 里已经写着 {SUPPORT_NAME!r}：那个名字是**助战那一格**的位置，"
+                "库里的助战条由 support 那一项接上，不该由清单再报一次"
+            )
+        arts = arts + (cut_support_art(page),)
+        names = tuple(names) + (SUPPORT_NAME,)
     return tuple(zip(names, arts))
 
 def _names_from_roster(path: Path) -> tuple[str, ...]:
