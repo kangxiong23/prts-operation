@@ -17,7 +17,7 @@
         1260
       ],
       "source": "screenshots/run-05/编队1-0.png",
-      "source_sha256": "abb9447659154dbdbdc9d0149a184ea494d72c2ae5b3a0fc3e9f0d3a495d7cb5"
+      "source_sha256": "dbb0abd1841b07c02e2166255654a55563fbcb4a3c2eb39a7013831a49243385"
     },
     {
       "file": "编队2-0.png",
@@ -30,7 +30,7 @@
         1260
       ],
       "source": "screenshots/run-05/编队2-0.png",
-      "source_sha256": "9f3ac219888c4457e5c284525a70f1594da009b8522865881a0648c2ab6497e3"
+      "source_sha256": "078ac4c8ef79f5131bfcb92fc7749dd2a894a4d86bcd230666495c7589c839c1"
     },
     {
       "file": "编队1-1_备战席.png",
@@ -43,7 +43,7 @@
         220
       ],
       "source": "screenshots/run-05/编队1-1.png",
-      "source_sha256": "ec9e31948c29cef30c90e22226f00055944cea033acc9a5ebbf03a49c54b4761"
+      "source_sha256": "81d82736fcc2438603525588ae3bf93f7d4b1da9a4d150c8942d4d0423790877"
     },
     {
       "file": "编队2-1_备战席.png",
@@ -56,7 +56,7 @@
         220
       ],
       "source": "screenshots/run-05/编队2-1.png",
-      "source_sha256": "1ab88a07816082e38751c2b18dec653da5c87be8d0e4c4bd645a4f87ade4cff3"
+      "source_sha256": "a93f981e5835bd37e22e5a7ca83df342f8f8eccaaac4cac568109723fd56623d"
     }
   ]
 }
