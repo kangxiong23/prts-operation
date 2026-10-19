@@ -2,11 +2,13 @@
 
 **这两份脚本不是「顺手工具」**：9 条错口径就是从它们身上长出来的 —— `filehash.py` 从前
 对**所有**文件都打「LF 折算（口径）」，而搬夹具的人照着「口径」那一栏抄，PNG 也被折了 LF。
-所以这一份钉三件事：
+所以这一份钉四件事：
 
 1. **口径按后缀分**：`.png` 是磁盘原样、`.py` 是 LF 折算 —— 这是会响的那一条；
 2. **闸门的账分得清**：能核 / 核不到 / 描述串，**三种不许混**（核不到不判红，但不许被吞）；
-3. **闸门对不上就红**，而且报得出是哪一条、记的是什么、算出来是什么。
+3. **闸门对不上就红**，而且报得出是哪一条、记的是什么、算出来是什么；
+4. **「原始载荷」不许再叫 `raw_sha256`**：那三处（两张拼图 + 一张竖排重建）补上**自己说明
+   它哈希的是谁**的名字与同一层的路径键之后，要从「不在判据里」挪进「能核」—— 值一个不改。
 
 **它不跑全仓那一趟**（那要读 561 MB）：全仓那一趟是 `scripts/check_source_hashes.py` 的活。
 这里只在一棵**临时造的小仓**上跑。
@@ -193,16 +195,17 @@ def test_pixel_hashes_are_not_file_hashes() -> None:
 
 
 def test_a_field_that_does_not_say_whose_hash_it_is_is_listed_not_judged() -> None:
-    """字段名没写明「这是哪个文件的哈希」的（`raw_sha256` / `sheet_sha256`）⇒ **进账、不判红**。
+    """字段名没写明「这是哪个文件的哈希」的（`mystery_sha256` 这种）⇒ **进账、不判红**。
 
-    不判红不等于不看见：那几条会出现在 `undeclared` 里，跑闸门时会打出来。
+    补上 `拼图_sha256` / `sheet_sha256` 之后，「不在判据里」这一栏今天空了，**但这一栏
+    与它的机制留着**：新夹具再冒出名字含糊的字段时，它会出现在 `undeclared` 里、跑闸门
+    时被打出来。**不判红不等于不看见。**
     """
-    assert "raw_sha256" not in GATE.DECLARED
-    assert "sheet_sha256" not in GATE.DECLARED
+    assert "mystery_sha256" not in GATE.DECLARED
     root = _fresh("source_hash_undeclared")
     _write_json(
         root / "tests" / "帧样本" / "小批" / "index.json",
-        {"crops": [{"file": "a.png", "raw_sha256": "0" * 64}]},
+        {"crops": [{"file": "a.png", "mystery_sha256": "0" * 64}]},
     )
     report = GATE.audit(root)
     assert report["checked"] == 0
@@ -213,4 +216,70 @@ def test_a_field_that_does_not_say_whose_hash_it_is_is_listed_not_judged() -> No
 def test_the_gate_only_reads_tests_and_assets() -> None:
     """闸门只扫 `tests/` 与 `assets/` —— `data/` 是 gitignored 的中间产物，不是「记下来的事实」。"""
     assert GATE.ROOTS == ("tests", "assets")
+
+
+def test_a_sheet_hash_under_its_own_name_is_judged() -> None:
+    """**"接上网"的那一步**：`拼图_sha256` / `sheet_sha256` 一旦在 `DECLARED` 里，
+    记错就红、记对就进「能核」。
+
+    从前它们叫 `raw_sha256` / 根本没有路径键，于是只能躺在「不在判据里」——
+    **量得对不对，闸门一句话也说不了**。
+    """
+    assert GATE.CHANGED_IN_THIS_TURN == ("拼图_sha256", "sheet_sha256")
+    assert GATE.DECLARED["拼图_sha256"] == "拼图"
+    assert GATE.DECLARED["sheet_sha256"] == "sheet"
+
+    for field, key in (("拼图_sha256", "拼图"), ("sheet_sha256", "sheet")):
+        good = _with_sheet(_fresh("sheet_hash_" + field), key, field, hashlib.sha256(_payload()).hexdigest())
+        report = GATE.audit(good)
+        assert report["checked"] == 1, field
+        assert report["wrong"] == [], field
+        assert report["undeclared"] == [], field
+
+        bad = _with_sheet(_fresh("sheet_hash_" + field + "_bad"), key, field, "0" * 64)
+        report = GATE.audit(bad)
+        assert report["checked"] == 1, field
+        assert len(report["wrong"]) == 1, field
+        assert field in report["wrong"][0], field
+
+
+def _with_sheet(root: Path, key: str, field: str, value: str) -> Path:
+    """一棵小仓：`shots/shot.png` 是那张"拼图"，同一层里 `key` 指路径、`field` 记哈希。"""
+    _write_json(
+        root / "tests" / "帧样本" / "小批" / "index.json",
+        {"crops": [{"file": "a.png", key: "shots/shot.png", field: value}]},
+    )
+    return root
+
+
+def test_the_three_unnamed_hashes_now_land_in_the_account() -> None:
+    """**这一条在补映射之前是红的**：全仓那三处从前去 `undeclared`，不进 `checked`。
+
+    今天它们**逐条落进「能核」且对上** —— 只算那 3 份 PNG（合计约 143 KB），
+    **不跑全仓那一趟**（561 MB）。三处的名字与路径键都在夹具里看得见，值一个没改。
+    """
+    found = {}
+    for path, data, trail, field, value in GATE.entries(REPO):
+        if field not in GATE.CHANGED_IN_THIS_TURN:
+            continue
+        where = "%s %s" % (path.relative_to(REPO), ".".join(trail))
+        found[where] = GATE.source_of(data, trail, path) + (value,)
+    assert len(found) == 3, "今天仓里恰好三处：" + repr(sorted(found))
+    for where, (source, state, value) in found.items():
+        assert state == "文件", where
+        assert value == GATE.expected_hash(source), where
+
+
+def test_the_name_raw_no_longer_holds_a_payload_hash() -> None:
+    """**`raw` 在这个仓里指"按磁盘原样算"这个口径**（`hash_conventions.py`），
+    「原始载荷」不许再占这个名字：今天 76 份 JSON 里 `raw_sha256` 一处不剩。
+
+    改名只动了字段名与同一层的路径键，**三个值一个没改**（值本身由上面那条用例核）。
+    """
+    counts = {}
+    for _path, _data, _trail, field, _value in GATE.entries(REPO):
+        counts[field] = counts.get(field, 0) + 1
+    assert "raw_sha256" not in counts
+    assert counts.get("拼图_sha256") == 2
+    assert counts.get("sheet_sha256") == 1
 
